@@ -1,0 +1,10 @@
+# Private project context, source material, and generated evidence.
+/Context/
+/tmp/
+
+# Local credentials and machine-specific files.
+.env
+.env.*
+.sunnify-context-engine-id
+.verification-venv/
+__pycache__/
