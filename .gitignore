@@ -5,6 +5,7 @@
 # Local credentials and machine-specific files.
 .env
 .env.*
+!.env.example
 .sunnify-context-engine-id
 .verification-venv/
 __pycache__/
