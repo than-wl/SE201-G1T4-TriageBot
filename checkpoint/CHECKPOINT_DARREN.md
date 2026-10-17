@@ -51,7 +51,7 @@ Keep the answer-key mapping in a separate evaluation-only record. Never place it
 ## How to do it
 
 1. Read `README.md` and `Context/README.md`.
-2. Use the pinned OWASP Benchmark instructions in `Context/README.md` if the local benchmark is available.
+2. Use the pinned OWASP Benchmark instructions in `README.md` (Setup) if the local benchmark is available.
 3. Inspect `Context/tmp/semgrep-owasp.json`, or reproduce the Semgrep run if needed.
 4. Extract the benchmark case ID from each finding's source path.
 5. Normalise each relevant finding into the shared alert structure.

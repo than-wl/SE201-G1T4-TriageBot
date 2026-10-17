@@ -147,7 +147,7 @@ Do not commit the full benchmark repository or the full raw Semgrep JSON.
 
 ## Steps
 
-1. Clone the pinned OWASP Benchmark version using `Context/README.md`.
+1. Clone the pinned OWASP Benchmark version using `README.md` (Setup).
 2. Locate `expectedresults-1.2.csv` and inspect its fields.
 3. Read the existing Semgrep JSON from `Context/tmp/semgrep-owasp.json`, or reproduce it with Semgrep 1.178.0 and the `p/java` ruleset if necessary.
 4. Extract the benchmark case ID from each Semgrep finding's source path.

@@ -201,7 +201,7 @@ Before implementation continues, the team should agree on:
 ## Source documents
 
 - `Context/SE201_2026T1_project_v1.02.pdf` — project brief and checkpoint requirements.
-- `Context/G1T4 Proposal.pdf` — submitted project proposal and checkpoint targets.
-- `Context/FEASIBILITY_CHECK_REPORT.md` — current feasibility and council-test evidence.
-- `Context/OPENROUTER_SMOKE_REPORT.md` — OpenRouter five-case smoke-test evidence.
+- `docs/proposal/G1T4_Proposal.pdf` — submitted project proposal and checkpoint targets.
+- `docs/feasibility/FEASIBILITY_CHECK_REPORT.md` — current feasibility and council-test evidence.
+- `docs/feasibility/OPENROUTER_SMOKE_REPORT.md` — OpenRouter five-case smoke-test evidence.
 - `Context/Codex Handoff.md` — project handoff and current operating context.

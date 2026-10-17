@@ -22,7 +22,7 @@ Status: **PASS WITH CHANGES**. The proposed scanner-to-model-to-council flow is 
 - Raw result: `Context/tmp/feasibility/20261002T112544Z/results.json`
 - Raw role responses: the three `*-raw.json` files in that directory
 - Reproducible check: `verification/feasibility_checks.py`
-- Earlier scanner/API evidence: `Context/OPENROUTER_SMOKE_REPORT.md`
+- Earlier scanner/API evidence: `docs/feasibility/OPENROUTER_SMOKE_REPORT.md`
 
 ## Proposal decision
 

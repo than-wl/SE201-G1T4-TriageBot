@@ -40,7 +40,7 @@ Compare these configurations where the data is available:
 
 ## How to do it
 
-1. Read `README.md`, `CHECKPOINT_BRIEF.md`, and the proposal context under `Context/`.
+1. Read `README.md`, `CHECKPOINT_BRIEF.md`, and the proposal under `docs/proposal/`.
 2. Define one input format for answer-key labels, scanner results, model results, and validated results.
 3. Keep the answer key in evaluation-only code and files. Never include it in prompts or common evidence.
 4. Ensure B and C use the same cases and equivalent evidence access.

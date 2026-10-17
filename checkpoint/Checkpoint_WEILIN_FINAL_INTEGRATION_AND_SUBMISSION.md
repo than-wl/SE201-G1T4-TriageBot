@@ -104,7 +104,7 @@ py -m venv .verification-venv
 
 The offline self-test must pass before any paid model call. It should reject fabricated quotes, wrong file/line citations, and malformed JSON.
 
-If the final code needs the OWASP Benchmark, clone the external repository locally using the pinned instructions in `Context/README.md`. The benchmark repository is intentionally not committed because it is large and includes the answer key.
+If the final code needs the OWASP Benchmark, clone the external repository locally using the pinned instructions in `README.md` (Setup). The benchmark repository is intentionally not committed because it is large and includes the answer key.
 
 Keep the local benchmark, answer key, raw Semgrep output, raw model responses, and generated results under ignored `Context/tmp/`. Never send the answer key to an AI prompt.
 

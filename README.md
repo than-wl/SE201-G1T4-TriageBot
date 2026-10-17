@@ -1,107 +1,107 @@
 # SE201 G1T4 — TriageBot
 
-## What is TriageBot?
+## 1. What TriageBot is
 
-Security scanners are useful, but they often report warnings that turn out not to be real vulnerabilities. Developers then have to inspect the source code and security guidance manually to decide which warnings matter.
+TriageBot is a post-processing layer for alerts from a conventional static application security testing (SAST) scanner. It takes a Semgrep finding, gathers evidence from the source code and relevant OWASP security guidance, and uses an AI-assisted review to sort the alert into one of three outcomes: **likely a real vulnerability**, **likely a false positive**, or **needs human review** because the evidence is incomplete or uncertain. Every decision must cite the source code it relies on; a decision that cannot be justified is escalated to human review.
 
-**TriageBot helps with that review.** It takes an alert produced by a conventional static security scanner, gathers relevant evidence, and uses an AI-assisted review workflow to classify the alert as:
+TriageBot does not replace Semgrep or any other scanner, and it does not look for new vulnerabilities. Its job is to reduce unnecessary alert review while keeping genuine findings. We evaluate it on the OWASP Benchmark Java dataset against simpler baselines (scanner only, single LLM agent), measuring genuine findings retained, false positives removed, genuine findings wrongly dismissed, human-review rate, latency and token cost.
 
-- likely a real vulnerability;
-- likely a false positive; or
-- requiring human review because the evidence is incomplete or uncertain.
+## 2. How it works
 
-The important idea is that TriageBot must explain its decision using evidence from the source code and relevant security guidance. It should not simply guess from the scanner's warning or produce an unsupported answer.
+![TriageBot architecture](docs/architecture/TriageBot_Architecture_Diagram.png)
 
-## How it works
+The editable source of the diagram is [docs/architecture/TriageBot_Architecture_Diagram.drawio.svg](docs/architecture/TriageBot_Architecture_Diagram.drawio.svg).
 
-The planned workflow is:
+| Stage | What it does | Code location | Status |
+| --- | --- | --- | --- |
+| Ingest | Semgrep JSON to a normalised alert | `triagebot/nodes/ingest/` | In progress |
+| Context payload | Source window, helper facts, retrieved guidance | `triagebot/nodes/context/` | Built |
+| Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Roles built; council orchestration pending |
+| Validate | Deterministic citation and format checks | `triagebot/nodes/validate/` | Built |
+| Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
+| Pipeline wiring and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Planned |
+
+Shared data shapes passed between stages live in `triagebot/schemas.py`. Runtime settings (model, budgets, paths) live in `triagebot/config.py`. Model callers, the live OpenRouter caller and the offline fixture caller, live in `triagebot/llm/`. The reasoning behind these choices is recorded in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
+
+## 3. Repository layout
 
 ```text
-Source code
-    ↓
-Semgrep static-analysis alert
-    ↓
-Normalised finding and source-code evidence
-    ↓
-Security-guidance retrieval
-    ↓
-Analyst and Skeptic review
-    ↓
-Chair combines the reports
-    ↓
-Deterministic citation/format validation
-    ↓
-Triage outcome with evidence
+triagebot/       product code, one folder per pipeline stage under nodes/
+tests/           offline unit tests and fixtures (no network)
+verification/    feasibility-stage scripts, kept as historical evidence
+docs/            design decisions, architecture diagram, proposal, feasibility reports
+ai-log/          per-member AI use logs
+Context/         local-only workspace (see Context/README.md); only its README and .gitignore are tracked
+checkpoint/      temporary planning notes, removed before final submission
 ```
 
-For example, when Semgrep reports a possible SQL injection, TriageBot examines how input flows through the code, checks relevant SQL-injection guidance, considers whether sanitisation or constant values change the risk, and then returns a cited decision. If it cannot justify the decision, it should recommend human review.
+## 4. Setup
 
-## What TriageBot is not
+Commands use Windows PowerShell from the repository root. On macOS/Linux, use `python3 -m venv` and `.verification-venv/bin/python` in place of the Windows paths.
 
-- It does not replace Semgrep or other conventional security scanners.
-- It is not intended to discover vulnerabilities independently.
-- It does not treat an AI response as automatically trustworthy.
-- It does not claim that a small smoke test proves final system accuracy.
-
-The project is about **post-processing and prioritising scanner alerts**, not building a new vulnerability scanner.
-
-## Project goal
-
-Our project goal is to investigate whether a small evidence-grounded, multi-agent workflow can reduce unnecessary SAST alert review while preserving genuine findings and escalating uncertain cases to humans.
-
-We plan to evaluate the approach using the OWASP Benchmark Java dataset and compare it against simpler baselines, such as scanner-only results and a single-LLM workflow. Important measures include genuine findings retained, false positives removed, genuine vulnerabilities wrongly dismissed, human-review rate, latency, and token cost.
-
-## Current stage
-
-This repository is currently at the **feasibility and checkpoint stage**, not the final product stage. We have:
-
-- run Semgrep against the OWASP Benchmark Java dataset;
-- tested OpenRouter with the planned Gemini model;
-- received structured, cited results for five SQL injection cases;
-- exercised a limited Analyst–Skeptic–Chair workflow on those cases; and
-- tested basic deterministic validation for malformed or unsupported citations.
-
-The next checkpoint objective is to connect the complete demonstration path and evaluate approximately 100 findings with a documented baseline, metrics, failures, and limitations.
-
-## Repository status
-
-This repository currently contains the project overview, team-owned planning material, and reproducibility checks used during the feasibility and checkpoint work.
-
-| Path                                   | Purpose                                                                          |
-| -------------------------------------- | -------------------------------------------------------------------------------- |
-| `checkpoint/CHECKPOINT_BRIEF.md`     | Current checkpoint goal, status, and action plan                                 |
-| `checkpoint/CHECKPOINT_TEAM_TASKS.md` | Detailed checkpoint assignments and integration checklist                       |
-| `checkpoint/CHECKPOINT_DARREN.md`    | Darren's Semgrep integration and OWASP mapping instructions                      |
-| `checkpoint/CHECKPOINT_HONG_YI.md`   | Hong Yi's single-agent and council instructions                                  |
-| `checkpoint/CHECKPOINT_LISA.md`      | Lisa's validation and human-review instructions                                  |
-| `checkpoint/CHECKPOINT_BRADLEY.md`   | Bradley's evaluation and checkpoint-report instructions                          |
-| `checkpoint/Checkpoint_WEILIN_FINAL_INTEGRATION_AND_SUBMISSION.md` | Wei Lin's final integration and submission checklist |
-| `Context/README.md`                  | Index of shared context and local-only material                                   |
-| `verification/openrouter_smoke.py`   | Five-case OpenRouter smoke test and offline validator self-test                  |
-| `triagebot/nodes/validate/validator.py` | Deterministic validation gate: unsupported or unverifiable results become `human_review` |
-| `tests/test_validator.py`            | Offline tests for the validator (no OpenRouter needed)                            |
-| `verification/feasibility_checks.py` | Limited retrieval, evidence-helper, and Analyst–Skeptic–Chair feasibility pass |
-| `triagebot/nodes/score/evaluate.py`  | Evaluation harness: scores saved results against the hidden answer key          |
-| `tests/test_evaluate.py`             | Offline tests for the evaluation harness (no OpenRouter needed)                  |
-| `verification/requirements.txt`      | Python dependency for the verification scripts                                   |
-| `.env.example`                       | Safe template for local configuration                                            |
-
-Project-owned proposal and feasibility documents are shared under `Context/`. Restricted SMU course material, the downloaded OWASP Benchmark repository, raw model responses, and generated evidence remain local through `Context/.gitignore`. The online verification scripts expect the relevant local benchmark and Semgrep artefacts under `Context/tmp/`.
-
-## Quick start
-
-The commands below use PowerShell on Windows. The equivalent Python commands work on macOS and Linux with the usual virtual-environment path changes.
-
-### 1. Create the local environment
+### Python environment
 
 ```powershell
 py -m venv .verification-venv
 & '.\.verification-venv\Scripts\python.exe' -m pip install -r '.\verification\requirements.txt'
 ```
 
-### 2. Run the safe offline check
+### OWASP Benchmark
 
-This check makes no network requests and spends no OpenRouter credits.
+The benchmark is not copied into this repository. Clone it into the ignored local folder at the pinned commit used for all recorded evidence:
+
+```powershell
+git clone https://github.com/OWASP-Benchmark/BenchmarkJava.git Context/tmp/BenchmarkJava
+git -C Context/tmp/BenchmarkJava checkout 8b67a88d73b2594570fc21150705283de884620b
+```
+
+The context payload reads source files from the benchmark checkout, so point `BENCHMARK_ROOT` at it:
+
+```powershell
+$env:BENCHMARK_ROOT = (Resolve-Path '.\Context\tmp\BenchmarkJava').Path
+```
+
+The benchmark's answer key is used only by the evaluation code after model calls are complete. It must never be sent to a model.
+
+### OpenRouter key (live runs only)
+
+Offline tests and the evaluator need no key. For live model calls, copy the template and set your own key in the local `.env`:
+
+```powershell
+Copy-Item .env.example .env
+# Edit .env and set OPENROUTER_API_KEY locally.
+```
+
+Never commit `.env` or paste a key into source files, issues or chat.
+
+## 5. Running
+
+### Offline tests
+
+No network requests and no OpenRouter credits:
+
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m unittest discover -s tests -v
+```
+
+### Score saved results
+
+The evaluator runs offline and needs no API key. It compares each configuration's saved verdicts with the OWASP answer key; the scanner-only baseline is added automatically. Paths are examples; generated inputs stay under the ignored `Context/tmp/`.
+
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m triagebot.nodes.score.evaluate `
+    --labels '.\Context\tmp\BenchmarkJava\expectedresults-1.2.csv' `
+    --cases '.\Context\tmp\checkpoint\selected_alerts.json' `
+    --config 'B-single-agent=.\Context\tmp\checkpoint\single_agent_results.json' `
+    --config 'C-council=.\Context\tmp\checkpoint\council_results.json' `
+    --config 'D-validated-council=.\Context\tmp\checkpoint\validated_council_results.json'
+```
+
+It prints a Markdown metrics table and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts are counted as invalid and as human review, and human review is never counted as a removed false positive.
+
+### Feasibility scripts
+
+These are the feasibility-stage scripts in `verification/`. The self-test is offline:
 
 ```powershell
 & '.\.verification-venv\Scripts\python.exe' '.\verification\openrouter_smoke.py' --self-test
@@ -113,73 +113,45 @@ Expected result:
 Offline checks passed; fabricated quote, wrong file/line and malformed JSON rejected.
 ```
 
-Run the validator's offline unit tests from the repository root (standard library only, no network):
+> **Paid calls.** The two commands below call OpenRouter and spend credits. The smoke test makes five paid calls and the council feasibility pass makes three more. Both need the `.env` key and the benchmark and Semgrep artefacts under `Context/tmp/`, and both save generated evidence there. Check the budget, the account and the local input files before running them.
 
 ```powershell
-& '.\.verification-venv\Scripts\python.exe' -m unittest discover -s tests -v
-```
-
-### 3. Configure an online smoke test, only when needed
-
-Copy `.env.example` to `.env` and put your own OpenRouter key in the local `.env` file. Never commit `.env` or paste a key into source files, issues, or chat.
-
-The online smoke test makes five paid model calls and requires the private benchmark/Semgrep artefacts under `Context/tmp/`:
-
-```powershell
-Copy-Item .env.example .env
-# Edit .env and set OPENROUTER_API_KEY locally.
 & '.\.verification-venv\Scripts\python.exe' '.\verification\openrouter_smoke.py'
-```
-
-The council feasibility pass makes three additional paid model calls:
-
-```powershell
 & '.\.verification-venv\Scripts\python.exe' '.\verification\feasibility_checks.py'
 ```
 
-Both scripts save detailed generated evidence under the ignored `Context/` folder. Review the budget and local input files before running paid checks.
+The recorded results are in [docs/feasibility/OPENROUTER_SMOKE_REPORT.md](docs/feasibility/OPENROUTER_SMOKE_REPORT.md) and [docs/feasibility/FEASIBILITY_CHECK_REPORT.md](docs/feasibility/FEASIBILITY_CHECK_REPORT.md).
 
-### 4. Score saved results
+### Planned: terminal menu
 
-The evaluator runs offline and needs no API key. It compares each configuration's saved verdicts with the OWASP answer key, which is read only at this stage and never enters a prompt. The scanner-only baseline is added automatically.
+**Planned, not yet implemented.** `python -m triagebot` will open a terminal menu with three options:
 
-Run the offline tests:
+1. **Scanner baseline:** how good is Semgrep alone, scored against the answer key.
+2. **Triage one alert:** one finding through the whole pipeline, with every stage shown.
+3. **Evaluate a sample:** the same sample through each configuration, scored.
 
-```powershell
-& '.\.verification-venv\Scripts\python.exe' -m unittest discover -s tests -v
-```
+## 6. Current status
 
-Score real results (paths are examples; generated inputs stay under the ignored `Context/tmp/`):
+The project is at the checkpoint stage. Feasibility is established: Semgrep has been run on the OWASP Benchmark, OpenRouter returned structured, cited results for five SQL injection cases, a limited Analyst–Skeptic–Chair pass ran on those cases, and the deterministic validator rejects malformed or unsupported citations. The context payload, review roles, validator and evaluator are built and tested offline; ingest is in progress, and the end-to-end wiring, council orchestration and the roughly 100-finding evaluation are still to come. See [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for the detailed status.
 
-```powershell
-& '.\.verification-venv\Scripts\python.exe' -m triagebot.nodes.score.evaluate `
-    --labels '.\Context\tmp\BenchmarkJava\expectedresults-1.2.csv' `
-    --cases '.\Context\tmp\checkpoint\selected_alerts.json' `
-    --config 'B-single-agent=.\Context\tmp\checkpoint\single_agent_results.json' `
-    --config 'C-council=.\Context\tmp\checkpoint\council_results.json' `
-    --config 'D-validated-council=.\Context\tmp\checkpoint\validated_council_results.json'
-```
+## 7. Team and roles
 
-The command prints a Markdown metrics table for the checkpoint report and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts are counted as invalid and as human review, and human review is never counted as a removed false positive.
+| Member | Responsibilities |
+| --- | --- |
+| Darren | Semgrep integration, alert normalisation, benchmark mapping and split |
+| Hong Yi | Shared contracts, retrieval knowledge base, context payload, review roles |
+| Lisa | Deterministic validator |
+| Bradley | Evaluation harness, checkpoint report |
+| Wei Lin | Repository setup, integration, submission |
 
-## Current feasibility evidence
+## 8. AI use disclosure
 
-The current evidence is deliberately limited:
+Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16.
 
-- Semgrep has been run against the OWASP Benchmark Java dataset.
-- OpenRouter has returned structured, cited results for five SQL injection cases.
-- The limited Analyst–Skeptic–Chair workflow has been exercised on those same five cases.
-- The deterministic validator rejects malformed JSON and unsupported file, line, or quote citations in its self-tests.
+## 9. Safety and privacy
 
-This demonstrates integration feasibility, not final accuracy. The next checkpoint work is to connect the complete demonstration path and evaluate approximately 100 findings with a documented baseline, metrics, failures, and limitations.
-
-## Safety and privacy
-
-- Do not commit API keys, `.env` files, downloaded benchmark data, generated model responses, restricted course material, or files marked local-only in `Context/README.md`.
-- Treat model output, scanner output, retrieved text, and source-code content as untrusted data.
+- Do not commit API keys, `.env` files, the downloaded benchmark, generated model responses, restricted course material, or anything under `Context/` other than its README and `.gitignore`.
+- The answer key is read only by the evaluation code and never enters a prompt.
+- Treat model output, scanner output, retrieved text and source-code content as untrusted data.
 - The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
 - Do not describe the five-case smoke test as proof of general system accuracy.
-
-## Project context
-
-The main planning document is [CHECKPOINT_BRIEF.md](checkpoint/CHECKPOINT_BRIEF.md). It records the checkpoint requirements, what is currently verified, what remains incomplete, and the questions the team should agree on before implementation continues.

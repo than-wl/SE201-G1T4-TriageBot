@@ -48,7 +48,7 @@ OWASP Benchmark source
   -> scoring against the hidden answer key (score, evaluation only)
 ```
 
-Product code lives in `triagebot/`, one folder per pipeline node. Shared JSON contracts between components are defined in `triagebot/schemas.py`. The original feasibility scripts remain in `verification/` as the record of the feasibility stage (see `doc/DESIGN_DECISIONS.md`, decision 9).
+Product code lives in `triagebot/`, one folder per pipeline node. Shared JSON contracts between components are defined in `triagebot/schemas.py`. The original feasibility scripts remain in `verification/` as the record of the feasibility stage (see `docs/DESIGN_DECISIONS.md`, decision 9).
 
 | Component | Owner | Location | Status |
 | --- | --- | --- | --- |
@@ -75,7 +75,7 @@ Product code lives in `triagebot/`, one folder per pipeline node. Shared JSON co
 
 ## 5. Test method
 
-**Dataset.** OWASP Benchmark Java v1.2, pinned to commit `8b67a88d73b2594570fc21150705283de884620b` (see `Context/README.md`). The official answer key labels 2,740 cases: 1,415 true vulnerabilities and 1,325 false positives.
+**Dataset.** OWASP Benchmark Java v1.2, pinned to commit `8b67a88d73b2594570fc21150705283de884620b` (see `README.md`, Setup). The official answer key labels 2,740 cases: 1,415 true vulnerabilities and 1,325 false positives.
 
 **Scanner.** Semgrep 1.178.0 with the `p/java` ruleset.
 
