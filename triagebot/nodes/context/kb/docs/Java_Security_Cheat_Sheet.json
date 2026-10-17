@@ -1,0 +1,301 @@
+{
+ "doc": "Java_Security_Cheat_Sheet",
+ "title": "Java Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#001",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Injection Prevention in Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "This section aims to provide tips to handle Injection in Java application code.\n\nSample code used in tips is located here."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#002",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Injection Prevention in Java > What is Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Injection in OWASP Top 10 is defined as following:\n\nConsider anyone who can send untrusted data to the system, including external users, internal users, and administrators."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#003",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Injection Prevention in Java > General advice to prevent Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "The following point can be applied, in a general way, to prevent Injection issue:\n\nApply Input Validation (using allowlist approach) combined with Output Sanitizing+Escaping on user input/output.\n\nIf you need to interact with system, try to use API features provided by your technology stack (Java / .Net / PHP...) instead of building command.\n\nAdditional advice is provided on this cheatsheet."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#004",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Examples in this section will be provided in Java technology (see Maven project associated) but advice is applicable to others technologies like .Net / PHP / Ruby / Python..."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#005",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > SQL > Symptom",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Injection of this type occur when the application uses untrusted user input to build an SQL query using a String and execute it."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#006",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > SQL > How to prevent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Use Query Parameterization in order to prevent injection."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#007",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > SQL > Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\n/*No DB framework used here in order to show the real use of\n  Prepared Statement from Java API*/\n/*Open connection with H2 database and use it*/\nClass.forName(\"org.h2.Driver\");\nString jdbcUrl = \"jdbc:h2:file:\" + new File(\".\").getAbsolutePath() + \"/target/db\";\ntry (Connection con = DriverManager.getConnection(jdbcUrl)) {\n\n    /* Sample A: Select data using Prepared Statement*/\n    String query = \"select * from color where friendly_name = ?\";\n    List<String> colors = new ArrayList<>();\n    try (PreparedStatement pStatement = con.prepareStatement(query)) {\n        pStatement.setString(1, \"yellow\");\n        try (ResultSet rSet = pStatement.executeQuery()) {\n            while (rSet.next()) {\n                colors.add(rSet.getString(1));\n            }\n        }\n    }\n\n    /* Sample B: Insert data using Prepared Statement*/\n    query = \"insert into color(friendly_name, red, green, blue) values(?, ?, ?, ?)\";\n    int insertedRecordCount;\n    try (PreparedStatement pStatement = con.prepareStatement(query)) {\n        pStatement.setString(1, \"orange\");\n        pStatement.setInt(2, 239);\n        pStatement.setInt(3, 125);\n        pStatement.setInt(4, 11);\n        insertedRecordCount = pStatement.executeUpdate();\n    }\n\n   /* Sample C: Update data using Prepared Statement*/\n    query = \"update color set blue = ? where friendly_name = ?\";\n    int updatedRecordCount;\n    try (PreparedStatement pStatement = con.prepareStatement(query)) {\n        pStatement.setInt(1, 10);\n        pStatement.setString(2, \"orange\");\n        updatedRecordCount = pStatement.executeUpdate();\n    }\n\n   /* Sample D: Delete data using Prepared Statement*/\n    query = \"delete from color where friendly_name = ?\";\n    int deletedRecordCount;\n    try (PreparedStatement pStatement = con.prepareStatement(query)) {\n        pStatement.setString(1, \"orange\");\n        deletedRecordCount = pStatement.executeUpdate();\n    }\n\n}\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#008",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > JPA > Symptom",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Injection of this type occur when the application uses untrusted user input to build a JPA query using a String and execute it. It's quite similar to SQL injection but here the altered language is not SQL but JPA QL."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#009",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > JPA > How to prevent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Use Java Persistence Query Language Query Parameterization in order to prevent injection."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#010",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > JPA > Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\nEntityManager entityManager = null;\ntry {\n    /* Get a ref on EntityManager to access DB */\n    entityManager = Persistence.createEntityManagerFactory(\"testJPA\").createEntityManager();\n\n    /* Define parameterized query prototype using named parameter to enhance readability */\n    String queryPrototype = \"select c from Color c where c.friendlyName = :colorName\";\n\n    /* Create the query, set the named parameter and execute the query */\n    Query queryObject = entityManager.createQuery(queryPrototype);\n    Color c = (Color) queryObject.setParameter(\"colorName\", \"yellow\").getSingleResult();\n\n} finally {\n    if (entityManager != null && entityManager.isOpen()) {\n        entityManager.close();\n    }\n}\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#011",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Operating System > Symptom",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Injection of this type occur when the application uses untrusted user input to build an Operating System command using a String and execute it."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#012",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Operating System > How to prevent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Use technology stack API in order to prevent injection."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#013",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Operating System > Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\n/* The context taken is, for example, to perform a PING against a computer.\n* The prevention is to use the feature provided by the Java API instead of building\n* a system command as String and execute it */\nInetAddress host = InetAddress.getByName(\"localhost\");\nvar reachable = host.isReachable(5000);\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#014",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > XML: XPath Injection > Symptom",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Injection of this type occur when the application uses untrusted user input to build a XPath query using a String and execute it."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#015",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > XML: XPath Injection > How to prevent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Use XPath Variable Resolver in order to prevent injection."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#016",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > XML: XPath Injection > Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Variable Resolver implementation.\n\n```\n/**\n * Resolver in order to define parameter for XPATH expression.\n *\n */\npublic class SimpleVariableResolver implements XPathVariableResolver {\n\n    private final Map<QName, Object> vars = new HashMap<QName, Object>();\n\n    /**\n     * External methods to add parameter\n     *\n     * @param name Parameter name\n     * @param value Parameter value\n     */\n    public void addVariable(QName name, Object value) {\n        vars.put(name, value);\n    }\n\n    /**\n     * {@inheritDoc}\n     *\n     * @see javax.xml.xpath.XPathVariableResolver#resolveVariable(javax.xml.namespace.QName)\n     */\n    public Object resolveVariable(QName variableName) {\n        return vars.get(variableName);\n    }\n}\n```\n\nCode using it to perform XPath query.\n\n```\n/*Create a XML document builder factory*/\nDocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();\n\n/*Disable External Entity resolution for different cases*/\n//Do not performed here in order to focus on variable resolver code\n//but do it for production code !\n\n/*Load XML file*/\nDocumentBuilder builder = dbf.newDocumentBuilder();\nDocument doc = builder.parse(new File(\"src/test/resources/SampleXPath.xml\"));\n\n/* Create and configure parameter resolver */\nString bid = \"bk102\";\nSimpleVariableResolver variableResolver = new SimpleVariableResolver();\nvariableResolver.addVariable(new QName(\"bookId\"), bid);\n\n/*Create and configure XPATH expression*/\nXPath xpath = XPathFactory.newInstance().newXPath();\nxpath.setXPathVariableResolver(variableResolver);\nXPathExpression xPathExpression = xpath.compile(\"//book[@id=$bookId]\");\n\n/* Apply expression on XML document */\nObject nodes = xPathExpression.evaluate(doc, XPathConstants.NODESET);\nNodeList nodesList = (NodeList) nodes;\nElement book = (Element)nodesList.item(0);\nvar containsRalls = book.getTextContent().contains(\"Ralls, Kim\");\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#017",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > HTML/JavaScript/CSS > Symptom",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Injection of this type occur when the application uses untrusted user input to build an HTTP response and sent it to browser."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#018",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Use context-specific output encoding when displaying untrusted text. When the application intentionally accepts HTML markup, use an HTML sanitization policy for the permitted elements and attributes. Input validation enforces business rules; it does not replace these XSS controls. See the XSS Prevention Cheat Sheet for HTML, attribute, JavaScript, and CSS context requirements."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#019",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > HTML/JavaScript/CSS > Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\n// Illustrative business validation; output still needs the appropriate XSS control.\nString userInput = \"You user login is owasp-user01\";\n\n/* First we check that the value contains only expected character*/\nif (!Pattern.matches(\"[a-zA-Z0-9\\\\s\\\\-]{1,50}\", userInput))\n{\n    return false;\n}\n\n// Plain text for an ordinary HTML body position, such as the content of a div.\nString encodedText = Encode.forHtml(userInput);\n\n// Allowed markup for an HTML body position; not for attributes, script, or style.\nString outputToUser = \"You <p>user login</p> is <strong>owasp-user01</strong>\";\noutputToUser += \"<script>alert(22);</script><img src='#' onload='javascript:alert(23);'>\";\n\n/* Create a sanitizing policy that only allow tag '<p>' and '<strong>'*/\nPolicyFactory policy = new HtmlPolicyBuilder().allowElements(\"p\", \"strong\").toFactory();\n\n/* Sanitize the output that will be sent to user*/\nString safeOutput = policy.sanitize(outputToUser);\n\n/* Keep the permitted markup: encoding this whole fragment would display tags as text. */\nString finalSafeOutputExpected = \"You <p>user login</p> is <strong>owasp-user01</strong>\";\nif (!finalSafeOutputExpected.equals(safeOutput))\n{\n    return false;\n}\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#020",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > HTML/JavaScript/CSS > References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "XSS\n\nOWASP Java HTML Sanitizer\n\nOWASP Java Encoder\n\nJava RegEx"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#021",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > LDAP",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "A dedicated cheatsheet has been created."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#022",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > NoSQL > Symptom",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Injection of this type occur when the application uses untrusted user input to build a NoSQL API call expression."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#023",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > NoSQL > How to prevent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Validate the expected input type, length, and business format, then use the driver's structured query API. Do not concatenate untrusted values into query strings or accept client-supplied query/operator objects. MongoDB's driver guidance distinguishes literal values built through typed APIs from JSON or JavaScript that is parsed as query syntax. A blacklist of punctuation is not needed for the string equality query below. See the NoSQL Security Cheat Sheet for broader controls."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#024",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > NoSQL > Example - MongoDB",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Assume collection is an application-configured MongoCollection<Document>. This example uses the Java driver's equality filter builder with a string value; the 50-character limit is an illustrative business rule, not the injection defense.\n\n```\nString userInput = \"Brooklyn\";\nif (userInput == null || userInput.length() > 50) {\n    throw new IllegalArgumentException(\"Invalid borough\");\n}\n\n// Keep the field name fixed and the input as a string value.\nBson expression = Filters.eq(\"borough\", userInput);\nFindIterable<Document> restaurants = collection.find(expression);\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#025",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > NoSQL > References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Testing for NoSQL injection\n\nSQL and NoSQL Injection\n\nNo SQL, No Injection?"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#026",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Log Injection > Symptom",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Log Injection occurs when an application includes untrusted data in an application log message (e.g., an attacker can cause an additional log entry that looks like it came from a completely different user, if they can inject CRLF characters in the untrusted data). More information about this attack is available on the OWASP Log Injection page."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#027",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Log Injection > How to prevent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "To prevent an attacker from writing malicious content into the application log, apply defenses such as:\n\nUse structured log formats, such as JSON, instead of unstructured text formats. Unstructured formats are susceptible to Carriage Return (CR) and Line Feed (LF) injection (see CWE-93).\n\nLimit the size of the user input value used to create the log message.\n\nMake sure all XSS defenses are applied when viewing log files in a web browser."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#028",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Log Injection > Example using Log4j Core 2",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "The recommended logging policy for a production environment is sending logs to a network socket using the structured JSON Template Layout introduced in Log4j 2.14.0 and truncate string values longer than 500 characters using the maxStringLength configuration attribute. The truncation suffix is appended after this limit; this does not cap the encoded byte size or the total JSON document size:\n\n```\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Configuration xmlns=\"https://logging.apache.org/xml/ns\"\n               xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n               xsi:schemaLocation=\"\n                   https://logging.apache.org/xml/ns\n                   https://logging.apache.org/xml/ns/log4j-config-2.xsd\">\n  <Appenders>\n    <Socket name=\"SOCKET\"\n            host=\"localhost\"\n            port=\"12345\">\n      <!-- Truncate strings longer than 500 characters, then append the truncation suffix -->\n      <JsonTemplateLayout maxStringLength=\"500\"\n                          nullEventDelimiterEnabled=\"true\"/>\n    </Socket>\n  </Appenders>\n  <Loggers>\n    <Root level=\"DEBUG\">\n      <AppenderRef ref=\"SOCKET\"/>\n    </Root>\n  </Loggers>\n</Configuration>\n```\n\nSee Integration with service-oriented architectures on Log4j website for more tips.\n\nUsage of the logger at code level:\n\n```\nimport org.apache.logging.log4j.LogManager;\nimport org.apache.logging.log4j.Logger;\n...\n// Most common way to declare a logger\nprivate static final Logger logger = LogManager.getLogger();\n// GOOD!\n//\n// Use parameterized logging to add user data to a message\n// The pattern should be a compile-time constant\nlogger.warn(\"Login failed for user {}.\", username);\n// BAD!\n//\n// Don't mix string concatenation and parameters\n// If `username` contains `{}`, the exception will leak into the message\nlogger.warn(\"Failure for user \" + username + \" and role {}.\", role, ex);\n...\n```\n\nSee Log4j API Best Practices for more information."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#029",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Log Injection > Example using Logback",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "The recommended logging policy for a production environment is using the structured JsonEncoder introduced in Logback 1.3.8. In the example below, Logback is configured to roll on 10 log files of 5 MiB each:\n\n```\n<?xml version=\"1.0\" encoding=\"UTF-8\" ?>\n<!DOCTYPE configuration>\n<configuration>\n  <import class=\"ch.qos.logback.classic.encoder.JsonEncoder\"/>\n  <import class=\"ch.qos.logback.core.rolling.FixedWindowRollingPolicy\"/>\n  <import class=\"ch.qos.logback.core.rolling.RollingFileAppender\"/>\n  <import class=\"ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy\"/>\n\n  <appender name=\"RollingFile\" class=\"RollingFileAppender\">\n    <file>app.log</file>\n    <rollingPolicy class=\"FixedWindowRollingPolicy\">\n      <fileNamePattern>app-%i.log</fileNamePattern>\n      <minIndex>1</minIndex>\n      <maxIndex>10</maxIndex>\n    </rollingPolicy>\n    <triggeringPolicy class=\"SizeBasedTriggeringPolicy\">\n      <maxFileSize>5MB</maxFileSize>\n    </triggeringPolicy>\n    <encoder class=\"JsonEncoder\"/>\n  </appender>\n\n  <root level=\"DEBUG\">\n    <appender-ref ref=\"RollingFile\"/>\n  </root>\n</configuration>\n```\n\nUsage of the logger at code level:\n\n```\nimport org.slf4j.Logger;\nimport org.slf4j.LoggerFactory;\n...\n// Most common way to declare a logger\nLogger logger = LoggerFactory.getLogger(MyClass.class);\n// GOOD!\n//\n// Use parameterized logging to add user data to a message\n// The pattern should be a compile-time constant\nlogger.warn(\"Login failed for user {}.\", username);\n// BAD!\n//\n// Don't mix string concatenation and parameters\n// If `username` contains `{}`, the exception will leak into the message\nlogger.warn(\"Failure for user \" + username + \" and role {}.\", role, ex);\n...\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#030",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Log Injection > References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Log4j Core Configuration File\n\nLog4j JSON Template Layout\n\nLog4j Appenders\n\nLogback Configuration File\n\nLogback JsonEncoder\n\nLogback Appenders"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#031",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > General cryptography guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Never, ever write your own cryptographic functions.\n\nWherever possible, try and avoid writing any cryptographic code at all. Instead try and either use pre-existing secret management solutions or the secret management solution provided by your cloud provider. For more information, see the OWASP Secrets Management Cheat Sheet.\n\nIf you cannot use a pre-existing secret management solution, try and use a trusted and well known implementation library rather than using the libraries built into JCA/JCE as it is far too easy to make cryptographic errors with them.\n\nMake sure your application or protocol can easily support a future change of cryptographic algorithms.\n\nUse your package manager wherever possible to keep all of your packages up to date. Watch the updates on your development setup, and plan updates to your applications accordingly.\n\nWe will show examples below based on Google Tink, which is a library created by cryptography experts for using cryptography safely (in the sense of minimizing common mistakes made when using standard cryptography libraries)."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#032",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Follow the algorithm guidance in the OWASP Cryptographic Storage Cheat Sheet."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#033",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for storage > Symmetric example using Google Tink",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Google Tink has documentation on performing common tasks.\n\nFor example, this page (from Google's website) shows how to perform simple symmetric encryption.\n\nThe following code snippet shows an encapsulated use of this functionality:\n\nClick here to view the \"Tink symmetric encryption\" code snippet."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#034",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for storage > Symmetric example using Google Tink",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\nimport static java.nio.charset.StandardCharsets.UTF_8;\n\nimport com.google.crypto.tink.Aead;\nimport com.google.crypto.tink.InsecureSecretKeyAccess;\nimport com.google.crypto.tink.KeysetHandle;\nimport com.google.crypto.tink.TinkJsonProtoKeysetFormat;\nimport com.google.crypto.tink.aead.AeadConfig;\nimport java.nio.file.Files;\nimport java.nio.file.Path;\nimport java.nio.file.Paths;\nimport java.util.Base64;\n\n// AesGcmSimpleTest\npublic class App {\n\n    // Based on example from:\n    // https://github.com/tink-crypto/tink-java/tree/main/examples/aead\n\n    public static void main(String[] args) throws Exception {\n\n        // Key securely generated using:\n        // tinkey create-keyset --key-template AES128_GCM --out-format JSON --out aead_test_keyset.json\n\n\n\n        // Register all AEAD key types with the Tink runtime.\n        AeadConfig.register();\n\n        // Read the keyset into a KeysetHandle.\n        KeysetHandle handle =\n        TinkJsonProtoKeysetFormat.parseKeyset(\n            new String(Files.readAllBytes( Paths.get(\"/home/fredbloggs/aead_test_keyset.json\")), UTF_8), InsecureSecretKeyAccess.get());\n\n        String message = \"This message to be encrypted\";\n        System.out.println(message);\n\n        // Add some relevant context about the encrypted data that should be verified\n        // on decryption\n        String metadata = \"Sender: fredbloggs@example.com\";\n\n        // Encrypt the message\n        byte[] cipherText = AesGcmSimple.encrypt(message, metadata, handle);\n        System.out.println(Base64.getEncoder().encodeToString(cipherText));\n\n        // Decrypt the message\n        String message2 = AesGcmSimple.decrypt(cipherText, metadata, handle);\n        System.out.println(message2);\n    }\n}\n\nclass AesGcmSimple {\n\n    public static byte[] encrypt(String plaintext, String metadata, KeysetHandle handle) throws Exception {\n        // Get the primitive.\n        Aead aead = handle.getPrimitive(Aead.class);\n        return aead.encrypt(plaintext.getBytes(UTF_8), metadata.getBytes(UTF_8));\n    }\n\n    public static String decrypt(byte[] ciphertext, String metadata, KeysetHandle handle) throws Exception {\n        // Get the primitive.\n        Aead aead = handle.getPrimitive(Aead.class);\n        return new String(aead.decrypt(ciphertext, metadata.getBytes(UTF_8)),UTF_8);\n    }\n\n}\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#035",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for storage > Symmetric example using built-in JCA/JCE classes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "If you absolutely cannot use a separate library, it is still possible to use the built JCA/JCE classes but it is strongly recommended to have a cryptography expert review the full design and code, as even the most trivial error can severely weaken your encryption.\n\nThe following code snippet shows an example of using AES-GCM to perform encryption/decryption of data.\n\nA few constraints/pitfalls with this code:\n\nIt does not take into account key rotation or management which is a whole topic in itself.\n\nIt is important to use a different nonce for every encryption operation, especially if the same key is used. For more information, see this answer on Cryptography Stack Exchange.\n\nThe key will need to be stored securely.\n\nClick here to view the \"JCA/JCE symmetric encryption\" code snippet."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#036",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for storage > Symmetric example using built-in JCA/JCE classes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\nimport java.nio.charset.StandardCharsets;\nimport java.security.SecureRandom;\nimport javax.crypto.spec.*;\nimport javax.crypto.*;\nimport java.util.Base64;\n\n\n// AesGcmSimpleTest\nclass Main {\n\n    public static void main(String[] args) throws Exception {\n        // Key of 32 bytes / 256 bits for AES\n        KeyGenerator keyGen = KeyGenerator.getInstance(AesGcmSimple.ALGORITHM);\n        keyGen.init(AesGcmSimple.KEY_SIZE, new SecureRandom());\n        SecretKey secretKey = keyGen.generateKey();\n\n        // Nonce of 12 bytes / 96 bits and this size should always be used.\n        // It is critical for AES-GCM that a unique nonce is used for every cryptographic operation.\n        byte[] nonce = new byte[AesGcmSimple.IV_LENGTH];\n        SecureRandom random = new SecureRandom();\n        random.nextBytes(nonce);\n\n        var message = \"This message to be encrypted\";\n        System.out.println(message);\n\n        // Encrypt the message\n        byte[] cipherText = AesGcmSimple.encrypt(message, nonce, secretKey);\n        System.out.println(Base64.getEncoder().encodeToString(cipherText));\n\n        // Decrypt the message\n        var message2 = AesGcmSimple.decrypt(cipherText, nonce, secretKey);\n        System.out.println(message2);\n    }\n}\n\nclass AesGcmSimple {\n\n    public static final String ALGORITHM = \"AES\";\n    public static final String CIPHER_ALGORITHM = \"AES/GCM/NoPadding\";\n    public static final int KEY_SIZE = 256;\n    public static final int TAG_LENGTH = 128;\n    public static final int IV_LENGTH = 12;\n\n    public static byte[] encrypt(String plaintext, byte[] nonce, SecretKey secretKey) throws Exception {\n        return cryptoOperation(plaintext.getBytes(StandardCharsets.UTF_8), nonce, secretKey, Cipher.ENCRYPT_MODE);\n    }\n\n    public static String decrypt(byte[] ciphertext, byte[] nonce, SecretKey secretKey) throws Exception {\n        return new String(cryptoOperation(ciphertext, nonce, secretKey, Cipher.DECRYPT_MODE), StandardCharsets.UTF_8);\n    }\n\n    private static byte[] cryptoOperation(byte[] text, byte[] nonce, SecretKey secretKey, int mode) throws Exception {\n        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);\n        GCMParameterSpec gcmParameterSpec = new GCMParameterSpec(TAG_LENGTH, nonce);\n        cipher.init(mode, secretKey, gcmParameterSpec);\n        return cipher.doFinal(text);\n    }\n\n}\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#037",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for transmission",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Again, follow the algorithm guidance in the OWASP Cryptographic Storage Cheat Sheet."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#038",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for transmission > Asymmetric example using Google Tink",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Google Tink has documentation on performing common tasks.\n\nFor example, this page (from Google's website) shows how to perform a hybrid encryption process where two parties want to share data based on their asymmetric key pair.\n\nThe following code snippet shows how this functionality can be used to share secrets between Alice and Bob:\n\nClick here to view the \"Tink hybrid encryption\" code snippet."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#039",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for transmission > Asymmetric example using Google Tink",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\nimport static java.nio.charset.StandardCharsets.UTF_8;\n\nimport com.google.crypto.tink.HybridDecrypt;\nimport com.google.crypto.tink.HybridEncrypt;\nimport com.google.crypto.tink.InsecureSecretKeyAccess;\nimport com.google.crypto.tink.KeysetHandle;\nimport com.google.crypto.tink.TinkJsonProtoKeysetFormat;\nimport com.google.crypto.tink.hybrid.HybridConfig;\nimport java.nio.file.Files;\nimport java.nio.file.Path;\nimport java.nio.file.Paths;\nimport java.util.Base64;\n\n// HybridReplaceTest\nclass App {\n    public static void main(String[] args) throws Exception {\n        /*\n\n        Generated public/private keypairs for Bob and Alice using the\n        following tinkey commands:\n\n        ./tinkey create-keyset \\\n        --key-template DHKEM_X25519_HKDF_SHA256_HKDF_SHA256_AES_256_GCM \\\n        --out-format JSON --out alice_private_keyset.json\n\n        ./tinkey create-keyset \\\n        --key-template DHKEM_X25519_HKDF_SHA256_HKDF_SHA256_AES_256_GCM \\\n        --out-format JSON --out bob_private_keyset.json\n\n        ./tinkey create-public-keyset --in alice_private_keyset.json \\\n        --in-format JSON --out-format JSON --out alice_public_keyset.json\n\n        ./tinkey create-public-keyset --in bob_private_keyset.json \\\n        --in-format JSON --out-format JSON --out bob_public_keyset.json\n        */\n\n        HybridConfig.register();\n\n        // Generate ECC key pair for Alice\n        var alice = new HybridSimple(\n                getKeysetHandle(\"/home/alicesmith/private_keyset.json\"),\n                getKeysetHandle(\"/home/alicesmith/public_keyset.json\")\n\n        );\n\n        KeysetHandle alicePublicKey = alice.getPublicKey();\n\n        // Generate ECC key pair for Bob\n        var bob = new HybridSimple(\n                getKeysetHandle(\"/home/bobjones/private_keyset.json\"),\n                getKeysetHandle(\"/home/bobjones/public_keyset.json\")\n\n        );\n\n        KeysetHandle bobPublicKey = bob.getPublicKey();\n\n        // This keypair generation should be reperformed every so often in order to\n        // obtain a new shared secret to avoid a long lived shared secret.\n\n        // Alice encrypts a message to send to Bob\n        String plaintext = \"Hello, Bob!\";\n\n        // Add some relevant context about the encrypted data that should be verified\n        // on decryption\n        String metadata = \"Sender: alicesmith@example.com\";\n\n        System.out.println(\"Secret being sent from Alice to Bob: \" + plaintext);\n        var cipherText = alice.encrypt(bobPublicKey, plaintext, metadata);\n        System.out.println(\"Ciphertext being sent from Alice to Bob: \" + Base64.getEncoder().encodeToString(cipherText));\n\n\n        // Bob decrypts the message\n        var decrypted = bob.decrypt(cipherText, metadata);\n        System.out.println(\"Secret received by Bob from Alice: \" + decrypted);\n        System.out.println();\n\n        // Bob encrypts a message to send to Alice\n        String plaintext2 = \"Hello, Alice!\";\n\n        // Add some relevant context about the encrypted data that should be verified\n        // on decryption\n        String metadata2 = \"Sender: bobjones@example.com\";\n\n        System.out.println(\"Secret being sent from Bob to Alice: \" + plaintext2);\n        var cipherText2 = bob.encrypt(alicePublicKey, plaintext2, metadata2);\n        System.out.println(\"Ciphertext being sent from Bob to Alice: \" + Base64.getEncoder().encodeToString(cipherText2));\n\n        // Bob decrypts the message\n        var decrypted2 = alice.decrypt(cipherText2, metadata2);\n        System.out.println(\"Secret received by Alice from Bob: \" + decrypted2);\n    }\n\n    private static KeysetHandle getKeysetHandle(String filename) throws Exception\n    {\n        return TinkJsonProtoKeysetFormat.parseKeyset(\n                new String(Files.readAllBytes( Paths.get(filename)), UTF_8), InsecureSecretKeyAccess.get());\n    }\n}\nclass HybridSimple {\n\n    private KeysetHandle privateKey;\n    private KeysetHandle publicKey;\n\n\n    public HybridSimple(KeysetHandle privateKeyIn, KeysetHandle publicKeyIn) throws Exception {\n        privateKey = privateKeyIn;\n        publicKey = publicKeyIn;\n    }\n\n    public KeysetHandle getPublicKey() {\n        return publicKey;\n    }\n\n    public byte[] encrypt(KeysetHandle partnerPublicKey, String message, String metadata) throws Exception {\n\n        HybridEncrypt encryptor = partnerPublicKey.getPrimitive(HybridEncrypt.class);\n\n        // return the encrypted value\n        return encryptor.encrypt(message.getBytes(UTF_8), metadata.getBytes(UTF_8));\n    }\n    public String decrypt(byte[] ciphertext, String metadata) throws Exception {\n\n        HybridDecrypt decryptor = privateKey.getPrimitive(HybridDecrypt.class);\n\n        // return the encrypted value\n        return new String(decryptor.decrypt(ciphertext, metadata.getBytes(UTF_8)),UTF_8);\n    }\n\n\n}\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#040",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for transmission > Asymmetric example using built-in JCA/JCE classes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "If you absolutely cannot use a separate library, it is still possible to use the built JCA/JCE classes but it is strongly recommended to have a cryptography expert review the full design and code, as even the most trivial error can severely weaken your encryption.\n\nThis Java 25+ example illustrates Elliptic Curve Diffie-Hellman (ECDH) followed by HKDF-SHA-256 and AES-GCM. Do not use raw ECDH output directly as an AES key: RFC 5869 explains why Diffie-Hellman values need extraction. The Java KDF API performs both extraction and expansion here. This is a primitive demonstration, not an authenticated communication protocol.\n\nNote that this code sample relies on the AesGcmSimple class from the previous section.\n\nA few constraints/pitfalls with this code:\n\nIt does not take into account key rotation or management which is a whole topic in itself.\n\nThe code deliberately enforces a new nonce for every encryption operation but this must be managed as a separate data item alongside the ciphertext.\n\nThe private keys will need to be stored securely.\n\nThe code does not consider the validation of public keys before use.\n\nPublic keys must be authenticated independently before use. HKDF does not authenticate the peer; this example omits that protocol and its identity/context binding.\n\nClick here to view the \"JCA/JCE hybrid encryption\" code snippet."
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#041",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Cryptography > Encryption for transmission > Asymmetric example using built-in JCA/JCE classes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "```\nimport java.nio.charset.StandardCharsets;\nimport java.security.SecureRandom;\nimport javax.crypto.spec.*;\nimport javax.crypto.*;\nimport java.util.*;\nimport java.security.*;\nimport java.security.spec.*;\nimport java.util.Arrays;\n\n// ECDHSimpleTest\nclass Main {\n    public static void main(String[] args) throws Exception {\n\n        // Generate ECC key pair for Alice\n        var alice = new ECDHSimple();\n        Key alicePublicKey = alice.getPublicKey();\n\n        // Generate ECC key pair for Bob\n        var bob = new ECDHSimple();\n        Key bobPublicKey = bob.getPublicKey();\n\n        // This keypair generation should be reperformed every so often in order to\n        // obtain a new shared secret to avoid a long lived shared secret.\n\n        // Alice encrypts a message to send to Bob\n        String plaintext = \"Hello\"; //, Bob!\";\n        System.out.println(\"Secret being sent from Alice to Bob: \" + plaintext);\n\n        var retPair = alice.encrypt(bobPublicKey, plaintext);\n        var nonce = retPair.getKey();\n        var cipherText = retPair.getValue();\n\n        System.out.println(\"Both cipherText and nonce being sent from Alice to Bob: \" + Base64.getEncoder().encodeToString(cipherText) + \" \" + Base64.getEncoder().encodeToString(nonce));\n\n\n        // Bob decrypts the message\n        var decrypted = bob.decrypt(alicePublicKey, cipherText, nonce);\n        System.out.println(\"Secret received by Bob from Alice: \" + decrypted);\n        System.out.println();\n\n        // Bob encrypts a message to send to Alice\n        String plaintext2 = \"Hello\"; //, Alice!\";\n        System.out.println(\"Secret being sent from Bob to Alice: \" + plaintext2);\n\n        var retPair2 = bob.encrypt(alicePublicKey, plaintext2);\n        var nonce2 = retPair2.getKey();\n        var cipherText2 = retPair2.getValue();\n        System.out.println(\"Both cipherText2 and nonce2 being sent from Bob to Alice: \" + Base64.getEncoder().encodeToString(cipherText2) + \" \" + Base64.getEncoder().encodeToString(nonce2));\n\n        // Bob decrypts the message\n        var decrypted2 = alice.decrypt(bobPublicKey, cipherText2, nonce2);\n        System.out.println(\"Secret received by Alice from Bob: \" + decrypted2);\n    }\n}\nclass ECDHSimple {\n    private KeyPair keyPair;\n\n    public class AesKeyNonce {\n        public SecretKey Key;\n        public byte[] Nonce;\n    }\n\n    public ECDHSimple() throws Exception {\n        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(\"EC\");\n        ECGenParameterSpec ecSpec = new ECGenParameterSpec(\"secp256r1\"); // Using secp256r1 curve\n        keyPairGenerator.initialize(ecSpec);\n        keyPair = keyPairGenerator.generateKeyPair();\n    }\n\n    public Key getPublicKey() {\n        return keyPair.getPublic();\n    }\n\n    public AbstractMap.SimpleEntry<byte[], byte[]> encrypt(Key partnerPublicKey, String message) throws Exception {\n\n        // Generate the AES Key and Nonce\n        AesKeyNonce aesParams = generateAESParams(partnerPublicKey);\n\n        // return the encrypted value\n        return new AbstractMap.SimpleEntry<>(\n            aesParams.Nonce,\n            AesGcmSimple.encrypt(message, aesParams.Nonce, aesParams.Key)\n            );\n    }\n    public String decrypt(Key partnerPublicKey, byte[] ciphertext, byte[] nonce) throws Exception {\n\n        // Generate the AES Key and Nonce\n        AesKeyNonce aesParams = generateAESParams(partnerPublicKey, nonce);\n\n        // return the decrypted value\n        return AesGcmSimple.decrypt(ciphertext, aesParams.Nonce, aesParams.Key);\n    }\n\n    private AesKeyNonce generateAESParams(Key partnerPublicKey, byte[] nonce) throws Exception {\n\n        // Derive the secret based on this side's private key and the other side's public key\n        KeyAgreement keyAgreement = KeyAgreement.getInstance(\"ECDH\");\n        keyAgreement.init(keyPair.getPrivate());\n        keyAgreement.doPhase(partnerPublicKey, true);\n        byte[] secret = keyAgreement.generateSecret();\n\n        AesKeyNonce aesKeyNonce = new AesKeyNonce();\n\n        // Illustrative domain label; a real protocol defines its full context binding.\n        byte[] info = \"OWASP Java ECDH example: AES-256-GCM v1\".getBytes(StandardCharsets.UTF_8);\n        var derivation = HKDFParameterSpec.ofExtract().addIKM(secret)\n                .thenExpand(info, AesGcmSimple.KEY_SIZE / 8);\n        aesKeyNonce.Key = KDF.getInstance(\"HKDF-SHA256\").deriveKey(\"AES\", derivation);\n        Arrays.fill(secret, (byte) 0);\n\n        // Passed in nonce will be used.\n        aesKeyNonce.Nonce = nonce;\n        return aesKeyNonce;\n\n    }\n\n    private AesKeyNonce generateAESParams(Key partnerPublicKey) throws Exception {\n\n        // Nonce of 12 bytes / 96 bits and this size should always be used.\n        // It is critical for AES-GCM that a unique nonce is used for every cryptographic operation.\n        // Therefore this is not generated from the shared secret\n        byte[] nonce = new byte[AesGcmSimple.IV_LENGTH];\n        SecureRandom random = new SecureRandom();\n        random.nextBytes(nonce);\n        return generateAESParams(partnerPublicKey, nonce);\n\n    }\n}\n```"
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#042",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html",
+   "text": "Oracle: Secure Coding Guidelines for Java SE\n\nTink: Authenticated Encryption with Associated Data"
+  }
+ ]
+}

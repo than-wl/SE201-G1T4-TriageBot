@@ -1,0 +1,112 @@
+{
+ "doc": "Security_Terminology_Cheat_Sheet",
+ "title": "Security Terminology Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#001",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "This cheat sheet provides clear definitions and distinctions for security terminology that is often confused, even by experienced developers. Understanding these terms is critical for correctly implementing security controls and following standards like the OWASP ASVS."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#002",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Table of Contents",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Data Handling: Encoding, Escaping, Sanitization, and Serialization\n\nCryptography: Encryption, Hashing, and Signatures\n\nIdentity: Authentication and Authorization\n\nFederated Identity Terms\n\nReferences"
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#003",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Data Handling: Encoding, Escaping, Sanitization, and Serialization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "These terms relate to how data is transformed for transport, storage, or display. See the Input Validation Cheat Sheet for validation guidance."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#004",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Data Handling: Encoding, Escaping, Sanitization, and Serialization > Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: Transforming data into a different format using a publicly available scheme, so that it can be safely consumed by a different system.\n\nPurpose: Represent data for a particular transport, storage, or output context.\n\nReversibility: Always reversible.\n\nExamples: Base64, URL Encoding, HTML Entity Encoding.\n\nSecurity Context: Base64 does not provide confidentiality. Context-appropriate output encoding is an XSS defense; using the wrong encoding for the destination context can leave an injection vulnerability."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#005",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Data Handling: Encoding, Escaping, Sanitization, and Serialization > Escaping",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: Representing characters with parser-specific escape sequences so they are interpreted literally in a particular context.\n\nPurpose: To ensure the interpreter treats the data as text rather than code/commands.\n\nExamples: \\\" inside a JSON string, &lt; in HTML text.\n\nSecurity Context: Escaping rules depend on the parser and context. For SQL values, use parameterized queries instead of constructing SQL with escaped strings."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#006",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Data Handling: Encoding, Escaping, Sanitization, and Serialization > Sanitization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: The process of cleaning or filtering input by removing, replacing, or modifying potentially dangerous characters or content.\n\nPurpose: To make \"dirty\" input \"clean\" according to a security policy.\n\nExamples: Using a maintained HTML sanitizer to allow approved elements and attributes in user-authored HTML.\n\nSecurity Context: Use HTML sanitization when untrusted input must be rendered as HTML. Removing <script> tags alone is insufficient; other elements and attributes can execute scripts. Use output encoding when the value should be displayed as text."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#007",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Data Handling: Encoding, Escaping, Sanitization, and Serialization > Serialization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: Converting an object or data structure into a format that can be stored or transmitted (e.g., a byte stream) and later reconstructed.\n\nPurpose: Data persistence and communication.\n\nSecurity Context: Insecure Deserialization occurs when untrusted data is used to reconstruct an object, potentially leading to Remote Code Execution (RCE)."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#008",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Cryptography: Encryption, Hashing, and Signatures",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "These terms relate to protecting the confidentiality, integrity, and authenticity of data. See the Key Management Cheat Sheet and Password Storage Cheat Sheet for implementation guidance."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#009",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Cryptography: Encryption, Hashing, and Signatures > Encryption",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: Transforming data (plaintext) into an unreadable format (ciphertext) using a secret key.\n\nPurpose: Confidentiality. Only authorized parties with the key can read the data.\n\nReversibility: Reversible (Decryption) with the correct key.\n\nTypes: Symmetric (same key) and Asymmetric (public/private keys)."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#010",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Cryptography: Encryption, Hashing, and Signatures > Hashing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: Transforming data into a fixed-size string (a \"hash\" or \"digest\") using a mathematical function.\n\nPurpose: Integrity. A small change in the input results in a completely different hash.\n\nReversibility: One-way (non-reversible).\n\nSecurity Context: Used for password storage (with salt) and verifying file integrity.\n\nExamples: SHA-256, Argon2, bcrypt."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#011",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Cryptography: Encryption, Hashing, and Signatures > Signatures (Digital Signatures)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: Using asymmetric cryptography to provide proof of the origin and integrity of a message.\n\nPurpose: Authenticity and Non-repudiation. Proves who sent the message and that it wasn't altered.\n\nMechanism: The signing algorithm uses the signer's private key; verification uses a trusted public key bound to that signer. Follow the algorithm's message-processing rules; do not add a separate prehash unless the chosen algorithm and API require it.\n\nExamples: Asymmetrically signed JWTs and GPG signatures. JWTs can also use shared-key message authentication codes or encryption; the JWT format does not imply a digital signature."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#012",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Identity: Authentication and Authorization > Authentication (AuthN)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: The process of verifying who a user is.\n\nQuestion: \"Who are you?\"\n\nFactors: Something you know (password), something you have (token), something you are (biometrics)."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#013",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Identity: Authentication and Authorization > Authorization (AuthZ)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "Definition: The process of verifying what a user has permission to do.\n\nQuestion: \"Are you allowed to do this?\"\n\nSecurity Context: Occurs after successful authentication.\n\nExamples: Role-Based Access Control (RBAC), Attribute-Based Access Control (ABAC)."
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#014",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "Federated Identity Terms",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "When working with OAuth2, SAML, or OIDC, these terms are frequently used:\n\nTerm\n\nDefinition\n\nContext\n\nIdentity Provider (IdP)\n\nThe system that creates, maintains, and manages identity information and provides authentication services.\n\nGoogle, Okta, Azure AD\n\nRelying Party (RP)\n\nAn application or service that relies on an IdP to authenticate users.\n\nYour web app using \"Login with Google\"\n\nService Provider (SP)\n\nIn SAML, the equivalent of a Relying Party.\n\nYour enterprise app using SAML\n\nPrincipal\n\nThe entity (user, service, or device) being authenticated.\n\nThe user logging in"
+  },
+  {
+   "chunk_id": "Security_Terminology_Cheat_Sheet#015",
+   "doc": "Security_Terminology_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Security_Terminology_Cheat_Sheet.html",
+   "text": "RFC 4949: Internet Security Glossary, Version 2\n\nOpenID Connect Core 1.0: Terminology"
+  }
+ ]
+}

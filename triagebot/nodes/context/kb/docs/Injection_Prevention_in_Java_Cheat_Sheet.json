@@ -1,0 +1,14 @@
+{
+ "doc": "Injection_Prevention_in_Java_Cheat_Sheet",
+ "title": "Injection Prevention Cheat Sheet in Java",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_in_Java_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Injection_Prevention_in_Java_Cheat_Sheet#001",
+   "doc": "Injection_Prevention_in_Java_Cheat_Sheet",
+   "section": "Injection Prevention Cheat Sheet in Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_in_Java_Cheat_Sheet.html",
+   "text": "This information has been moved to the dedicated Java Security CheatSheet"
+  }
+ ]
+}

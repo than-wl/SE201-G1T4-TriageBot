@@ -1,0 +1,119 @@
+{
+ "doc": "Mass_Assignment_Cheat_Sheet",
+ "title": "Mass Assignment Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#001",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Introduction > Definition",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Software frameworks sometimes allow developers to automatically bind HTTP request parameters into program code variables or objects to make using that framework easier on developers. This can sometimes cause harm.\n\nAttackers can sometimes use this methodology to create new parameters that the developer never intended which in turn creates or overwrites new variable or objects in program code that was not intended.\n\nThis is called a Mass Assignment vulnerability."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#002",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Introduction > Alternative Names",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Depending on the language/framework in question, this vulnerability can have several alternative names:\n\nMass Assignment: Ruby on Rails, NodeJS.\n\nAutobinding: Spring MVC, ASP NET MVC.\n\nObject injection: PHP."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#003",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Introduction > Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Suppose there is a form for editing a user's account information:\n\n```\n<form>\n     <input name=\"userid\" type=\"text\">\n     <input name=\"password\" type=\"text\">\n     <input name=\"email\" text=\"text\">\n     <input type=\"submit\">\n</form>  \n```\n\nHere is the object that the form is binding to:\n\n```\npublic class User {\n   private String userid;\n   private String password;\n   private String email;\n   private boolean isAdmin;\n\n   //Getters & Setters\n}\n```\n\nHere is the controller handling the request:\n\n```\n@RequestMapping(value = \"/addUser\", method = RequestMethod.POST)\npublic String submit(User user) {\n   userService.add(user);\n   return \"successPage\";\n}\n```\n\nHere is the typical request:\n\n```\nPOST /addUser\n...\nuserid=bobbytables&password=hashedpass&email=bobby@tables.com\n```\n\nAnd here is the exploit in which we set the value of the attribute isAdmin of the instance of the class User:\n\n```\nPOST /addUser\n...\nuserid=bobbytables&password=hashedpass&email=bobby@tables.com&isAdmin=true\n```"
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#004",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Introduction > Exploitability",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Mass assignment is exploitable when attacker-controlled input can initialize or update fields that the caller is not authorized to change, such as a role or account owner. Field names may be guessed or discovered; source-code access is not required. CWE-915 defines the weakness in terms of insufficient control over writable attributes.\n\nAn empty constructor is not a general prerequisite. For example, Spring supports both constructor and setter binding. Review which inputs the binding mechanism exposes, including nested objects."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#005",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Introduction > GitHub case study",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "In 2012, GitHub was hacked using mass assignment. A user was able to upload his public key to any organization and thus make any subsequent changes in their repositories. GitHub's Blog Post."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#006",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Introduction > Solutions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Prefer dedicated input objects, such as Data Transfer Objects (DTOs), containing only fields the caller may edit; see Spring's model design guidance.\n\nExplicitly allow-list fields when binding to an object with additional properties.\n\nDo not rely on a block-list as the sole protection: a new or overlooked sensitive field remains bindable. CWE-915 recommends allowlists over denylists. The block-list examples below illustrate mechanisms encountered in existing applications, not the recommended design.\n\nDTOs and field allowlists restrict writable properties; they do not replace authorization for the requested object and operation."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#007",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "General Solutions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "An architectural approach is to create Data Transfer Objects and avoid binding input directly to domain objects. Only the fields that are meant to be editable by the user are included in the DTO.\n\n```\npublic class UserRegistrationFormDTO {\n private String userid;\n private String password;\n private String email;\n\n //NOTE: isAdmin field is not present\n\n //Getters & Setters\n}\n```"
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#008",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > Spring MVC > Allow-listing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "```\n@Controller\npublic class UserController\n{\n    @InitBinder\n    public void initBinder(WebDataBinder binder, WebRequest request)\n    {\n        binder.setAllowedFields(\"userid\", \"password\", \"email\");\n    }\n...\n}\n```\n\nSee Spring's model design guidance for dedicated input objects and allowed fields."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#009",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > Spring MVC > Block-listing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Spring describes disallowedFields as fragile because fields can be missed or added later. Prefer the allow-list above; this example only excludes the named property.\n\n```\n@Controller\npublic class UserController\n{\n   @InitBinder\n   public void initBinder(WebDataBinder binder, WebRequest request)\n   {\n      binder.setDisallowedFields(\"isAdmin\");\n   }\n...\n}\n```\n\nSee the Spring data binding limitations."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#010",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > NodeJS + Mongoose > Allow-listing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "```\nvar UserSchema = new mongoose.Schema({\n    userid: String,\n    password: String,\n    email : String,\n    isAdmin : Boolean,\n});\n\nUserSchema.statics = {\n    User.userCreateSafeFields: ['userid', 'password', 'email']\n};\n\nvar User = mongoose.model('User', UserSchema);\n\n_ = require('underscore');\nvar user = new User(_.pick(req.body, User.userCreateSafeFields));\n```\n\nTake a look here for the documentation."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#011",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > NodeJS + Mongoose > Block-listing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "```\nvar massAssign = require('mongoose-mass-assign');\n\nvar UserSchema = new mongoose.Schema({\n    userid: String,\n    password: String,\n    email : String,\n    isAdmin : { type: Boolean, protect: true, default: false }\n});\n\nUserSchema.plugin(massAssign);\n\nvar User = mongoose.model('User', UserSchema);\n\n/** Static method, useful for creation **/\nvar user = User.massAssign(req.body);\n\n/** Instance method, useful for updating**/\nvar user = new User;\nuser.massAssign(req.body);\n\n/** Static massUpdate method **/\nvar input = { userid: 'bhelx', isAdmin: 'true' };\nUser.update({ '_id': someId }, { $set: User.massUpdate(input) }, console.log);\n```\n\nTake a look here for the documentation."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#012",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > PHP Laravel + Eloquent > Allow-listing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "```\n<?php\n\nnamespace App;\n\nuse Illuminate\\Database\\Eloquent\\Model;\n\nclass User extends Model\n{\n    private $userid;\n    private $password;\n    private $email;\n    private $isAdmin;\n\n    protected $fillable = array('userid','password','email');\n}\n```\n\nTake a look here for the documentation."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#013",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > PHP Laravel + Eloquent > Block-listing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "```\n<?php\n\nnamespace App;\n\nuse Illuminate\\Database\\Eloquent\\Model;\n\nclass User extends Model\n{\n    private $userid;\n    private $password;\n    private $email;\n    private $isAdmin;\n\n    protected $guarded = array('isAdmin');\n}\n```\n\nTake a look here for the documentation."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#014",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > Jackson (JSON Object Mapper)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Take a look here and here for the documentation."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#015",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "Language & Framework specific solutions > GSON (JSON Object Mapper)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Take a look here and here for the document."
+  },
+  {
+   "chunk_id": "Mass_Assignment_Cheat_Sheet#016",
+   "doc": "Mass_Assignment_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mass_Assignment_Cheat_Sheet.html",
+   "text": "Ruby on Rails: Strong Parameters\n\nSpring Framework: DataBinder Security Considerations"
+  }
+ ]
+}

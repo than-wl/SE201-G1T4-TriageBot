@@ -1,0 +1,14 @@
+{
+ "doc": "Access_Control_Cheat_Sheet",
+ "title": "DEPRECATED: Access Control Cheatsheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Access_Control_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Access_Control_Cheat_Sheet#001",
+   "doc": "Access_Control_Cheat_Sheet",
+   "section": "DEPRECATED: Access Control Cheatsheet",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Access_Control_Cheat_Sheet.html",
+   "text": "The Access Control cheatsheet has been deprecated.\n\nPlease visit the Authorization Cheatsheet instead."
+  }
+ ]
+}

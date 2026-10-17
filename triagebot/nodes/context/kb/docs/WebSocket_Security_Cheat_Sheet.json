@@ -1,0 +1,126 @@
+{
+ "doc": "WebSocket_Security_Cheat_Sheet",
+ "title": "WebSocket Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#001",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "WebSockets enable real-time, bidirectional communication between clients and servers, powering applications like chat systems, live trading platforms, and collaborative tools. Unlike traditional HTTP requests, WebSocket connections remain open and allow continuous data exchange.\n\nHowever, WebSockets introduce security challenges that differ from standard web application security:\n\nCross-Site WebSocket Hijacking (CSWSH): Attackers hijack authenticated connections from malicious websites\n\nAuthentication bypass: No built-in authentication makes access control easy to forget\n\nInjection attacks: WebSocket messages can carry XSS, SQL injection, and other malicious payloads\n\nDenial-of-service: Persistent connections enable new DoS attack vectors like connection exhaustion\n\nMonitoring gaps: Traditional HTTP logs only capture the initial upgrade request, missing all message traffic\n\nReal-world vulnerabilities:\n\nGitpod CSWSH (2023): Insufficient origin validation allowed full account takeover via hijacked WebSocket connections\n\nSpring RCE vulnerability: CVE-2018-1270 let attackers execute code through crafted STOMP messages"
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#002",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Transport Security > Always Use WSS (WebSocket Secure)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Never use unencrypted ws:// connections in production. Unencrypted ws:// connections allow eavesdropping and tampering.\n\n```\n// Secure - always use this\nconst socket = new WebSocket('wss://app.example.com/socket');\n\n// Insecure - never use in production\n// const socket = new WebSocket('ws://app.example.com/socket');\n```\n\nSee the Transport Layer Security Cheat Sheet for more details."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#003",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Transport Security > WebSocket Protocol Configuration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Use modern protocol versions:\n\nOnly support RFC 6455 (the current WebSocket standard). Drop backward compatibility for outdated versions like Hixie-76 and hybi-00 which have known security vulnerabilities.\n\nCompression security:\n\nDisable permessage-deflate compression unless specifically needed. Compression can introduce security vulnerabilities similar to CRIME/BREACH attacks where compression combined with secret data can leak information.\n\n```\n// Node.js - disable compression for security\nconst wss = new WebSocket.Server({\n  perMessageDeflate: false\n});\n```"
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#004",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Transport Security > Infrastructure Configuration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Proxy and load balancer support:\n\nEnsure reverse proxies, load balancers, and CDNs are configured to handle WebSocket upgrades:\n\nConfigure proxy to support HTTP/1.1 upgrade mechanism\n\nPass Upgrade and Connection: upgrade headers correctly\n\nSet proper read timeouts for long-lived connections\n\nEnsure WebSocket traffic isn't blocked by security policies\n\nWAF support:\n\nCheck that your WAF supports WebSocket traffic inspection beyond the initial handshake. If not, rely on server-side validation and application logging."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#005",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Authentication and Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "For general identity and session controls, see the Authentication Cheat Sheet and Session Management Cheat Sheet.\n\nWebSockets don't have built-in authentication. Browsers include cookies in WebSocket handshake requests, making WebSocket applications vulnerable to Cross-Site WebSocket Hijacking (CSWSH).\n\nCSWSH allows attackers to hijack authenticated WebSocket connections from malicious websites:\n\nUser logs into your application (session cookie established)\n\nUser later visits a malicious website\n\nMalicious site opens WebSocket to your application, browser sends cookies automatically\n\nServer accepts the connection → attacker gets live, authenticated WebSocket access"
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#006",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Authentication and Authorization > Origin Header Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Validate the Origin header on every handshake. Always use an explicit allowlist of trusted origins. Browsers include this header and malicious JavaScript cannot override it.\n\nFor Node.js ws, validate the Origin header in the HTTP server's upgrade event before calling handleUpgrade; the library discourages verifyClient (ws documentation).\n\nImportant: Use an allowlist, not a denylist. Avoid wildcards or substring matching which are error-prone."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#007",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Authentication and Authorization > Additional CSWSH Protections",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "For applications already using CSRF protection, include CSRF tokens in WebSocket handshakes."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#008",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Authentication and Authorization > Session Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "WebSocket connections often outlive normal sessions, requiring special handling.\n\nUse SameSite cookies (SameSite=Lax or Strict) to prevent cross-site cookie transmission and strengthen CSWSH defenses.\n\nHandle session expiration by implementing server-side validation for long-running connections. Close WebSocket connections when sessions expire. Re-validate user sessions periodically (every 30 minutes is common) to ensure they remain valid.\n\n```\n// Example: Close WebSocket on session expiry\nfunction validateSession(ws, sessionId) {\n  if (!isSessionValid(sessionId)) {\n    ws.close(1008, 'Session expired');\n    return false;\n  }\n  return true;\n}\n```\n\nWhen users log out, close all their WebSocket connections immediately. Maintain a mapping of sessions to active connections so you can invalidate WebSocket access the moment logout occurs.\n\nToken-based authentication:\n\nFor browser clients using tokens, prefer sending the token in the first message over WSS. Avoid tokens in URL query strings because they can leak into access logs; see the websockets authentication guidance.\n\nUntil token validation succeeds, accept only the authentication message and do not send protected data. Close the connection on authentication failure or timeout, and limit unauthenticated connections. Message-based authentication keeps tokens out of the handshake URL, but tokens must also be excluded from message logs.\n\nToken refresh:\n\nRotate tokens in long-lived connections to prevent hijacked sessions from persisting."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#009",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Authentication and Authorization > Message-Level Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Don't assume WebSocket connection equals unlimited access. Check authorization for each action:\n\n```\nws.on('message', (data) => {\n  const message = JSON.parse(data);\n\n  // Check authorization for each action\n  if (message.action === 'delete_user' && !user.hasRole('admin')) {\n    ws.send(JSON.stringify({type: 'error', message: 'Access denied'}));\n    return;\n  }\n\n  handleAuthorizedMessage(ws, user, message);\n});\n```"
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#010",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Input Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Treat all WebSocket messages as untrusted input. WebSocket messages can carry injection payloads such as SQLi, XSS, and command injection.\n\nValidate message structure and content using JSON schemas and allow-lists. Set reasonable size limits (typically 64KB or less) and implement rate limiting to prevent message flooding.\n\nFor binary data, verify file types using magic numbers rather than trusting content-type headers. Scan uploads for malware when appropriate, and use safe deserialization for protocols like protobuf or MessagePack.\n\n```\nws.on('message', (data, isBinary) => {\n  if (isBinary) {\n    // Validate binary data\n    if (data.length > MAX_BINARY_SIZE) {\n      ws.close(1009, 'Message too large');\n      return;\n    }\n\n    // Check file type by magic numbers\n    if (!isValidFileType(data)) {\n      ws.close(1008, 'Invalid file type');\n      return;\n    }\n  }\n\n  processBinaryData(data);\n});\n```\n\nTo prevent message replay attacks include timestamps or nonces in messages and reject duplicates to ensure old messages cannot be maliciously resent.\n\n```\nws.on('message', (data) => {\n  const message = JSON.parse(data);\n\n  // Check timestamp or nonce to prevent replay\n  if (!isValidNonce(message.nonce)) {\n    ws.close(1008, 'Replay detected');\n    return;\n  }\n\n  processMessage(message);\n});\n```\n\nAlways use JSON.parse() instead of eval() for JSON processing - eval() enables code execution from untrusted input.\n\n```\n// Safe\nconst message = JSON.parse(data);\n\n// Dangerous - enables code execution\n// const message = eval('(' + data + ')');\n```\n\nSee the Input Validation Cheat Sheet, Cross Site Scripting Prevention Cheat Sheet, and SQL Injection Prevention Cheat Sheet for more details."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#011",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Service Tunneling Risks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "While WebSockets can tunnel TCP services (VNC, FTP, SSH), this creates security risks. If your application has XSS vulnerabilities, attackers could access these services directly from victims' browsers. If tunneling is necessary, implement additional authentication and access controls beyond the WebSocket layer."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#012",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Denial-of-Service Protection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Persistent WebSocket connections increase DoS risk.\n\nLimit connections and resources by restricting total connections and implementing per-user limits (preferred) or per-IP limits where user identification isn't available. Set message size limits (typically 64KB or less) and implement rate limiting to prevent message flooding - 100 messages per minute is a common starting point.\n\nHandle idle and dead connections by implementing idle timeouts to close inactive connections. Use heartbeat monitoring with ping/pong frames to detect and clean up dead connections.\n\nImplement backpressure controls to prevent memory exhaustion from fast message producers. Many WebSocket implementations lack proper flow control, allowing attackers to overwhelm server memory by sending messages faster than they can be processed.\n\n```\nconst wss = new WebSocket.Server({\n  maxPayload: 64 * 1024\n});\n```"
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#013",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Security Monitoring and Logging",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Traditional HTTP access logs only capture the initial WebSocket upgrade request, not subsequent message traffic. You'll miss auth failures, injection attempts, rate-limit violations, and abuse.\n\nLog WebSocket events including connection establishment and termination (with user identity, IP, and origin), authentication and authorization events during handshake and message processing, security violations like rate limiting triggers and message validation failures, and abnormal disconnections and protocol errors.\n\nAvoid logging sensitive data - never log complete message contents, authentication tokens, session IDs, or personal information that could violate privacy regulations.\n\nSee the Logging Cheat Sheet for more details."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#014",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Testing WebSocket Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Key security tests:\n\nOrigin validation: Connect from unauthorized domains\n\nAuthentication bypass: Attempt connections without proper credentials\n\nMessage injection: Send XSS, SQL injection, and command injection payloads\n\nDoS resistance: Test connection limits, message flooding, and oversized messages\n\nSession management: Test session expiration and logout handling\n\nTesting tools:\n\nBrowser developer tools for manual testing\n\nwscat for command-line WebSocket connections\n\nCustom scripts for automated vulnerability testing\n\nOWASP ZAP (includes WebSocket security testing features)"
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#015",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Framework-Specific Best Practices",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Node.js: With ws, perform origin and authentication checks in the HTTP server's upgrade event; set maxPayload limits and disable perMessageDeflate compression unless needed.\n\nPython: With Django Channels, implement authentication middleware and origin validation. Use async exception handling to prevent application crashes from malformed WebSocket messages.\n\nJava Spring: Configure allowed origins explicitly and integrate Spring Security for authorization. Set message size limits in your WebSocket container configuration to prevent resource exhaustion.\n\nGo: When using Gorilla WebSocket, implement validation in your CheckOrigin function - don't just return true. Set read limits, implement timeouts, and use context cancellation for graceful connection cleanup."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#016",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "Primary Defenses > Framework-Specific Best Practices > Keep Dependencies Updated",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "Regularly update WebSocket libraries and monitor security advisories. Past versions of popular libraries (ws, Spring STOMP, Python websockets) have had critical security vulnerabilities including DoS and RCE issues."
+  },
+  {
+   "chunk_id": "WebSocket_Security_Cheat_Sheet#017",
+   "doc": "WebSocket_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/WebSocket_Security_Cheat_Sheet.html",
+   "text": "RFC 6455: The WebSocket Protocol\n\nCWE-1385: Missing Origin Validation in WebSockets"
+  }
+ ]
+}

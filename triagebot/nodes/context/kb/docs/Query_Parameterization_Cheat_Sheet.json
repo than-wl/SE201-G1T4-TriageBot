@@ -1,0 +1,119 @@
+{
+ "doc": "Query_Parameterization_Cheat_Sheet",
+ "title": "Query Parameterization Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#001",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "SQL Injection is one of the most dangerous web vulnerabilities. As of the OWASP Top 10:2025, it is categorized under A05:2025-Injection.\n\nIt represents a serious threat because SQL Injection allows evil attacker code to change the structure of a web application's SQL statement in a way that can steal data, modify data, or potentially facilitate command injection to the underlying OS.\n\nThis cheat sheet is a derivative work of the SQL Injection Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#002",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "SQL Injection is best prevented through the use of parameterized queries. The following chart demonstrates, with real-world code samples, how to build parameterized queries in most of the common web languages. The purpose of these code samples is to demonstrate to the web developer how to avoid SQL Injection when building database queries within a web application.\n\nPlease note, many client side frameworks and libraries offer client side query parameterization. These libraries often just build queries with string concatenation before sending raw queries to a server. Please ensure that query parameterization is done server-side!"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#003",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using Java built-in feature",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\nString custname = request.getParameter(\"customerName\");\nString query = \"SELECT account_balance FROM user_data WHERE user_name = ? \";  \nPreparedStatement pstmt = connection.prepareStatement( query );\npstmt.setString( 1, custname);\nResultSet results = pstmt.executeQuery( );\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#004",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using Java with Hibernate",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\n// HQL\n@Entity // declare as entity;\n@NamedQuery(\n name=\"findByDescription\",\n query=\"FROM Inventory i WHERE i.productDescription = :productDescription\"\n)\npublic class Inventory implements Serializable {\n @Id\n private long id;\n private String productDescription;\n}\n\n// Use case\n// This should REALLY be validated too\nString userSuppliedParameter = request.getParameter(\"Product-Description\");\n// Perform input validation to detect attacks\nList<Inventory> list =\n session.getNamedQuery(\"findByDescription\")\n .setParameter(\"productDescription\", userSuppliedParameter).list();\n\n// Criteria API\n// This should REALLY be validated too\nString userSuppliedParameter = request.getParameter(\"Product-Description\");\n// Perform input validation to detect attacks\nInventory inv = (Inventory) session.createCriteria(Inventory.class).add\n(Restrictions.eq(\"productDescription\", userSuppliedParameter)).uniqueResult();\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#005",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using .NET built-in feature",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\nString query = \"SELECT account_balance FROM user_data WHERE user_name = ?\";\ntry {\n   OleDbCommand command = new OleDbCommand(query, connection);\n   command.Parameters.Add(new OleDbParameter(\"customerName\", CustomerName.Text));\n   OleDbDataReader reader = command.ExecuteReader();\n   // …\n} catch (OleDbException se) {\n   // error handling\n}\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#006",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using ASP .NET built-in feature",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\nstring sql = \"SELECT * FROM Customers WHERE CustomerId = @CustomerId\";\nSqlCommand command = new SqlCommand(sql);\ncommand.Parameters.Add(new SqlParameter(\"@CustomerId\", System.Data.SqlDbType.Int));\ncommand.Parameters[\"@CustomerId\"].Value = 1;\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#007",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using Ruby with ActiveRecord",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\n## Create\nProject.create!(:name => 'owasp')\n## Read\nProject.all(:conditions => \"name = ?\", name)\nProject.all(:conditions => { :name => name })\nProject.where(\"name = :name\", :name => name)\n## Update\nproject.update_attributes(:name => 'owasp')\n## Delete\nProject.delete(:name => 'name')\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#008",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using Ruby built-in feature",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\ninsert_new_user = db.prepare \"INSERT INTO users (name, age, gender) VALUES (?, ? ,?)\"\ninsert_new_user.execute 'aizatto', '20', 'male'\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#009",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using PHP with PHP Data Objects",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\n$stmt = $dbh->prepare(\"INSERT INTO REGISTRY (name, value) VALUES (:name, :value)\");\n$stmt->bindParam(':name', $name);\n$stmt->bindParam(':value', $value);\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#010",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using Cold Fusion built-in feature",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\n<cfquery name = \"getFirst\" dataSource = \"cfsnippets\">\n    SELECT * FROM #strDatabasePrefix#_courses WHERE intCourseID =\n    <cfqueryparam value = #intCourseID# CFSQLType = \"CF_SQL_INTEGER\">\n</cfquery>\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#011",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using PERL with Database Independent Interface",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\nmy $sql = \"INSERT INTO foo (bar, baz) VALUES ( ?, ? )\";\nmy $sth = $dbh->prepare( $sql );\n$sth->execute( $bar, $baz );\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#012",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Prepared Statement Examples > Using Rust with SQLx",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "```\n// Input from CLI args but could be anything\nlet username = std::env::args().last().unwrap();\n\n// Using build-in macros (compile time checks)\nlet users = sqlx::query_as!(\n        User,\n        \"SELECT * FROM users WHERE name = ?\",\n        username\n    )\n    .fetch_all(&pool)\n    .await \n    .unwrap();\n\n// Using built-in functions\nlet users: Vec<User> = sqlx::query_as::<_, User>(\n        \"SELECT * FROM users WHERE name = ?\"\n    )\n    .bind(&username)\n    .fetch_all(&pool)\n    .await\n    .unwrap();\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#013",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Stored Procedure Examples",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "The SQL you write in your web application isn't the only place that SQL injection vulnerabilities can be introduced. If you are using Stored Procedures, and you are dynamically constructing SQL inside them, you can also introduce SQL injection vulnerabilities.\n\nDynamic SQL can be parameterized using bind variables, to ensure the dynamically constructed SQL is secure.\n\nHere are some examples of using bind variables in stored procedures in different databases."
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#014",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Stored Procedure Examples > Oracle using PL/SQL",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "Normal Stored Procedure\n\nNo dynamic SQL being created. Parameters passed in to stored procedures are naturally bound to their location within the query without anything special being required:\n\n```\nPROCEDURE SafeGetBalanceQuery(UserID varchar, Dept varchar) AS BEGIN\n   SELECT balance FROM accounts_table WHERE user_ID = UserID AND department = Dept;\nEND;\n```\n\nStored Procedure Using Bind Variables in SQL Run with EXECUTE\n\nBind variables are used to tell the database that the inputs to this dynamic SQL are 'data' and not possibly code:\n\n```\nPROCEDURE AnotherSafeGetBalanceQuery(UserID varchar, Dept varchar)\n          AS stmt VARCHAR(400); result NUMBER;\nBEGIN\n   stmt := 'SELECT balance FROM accounts_table WHERE user_ID = :1\n            AND department = :2';\n   EXECUTE IMMEDIATE stmt INTO result USING UserID, Dept;\n   RETURN result;\nEND;\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#015",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Parameterized Query Examples > Stored Procedure Examples > SQL Server using Transact-SQL",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "Normal Stored Procedure\n\nNo dynamic SQL being created. Parameters passed in to stored procedures are naturally bound to their location within the query without anything special being required:\n\n```\nPROCEDURE SafeGetBalanceQuery(@UserID varchar(20), @Dept varchar(10)) AS BEGIN\n   SELECT balance FROM accounts_table WHERE user_ID = @UserID AND department = @Dept\nEND\n```\n\nStored Procedure Using Bind Variables in SQL Run with EXEC\n\nBind variables are used to tell the database that the inputs to this dynamic SQL are 'data' and not possibly code:\n\n```\nPROCEDURE SafeGetBalanceQuery(@UserID varchar(20), @Dept varchar(10)) AS BEGIN\n   DECLARE @sql VARCHAR(200)\n   SELECT @sql = 'SELECT balance FROM accounts_table WHERE '\n                 + 'user_ID = @UID AND department = @DPT'\n   EXEC sp_executesql @sql,\n                      '@UID VARCHAR(20), @DPT VARCHAR(10)',\n                      @UID=@UserID, @DPT=@Dept\nEND\n```"
+  },
+  {
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#016",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Query_Parameterization_Cheat_Sheet.html",
+   "text": "Oracle JDBC: Using Prepared Statements\n\nPHP PDO: Prepared Statements and Stored Procedures"
+  }
+ ]
+}

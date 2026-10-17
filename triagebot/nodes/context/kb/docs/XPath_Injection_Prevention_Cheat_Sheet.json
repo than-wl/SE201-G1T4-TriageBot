@@ -1,0 +1,42 @@
+{
+ "doc": "XPath_Injection_Prevention_Cheat_Sheet",
+ "title": "XPath Injection Prevention Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/XPath_Injection_Prevention_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "XPath_Injection_Prevention_Cheat_Sheet#001",
+   "doc": "XPath_Injection_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XPath_Injection_Prevention_Cheat_Sheet.html",
+   "text": "XPath selects data from XML documents. XPath injection occurs when external input becomes part of an expression's syntax, allowing it to change the query's meaning. Prevent it by keeping expressions under application control and passing external values through variable binding."
+  },
+  {
+   "chunk_id": "XPath_Injection_Prevention_Cheat_Sheet#002",
+   "doc": "XPath_Injection_Prevention_Cheat_Sheet",
+   "section": "Bind Values to Fixed Expressions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XPath_Injection_Prevention_Cheat_Sheet.html",
+   "text": "Use an XPath API that supports variables. Write the expression in application code and supply external values separately. Do not concatenate or interpolate input into the expression, even if you compile it afterward: compilation alone does not separate data from query syntax.\n\nFor example, Python's lxml xpath() method accepts variables as keyword arguments. This illustrative lookup assumes xml_document is an already parsed lxml document and requested_id is an external string:\n\n```\nbooks = xml_document.xpath(\n    \"/catalog/book[@id=$book_id]\",\n    book_id=requested_id,\n)\n```\n\nThe expression stays fixed; requested_id supplies only the value of $book_id. The application must separately authorize access to the selected books.\n\nFor Java, use the resolver pattern in the Java Security Cheat Sheet. Check the documentation for your particular API: accepting an XPath string or compiling an expression does not by itself mean the API provides variable binding.\n\nIf the API cannot bind values, prefer one that can. Where practical, use a fixed expression to retrieve an authorized set of records and compare values in application code. Do not substitute ad hoc quote replacement for variable binding."
+  },
+  {
+   "chunk_id": "XPath_Injection_Prevention_Cheat_Sheet#003",
+   "doc": "XPath_Injection_Prevention_Cheat_Sheet",
+   "section": "Keep Query Structure Under Application Control",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XPath_Injection_Prevention_Cheat_Sheet.html",
+   "text": "XPath variables represent values; they do not substitute expression fragments. When a user chooses a query mode, map that choice to a complete, fixed expression defined by the application. Reject unknown choices and bind any external data values separately.\n\nFor example, a catalog application can map the choices books and magazines to the fixed paths /catalog/book and /catalog/magazine. Do not insert the selected choice directly into a path or accept user-supplied predicates, operators, or function calls.\n\nValidate values against the application's expected types, lengths, and business rules, following the Input Validation Cheat Sheet. Validation complements binding; it does not make dynamically constructed XPath safe by itself."
+  },
+  {
+   "chunk_id": "XPath_Injection_Prevention_Cheat_Sheet#004",
+   "doc": "XPath_Injection_Prevention_Cheat_Sheet",
+   "section": "Limit Exposure and Review Usage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XPath_Injection_Prevention_Cheat_Sheet.html",
+   "text": "Keep these controls separate from the binding mechanism:\n\nAuthorization: Check the caller's permission to access each requested resource. A fixed query, narrow path, or bound identifier does not establish permission. Follow the Authorization Cheat Sheet and the principle of least privilege to limit the data an operation can access and return.\n\nError handling: Keep XPath expressions, XML contents, and stack traces out of client-facing error messages. Follow the Error Handling Cheat Sheet. Generic errors reduce disclosure; they do not prevent injection.\n\nXML parsing: Configure the parser according to the XML External Entity Prevention Cheat Sheet. Parser hardening addresses XML parser risks, not unsafe XPath construction; binding values does not harden the parser.\n\nDuring code review, locate calls that evaluate or compile XPath. Trace each expression back to application-controlled text and verify that external values reach it only through variable binding. For fixed query mappings, verify that unknown choices are rejected. Include correctness checks for ordinary valid values, absent records, and access to resources outside the caller's permissions.\n\nFor security assessment guidance, see the Web Security Testing Guide's XPath injection chapter."
+  },
+  {
+   "chunk_id": "XPath_Injection_Prevention_Cheat_Sheet#005",
+   "doc": "XPath_Injection_Prevention_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XPath_Injection_Prevention_Cheat_Sheet.html",
+   "text": "CWE-643: XPath Injection\n\nlxml: XPath Variables\n\nW3C XPath 3.1: Variable References"
+  }
+ ]
+}

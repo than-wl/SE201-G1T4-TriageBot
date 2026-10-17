@@ -1,0 +1,77 @@
+{
+ "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+ "title": "Authorization Policy and Data Distribution Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#001",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "An authorization decision is only as reliable as its policy and input data. A Policy Decision Point (PDP) evaluates rules using attributes supplied by a Policy Enforcement Point (PEP) or an authoritative Policy Information Point (PIP). OPA's external data guidance describes common ways to deliver those inputs. See Authorization Patterns for component placement."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#002",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Define Ownership and Freshness Requirements",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "Record who may change each policy and attribute, which service is authoritative for it, and the maximum delay before a change must affect decisions. Distinguish policy changes, such as a new restriction, from data changes, such as revoking a user's membership. Neither organizational ownership nor update frequency determines acceptable delay: a central policy can require an emergency update, while another can have a scheduled effective date.\n\nChoose delivery against those requirements. OPA bundles can carry both policies and data, but distribution is eventually consistent. A successful publication is not proof that every PDP has activated the update.\n\nRequirement\n\nSuitable starting point\n\nSecurity condition\n\nEmergency restriction or revocation\n\nDynamic updates or authoritative lookup\n\nMeasure the propagation bound and deny affected operations when it cannot be met\n\nScheduled, stable rules\n\nVersioned deployment or dynamic distribution\n\nActivate the required revision before its effective deadline\n\nFrequently changing resource or relationship data\n\nSynchronization or lookup from its authoritative source\n\nAccount for replication lag and cached decisions\n\nRequest-specific attributes\n\nValidated context passed by the PEP\n\nAuthenticate the PEP and establish where each security-relevant value came from"
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#003",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Deliver Policies and Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "A Policy Administration Point (PAP) manages policy changes. Distribute approved policies independently of application releases when restrictions must take effect sooner than a deployment can reliably complete. Delivery may use push or pull; OPA bundle downloads are an example of pull-based updates outside the decision request. Embedding policies in a release is suitable only when its deployment process meets the required update deadline.\n\nFor input data, select among these approaches using the source's consistency guarantees and the PDP's actual capabilities. Model names alone do not establish which mechanisms a product supports."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#004",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Deliver Policies and Data > Lookup During Evaluation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "The PDP retrieves required attributes from an authoritative PIP.\n\nUse this when the source can satisfy the decision's availability and freshness requirements. A lookup does not guarantee current data if the source, replica, or intermediate cache is stale. Deny affected operations when a required attribute cannot be obtained reliably."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#005",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Deliver Policies and Data > Replicated Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "Updates reach a PDP's local data store before evaluation.\n\nThis removes the PIP from the immediate request path but creates a revocation delay. Monitor synchronization progress and handle missed, repeated, and reordered updates. Do not describe local availability as a freshness guarantee."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#006",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Deliver Policies and Data > Request-Time Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "The PEP collects attributes and includes them in its decision request.\n\nThe AuthZEN security considerations address PEP authentication and trust. An authenticated PEP must still derive user identity, roles, ownership, and tenant membership from trusted sources; copying values from an end user request does not make them authoritative. Validate resource identifiers against the actual target and distinguish user-supplied context from verified attributes."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#007",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Deliver Policies and Data > Embedded Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "Stable data is packaged with the PDP or policy release.\n\nUse this only when changing the data through a deployment meets its freshness requirement. Avoid embedding mutable account status or revocation data in releases that cannot update promptly."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#008",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Protect Distribution and Administration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "Protect network-exposed decision APIs and the APIs that read or modify policy and data. Authenticate PEPs and administrators, restrict each to the tenants and operations they need, and prevent service teams from replacing organization-wide restrictions. OPA's API security documentation describes authentication and authorization for these interfaces. An in-process PDP shares the application's trust boundary; it does not require a separate network authentication exchange.\n\nVerify policy artifacts before activation. For bundles, require a signature from a configured trusted publisher and verify all covered files; OPA documents the verification and activation rules. Protect transport and signing keys as well. A valid signature proves origin and integrity, not that a policy is correct or current.\n\nPin deployments to reviewed policy and schema versions, and record which revision each PDP actually activates. Reject unexpected or obsolete revisions; allow a rollback only through the reviewed release process. Test that service-owned rules cannot override mandatory restrictions. These controls are needed for embedded releases as well as dynamic delivery."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#009",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "Freshness and Outages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "Distinguish loss of the policy distribution service from loss of a usable authorization decision. OPA retains its existing bundle when a new bundle fails verification; this preserves availability but does not establish that the old bundle is still fresh enough.\n\nContinue evaluating a previously verified policy only while its policy, data, and any decision-cache freshness requirements remain satisfied.\n\nAt startup, do not serve protected operations until the required policy and data are available and valid.\n\nDeny affected operations when required inputs are missing, invalid, or older than the allowed bound. Do not turn a timeout or undefined result into a permit; follow Deny by Default.\n\nExercise revocation, delayed updates, invalid artifacts, unavailable sources, and recovery. Verify the effective decision at the PEP, not just delivery to the PDP.\n\nPrefer reviewed, versioned policies and an explicit freshness budget for each security-relevant input. Select the simplest delivery mechanism that meets those limits and stop granting affected access when it cannot."
+  },
+  {
+   "chunk_id": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet#010",
+   "doc": "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Authorization_Policy_And_Data_Distribution_Cheat_Sheet.html",
+   "text": "OPA external data integration\n\nOPA policy and data bundles\n\nOpenID AuthZEN security considerations"
+  }
+ ]
+}

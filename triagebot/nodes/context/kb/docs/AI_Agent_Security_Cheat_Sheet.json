@@ -1,0 +1,203 @@
+{
+ "doc": "AI_Agent_Security_Cheat_Sheet",
+ "title": "AI Agent Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#001",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "AI agents are autonomous systems powered by Large Language Models (LLMs) that can reason, plan, use tools, maintain memory, and take actions to accomplish goals. This expanded capability introduces unique security risks beyond traditional LLM prompt injection. This cheat sheet provides best practices to secure AI agent architectures and minimize attack surfaces."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#002",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Key Risks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Prompt Injection (Direct & Indirect): Malicious instructions injected via user input or external data sources (websites, documents, emails) that hijack agent behavior. (See LLM Prompt Injection Prevention Cheat Sheet)\n\nTool Abuse & Privilege Escalation: Agents exploiting overly permissive tools to perform unintended actions or access unauthorized resources.\n\nData Exfiltration: Sensitive information leaked through tool calls, API requests, or agent outputs.\n\nMemory Poisoning: Malicious data persisted in agent memory to influence future sessions or other users.\n\nGoal Hijacking: Manipulating agent objectives to serve attacker purposes while appearing legitimate.\n\nExcessive Autonomy: Agents taking high-impact actions without appropriate human oversight.\n\nHigh-Impact Action Abuse: Agents executing irreversible, financial, administrative, or externally visible operations without independent validation.\n\nDecision and Approval Manipulation: Attackers influencing risk scores, model confidence, or approval thresholds to bypass safeguards.\n\nCascading Failures: Compromised agents in multi-agent systems propagating attacks to other agents.\n\nAI Console Malicious Configuration: AI developer consoles can be compelled to consume data that contains instructions driving malicious changes to the underlying LLM configuration.\n\nDenial of Wallet (DoW): Attacks causing excessive API/compute costs through unbounded agent loops.\n\nSensitive Data Exposure: PII, credentials, or confidential data inadvertently included in agent context or logs.\n\nSupply Chain Attacks: Compromising third-party tools, APIs, or data sources used by agents."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#003",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 1. Tool Security & Least Privilege",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Grant agents the minimum tools required for their specific task.\n\nImplement per-tool permission scoping (read-only vs. write, specific resources).\n\nUse separate tool sets for different trust levels (e.g., internal vs. user-facing agents).\n\nRequire explicit tool authorization for sensitive operations."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#004",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 1. Tool Security & Least Privilege > Bad: Over-permissioned Model Context Protocol (MCP) tool configuration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\n# Dangerous: Agent has unrestricted shell access\ntools = [\n    {\n        \"name\": \"execute_command\",\n        \"description\": \"Execute any shell command\",\n        \"allowed_commands\": \"*\"  # No restrictions\n    }\n]\n```"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#005",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 1. Tool Security & Least Privilege > Good: Scoped MCP tool with allowlist",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\n# Safe: Restricted to specific, safe commands\ntools = [\n    {\n        \"name\": \"file_reader\",\n        \"description\": \"Read files from the reports directory\",\n        \"allowed_paths\": [\"/app/reports/*\"],\n        \"allowed_operations\": [\"read\"],\n        \"blocked_patterns\": [\"*.env\", \"*.key\", \"*.pem\", \"*secret*\"]\n    }\n]\n```"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#006",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 1. Tool Security & Least Privilege > Tool Authorization Middleware",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Enforce authorization in the execution component, outside the agent's context. A user_confirmed flag is insufficient: the component must verify that the approval belongs to the current actor and exact tool call, remains valid, and has not already been consumed. Check and consume the approval in one atomic step immediately before execution so concurrent or repeated requests cannot reuse it. Changes to the target or parameters require new approval. Apply the High-Impact Action Integrity Controls and the Transaction Authorization Cheat Sheet. Fail closed for unknown tools or missing approval requirements."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#007",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 2. Input Validation & Prompt Injection Defense",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Treat all external data as untrusted (user messages, retrieved documents, API responses, emails).\n\nImplement input sanitization before including external content in agent context.\n\nUse delimiters and clear boundaries between instructions and data.\n\nApply content filtering for known injection patterns.\n\nConsider using separate LLM calls to validate/summarize untrusted content.\n\nPlease refer to the LLM Prompt Injection Prevention Cheat Sheet for detailed techniques."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#008",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 3. Memory & Context Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Validate and sanitize data before storing in agent memory.\n\nImplement memory isolation between users/sessions.\n\nSet memory expiration and size limits.\n\nAudit memory contents for sensitive data before persistence.\n\nUse cryptographic integrity checks for long-term memory."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#009",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 3. Memory & Context Security > Bad: Unvalidated memory storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\n# Dangerous: Storing arbitrary user input in persistent memory\ndef save_memory(agent, user_message, assistant_response):\n    agent.memory.add({\n        \"user\": user_message,  # Could contain injection payload\n        \"assistant\": assistant_response,\n        \"timestamp\": datetime.now()\n    })\n```"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#010",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 3. Memory & Context Security > Good: Validated and isolated memory",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\nimport hashlib\nfrom datetime import datetime, timedelta\n\nclass SecureAgentMemory:\n    MAX_MEMORY_ITEMS = 100\n    MAX_ITEM_LENGTH = 5000\n    MEMORY_TTL_HOURS = 24\n\n    def __init__(self, user_id: str, encryption_key: bytes):\n        self.user_id = user_id\n        self.encryption_key = encryption_key\n        self.memories = []\n\n    def add(self, content: str, memory_type: str = \"conversation\"):\n        # Validate content\n        if len(content) > self.MAX_ITEM_LENGTH:\n            content = content[:self.MAX_ITEM_LENGTH]\n\n        # Scan for sensitive data patterns\n        if self._contains_sensitive_data(content):\n            content = self._redact_sensitive_data(content)\n\n        # Scan for injection patterns\n        content = self._sanitize_injection_attempts(content)\n\n        # Create integrity-checked memory entry\n        entry = {\n            \"content\": content,\n            \"type\": memory_type,\n            \"timestamp\": datetime.utcnow().isoformat(),\n            \"user_id\": self.user_id,\n            \"checksum\": self._compute_checksum(content)\n        }\n\n        self.memories.append(entry)\n        self._enforce_limits()\n\n    def get_context(self) -> list:\n        \"\"\"Retrieve valid, non-expired memories.\"\"\"\n        valid_memories = []\n        cutoff = datetime.utcnow() - timedelta(hours=self.MEMORY_TTL_HOURS)\n\n        for mem in self.memories:\n            mem_time = datetime.fromisoformat(mem[\"timestamp\"])\n            if mem_time > cutoff and self._verify_checksum(mem):\n                valid_memories.append(mem[\"content\"])\n\n        return valid_memories\n\n    def _contains_sensitive_data(self, content: str) -> bool:\n        sensitive_patterns = [\n            r'\\b\\d{3}-\\d{2}-\\d{4}\\b',  # SSN\n            r'\\b\\d{16}\\b',              # Credit card\n            r'password\\s*[:=]\\s*\\S+',   # Passwords\n            r'api[_-]?key\\s*[:=]\\s*\\S+' # API keys\n        ]\n        return any(re.search(p, content, re.I) for p in sensitive_patterns)\n\n    def _compute_checksum(self, content: str) -> str:\n        return hashlib.sha256(\n            (content + self.user_id).encode() + self.encryption_key\n        ).hexdigest()[:16]\n```"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#011",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 4. Human-in-the-Loop Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Require explicit approval for high-impact or irreversible actions.\n\nImplement action previews before execution.\n\nSet autonomy boundaries based on action risk levels.\n\nProvide clear audit trails of agent decisions and actions.\n\nAllow users to interrupt and rollback agent operations."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#012",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 4. Human-in-the-Loop Controls > Action Classification Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\nfrom enum import Enum\n\nclass RiskLevel(Enum):\n    LOW = \"low\"\n    MEDIUM = \"medium\"\n    HIGH = \"high\"\n    CRITICAL = \"critical\"\n\nACTION_RISK = {\n    \"search_documents\": RiskLevel.LOW,\n    \"read_file\": RiskLevel.LOW,\n    \"write_file\": RiskLevel.MEDIUM,\n    \"send_email\": RiskLevel.HIGH,\n    \"execute_code\": RiskLevel.HIGH,\n    \"database_delete\": RiskLevel.CRITICAL,\n    \"transfer_funds\": RiskLevel.CRITICAL,\n}\n\ndef needs_human_approval(tool_name: str) -> bool:\n    # Unknown tools fail closed. Only explicitly low-risk tools skip review.\n    return ACTION_RISK.get(tool_name, RiskLevel.HIGH) is not RiskLevel.LOW\n```\n\nOnly the two mapped low-risk tools skip human review in this example. Medium, high, critical, and unmapped tools require it. This classification does not grant permission to run a tool; the execution component must still check the actor's authorization and any required approval for the exact action."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#013",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 4. Human-in-the-Loop Controls > High-Impact Action Integrity Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "For destructive, financial, administrative, or externally visible actions, add controls beyond a simple approval prompt:\n\nSeparate decision-making from execution. The agent can propose an action, but a policy service or execution component should independently validate scope, privilege, and approval state before execution.\n\nBind approval to the exact action. Include the actor, tool name, target resource, normalized parameters, timestamp, and expiry in the approval record.\n\nUse short-lived authorization artifacts and replay protection for irreversible operations.\n\nRequire step-up authentication for critical actions such as account recovery, payment initiation, privilege changes, bulk deletion, or production deployment.\n\nMake high-impact actions idempotent where possible and require explicit duplicate confirmation when idempotency is not possible.\n\nFail closed when risk classification, approval validation, policy lookup, or audit logging fails."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#014",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 5. Output Validation & Guardrails",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Validate agent outputs before execution or display.\n\nImplement output filtering for sensitive data leakage.\n\nUse structured outputs with schema validation where possible.\n\nSet boundaries on output actions (rate limits, scope limits).\n\nApply content safety filters to generated responses."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#015",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 5. Output Validation & Guardrails > Output Validation Pipeline",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\nimport json\nimport re\nfrom pydantic import BaseModel, validator\nfrom typing import Optional, List\n\nclass AgentToolCall(BaseModel):\n    tool_name: str\n    parameters: dict\n    reasoning: Optional[str]\n\n    @validator('tool_name')\n    def validate_tool_allowed(cls, v):\n        allowed_tools = [\"search\", \"read_file\", \"calculator\", \"get_weather\"]\n        if v not in allowed_tools:\n            raise ValueError(f\"Tool '{v}' is not in allowed list\")\n        return v\n\n    @validator('parameters')\n    def validate_no_sensitive_data(cls, v):\n        sensitive_patterns = [\n            r'api[_-]?key', r'password', r'secret', r'token',\n            r'credential', r'private[_-]?key'\n        ]\n        params_str = json.dumps(v).lower()\n        for pattern in sensitive_patterns:\n            if re.search(pattern, params_str):\n                raise ValueError(\"Parameters contain potentially sensitive data\")\n        return v\n\nclass OutputGuardrails:\n    def __init__(self):\n        self.pii_patterns = self._load_pii_patterns()\n        self.blocked_actions = set()\n        self.rate_limiter = RateLimiter(max_calls=100, window_seconds=60)\n\n    async def validate_output(self, agent_output: dict) -> dict:\n        # Check rate limits\n        if not self.rate_limiter.allow():\n            raise RateLimitExceeded(\"Agent action rate limit exceeded\")\n\n        # Validate structure\n        if \"tool_calls\" in agent_output:\n            for call in agent_output[\"tool_calls\"]:\n                validated = AgentToolCall(**call)\n\n        # Filter PII from responses\n        if \"response\" in agent_output:\n            agent_output[\"response\"] = self._filter_pii(agent_output[\"response\"])\n\n        # Check for data exfiltration patterns\n        if self._detect_exfiltration_attempt(agent_output):\n            raise SecurityViolation(\"Potential data exfiltration detected\")\n\n        return agent_output\n\n    def _detect_exfiltration_attempt(self, output: dict) -> bool:\n        \"\"\"Detect attempts to exfiltrate data through tool calls.\"\"\"\n        suspicious_patterns = [\n            # Encoding sensitive data in URLs\n            lambda o: \"http\" in str(o) and any(\n                p in str(o).lower() for p in [\"base64\", \"encode\", \"password\"]\n            ),\n            # Large data in webhook/API calls\n            lambda o: o.get(\"tool_name\") in [\"http_request\", \"webhook\"] and \n                     len(str(o.get(\"parameters\", \"\"))) > 10000,\n        ]\n        return any(pattern(output) for pattern in suspicious_patterns)\n```"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#016",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 6. Monitoring & Observability",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Log all agent decisions, tool calls, and outcomes.\n\nImplement anomaly detection for unusual agent behavior.\n\nTrack token usage and costs per session/user.\n\nSet up alerts for security-relevant events.\n\nMaintain audit trails for compliance and forensics.\n\nLog structured decision metadata for high-risk actions, including action classification, risk score when applicable, authorization outcome, approval identifier, execution result, and policy version.\n\nMonitor for drift in approval behavior, repeated approval bypass attempts, elevated privilege usage, abnormal tool invocation frequency, and sudden increases in high-risk actions.\n\nWhen the logs come from a component you did not build, see the Verifying Third-Party Agent Execution Evidence Cheat Sheet for how to judge what such a record establishes."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#017",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 6. Monitoring & Observability > Agent Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "For elapsed-time windows, use Python's timedelta.total_seconds(); the seconds attribute excludes whole days."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#018",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 6. Monitoring & Observability > Agent Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\nimport structlog\nfrom dataclasses import dataclass, field\nfrom typing import List, Dict, Any\nfrom datetime import datetime\n\nlogger = structlog.get_logger()\n\n@dataclass\nclass AgentSecurityEvent:\n    event_type: str\n    severity: str  # INFO, WARNING, CRITICAL\n    agent_id: str\n    session_id: str\n    user_id: str\n    timestamp: datetime\n    details: Dict[str, Any]\n    tool_name: Optional[str] = None\n\nclass AgentMonitor:\n    ANOMALY_THRESHOLDS = {\n        \"tool_calls_per_minute\": 30,\n        \"failed_tool_calls\": 5,\n        \"injection_attempts\": 1,\n        \"sensitive_data_access\": 3,\n        \"cost_per_session_usd\": 10.0,\n    }\n\n    def __init__(self, agent_id: str):\n        self.agent_id = agent_id\n        self.session_metrics = {}\n        self.alert_handlers = []\n\n    async def log_tool_call(self, session_id: str, tool_name: str, \n                           params: dict, result: dict, user_id: str):\n        # Redact sensitive data before logging\n        safe_params = self._redact_sensitive(params)\n        safe_result = self._redact_sensitive(result)\n\n        event = AgentSecurityEvent(\n            event_type=\"tool_call\",\n            severity=\"INFO\",\n            agent_id=self.agent_id,\n            session_id=session_id,\n            user_id=user_id,\n            timestamp=datetime.utcnow(),\n            tool_name=tool_name,\n            details={\n                \"parameters\": safe_params,\n                \"result_status\": result.get(\"status\"),\n                \"execution_time_ms\": result.get(\"execution_time_ms\"),\n            }\n        )\n\n        await self._emit_event(event)\n        await self._check_anomalies(session_id, event)\n\n    async def log_security_event(self, session_id: str, event_type: str,\n                                  severity: str, details: dict, user_id: str):\n        event = AgentSecurityEvent(\n            event_type=event_type,\n            severity=severity,\n            agent_id=self.agent_id,\n            session_id=session_id,\n            user_id=user_id,\n            timestamp=datetime.utcnow(),\n            details=details\n        )\n\n        await self._emit_event(event)\n\n        if severity == \"CRITICAL\":\n            await self._trigger_alert(event)\n\n    async def _check_anomalies(self, session_id: str, event: AgentSecurityEvent):\n        metrics = self.session_metrics.setdefault(session_id, {\n            \"tool_calls\": [],\n            \"failed_calls\": 0,\n            \"total_cost\": 0.0,\n        })\n\n        now = datetime.utcnow()\n        metrics[\"tool_calls\"].append(now)\n\n        # Check tool call rate\n        recent_calls = [t for t in metrics[\"tool_calls\"] \n                       if 0 <= (now - t).total_seconds() < 60]\n        if len(recent_calls) > self.ANOMALY_THRESHOLDS[\"tool_calls_per_minute\"]:\n            await self.log_security_event(\n                session_id, \"anomaly_detected\", \"WARNING\",\n                {\"reason\": \"excessive_tool_calls\", \"count\": len(recent_calls)},\n                event.user_id\n            )\n\n    def _redact_sensitive(self, data: dict) -> dict:\n        \"\"\"Redact sensitive fields from log data.\"\"\"\n        sensitive_keys = {\"password\", \"api_key\", \"token\", \"secret\", \"credential\"}\n\n        def redact(obj):\n            if isinstance(obj, dict):\n                return {\n                    k: \"***REDACTED***\" if k.lower() in sensitive_keys else redact(v)\n                    for k, v in obj.items()\n                }\n            elif isinstance(obj, list):\n                return [redact(i) for i in obj]\n            return obj\n\n        return redact(data)\n```"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#019",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 7. Multi-Agent Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Implement trust boundaries between agents.\n\nValidate and sanitize inter-agent communications.\n\nPrevent privilege escalation through agent chains.\n\nIsolate agent execution environments.\n\nApply circuit breakers to prevent cascading failures."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#020",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 7. Multi-Agent Security > Secure Multi-Agent Communication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Authenticate communicating agents and enforce the sender's permissions at the receiving service before executing a request. A valid message signature does not grant permission to perform the requested action.\n\nWhen message signatures are needed, use a maintained protocol implementation. Protect the sender, intended recipient, message type, payload, creation and expiry times, and a unique message identifier. For HTTP, RFC 9421 explains why verification must require all security-relevant components to be signed.\n\nEnforce a bounded validity window and reject repeated message identifiers before execution. A timestamp check alone permits repeated execution within that window; see RFC 9421's replay considerations. Check and record each identifier in one atomic step, and keep the record for the entire acceptance window, including any clock-skew allowance. Share that state across every receiver instance that can accept the message, and reject messages when it is unavailable; RFC 9449's DPoP replay guidance notes that single-use checks may not be feasible when servers behind one endpoint have no shared state. Keep transport encryption: message signatures do not provide confidentiality."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#021",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 8. Data Protection & Privacy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Minimize sensitive data in agent context.\n\nImplement data classification and handling rules.\n\nApply encryption for data at rest and in transit.\n\nEnforce data retention and deletion policies.\n\nComply with privacy regulations (GDPR, CCPA)."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#022",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 8. Data Protection & Privacy > Data Classification and Handling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "```\nfrom enum import Enum\nfrom typing import Callable\n\nclass DataClassification(Enum):\n    PUBLIC = \"public\"\n    INTERNAL = \"internal\"\n    CONFIDENTIAL = \"confidential\"\n    RESTRICTED = \"restricted\"  # PII, financial, health\n\nclass DataProtectionPolicy:\n    def __init__(self):\n        self.classification_rules = []\n        self.handling_rules = {}\n\n    def classify_data(self, data: str, context: dict) -> DataClassification:\n        \"\"\"Automatically classify data based on content patterns.\"\"\"\n        patterns = {\n            DataClassification.RESTRICTED: [\n                r'\\b\\d{3}-\\d{2}-\\d{4}\\b',      # SSN\n                r'\\b\\d{16}\\b',                  # Credit card\n                r'\\b[A-Z]{2}\\d{6,9}\\b',         # Passport\n                r'diagnosis|prescription|patient',  # Health\n            ],\n            DataClassification.CONFIDENTIAL: [\n                r'salary|compensation|bonus',\n                r'api[_-]?key|password|secret',\n                r'confidential|internal only',\n            ],\n            DataClassification.INTERNAL: [\n                r'@company\\.com',\n                r'internal|draft|not for distribution',\n            ]\n        }\n\n        for classification, pattern_list in patterns.items():\n            if any(re.search(p, data, re.I) for p in pattern_list):\n                return classification\n\n        return DataClassification.PUBLIC\n\n    def apply_protection(self, data: str, classification: DataClassification,\n                         operation: str) -> str:\n        \"\"\"Apply appropriate protection based on classification.\"\"\"\n        handlers = {\n            DataClassification.RESTRICTED: {\n                \"include_in_context\": self._redact_fully,\n                \"log\": self._redact_fully,\n                \"output\": self._redact_fully,\n            },\n            DataClassification.CONFIDENTIAL: {\n                \"include_in_context\": self._mask_partially,\n                \"log\": self._redact_fully,\n                \"output\": self._mask_partially,\n            },\n            DataClassification.INTERNAL: {\n                \"include_in_context\": lambda x: x,\n                \"log\": self._mask_partially,\n                \"output\": lambda x: x,\n            },\n        }\n\n        handler = handlers.get(classification, {}).get(operation, lambda x: x)\n        return handler(data)\n\n    def _redact_fully(self, data: str) -> str:\n        return \"[REDACTED]\"\n\n    def _mask_partially(self, data: str) -> str:\n        if len(data) <= 4:\n            return \"****\"\n        return data[:2] + \"*\" * (len(data) - 4) + data[-2:]\n\n\n# Usage in agent context building\nclass SecureContextBuilder:\n    def __init__(self, policy: DataProtectionPolicy):\n        self.policy = policy\n\n    def build_context(self, documents: List[str], max_tokens: int = 4000) -> str:\n        protected_docs = []\n\n        for doc in documents:\n            classification = self.policy.classify_data(doc, {})\n            protected = self.policy.apply_protection(\n                doc, classification, \"include_in_context\"\n            )\n            protected_docs.append(protected)\n\n        # Combine and truncate\n        context = \"\\n---\\n\".join(protected_docs)\n        return context[:max_tokens * 4]  # Rough char estimate\n```"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#023",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 9. Secure Agent Testing & Adversarial Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "AI agents should undergo structured security testing before production deployment and after material changes to prompts, tools, memory, retrieval, policies, or model providers. Testing should exercise both application controls and agent-specific failure modes."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#024",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 9. Secure Agent Testing & Adversarial Validation > Abuse-Case Test Matrix",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Maintain repeatable test cases for:\n\nAbuse case\n\nWhat to validate\n\nPrompt override\n\nSystem and developer instructions are not silently replaced by user or retrieved content\n\nTool misuse\n\nUnauthorized tools are denied even when the model requests them confidently\n\nPrivilege escalation\n\nLow-trust sessions cannot reach privileged tools, credentials, or admin actions\n\nMemory poisoning\n\nMalicious content is sanitized, scoped, expired, or rejected before persistence\n\nData exfiltration\n\nSensitive context is not leaked through tool calls, citations, logs, or final output\n\nRecursive tool abuse\n\nChain depth, retry, token, and cost limits stop runaway loops\n\nApproval bypass\n\nHigh-impact actions cannot execute without a valid, unexpired, parameter-bound approval\n\nMulti-agent chaining\n\nOne compromised agent cannot cause another agent to exceed its trust boundary"
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#025",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 9. Secure Agent Testing & Adversarial Validation > CI/CD and Release Gates",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Run adversarial test suites in CI/CD for agent templates, tool policies, and prompt changes.\n\nInclude regression tests for previously observed injection, memory poisoning, and tool-abuse failures.\n\nBlock releases when high-risk tool policies, approval logic, or credential scopes change without updated tests.\n\nKeep red-team prompts and expected denials version controlled, but do not store secrets or live customer data in test fixtures.\n\nReview test changes carefully; attackers may try to weaken or remove security tests in the same pull request that changes agent behavior."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#026",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Best Practices > 9. Secure Agent Testing & Adversarial Validation > Validation Evidence",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "For production agents, retain evidence that shows:\n\nThe tested agent version, model provider, tool policy, and retrieval configuration.\n\nThe abuse cases executed and their expected results.\n\nThe approval, denial, timeout, or circuit-breaker behavior observed.\n\nAny accepted residual risk and the compensating control."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#027",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "Do's and Don'ts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "Do:\n\nApply least privilege to all agent tools and permissions.\n\nValidate and sanitize all external inputs (user messages, documents, API responses).\n\nImplement human-in-the-loop for high-risk actions.\n\nIsolate memory and context between users/sessions.\n\nMonitor agent behavior and set up anomaly detection.\n\nUse structured outputs with schema validation.\n\nSign and verify inter-agent communications.\n\nClassify data and apply appropriate protections.\n\nSeparate decision-making from execution for irreversible operations.\n\nPerform structured adversarial testing before production deployment.\n\nEnforce token, cost, retry, and tool-chain limits.\n\nLog structured decision metadata for high-risk actions.\n\nDon't:\n\nGive agents unrestricted tool access or wildcard permissions.\n\nTrust content from external sources (websites, emails, documents).\n\nAllow agents to execute arbitrary code without sandboxing.\n\nStore sensitive data in agent memory without encryption/redaction.\n\nLet agents make high-impact decisions without human oversight.\n\nIgnore cost controls (unbounded loops can cause DoW).\n\nPass unsanitized data between agents in multi-agent systems.\n\nLog sensitive data (PII, credentials) in plain text.\n\nRely solely on model output for authorization decisions.\n\nSkip adversarial testing after prompt, tool, memory, retrieval, or provider changes.\n\nPermit unlimited recursion, retries, or tool chaining."
+  },
+  {
+   "chunk_id": "AI_Agent_Security_Cheat_Sheet#028",
+   "doc": "AI_Agent_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+   "text": "OWASP LLM06:2025 Excessive Agency\n\nNIST Artificial Intelligence Risk Management Framework (AI RMF 1.0)"
+  }
+ ]
+}

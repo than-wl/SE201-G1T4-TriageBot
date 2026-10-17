@@ -1,0 +1,126 @@
+{
+ "doc": "Network_Segmentation_Cheat_Sheet",
+ "title": "Network segmentation Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#001",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "Network segmentation is the core of multi-layer defense in depth for modern services. Segmentation slow down an attacker if he cannot implement attacks such as:\n\nSQL-injections, see SQL Injection Prevention Cheat Sheet;\n\ncompromise of workstations of employees with elevated privileges;\n\ncompromise of another server in the perimeter of the organization;\n\ncompromise of the target service through the compromise of the LDAP directory, DNS server, and other corporate services and sites published on the Internet.\n\nThe main goal of this cheat sheet is to show the basics of network segmentation to effectively counter attacks by building a secure and maximally isolated service network architecture.\n\nSegmentation will avoid the following situations:\n\nexecuting arbitrary commands on a public web server (NginX, Apache, Internet Information Service) prevents an attacker from gaining direct access to the database;\n\nhaving unauthorized access to the database server, an attacker cannot access CnC on the Internet."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#002",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Content",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "Schematic symbols;\n\nThree-layer network architecture;\n\nInterservice interaction;\n\nNetwork security policy;\n\nUseful links."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#003",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Schematic symbols",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "Elements used in network diagrams:\n\nCrossing the border of the rectangle means crossing the firewall:\n\nIn the image above, traffic passes through two firewalls with the names FW1 and FW2\n\nIn the image above, traffic passes through one firewall, behind which there are two VLANs\n\nFurther, the schemes do not contain firewall icons so as not to overload the schemes"
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#004",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Three-layer network architecture",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "By default, developed information systems should consist of at least three components (security zones):\n\nFRONTEND;\n\nMIDDLEWARE;\n\nBACKEND."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#005",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Three-layer network architecture > FRONTEND",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "FRONTEND - A frontend is a set of segments with the following network elements:\n\nbalancer;\n\napplication layer firewall;\n\nweb server;\n\nweb cache."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#006",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Three-layer network architecture > MIDDLEWARE",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "MIDDLEWARE - a set of segments to accommodate the following network elements:\n\nweb applications that implement the logic of the information system (processing requests from clients, other services of the company and external services; execution of requests);\n\nauthorization services;\n\nanalytics services;\n\nmessage queues;\n\nstream processing platform."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#007",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Three-layer network architecture > BACKEND",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "BACKEND - a set of network segments to accommodate the following network elements:\n\nSQL database;\n\nLDAP directory (Domain controller);\n\nstorage of cryptographic keys;\n\nfile server."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#008",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Three-layer network architecture > Example of Three-layer network architecture",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "The following example shows an organization's local network. The organization is called \"Сontoso\".\n\nThe edge firewall contains 2 VLANs of FRONTEND security zone:\n\nDMZ Inbound - a segment for hosting services and applications accessible from the Internet, they must be protected by WAF;\n\nDMZ Outgoing - a segment for hosting services that are inaccessible from the Internet, but have access to external networks (the firewall does not contain any rules for allowing traffic from external networks).\n\nThe internal firewall contains 4 VLANs:\n\nMIDDLEWARE security zone contains only one VLAN with name APPLICATIONS - a segment designed to host information system applications that interact with each other (interservice communication) and interact with other services;\n\nBACKEND security zone contains:\n\nDATABASES - a segment designed to delimit various databases of an automated system;\n\nAD SERVICES - segment designed to host various Active Directory services, in the example only one server with a domain controller Contoso.com is shown;\n\nLOGS - segment, designed to host servers with logs, servers centrally store application logs of an automated system."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#009",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Interservice interaction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "Usually some information systems of the company interact with each other. It is important to define a firewall policy for such interactions. The base allowed interactions are indicated by the green arrows in the image below: The image above also shows the allowed access from the FRONTEND and MIDDLEWARE segments to external networks (the Internet, for example).\n\nFrom this image follows:\n\nAccess between FRONTEND and MIDDLEWARE segments of different information systems is prohibited;\n\nAccess from the MIDDLEWARE segment to the BACKEND segment of another service is prohibited (access to a foreign database bypassing the application server is prohibited).\n\nForbidden accesses are indicated by red arrows in the image below:"
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#010",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Interservice interaction > Many applications on the same network",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "If you prefer to have fewer networks in your organization and host more applications on each network, it is acceptable to host the load balancer on those networks. This balancer will balance traffic to applications on the network. In this case, it will be necessary to open one port to such a network, and balancing will be performed, for example, based on the HTTP request parameters. An example of such segmentation:\n\nAs you can see, there is only one incoming access to each network, access is opened up to the balancer in the network. However, in this case, segmentation no longer works, access control between applications from different network segments is performed at the 7th level of the OSI model using a balancer."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#011",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Network security policy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "The organization must define a \"paper\" policy that describes firewall rules and basic allowed network access. This policy is at least useful for:\n\nnetwork administrators;\n\nsecurity representatives;\n\nIT auditors;\n\narchitects of information systems and software;\n\ndevelopers;\n\nIT administrators.\n\nIt is convenient when the policy is described by similar images. The information is presented as concisely and simply as possible."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#012",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Network security policy > Examples of individual policy provisions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "Examples in the network policy will help colleagues quickly understand what access is potentially allowed and can be requested."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#013",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Network security policy > Examples of individual policy provisions > Permissions for CI/CD",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "The network security policy may define, for example, the basic permissions allowed for the software development system. Let's look at an example of what such a policy might look like:"
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#014",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Network security policy > Examples of individual policy provisions > Secure logging",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "It is important that in the event of a compromise of any information system, its logs are not subsequently modified by an attacker. To do this, you can do the following: copy the logs to a separate server, for example, using the syslog protocol, which does not allow an attacker to modify the logs, syslog only allows you to add new events to the logs. The network security policy for this activity looks like this:\n\nIn this example, we are also talking about application logs that may contain security events, as well as potentially important events that may indicate an attack."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#015",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Network security policy > Examples of individual policy provisions > Permissions for monitoring systems",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "Suppose a company uses Zabbix as an IT monitoring system. In this case, the policy might look like this:"
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#016",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "Useful links",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "Full network segmentation cheat sheet by sergiomarotco: link."
+  },
+  {
+   "chunk_id": "Network_Segmentation_Cheat_Sheet#017",
+   "doc": "Network_Segmentation_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Network_Segmentation_Cheat_Sheet.html",
+   "text": "NIST SP 800-41 Rev. 1: Guidelines on Firewalls and Firewall Policy\n\nNIST SP 800-215: Guide to a Secure Enterprise Network Landscape"
+  }
+ ]
+}

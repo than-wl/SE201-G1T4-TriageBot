@@ -1,0 +1,189 @@
+{
+ "doc": "gRPC_Security_Cheat_Sheet",
+ "title": "gRPC Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#001",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "gRPC (gRPC Remote Procedure Call) is a high-performance, language-neutral RPC framework that uses HTTP/2 for transport and Protocol Buffers for serialization. While gRPC offers significant performance advantages for microservices and distributed systems, it introduces unique security challenges that differ from traditional REST APIs.\n\nThe following sections cover essential security controls for protecting gRPC services from common attack vectors."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#002",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Transport Security > Always Use TLS in Production",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Production deployments need TLS encryption to protect against eavesdropping and man-in-the-middle attacks.\n\n```\n// Go - Secure server with TLS\ncreds, err := credentials.NewServerTLSFromFile(certFile, keyFile)\nif err != nil {\n    log.Fatalf(\"Failed to load TLS credentials: %v\", err)\n}\ns := grpc.NewServer(grpc.Creds(creds))\n```\n\nConfigure TLS 1.2 or higher with strong cipher suites, and disable weak protocols and ciphers."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#003",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Transport Security > Implement Mutual TLS (mTLS) for Service-to-Service Communication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "mTLS provides mutual authentication where both client and server verify each other's certificates, enabling zero-trust communication.\n\n```\n// Go - mTLS client configuration\ncert, err := tls.LoadX509KeyPair(clientCertFile, clientKeyFile)\ncaCert, err := ioutil.ReadFile(caCertFile)\ncaCertPool := x509.NewCertPool()\ncaCertPool.AppendCertsFromPEM(caCert)\n\ncreds := credentials.NewTLS(&tls.Config{\n    Certificates: []tls.Certificate{cert},\n    RootCAs:      caCertPool,\n})\nconn, err := grpc.Dial(address, grpc.WithTransportCredentials(creds))\n```\n\nUse short-lived certificates (90 days or less) with automated rotation to limit the impact of compromised keys."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#004",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Authentication and Authorization > Implement Strong Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Implement authentication checks for each protected service method."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#005",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Authentication and Authorization > Implement Strong Authentication > Token-Based Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "The following unary server interceptor illustrates authentication for unary RPCs only. Register it with the server; protected streaming RPCs need equivalent checks in a stream server interceptor before invoking the stream handler. Registering a unary interceptor does not protect streaming methods.\n\n```\n// Go - JWT token validation interceptor\nfunc authInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {\n    md, ok := metadata.FromIncomingContext(ctx)\n    if !ok {\n        return nil, status.Errorf(codes.Unauthenticated, \"missing metadata\")\n    }\n\n    tokens := md[\"authorization\"]\n    if len(tokens) == 0 {\n        return nil, status.Errorf(codes.Unauthenticated, \"missing authorization token\")\n    }\n\n    token := strings.TrimPrefix(tokens[0], \"Bearer \")\n    if !validateJWT(token) {\n        return nil, status.Errorf(codes.Unauthenticated, \"invalid token\")\n    }\n\n    return handler(ctx, req)\n}\n```"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#006",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Authentication and Authorization > Implement Strong Authentication > API Key Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "```\n// Go - API key validation\nfunc validateAPIKey(ctx context.Context) error {\n    md, ok := metadata.FromIncomingContext(ctx)\n    if !ok {\n        return status.Error(codes.Unauthenticated, \"missing metadata\")\n    }\n\n    keys := md[\"x-api-key\"]\n    if len(keys) == 0 || !isValidAPIKey(keys[0]) {\n        return status.Error(codes.Unauthenticated, \"invalid API key\")\n    }\n    return nil\n}\n```\n\nImplement token expiration and refresh mechanisms with short-lived tokens (15-60 minutes). Avoid embedding credentials in gRPC method parameters - use metadata headers."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#007",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Authentication and Authorization > Enforce Granular Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Implement method-level authorization checks based on the principle of least privilege.\n\n```\n// Go - Role-based authorization\nfunc authorizeMethod(ctx context.Context, methodName string, userRoles []string) error {\n    requiredRole, exists := methodPermissions[methodName]\n    if !exists {\n        return status.Errorf(codes.PermissionDenied, \"method not found\")\n    }\n\n    for _, role := range userRoles {\n        if role == requiredRole {\n            return nil\n        }\n    }\n\n    return status.Errorf(codes.PermissionDenied, \"insufficient permissions\")\n}\n```\n\nLog all authorization failures to detect potential attacks and compliance violations."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#008",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Input Validation and Data Security > Validate All Protocol Buffer Messages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Protocol Buffers provide type safety but not business logic validation. Always perform thorough server-side validation.\n\n```\n// Use protoc-gen-validate for automatic validation\nsyntax = \"proto3\";\nimport \"validate/validate.proto\";\n\nmessage CreateUserRequest {\n  string email = 1 [(validate.rules).string.email = true];\n  string name = 2 [(validate.rules).string = {min_len: 1, max_len: 100}];\n  int32 age = 3 [(validate.rules).int32 = {gte: 0, lte: 150}];\n}\n```\n\nUse allowlist validation for string inputs to prevent unexpected characters and injection attempts."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#009",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Input Validation and Data Security > Prevent Injection Attacks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Validate user input carefully when used in database queries or system operations.\n\n```\n// Go - Safe database query with parameterization\nfunc getUserByEmail(email string) (*User, error) {\n    if !isValidEmail(email) {\n        return nil, errors.New(\"invalid email format\")\n    }\n\n    query := \"SELECT id, name, email FROM users WHERE email = ?\"\n    row := db.QueryRow(query, email)\n\n    var user User\n    err := row.Scan(&user.ID, &user.Name, &user.Email)\n    return &user, err\n}\n```\n\nAlways use prepared statements for database operations to prevent SQL injection."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#010",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Input Validation and Data Security > Implement Message Size Limits",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Set application-appropriate limits on individual messages in both directions. In grpc-go, the server's MaxRecvMsgSize already defaults to 4 MiB. A stream can still carry many individually valid messages, so a per-message limit does not bound the total data or processing work for the stream.\n\n```\n// Go - Set message size limits\ns := grpc.NewServer(\n    grpc.MaxRecvMsgSize(4*1024*1024), // 4 MiB max receive\n    grpc.MaxSendMsgSize(4*1024*1024), // 4 MiB max send\n)\n```\n\nLimit streaming sessions and message counts to prevent resource exhaustion. Monitor and enforce maximum messages per stream and maximum session duration."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#011",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Rate Limiting and Resource Protection > Implement Request Rate Limiting",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Protect services from request flooding and resource exhaustion. The example below limits unary RPCs only. Apply stream admission limits through a stream interceptor and enforce per-message limits within the stream; limiting stream creation alone does not limit the messages sent over an existing stream.\n\n```\n// Go - Illustrative unary rate limiting with bounded entry count\nimport (\n    \"golang.org/x/time/rate\"\n    \"sync\"\n    \"time\"\n)\n\ntype RateLimiterStore struct {\n    limiters map[string]*rateLimiterEntry\n    mu       sync.RWMutex\n}\n\ntype rateLimiterEntry struct {\n    limiter  *rate.Limiter\n    lastSeen time.Time\n}\n\nvar store = &RateLimiterStore{\n    limiters: make(map[string]*rateLimiterEntry),\n}\n\nfunc rateLimitInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {\n    clientIP := getClientIP(ctx)\n\n    store.mu.Lock()\n    entry, exists := store.limiters[clientIP]\n    if !exists {\n        if len(store.limiters) >= maxLimiterEntries {\n            store.mu.Unlock()\n            return nil, status.Error(codes.ResourceExhausted, \"limiter capacity reached\")\n        }\n        entry = &rateLimiterEntry{\n            limiter:  rate.NewLimiter(rate.Limit(10), 20), // 10 req/sec, burst 20\n            lastSeen: time.Now(),\n        }\n        store.limiters[clientIP] = entry\n    }\n    entry.lastSeen = time.Now()\n    store.mu.Unlock()\n\n    if !entry.limiter.Allow() {\n        return nil, status.Errorf(codes.ResourceExhausted, \"rate limit exceeded\")\n    }\n\n    return handler(ctx, req)\n}\n\n// Cleanup old limiters periodically\nfunc cleanupOldLimiters() {\n    store.mu.Lock()\n    defer store.mu.Unlock()\n\n    cutoff := time.Now().Add(-time.Hour)\n    for ip, entry := range store.limiters {\n        if entry.lastSeen.Before(cutoff) {\n            delete(store.limiters, ip)\n        }\n    }\n}\n```"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#012",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Rate Limiting and Resource Protection > Implement Request Rate Limiting",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Configure maxLimiterEntries as a positive cap based on the process memory budget. Schedule cleanupOldLimiters as part of the service lifecycle; defining it does not run it. At capacity, this illustration rejects new client keys while retaining existing limits, so monitor saturation and its effect on legitimate clients. Derive client keys from a trusted connection or authenticated identity, not arbitrary forwarded headers.\n\nEach rate.Limiter limits events for one key; it does not bound the number of keys in the map. This store is local to one process. Use a maintained shared rate-limiting service when limits must apply across replicas."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#013",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Rate Limiting and Resource Protection > Set Appropriate Timeouts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Configure timeouts to prevent resource exhaustion from long-running requests.\n\n```\n// Go - Server-side timeout for resource protection\nfunc (s *server) GetUser(ctx context.Context, req *pb.GetUserRequest) (*pb.User, error) {\n    // Check if client already set a deadline\n    if deadline, ok := ctx.Deadline(); ok && time.Until(deadline) < 5*time.Second {\n        return processGetUser(ctx, req)\n    }\n\n    // Set defensive timeout to prevent resource exhaustion\n    ctx, cancel := context.WithTimeout(ctx, 5*time.Second)\n    defer cancel()\n\n    return processGetUser(ctx, req)\n}\n```\n\nConfigure both client-side and server-side timeouts appropriately for your use case."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#014",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Error Handling and Information Disclosure > Secure Error Responses",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Detailed error messages can reveal system internals to attackers. Return generic error messages while logging detailed information server-side.\n\n```\n// Go - Secure error handling\nfunc (s *server) ProcessPayment(ctx context.Context, req *pb.PaymentRequest) (*pb.PaymentResponse, error) {\n    if err := validatePayment(req); err != nil {\n        // Log detailed error server-side\n        log.Printf(\"Payment validation failed for user %s: %v\", getUserID(ctx), err)\n        // Return generic error to client\n        return nil, status.Error(codes.InvalidArgument, \"invalid payment request\")\n    }\n\n    // Continue processing...\n}\n```\n\nUse appropriate gRPC status codes: UNAUTHENTICATED for auth failures, PERMISSION_DENIED for authorization failures, INVALID_ARGUMENT for validation errors."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#015",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Error Handling and Information Disclosure > Implement Structured Logging",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Log security events to help detect attacks and investigate incidents. Include authentication attempts, authorization failures, and suspicious activities.\n\n```\n// Go - Security event logging\nfunc logSecurityEvent(event string, userID string, clientIP string, success bool) {\n    log.Printf(\"SECURITY_EVENT: %s | User: %s | IP: %s | Success: %t | Time: %s\",\n        event, userID, clientIP, success, time.Now().UTC().Format(time.RFC3339))\n}\n```\n\nInclude correlation IDs to track requests across distributed services and ensure logs don't contain sensitive data like passwords or tokens."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#016",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Service Discovery and Reflection > Disable gRPC Reflection in Production",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "gRPC reflection allows clients to discover service methods and message schemas at runtime, which is invaluable for development and debugging. However, this same capability gives attackers detailed information about your service's API surface, making it easier to craft targeted attacks.\n\n```\n// Go - Conditional reflection (development only)\nif os.Getenv(\"ENVIRONMENT\") != \"production\" {\n    reflection.Register(s)\n}\n```"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#017",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Service Discovery and Reflection > Secure Service Discovery",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Service discovery mechanisms require protection to prevent attackers from injecting malicious service endpoints or intercepting service information.\n\nConsul with mTLS:\n\n```\nconsulConfig := &api.Config{\n    Address:    \"consul.example.com:8500\",\n    Scheme:     \"https\",\n    TLSConfig: &api.TLSConfig{\n        CertFile: \"/path/to/client.crt\",\n        KeyFile:  \"/path/to/client.key\",\n        CAFile:   \"/path/to/ca.crt\",\n    },\n}\n```\n\nKubernetes RBAC:\n\n```\napiVersion: rbac.authorization.k8s.io/v1\nkind: Role\nmetadata:\n  name: grpc-service-discovery\nrules:\n- apiGroups: [\"\"]\n  resources: [\"services\", \"endpoints\"]\n  verbs: [\"get\", \"list\", \"watch\"]\n```\n\nUse service mesh solutions like Istio or Linkerd for automatic mTLS and centralized security policies."
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#018",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Monitoring and Incident Response > Implement Security Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Monitor gRPC services for security events and potential attacks.\n\nKey metrics to monitor:\n\nRequest rates per method and client\n\nAuthentication and authorization failure rates\n\nError rates and types\n\nUnusual traffic patterns\n\nSet up alerts for:\n\nHigh authentication failure rates\n\nAttempts to access non-existent methods\n\nResource exhaustion patterns"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#019",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Monitoring and Incident Response > Enable Distributed Tracing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Track requests across microservices for security analysis.\n\n```\n// Go - OpenTelemetry tracing with security context\ntracer := otel.Tracer(\"grpc-service\")\nctx, span := tracer.Start(ctx, \"grpc.method.call\")\ndefer span.End()\n\nspan.SetAttributes(\n    attribute.String(\"grpc.method\", info.FullMethod),\n    attribute.String(\"client.ip\", getClientIP(ctx)),\n)\n```"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#020",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Testing and Validation > Perform gRPC Security Testing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Include gRPC-specific security tests in your development pipeline.\n\nTest categories:\n\nAuthentication bypass attempts\n\nAuthorization boundary testing\n\nInput validation and injection testing\n\nRate limiting effectiveness\n\nMessage size limit enforcement\n\nUse tools like grpcurl and custom test clients to verify security controls.\n\n```\n# Test authentication requirement\ngrpcurl -plaintext localhost:50051 list\ngrpcurl -plaintext localhost:50051 myservice.MyService/GetUser\n\n# Test with invalid tokens\ngrpcurl -plaintext -H \"authorization: Bearer invalid_token\" \\\n  localhost:50051 myservice.MyService/GetUser\n```"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#021",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Testing and Validation > Security Assessment Guidelines",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Test all gRPC methods for proper authentication and authorization\n\nVerify input validation on all message fields\n\nTest rate limiting and resource exhaustion protections\n\nValidate TLS configuration and certificate handling\n\nCheck for information disclosure in error messages"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#022",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Language-Specific Considerations > Go",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Use interceptors for cross-cutting security concerns\n\nLeverage the context package for request-scoped security information\n\nExplicitly configure TLS - Go's gRPC requires manual TLS setup"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#023",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Language-Specific Considerations > Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Use Java's rich security ecosystem (Spring Security, etc.)\n\nConfigure Netty properly for TLS settings\n\nEnsure ALPN support for HTTP/2"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#024",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Language-Specific Considerations > Python",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Validate all inputs as Python's dynamic typing can hide type issues\n\nUse secure credential management for certificate storage\n\nBe aware of GIL limitations for high-concurrency scenarios"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#025",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "Language-Specific Considerations > C# (.NET)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "Leverage ASP.NET Core's built-in security features\n\nUse the [Authorize] attribute on service methods\n\nConfigure HTTPS properly in production environments"
+  },
+  {
+   "chunk_id": "gRPC_Security_Cheat_Sheet#026",
+   "doc": "gRPC_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/gRPC_Security_Cheat_Sheet.html",
+   "text": "gRPC Authentication Documentation\n\ngRPC: Deadlines\n\ngRPC: Reflection"
+  }
+ ]
+}

@@ -1,0 +1,98 @@
+{
+ "doc": "Bean_Validation_Cheat_Sheet",
+ "title": "Bean Validation Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#001",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "This article is focused on providing clear, simple, actionable guidance for providing Java Bean Validation security functionality in your applications.\n\nBean validation (aka Jakarta Validation) is one of the most common ways to perform input validation in Java. It is an application layer agnostic validation spec which provides the developer with the means to define a set of validation constraints on a domain model and then perform validation of those constraints through out the various application tiers.\n\nOne advantage of this approach is that the validation constraints and the corresponding validators are only written once, thus reducing duplication of effort and ensuring uniformity:"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#002",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Setup",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "The illustrative examples below use the legacy javax.validation API, including its built-in constraint package, with Hibernate Validator. Jakarta Validation 3.0 uses jakarta.validation; use API and provider versions compatible with your application.\n\nAdd Hibernate Validator to your pom.xml:\n\n```\n<dependency>\n   <groupId>org.hibernate</groupId>\n   <artifactId>hibernate-validator</artifactId>\n   <version>USE_LATEST_VERSION</version>\n</dependency>\n```\n\nEnable bean validation support in Spring's context.xml:\n\n```\n<beans:beans ...\n   ...\n   <mvc:annotation-driven />\n   ...\n</beans:beans>\n```\n\nFor more info, please see the setup guide"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#003",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Basics",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "In order to get started using Bean Validation, you must add validation constraints (@Pattern, @Digits, @Min, @Max, @Size, @Past, @Future, @CreditCardNumber, @Email, @URL, etc.) to your model and then utilize the @Valid annotation when passing your model around in various application layers.\n\nConstraints can be applied in several places:\n\nFields\n\nProperties\n\nClasses\n\nFor Bean Validation 1.1 also on:\n\nParameters\n\nReturn values\n\nConstructors\n\nFor the sake of simplicity all the examples below feature field constraints and all validation is triggered by the controller. Refer to the Bean Validation documentation for a full list of examples.\n\nWhen it comes to error handling, the Hibernate Validator returns a BindingResult object which contains a List<ObjectError>. The examples below feature simplistic error handling, while a production ready application would have a more elaborate design that takes care of logging and error page redirection."
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#004",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Predefined Constraints > @Pattern",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "Annotation:\n\n@Pattern(regexp=,flags=)\n\nData Type:\n\nCharSequence\n\nUse:\n\nChecks if the annotated string matches the regular expression regex considering the given flag match. Please visit OWASP Validation Regex Repository for other useful regex's.\n\nReference:\n\nDocumentation\n\nModel:\n\n```\nimport javax.validation.constraints.Pattern;\n\npublic class Article  {\n //Constraint: One or more ASCII letters, digits, or spaces\n @Pattern(regexp = \"[a-zA-Z0-9 ]+\")\n private String articleTitle;\n public String getArticleTitle()  {\n  return  articleTitle;\n }\n public void setArticleTitle(String  articleTitle)  {\n   this.articleTitle  =  articleTitle;\n  }\n\n  ...\n\n}\n```\n\nController:\n\n```\nimport javax.validation.Valid;\nimport com.company.app.model.Article;\n\n@Controller\npublic class ArticleController  {\n\n ...\n\n @RequestMapping(value = \"/postArticle\",  method = RequestMethod.POST)\n public @ResponseBody String postArticle(@Valid  Article  article,  BindingResult  result,\n HttpServletResponse  response) {\n  if (result.hasErrors()) {\n   String errorMessage  =  \"\";\n   response.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n   List<ObjectError> errors = result.getAllErrors();\n   for(ObjectError  e :  errors) {\n    errorMessage += \"ERROR: \" +  e.getDefaultMessage();\n   }\n   return  errorMessage;\n  } else {\n   return  \"Validation Successful\";\n  }\n }\n}\n```"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#005",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Predefined Constraints > @Digits",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "Annotation:\n\n@Digits(integer=,fraction=)\n\nData Type:\n\nBigDecimal, BigInteger, CharSequence, byte, short, int, long and the respective wrappers of the primitive types; Additionally supported by HV: any sub-type of Number\n\nUse:\n\nChecks whether the annotated value is a number having up to integer digits and fraction fractional digits\n\nReference:\n\nDocumentation\n\nModel:\n\n```\nimport javax.validation.constraints.Digits;\n\npublic class Customer {\n  //Constraint: Age can only be 3 digits long or less\n  @Digits(integer = 3, fraction = 0)\n  private int age;\n\n  public int getAge()  {\n    return age;\n  }\n\n  public void setAge(int age)  {\n      this.age = age;\n    }\n\n    ...\n}\n```\n\nController:\n\n```\nimport javax.validation.Valid;\nimport com.company.app.model.Customer;\n\n@Controller\npublic class CustomerController  {\n\n ...\n\n @RequestMapping(value = \"/registerCustomer\",  method = RequestMethod.POST)\n public @ResponseBody String registerCustomer(@Valid Customer customer, BindingResult result,\n HttpServletResponse  response) {\n\n  if (result.hasErrors()) {\n   String errorMessage = \"\";\n   response.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n   List<ObjectError> errors = result.getAllErrors();\n\n   for( ObjectError  e :  errors) {\n    errorMessage += \"ERROR: \"  +  e.getDefaultMessage();\n   }\n   return  errorMessage;\n  } else {\n   return  \"Validation Successful\";\n  }\n }\n}\n```"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#006",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Predefined Constraints > @Size",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "Annotation:\n\n@Size(min=, max=)\n\nData Type:\n\nCharSequence, Collection, Map and Arrays\n\nUse:\n\nChecks if the annotated element's size is between min and max (inclusive)\n\nReference:\n\nDocumentation\n\nModel:\n\n```\nimport javax.validation.constraints.Size;\n\npublic class Message {\n\n   //Constraint: Message must contain 10 to 500 characters, inclusive\n   @Size(min = 10, max = 500)\n   private String message;\n\n   public String getMessage() {\n      return message;\n   }\n\n   public void setMessage(String message) {\n      this.message = message;\n   }\n\n...\n}\n```\n\nController:\n\n```\nimport javax.validation.Valid;\nimport com.company.app.model.Message;\n\n@Controller\npublic class MessageController {\n\n...\n\n@RequestMapping(value=\"/sendMessage\", method=RequestMethod.POST)\npublic @ResponseBody String sendMessage(@Valid Message message, BindingResult result,\nHttpServletResponse response){\n\n   if(result.hasErrors()){\n      String errorMessage = \"\";\n      response.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n      List<ObjectError> errors = result.getAllErrors();\n      for( ObjectError e : errors){\n         errorMessage+= \"ERROR: \" + e.getDefaultMessage();\n      }\n      return errorMessage;\n   }\n   else{\n      return \"Validation Successful\";\n   }\n}\n}\n```"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#007",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Predefined Constraints > @Past / @Future",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "Annotation:\n\n@Past, @Future\n\nData Type:\n\njava.util.Date, java.util.Calendar, java.time.chrono.ChronoZonedDateTime, java.time.Instant, java.time.OffsetDateTime\n\nUse:\n\nChecks whether the annotated date is in the past / future. Use a supported date type, such as java.util.Date; @Future does not validate date strings.\n\nReference:\n\nDocumentation\n\nModel:\n\n```\nimport java.util.Date;\nimport javax.validation.constraints.Past;\nimport javax.validation.constraints.Future;\n\npublic class DoctorVisit {\n\n   //Constraint: Birthdate must be in the past\n   @Past\n   private Date birthDate;\n\n   public Date getBirthDate() {\n      return birthDate;\n   }\n\n   public void setBirthDate(Date birthDate) {\n      this.birthDate = birthDate;\n   }\n\n   //Constraint: Schedule visit date must be in the future\n   @Future\n   private Date scheduledVisitDate;\n\n   public Date getScheduledVisitDate() {\n      return scheduledVisitDate;\n   }\n\n   public void setScheduledVisitDate(Date scheduledVisitDate) {\n      this.scheduledVisitDate = scheduledVisitDate;\n   }\n\n...\n}\n```\n\nController:\n\n```\nimport javax.validation.Valid;\nimport com.company.app.model.DoctorVisit;\n\n@Controller\npublic class DoctorVisitController {\n\n   ...\n\n   @RequestMapping(value=\"/scheduleVisit\", method=RequestMethod.POST)\n   public @ResponseBody String scheduleVisit(@Valid DoctorVisit doctorvisit, BindingResult result,\n   HttpServletResponse response){\n\n      if(result.hasErrors()){\n         String errorMessage = \"\";\n         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n         List<ObjectError> errors = result.getAllErrors();\n         for( ObjectError e : errors){\n            errorMessage+= \"ERROR: \" + e.getDefaultMessage();\n         }\n         return errorMessage;\n      }\n      else{\n         return \"Validation Successful\";\n      }\n   }\n}\n```"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#008",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Predefined Constraints > Combining Constraints",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "Validation annotations can be combined in any suitable way. For instance, to specify a valid reviewRating value between 1 and 5, specify the validation like this :\n\nAnnotation:\n\n@Min(value=), @Max(value=)\n\nData Type:\n\nBigDecimal, BigInteger, byte, short, int, long and the respective wrappers of the primitive types; Additionally supported by HV: any sub-type of CharSequence (the numeric value represented by the character sequence is evaluated), any sub-type of Number\n\nUse:\n\nChecks whether the annotated value is higher/lower than or equal to the specified minimum\n\nReference:\n\nDocumentation\n\nModel:\n\n```\nimport javax.validation.constraints.Min;\nimport javax.validation.constraints.Max;\n\npublic class Review {\n\n //Constraint: Review rating must be between 1 and 5\n @Min(1)\n @Max(5)\n private int reviewRating;\n\n public int getReviewRating() {\n   return reviewRating;\n }\n\n public void setReviewRating(int reviewRating) {\n   this.reviewRating = reviewRating;\n}\n ...\n}\n```\n\nController:\n\n```\nimport javax.validation.Valid;\nimport com.company.app.model.ReviewRating;\n\n@Controller\npublic class ReviewController {\n\n   ...\n\n   @RequestMapping(value=\"/postReview\", method=RequestMethod.POST)\n   public @ResponseBody String postReview(@Valid Review review, BindingResult result,\n   HttpServletResponse response){\n\n      if(result.hasErrors()){\n         String errorMessage = \"\";\n         response.setStatus(HttpServletResponse.SC_BAD_REQUEST);\n         List<ObjectError> errors = result.getAllErrors();\n         for( ObjectError e : errors){\n            errorMessage+= \"ERROR: \" + e.getDefaultMessage();\n         }\n         return errorMessage;\n      }\n       else{\n         return \"Validation Successful\";\n      }\n   }\n}\n```"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#009",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Predefined Constraints > Cascading Constraints",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "Validating one bean is a good start, but often, beans are nested or in a complete graph of beans. To validate that graph in one go, apply cascading validation with @Valid"
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#010",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Predefined Constraints > Additional Constraints",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "In addition to providing the complete set of JSR303 constraints, Hibernate Validator also defines some additional constraints for convenience:\n\n@CreditCardNumber\n\n@EAN\n\n@Email\n\n@Length\n\n@Range\n\n@ScriptAssert\n\n@URL\n\nTake a look at this list for the complete list.\n\nNote that @SafeHtml, a previously valid constraint, has been deprecated according to the Hibernate Validator 6.1.0.Final and 6.0.18.Final release blogpost. Please refrain from using the @SafeHtml constraint."
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#011",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Custom Constraints",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "One of the most powerful features of bean validation is the ability to define your own constraints that go beyond the simple validation offered by built-in constraints.\n\nCreating custom constraints is beyond the scope of this guide. Please see this documentation."
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#012",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "Error Messages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "It is possible to specify a message ID with the validation annotation, so that error messages are customized :\n\n```\n@Pattern(regexp = \"[a-zA-Z0-9 ]+\", message=\"article.title.error\")\nprivate String articleTitle;\n```\n\nSpring MVC will then look up a message with ID article.title.error in a defined MessageSource. More on this documentation."
+  },
+  {
+   "chunk_id": "Bean_Validation_Cheat_Sheet#013",
+   "doc": "Bean_Validation_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Bean_Validation_Cheat_Sheet.html",
+   "text": "Jakarta Bean Validation 3.0 Specification\n\nHibernate Validator 9.0: Interpolating Constraint Error Messages"
+  }
+ ]
+}

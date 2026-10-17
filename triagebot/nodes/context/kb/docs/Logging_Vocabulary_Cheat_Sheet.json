@@ -1,0 +1,504 @@
+{
+ "doc": "Logging_Vocabulary_Cheat_Sheet",
+ "title": "Application Logging Vocabulary Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#001",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Application Logging Vocabulary Cheat Sheet",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "This document proposes a standard vocabulary for logging security events. The intent is to simplify monitoring and alerting such that, assuming developers trap errors and log them using this vocabulary, monitoring and alerting would be improved by simply keying on these terms."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#002",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Overview",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Each year IBM Security commissions the Ponemon Institute to survey companies around the world for information related to security breaches, mitigation, and the associated costs; the result is called the Cost of a Data Breach Report.\n\nIn addition to the millions of dollars lost due to breaches the report finds that the mean time to identify a breach continues to hover around 200 days. Clearly our ability to monitor applications and alert on anomalous behavior would improve our time to identify and mitigate an attack against our applications.\n\nIBM Cost of a Data Breach Report 2025, Fig.4, pg.12\n\nThis logging standard would seek to define specific keywords which, when applied consistently across software, would allow groups to simply monitor for these events terms across all applications and respond quickly in the event of attack."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#003",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Assumptions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Observability/SRE groups must support the use of this standard and encourage developers to use it\n\nIncident Response must either ingest this data OR provide a means by which other monitoring teams can send a notification of alert, preferably programmatically.\n\nArchitects must support, adopt, and contribute to this standard\n\nDevelopers must embrace this standard and begin to implement (requires knowledge and intent to understand potential attacks and trap those errors in code)."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#004",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Getting Started",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "As a reminder, the goal of logging is to be able to alert on specific security events. Of course, the first step to logging these events is good error handling, if you're not trapping the events, you don't have an event to log."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#005",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Getting Started > Identifying Events",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "In order to better understand security event logging a good high-level understanding of threat modeling would be helpful, even if it's a simple approach of:\n\nWhat could go wrong?\n\nOrders: could someone order on behalf of another?\n\nAuthentication: could I log in as someone else?\n\nAuthorization: could I see someone else' account?\n\nWhat would happen if it did?\n\nOrders: I've placed an order on behalf of another... to an abandoned warehouse in New Jersey. Oops.\n\nThen I bragged about it on 4Chan.\n\nThen I told the New York Times about it.\n\nWho might intend to do this?\n\nIntentional attacks by hackers.\n\nAn employee \"testing\" how things work.\n\nAn API coded incorrectly doing things the author did not intend."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#006",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Getting Started > Implementation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Some languages have libraries which ease the job of adopting this logging vocabulary in applications:\n\nPython: lucabello/owasp-logger\n\nC#/.NET: byteguard-hq/byteguard-security-logger\n\nPython / Java / Go / Node.js: thatsjet/security_event_logger"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#007",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Format",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "NOTE: All dates should be logged in ISO 8601 format WITH UTC offset to ensure maximum portability\n\n```\n{\n    \"datetime\": \"2021-01-01T01:01:01-0700\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"AUTHN_login_success:joebob1\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 login successfully\",\n    \"useragent\": \"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36\",\n    \"source_ip\": \"165.225.50.94\",\n    \"host_ip\": \"10.12.7.9\",\n    \"hostname\": \"portalauth.foobar.com\",\n    \"protocol\": \"https\",\n    \"port\": \"440\",\n    \"request_uri\": \"/api/v2/auth/\",\n    \"request_method\": \"POST\",\n    \"region\": \"AWS-US-WEST-2\",\n    \"geo\": \"USA\"\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#008",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "The Vocabulary",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "What follows are the various event types that should be captured. For each event type there is a prefix like \"authn\" and additional data that may be included for that event.\n\nPortions of the full logging format are included for example, but a complete event log should follow the format above.\n\nNote on Data Privacy:\n\nAll fields logged after event type should be considered optional. Businesses implementing this logging method should consider value of the fields being logged vs. responsibility as a data steward for the data logged. For example: logging user IP address may be useful for detection and response, but may be considered personally identifiable information when combined with other data and subject to regulation or deletion requests."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#009",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_login_success[:userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description All login events should be recorded including success.\n\nLevel: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_login_success:joebob1\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 login successfully\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#010",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_login_successafterfail[:userid,retries]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description The user successfully logged in after previously failing.\n\nLevel: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_login_successafterfail:joebob1,2\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 login successfully\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#011",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_login_fail[:userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description All login events should be recorded including failure.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_login_fail:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 login failed\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#012",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_login_fail_max[:userid,maxlimit(int)]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description All login events should be recorded including failure.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_login_fail_max:joebob1,3\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 reached the login fail limit of 3\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#013",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_login_lock[:userid,reason]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When the feature exists to lock an account after x retries or other condition, the lock should be logged with relevant data.\n\nLevel: WARN\n\nReasons:\n\nmaxretries: The maximum number of retries was reached\n\nsuspicious: Suspicious activity was observed on the account\n\ncustomer: The customer requested their account be locked\n\nother: Other\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_login_lock:joebob1,maxretries\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 login locked because maxretries exceeded\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#014",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_password_change[:userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description Every password change should be logged, including the userid that it was for.\n\nLevel: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_password_change:joebob1\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 has successfully changed their password\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#015",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_password_change_fail[:userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description An attempt to change a password that failed. May also trigger other events such as authn_login_lock.\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_password_change_fail:joebob1\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User joebob1 failed to change their password\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#016",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_impossible_travel[:userid,region1,region2]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a user is logged in from one city and suddenly appears in another, too far away to have traveled in a reasonable timeframe, this often indicates a potential account takeover.\n\nLevel:: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_impossible_travel:joebob1,US-OR,CN-SH\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User joebob1 has accessed the application in two distant cities at the same time\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#017",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_token_created[:userid, entitlement(s)]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a token is created for service access it should be recorded\n\nLevel:: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"aws.foobar.com\",\n    \"event\": \"authn_token_created:app.foobarapi.prod,create,read,update\",\n    \"level\": \"INFO\",\n    \"description\": \"A token has been created for app.foobarapi.prod with create,read,update\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#018",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_token_revoked[:userid,tokenid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description A token has been revoked for the given account.\n\nLevel:: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"aws.foobar.com\",\n    \"event\": \"authn_token_revoked:app.foobarapi.prod,xyz-abc-123-gfk\",\n    \"level\": \"INFO\",\n    \"description\": \"Token ID: xyz-abc-123-gfk was revoked for user app.foobarapi.prod\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#019",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_token_reuse[:userid,tokenid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description A previously revoked token was attempted to be reused.\n\nLevel:: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"aws.foobar.com\",\n    \"event\": \"authn_token_reuse:app.foobarapi.prod,xyz-abc-123-gfk\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User app.foobarapi.prod attempted to use token ID: xyz-abc-123-gfk which was previously revoked\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#020",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authentication [AUTHN] > authn_token_delete[:appid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a token is deleted it should be recorded\n\nLevel:: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authn_token_delete:foobarapi\",\n    \"level\": \"WARN\",\n    \"description\": \"The token for foobarapi has been deleted\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#021",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authorization [AUTHZ] > authz_fail[:userid,resource]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description An attempt was made to access a resource which was unauthorized\n\nLevel:: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authz_fail:joebob1,resource\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User joebob1 attempted to access a resource without entitlement\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#022",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authorization [AUTHZ] > authz_change[:userid,from,to]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description The user or entity entitlements was changed\n\nLevel:: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authz_change:joebob1,user,admin\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 access was changed from user to admin\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#023",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Authorization [AUTHZ] > authz_admin[:userid,event]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description All activity by privileged users such as admin should be recorded.\n\nLevel:: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"authz_admin:joebob1,user_privilege_change\",\n    \"level\": \"WARN\",\n    \"description\": \"Administrator joebob1 has updated privileges of user foobarapi from user to admin\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#024",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Encryption/Decryption [CRYPT] > crypt_decrypt_fail[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description Failure to perform encryption and decryption could be simply due to a system error, or it may be related to authorization failures where a user lacks permissions on the related data.\n\nLevel:: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"crypt_decrypt_fail:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 was unable to perform decryption\" + err,\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#025",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Encryption/Decryption [CRYPT] > crypt_encrypt_fail[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description Failure to perform encryption and decryption could be simply due to a system error, or it may be related to authorization failures where a user lacks permissions on the related data.\n\nLevel:: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"crypt_encrypt_fail:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 was unable to perform encryption\" + err,\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#026",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Excessive Use [EXCESS] > excess_rate_limit_exceeded[userid,max]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description Expected service limit ceilings should be established and alerted when exceeded, even if simply for managing costs and scaling.\n\nLevel:: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"excess_rate_limit_exceeded:app.foobarapi.prod,100000\",\n    \"level\": \"WARN\",\n    \"description\": \"User app.foobarapi.prod has exceeded max:100000 requests\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#027",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Excessive Use [EXCESS] > excess_sessions_exceeded[userid,max]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a user exceeds the maximum number of concurrent sessions allowed it should be logged. An unusually high concurrent-session count can indicate credential sharing or account takeover.\n\nLevel:: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"excess_sessions_exceeded:app.foobarapi.prod,5\",\n    \"level\": \"WARN\",\n    \"description\": \"User app.foobarapi.prod exceeded the max of 5 concurrent sessions\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#028",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "File Upload [UPLOAD] > upload_complete[userid,filename,type]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description On successful file upload the first step in the validation process is that the upload has completed.\n\nLevel:: INFO\n\nExample:\n\n```\n    {\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"upload_complete:joebob1,user_generated_content.png,PNG\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 has uploaded user_generated_content.png\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#029",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "File Upload [UPLOAD] > upload_stored[filename,from,to]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description One step in good file upload validation is to move/rename the file and when providing the content back to end users, never reference the original filename in the download. This is true both when storing in a filesystem as well as in block storage.\n\nLevel:: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"upload_stored:user_generated_content.png,kjsdhkrjhwijhsiuhdf000010202002\",\n    \"level\": \"INFO\",\n    \"description\": \"File user_generated_content.png was stored in the database with key abcdefghijk101010101\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#030",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "File Upload [UPLOAD] > upload_validation[filename,(virusscan|imagemagick|...):(FAILED|incomplete|passed)]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description All file uploads should have some validation performed, both for correctness (is in fact of file type x), and for safety (does not contain a virus).\n\nLevel:: INFO|CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"upload_validation:filename,virusscan:FAILED\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"File user_generated_content.png FAILED virus scan and was purged\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#031",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "File Upload [UPLOAD] > upload_delete[userid,fileid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a file is deleted for normal reasons it should be recorded.\n\nLevel:: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"upload_delete:joebob1,\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 has marked file abcdefghijk101010101 for deletion.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#032",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Input Validation [INPUT] > input_validation_fail:[(fieldone,fieldtwo...),userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When input validation fails on the server-side it must either be because a) sufficient validation was not provided on the client, or b) client-side validation was bypassed. In either case it's an opportunity for attack and should be mitigated quickly.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"input_validation_fail:(zip,date_of_birth),joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 submitted data that failed validation.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#033",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Input Validation [INPUT] > input_validation_discrete_fail[:field,userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When server-side validation of a value against a discrete list of options (e.g. drop down list, radio buttons) fails, it is a strong indication of malicious activity as this indicates the client-side code has been tampered with.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2021-02-01T08:30:00-0500\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"input_validation_discrete_fail:country,joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 submitted an invalid value for the 'country' field.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#034",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_excess_404:[userid|IP,useragent]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a user makes numerous requests for files that don't exist it often is an indicator of attempts to \"force-browse\" for files that could exist and is often behavior indicating malicious intent.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_excess404:123.456.789.101,M@l1c10us-Hax0rB0t0-v1\",\n    \"level\": \"WARN\",\n    \"description\": \"A user at 123.456.789.101 has generated a large number of 404 requests.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#035",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_extraneous:[userid|IP,inputname,useragent]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a user submits data to a backend handler that was not expected it can indicate probing for input validation errors. If your backend service receives data it does not handle or have an input for this is an indication of likely malicious abuse.\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_extraneous:dr@evil.com,creditcardnum,Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User dr@evil.com included field creditcardnum in the request which is not handled by this service.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#036",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_attack_tool:[userid|IP,toolname,useragent]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When obvious attack tools are identified either by signature or by user agent they should be logged.\n\nFor example, the tool \"Nikto\" leaves behind its user agent by default with a string like \"Mozilla/5.00 (Nikto/2.1.6) (Evasions:None) (Test:Port Check)\"\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_attack_tool:127.0.0.1,nikto,Mozilla/5.00 (Nikto/2.1.6) (Evasions:None) (Test:Port Check)\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"Attack traffic indicating use of Nikto coming from 127.0.0.1\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#037",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_sqli:[userid|IP,parameter,ruleid,useragent]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When request input matches a SQL injection (SQLi) signature or heuristic, log the suspected attempt. Configure blocking under a tested policy and tune false positives for the application; a detection match is not proof of exploitation. Use parameterized queries and the other primary SQL injection defenses regardless of detection rules.\n\nNOTE: Logging the payload is dangerous and may result in log injection. Prefer recording a detection rule ID / category and the parameter name over logging the full payload.\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_sqli:127.0.0.1,search,SQLI-UNION,Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"Request from 127.0.0.1 contained a SQL injection pattern (rule SQLI-UNION) in parameter 'search'.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#038",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_cors:[userid|IP,useragent,referer]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When attempts are made from unauthorized origins they should of course be blocked, but also logged whenever possible. Even if we block an illegal cross-origin request the fact that the request is being made could be an indication of attack.\n\nNOTE: Did you know that the word \"referer\" is misspelled in the original HTTP specification? The correct spelling should be \"referrer\" but the original typo persists to this day and is used here intentionally.\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_cors:127.0.0.1,Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0,attack.evil.com\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"An illegal cross-origin request from 127.0.0.1 was referred from attack.evil.com\"\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#039",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_direct_reference:[userid|IP, useragent]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description A common attack against authentication and authorization is to directly access an object without credentials or appropriate access authority. Failing to prevent this flaw used to be one of the OWASP Top Ten called Insecure Direct Object Reference. Assuming you've correctly prevented this attack, logging the attempt is valuable to identify malicious users.\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_direct_reference:joebob1, Mozilla/5.0 (X11; Linux x86_64; rv:10.0) Gecko/20100101 Firefox/10.0\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User joebob1 attempted to access an object to which they are not authorized\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#040",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_csrf:[userid|IP]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a state-changing request arrives without a valid anti-CSRF token (or with a mismatched token, Origin, or Referer) it may indicate a cross-site request forgery attempt. Block the request and log the attempt. See the OWASP Cross-Site Request Forgery Prevention Cheat Sheet for token and Origin/Referer validation guidance.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_csrf:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"A state-changing request from joebob1 was missing a valid anti-CSRF token\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#041",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Malicious Behavior [MALICIOUS] > malicious_csp_violation:[userid|IP,effective_directive,blocked_uri,useragent]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a browser reports a Content-Security-Policy violation to your report endpoint, log the violation. In Report-Only mode this is high-noise — browser extensions and injected third-party scripts trigger benign violations — so WARN is appropriate; promote to CRITICAL only if you treat enforced-mode blocks as attack signal.\n\nNOTE: CSP report fields such as document-uri, referrer, and blocked-uri are URL-valued (see the W3C Content Security Policy Level 3 violation report definition) and routinely contain full URLs whose query strings carry session or reset tokens. Strip the query string/fragment before logging, and prefer the effective-directive + blocked-uri (origin+path) over the full report body to avoid a secondary sensitive-data or log-injection risk.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"malicious_csp_violation:203.0.113.7,script-src,https://foobar.com/dashboard,Mozilla/5.0\",\n    \"level\": \"WARN\",\n    \"description\": \"A CSP violation for directive script-src was reported by a browser at 203.0.113.7\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#042",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "MCP Servers [MCP]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "This section focuses on concerns related to the use of MCP servers either within productivity applications, or at the enterprise level."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#043",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "MCP Servers [MCP] > mcp_prompt_injection[:userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When an MCP client or server detects indicators of prompt injection (for example, instructions to ignore system/developer messages, attempts to override tool policies, requests to reveal secrets, or attempts to coerce tool calls outside of the intended task), block or constrain the action and log the event for investigation.\n\nNOTE: Avoid logging the full prompt/tool I/O. Prefer logging a detection category or rule ID, the target tool/server, and request identifiers to support triage without creating a secondary sensitive-data or log-injection risk.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.cooldevapp_mcp_toolname\",\n    \"event\": \"mcp_prompt_injection:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"A possible prompt injection has occurred\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#044",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "MCP Servers [MCP] > mcp_resource_exhaustion[:userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When an MCP client or server detects a request pattern intended to exhaust resources (for example, unusually large prompts, repeated retries, tool-call loops, or other behavior that drives excessive token usage and cost), terminate or throttle the activity and log the attempt.\n\nNOTE: Avoid logging full prompts or tool inputs/outputs. Prefer logging measured usage (tokens in/out), policy thresholds, request identifiers, and the tool/model involved.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.cooldevapp_mcp_toolname\",\n    \"event\": \"mcp_resource_exhaustion:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"Request blocked due to token budget overrun (tokens_in=18240, tokens_out=0, budget=8000)\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#045",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "MCP Servers [MCP] > mcp_tool_poisoning[:userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When an MCP client or server detects that a tool may be malicious or tampered with (for example, unexpected tool changes, signature/hash verification failures, suspicious tool metadata, or a tool sourced from an agent/tool marketplace with minimal validation), block or quarantine the tool and log the attempt.\n\nNOTE: Tool ecosystems and agent marketplaces can enable rapid proliferation of third-party tools with relatively low validation. An internal marketplace or hashed allowlist for approved tools is highly recommended.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.cooldevapp_mcp_toolname\",\n    \"event\": \"mcp_tool_poisoning:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"Tool execution blocked (tool=\\\"calendar_sync\\\", source=\\\"https://marketplace.example/tools/calendar_sync\\\", version=\\\"2.4.1\\\", signature=\\\"missing\\\", policy=\\\"allowlist_required\\\")\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#046",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Privilege Changes [PRIVILEGE]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "This section focuses on object privilege changes such as read/write/execute permissions or objects in a database having authorization meta-information changed.\n\nChanges to user/account are covered in the User Management section."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#047",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Privilege Changes [PRIVILEGE] > privilege_permissions_changed:[userid,file|object,fromlevel,tolevel]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description Tracking changes to objects to which there are access control restrictions can uncover attempt to escalate privilege on those files by unauthorized users.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"permissions_changed:joebob1, /users/admin/some/important/path,0511,0777\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 changed permissions on /users/admin/some/important/path\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#048",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Sensitive Data Changes [DATA]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "It's not necessary to log or alert on changes to all files, but in the case of highly sensitive files or data it is important that we monitor and alert on changes."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#049",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Sensitive Data Changes [DATA] > sensitive_create:[userid,file|object]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a new piece of data is created and marked as sensitive or placed into a directory/table/repository where sensitive data is stored, that creation should be logged and reviewed periodically.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sensitive_create:joebob1, /users/admin/some/important/path\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 created a new file in /users/admin/some/important/path\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#050",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Sensitive Data Changes [DATA] > sensitive_read:[userid,file|object]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description All data marked as sensitive or placed into a directory/table/repository where sensitive data is stored should be have access logged and reviewed periodically.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sensitive_read:joebob1, /users/admin/some/important/path\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 read file /users/admin/some/important/path\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#051",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Sensitive Data Changes [DATA] > sensitive_update:[userid,file|object]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description All data marked as sensitive or placed into a directory/table/repository where sensitive data is stored should be have updates to the data logged and reviewed periodically.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sensitive_update:joebob1, /users/admin/some/important/path\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 modified file /users/admin/some/important/path\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#052",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Sensitive Data Changes [DATA] > sensitive_delete:[userid,file|object]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description Log and periodically review deletion events for sensitive files and data. Record the action and object identifier without copying the sensitive contents into the log. Retain the underlying data according to the applicable information-retention requirements (NIST SI-12), then securely dispose of it and retained copies when no longer needed (SI-12(3)). Keep the deletion audit record according to the log retention and disposal requirements; recording a deletion event does not itself require archiving the deleted file.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sensitive_delete:joebob1, /users/admin/some/important/path\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 deleted file /users/admin/some/important/path\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#053",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Sequence Errors [SEQUENCE]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Also called a business logic attack, if a specific path is expected through a system and an attempt is made to skip or change the order of that path it could indicate malicious intent."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#054",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Sequence Errors [SEQUENCE] > sequence_fail:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a user reaches a part of the application out of sequence it may indicate intentional abuse of the business logic and should be tracked.\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sequence_fail:joebob1\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User joebob1 has reached a part of the application out of the normal application flow.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#055",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Session Management [SESSION] > session_created:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a new authenticated session is created that session may be logged and activity monitored.\n\nLevel: INFO\n\nExample:\n\n```\n    {\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"session_created:joebob1\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 has started a new session\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#056",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Session Management [SESSION] > session_renewed:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a user is warned of session to be expired/revoked and chooses to extend their session that activity should be logged. Also, if the system in question contains highly confidential data then extending a session may require additional verification.\n\nLevel: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"session_renewed:joebob1\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 was warned of expiring session and extended.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#057",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Session Management [SESSION] > session_expired:[userid,reason]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a session expires, especially in the case of an authenticated session or with sensitive data, then that session expiry may be logged and clarifying data included. The reason code may be any such as: logout, timeout, revoked, etc. Sessions should never be deleted but rather expired in the case of revocation requirement.\n\nLevel: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"session_expired:joebob1,revoked\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 session expired due to administrator revocation.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#058",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Session Management [SESSION] > session_logout:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a user explicitly logs out (as opposed to a timeout or administrative revocation) the event may be logged. This is a more explicit alternative to session_expired:[userid,logout] for systems that distinguish a user-initiated logout. Do not include the raw session ID or bearer token. If session correlation is needed, follow the Session Management logging guidance.\n\nLevel: INFO\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"session_logout:joebob1\",\n    \"level\": \"INFO\",\n    \"description\": \"User joebob1 logged out\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#059",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Session Management [SESSION] > session_use_after_expire:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description In the case a user attempts to access systems with an expire session it may be helpful to log, especially if combined with subsequent login failure. This could identify a case where a malicious user is attempting a session hijack or directly accessing another person's machine/browser.\n\nLevel: CRITICAL\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"session_use_after_expire:joebob1\",\n    \"level\": \"CRITICAL\",\n    \"description\": \"User joebob1 attempted access after session expired.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#060",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "System Events [SYS] > sys_startup:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a system is first started it can be valuable to log the startup, even if the system is serverless or a container, especially if possible to log the user that initiated the system.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sys_startup:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 spawned a new instance\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#061",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "System Events [SYS] > sys_shutdown:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a system is shut down it can be valuable to log the event, even if the system is serverless or a container, especially if possible to log the user that initiated the system.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sys_shutdown:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 stopped this instance\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#062",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "System Events [SYS] > sys_restart:[userid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When a system is restarted it can be valuable to log the event, even if the system is serverless or a container, especially if possible to log the user that initiated the system.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sys_restart:joebob1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 initiated a restart\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#063",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "System Events [SYS] > sys_crash[:reason]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description If possible to catch an unstable condition resulting in the crash of a system, logging that event could be helpful, especially if the event is triggered by an attack.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sys_crash:outofmemory,\n    \"level\": \"WARN\",\n    \"description\": \"The system crashed due to Out of Memory error.\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#064",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "System Events [SYS] > sys_monitor_disabled:[userid,monitor]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description If your systems contain agents responsible for file integrity, resources, logging, virus, etc. it is especially valuable to know if they are halted and by whom.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sys_monitor_disabled:joebob1,crowdstrike\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 has disabled CrowdStrike\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#065",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "System Events [SYS] > sys_monitor_enabled:[userid,monitor]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description If your systems contain agents responsible for file integrity, resources, logging, virus, etc. it is especially valuable to know if they are started again after being stopped, and by whom.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"sys_monitor_enabled:joebob1,crowdstrike\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 has enabled CrowdStrike\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#066",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "User Management [USER] > user_created:[userid,newuserid,attributes[one,two,three]]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When creating new users, logging the specifics of the user creation event is helpful, especially if new users can be created with administration privileges.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"user_created:joebob1,user1,admin:create,update,delete\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 created user1 with admin:create,update,delete privilege attributes\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#067",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "User Management [USER] > user_updated:[userid,onuserid,attributes[one,two,three]]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description When updating users, logging the specifics of the user update event is helpful, especially if users can be updated with administration privileges.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"user_updated:joebob1,user1,admin:create,update,delete\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 updated user1 with attributes admin:create,update,delete privilege attributes\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#068",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "User Management [USER] > user_archived:[userid,onuserid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description It is always best to archive users rather than deleting, except where required. When archiving users, logging the specifics of the user archive event is helpful. A malicious user could use this feature to deny service to legitimate users.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"user_archived:joebob1,user1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 archived user1\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#069",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "User Management [USER] > user_deleted:[userid,onuserid]",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "Description It is always best to archive users rather than deleting, except where required. When deleting users, logging the specifics of the user delete event is helpful. A malicious user could use this feature to deny service to legitimate users.\n\nLevel: WARN\n\nExample:\n\n```\n{\n    \"datetime\": \"2019-01-01 00:00:00,000\",\n    \"appid\": \"foobar.netportal_auth\",\n    \"event\": \"user_deleted:joebob1,user1\",\n    \"level\": \"WARN\",\n    \"description\": \"User joebob1 has deleted user1\",\n    ...\n}\n```"
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#070",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "Exclusions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "As important as what you DO log is what you DON'T log. Private or secret information, source code, keys, certs, etc. should never be logged.\n\nFor comprehensive overview of items that should be excluded from logging, please see the OWASP Logging Cheat Sheet."
+  },
+  {
+   "chunk_id": "Logging_Vocabulary_Cheat_Sheet#071",
+   "doc": "Logging_Vocabulary_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Logging_Vocabulary_Cheat_Sheet.html",
+   "text": "RFC 5424: The Syslog Protocol\n\nNIST SP 800-92: Guide to Computer Security Log Management"
+  }
+ ]
+}

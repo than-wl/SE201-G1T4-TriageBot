@@ -1,0 +1,14 @@
+{
+ "doc": "Transport_Layer_Protection_Cheat_Sheet",
+ "title": "DEPRECATED: Transport Layer Protection Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Transport_Layer_Protection_Cheat_Sheet#001",
+   "doc": "Transport_Layer_Protection_Cheat_Sheet",
+   "section": "DEPRECATED: Transport Layer Protection Cheat Sheet",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Transport_Layer_Protection_Cheat_Sheet.html",
+   "text": "The Transport Layer Protection Cheat Sheet has been deprecated.\n\nPlease visit the Transport Layer Security Cheat Sheet instead."
+  }
+ ]
+}

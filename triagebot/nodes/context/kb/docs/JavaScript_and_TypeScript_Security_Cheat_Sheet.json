@@ -1,0 +1,84 @@
+{
+ "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+ "title": "JavaScript and TypeScript Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#001",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "This cheat sheet lists secure development practices for JavaScript and TypeScript that apply everywhere the language runs: browsers, hybrid apps, server-side Node.js, and any other runtime that implements the language (MDN JavaScript). It covers language-level pitfalls (dynamic code execution, prototype pollution, regular expressions), client-side sinks, and TypeScript-specific false confidence. Rules that are equally valid on the client and the server are stated once here; backend and runtime hardening stays in the Node.js Security Cheat Sheet, which this sheet links to instead of duplicating."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#002",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Related Cheat Sheets (Top-Level Links)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Node.js Security Cheat Sheet - backend and runtime guidance.\n\nCross Site Scripting Prevention Cheat Sheet - output encoding rules per context.\n\nDOM based XSS Prevention Cheat Sheet - client-side XSS sinks and sources.\n\nThird Party JavaScript Management Cheat Sheet - managing external scripts.\n\nTransport Layer Security Cheat Sheet - TLS configuration.\n\nOWASP Cheat Sheet Series index - start here for the full catalog."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#003",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Dangerous Language Surface > eval, Function, and with",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Never build code from strings. See MDN's eval guidance. eval and new Function execute arbitrary code with the current runtime's privileges, so any attacker-influenced input reaching them is code injection (CWE-94). In browsers, setTimeout and setInterval with a string argument compile it the same way through implied eval.\n\nParse data with JSON.parse, never eval.\n\nReplace dynamic dispatch with static maps of functions instead of constructing calls from names.\n\nDo not use the with statement. It makes scope unpredictable, is forbidden in strict mode, and blocks engine optimizations.\n\nEnforce this statically with the no-eval, no-implied-eval, and no-new-func lint rules.\n\nIn browsers, block string compilation with an enforced Content Security Policy whose script-src directive, or default-src fallback, omits both 'unsafe-eval' and 'trusted-types-eval'. A report-only policy does not block execution (CSP EnsureCSPDoesNotBlockStringCompilation).\n\nCSP is a browser-side control and does not apply to server-side runtimes, so the lint rules remain the primary enforcement everywhere."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#004",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Dangerous Language Surface > Evil Regex (ReDoS)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Nested quantifiers such as (a+)+, and repeated ambiguous alternatives such as ^(a|aa)*$, can make matching take exponential time on crafted input, consuming CPU and potentially blocking the executing thread or event loop (CWE-1333). Whether a pattern is actually exploitable depends on the surrounding expression and the failing input, not just the quantified group.\n\nPrefer well-tested validators over hand-written patterns for emails, URLs, and similar inputs.\n\nKeep patterns linear: avoid nested quantifiers and ambiguous alternation over the same characters.\n\nCap untrusted input length before matching, and reject rather than sanitize when input does not match.\n\nFor the attack mechanics and detection tooling, see the OWASP ReDoS guidance; use linear-time patterns as the primary control and input-length caps as defense in depth."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#005",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Dangerous Language Surface > Strict Mode",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Ship ES modules (strict by default) or declare 'use strict', as described in MDN's strict mode documentation. Strict mode turns silent mistakes into errors: assignment to undeclared variables throws, this stays undefined in plain functions instead of becoming the global object, and with is rejected. It does not fix injection, XSS, or prototype pollution; treat it as hygiene, not a security boundary."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#006",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Object and Property Safety (Including Prototype Pollution)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Prototype pollution (CWE-1321) occurs when attacker-controlled keys such as __proto__, constructor, or prototype reach a recursive merge or path setter and modify an object's prototype. This can alter the behavior of objects that inherit from that prototype. These are the JavaScript-specific essentials only; the full protection guidance lives in the dedicated Prototype Pollution Prevention Cheat Sheet.\n\nNever pass untrusted input to a recursive merge or set-by-path helper, and reject the key segments __proto__, constructor, and prototype before writing.\n\nUse a Map with set, get, and has for untrusted dictionary keys, keeping entries separate from object properties (MDN prototype pollution defenses). If an object is required, create it with Object.create(null) so it has no prototype.\n\nValidate parsed or copied untrusted data against a schema before use, and drop __proto__ keys first: Object.assign applies them through the prototype setter and mutates the target's prototype, while spread creates a silent own property."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#007",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "DOM Sinks and Output Context",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Injecting attacker-controlled strings into HTML, script, or URL contexts is cross-site scripting (CWE-79). Follow the Cross Site Scripting Prevention Cheat Sheet for per-context encoding and the DOM based XSS Prevention Cheat Sheet for client-side sources and sinks.\n\nBuild DOM with textContent and createElement instead of innerHTML or insertAdjacentHTML.\n\nWhen HTML must be rendered, sanitize with a maintained allowlist sanitizer and enforce Trusted Types with no permissive default policy.\n\nFramework auto-escaping has explicit bypasses that must never receive untrusted input: React dangerouslySetInnerHTML, Vue v-html, and Angular bypassSecurityTrustHtml and its siblings."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#008",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Async Error Handling, Messaging, and Origin Checks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Not every promise failure is a defect. An expected failure is part of a function's contract, such as a lookup that returns null for a missing key or a parse that throws on malformed input; handle it where the caller decides what to do, with a try/catch around await or a .catch on the terminal link of the chain, and return a typed result or a documented error. An unhandled rejection is a promise that rejects with no handler attached, so the failure propagates past the call site and is usually a bug: browsers report it in the console and fire an unhandledrejection event, while Node.js behavior depends on its unhandled-rejection mode and may terminate the process (MDN promise rejection events). Keep promise chains flat with a terminal error handler so genuinely unexpected rejections stay visible, and do not silence them with an empty catch. Server-side specifics live in the Node.js Security Cheat Sheet and are not repeated here.\n\nFor postMessage, the receiver must verify event.origin against an explicit allowlist, check event.source when a conversation partner is expected, and validate event.data against the expected schema before acting on it. The sender must pass an exact targetOrigin, never \"*\" for sensitive data (MDN postMessage). Prefer narrow MessageChannel ports over broadcast messaging where the design allows it."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#009",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "TypeScript-Specific Caveats",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Types are erased at runtime, so TypeScript alone enforces nothing against a malicious or malformed caller.\n\nTreat any as a hole in every check. unknown is the safe default for values of unknown type, because it forces you to narrow before use, whereas any disables type checking for that value (TypeScript Handbook: unknown).\n\nType assertions (as) and non-null assertions (!) silence the compiler without changing runtime values; do not use them on untrusted data.\n\nEnable strict in tsconfig.json (plus noUncheckedIndexedAccess where affordable) to catch accidental unsafety in your own code. It is a code-quality control, not a trust boundary.\n\nValidate at every trust boundary (network responses, postMessage payloads, storage reads) with a runtime schema validator. The validated type should flow from the schema, not from a parallel hand-written interface."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#010",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "Linting and Dependency Tooling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "Lint with typescript-eslint recommended sets plus no-eval, no-implied-eval, and no-new-func. Keep dependencies updated so new rules apply.\n\nPin versions with a lockfile, review dependency changes, and monitor advisories. Frontend dependency-review specifics overlap with the Node.js Security Cheat Sheet.\n\nFor third-party scripts loaded from a CDN, pin a Subresource Integrity hash with crossorigin handling per the Third Party JavaScript Management Cheat Sheet."
+  },
+  {
+   "chunk_id": "JavaScript_and_TypeScript_Security_Cheat_Sheet#011",
+   "doc": "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/JavaScript_and_TypeScript_Security_Cheat_Sheet.html",
+   "text": "MDN: Window.postMessage\n\nTypeScript Handbook: unknown\n\nW3C Trusted Types"
+  }
+ ]
+}

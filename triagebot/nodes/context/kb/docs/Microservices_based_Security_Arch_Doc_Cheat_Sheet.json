@@ -1,0 +1,168 @@
+{
+ "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+ "title": "Microservices based Security Arch Doc Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#001",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "The microservice architecture is being increasingly used for designing and implementing application systems in both cloud-based and on-premise infrastructures. There are many security challenges need to be addressed in the application design and implementation phases. In order to address some security challenges it is necessity to collect security-specific information on application architecture. The goal of this article is to provide a concrete proposal of approach to collect microservice-based architecture information to securing application."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#002",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Context",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "During securing applications based on microservices architecture, security architects/engineers usually face with the following questions (mostly referenced in the OWASP Application Security Verification Standard Project under the section V1 \"Architecture, Design and Threat Modeling Requirements\"):\n\nThreat modeling and enforcement of the principle of least privilege:\n\nWhat scopes or API keys does microservice minimally need to access other microservice APIs?\n\nWhat grants does microservice minimally need to access database or message queue?\n\nData leakage analysis:\n\nWhat storages or message queues do contain sensitive data?\n\nDoes microservice read/write date from/to specific database or message queue?\n\nWhat microservices are invoked by dedicated microservice? What data is passed between microservices?\n\nAttack surface analysis:\n\nWhat microservices endpoints need to be tested during security testing?\n\nIn most cases, existing application architecture documentation is not suitable to answer those questions. Next sections propose what architecture security-specific information can be collected to answer the questions above."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#003",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Objective",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "The objectives of the cheat sheet are to explain what architecture security-specific information can be collected to answer the questions above and provide concrete proposal of approach to collect microservice-based architecture information to securing application."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#004",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on the building blocks > Identify and describe application-functionality services",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Application-functionality services implement one or several business process or functionality (e.g., storing customer details, storing and displaying product catalog). Collect information on the parameters listed below related to each application-functionality service.\n\nParameter name\n\nDescription\n\nService name (ID)\n\nUnique service name or ID\n\nShort description\n\nShort description of business process or functionality implemented by the microservice\n\nLink to source code repository\n\nSpecify a link to service source code repository\n\nDevelopment Team\n\nSpecify development team which develops the microservice\n\nAPI definition\n\nIf microservice exposes external interface specify a link to the interface description (e.g., OpenAPI specification). It is advisable to define used security scheme, e.g. define scopes or API keys needed to invoke dedicated endpoint (e.g., see).\n\nThe microservice architecture description\n\nSpecify a link to the microservice architecture diagram, description (if available)\n\nLink to runbook\n\nSpecify a link to the microservice runbook"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#005",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on the building blocks > Identify and describe infrastructure services",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Infrastructure services including remote services may implement authentication, authorization, service registration and discovery, security monitoring, logging etc. Collect information on the parameters listed below related to each infrastructure service.\n\nParameter name\n\nDescription\n\nService name (ID)\n\nUnique service name or ID\n\nShort description\n\nShort description of functionality implemented by the service (e.g., authentication, authorization, service registration and discovery, logging, security monitoring, API gateway).\n\nLink to source code repository\n\nSpecify a link to service source code repository (if applicable)\n\nLink to the service documentation\n\nSpecify a link to the service documentation that includes service API definition, operational guidance/runbook, etc."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#006",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on the building blocks > Identify and describe data storages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Collect information on the parameters listed below related to each data storage.\n\nParameter name\n\nDescription\n\nStorage name (ID)\n\nUnique storage name or ID\n\nSoftware type\n\nSpecify software that implements the data storage (e.g., PostgreSQL, Redis, Apache Cassandra)."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#007",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on the building blocks > Identify and describe message queues",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Messaging systems (e.g., RabbitMQ or Apache Kafka) are used to implement asynchronous microservices communication mechanism. Collect information on the parameters listed below related to each message queue.\n\nParameter name\n\nDescription\n\nMessage queue (ID)\n\nUnique message queue name or ID\n\nSoftware type\n\nSpecify software that implements the message queue (e.g., RabbitMQ, Apache Kafka)."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#008",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on the building blocks > Identify and describe data assets",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Identify and describe data assets that processed by system microservices/services. It is advisable firstly to identify assets, which are valuable from a security perspective (e.g., \"User information\", \"Payment\"). Collect information on the parameters listed below related to each asset.\n\nParameter name\n\nDescription\n\nAsset name (ID)\n\nUnique asset name or ID\n\nProtection level\n\nSpecify asset protection level (e.g., PII, confidential)\n\nAdditional info\n\nAdd clarifying information"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#009",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on relations between building blocks > Identify \"service-to-storage\" relations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Collect information on the parameters listed below related to each \"service-to-storage\" relation.\n\nParameter name\n\nDescription\n\nService name (ID)\n\nSpecify service name (ID) defined above\n\nStorage name (ID)\n\nSpecify storage name (ID) defined above\n\nAccess type\n\nSpecify access type, e.g. \"Read\" or \"Read/Write\""
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#010",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on relations between building blocks > Identify \"service-to-service\" synchronous communications",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Collect information on the parameters listed below related to each \"service-to-service\" synchronous communication.\n\nParameter name\n\nDescription\n\nCaller service name (ID)\n\nSpecify caller service name (ID) defined above\n\nCalled service name (ID)\n\nSpecify called service name (ID) defined above\n\nProtocol/framework used\n\nSpecify protocol/framework used for communication, e.g. HTTP (REST, SOAP), Apache Thrift, gRPC\n\nShort description\n\nShortly describe the purpose of communication (requests for query of information or request/commands for a state-changing business function) and data passed between services (if possible, in therms of assets defined above)"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#011",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on relations between building blocks > Identify \"service-to-service\" asynchronous communications",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Collect information on the parameters listed below related to each \"service-to-service\" asynchronous communication.\n\nParameter name\n\nDescription\n\nPublisher service name (ID)\n\nSpecify publisher service name (ID) defined above\n\nSubscriber service name (ID)\n\nSpecify subscriber service name (ID) defined above\n\nMessage queue (ID)\n\nSpecify message queue (ID) defined above\n\nShort description\n\nShortly describe the purpose of communication (receiving of information or commands for a state-changing business function) and data passed between services (if possible, in therms of assets defined above)"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#012",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Collect information on relations between building blocks > Identify \"asset-to-storage\" relations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Collect information on the parameters listed below related to each \"asset-to-storage\" relation.\n\nParameter name\n\nDescription\n\nAsset name (ID)\n\nAsset name (ID) defined above\n\nStorage name (ID)\n\nSpecify storage name (ID) defined above\n\nStorage type\n\nSpecify storage type for the asset, e.g. \"golden source\" or \"cache\""
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#013",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Create a graphical presentation of application architecture",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "It is advisable to create graphical presentation of application architecture (building blocks and relations defined above) in form of services call graph or data flow diagram. In order to do that one can use special software tools (e.g. Enterprise Architect) or DOT language. See example of using DOT language here."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#014",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Collected information may be useful for doing application security practices, e.g. during defining security requirements, threat modeling or security testing. Sections below contains examples of activities related to securing application architecture (as well as its mapping to OWASP projects) and tips for their implementation using information collected above."
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#015",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Attack surface analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nTo enumerate microservices endpoints that need to be tested during security testing and analyzed during threat modeling analyze data collected under the following sections:\n\nIdentify and describe application-functionality services (parameter \"API definition\")\n\nIdentify and describe infrastructure services (parameter \"Link to the service documentation\")\n\nMapping to OWASP projects\n\nOWASP ASVS, V1 \"Architecture, Design and Threat Modeling Requirements\", #1.1.2\n\nOWASP Attack Surface Analysis Cheat Sheet"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#016",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Data leakage analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nTo analyze possible data leakage analyze data collected under the following sections:\n\nIdentify and describe data assets\n\nIdentify \"service-to-storage\" relations\n\nIdentify \"service-to-service\" synchronous communications\n\nIdentify \"service-to-service\" asynchronous communications\n\nIdentify \"asset-to-storage\" relations\n\nMapping to OWASP projects\n\nOWASP ASVS, V1 \"Architecture, Design and Threat Modeling Requirements\", #1.1.2\n\nOWASP Top 10-2017 A3-Sensitive Data Exposure"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Application's trust boundaries, components, and significant data flows justification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nStart the review of the application's trust boundaries, components, and significant data flows with the inventories from these sections:\n\nIdentify and describe application-functionality services\n\nIdentify and describe infrastructure services\n\nIdentify and describe data storages\n\nIdentify and describe message queues\n\nIdentify \"service-to-storage\" relations\n\nIdentify \"service-to-service\" synchronous communications\n\nIdentify \"service-to-service\" asynchronous communications\n\nUse these inventories as inputs to a system model. Mark the trust boundaries and the flows that cross them, and justify each crossing. Record the endpoint identities, authentication and authorization enforcement points, and protections for data in transit (see NIST SP 800-204, sections 4.1 and 4.3). Check these controls against the deployed configuration and behavior; the inventories alone do not verify enforcement.\n\nMapping to OWASP projects\n\nOWASP ASVS, V1 \"Architecture, Design and Threat Modeling Requirements\", #1.1.4"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#018",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Analysis of the application's high-level architecture",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nTo verify definition and security analysis of the application's high-level architecture and all connected remote services analyze data collected under the following sections:\n\nIdentify and describe application-functionality services\n\nIdentify and describe infrastructure services\n\nIdentify and describe data storages\n\nIdentify and describe message queues\n\nMapping to OWASP projects\n\nOWASP ASVS, V1 \"Architecture, Design and Threat Modeling Requirements\", #1.1.5"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#019",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Implementation of centralized security controls verification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nTo verify implementation of centralized, simple (economy of design), vetted, secure, and reusable security controls to avoid duplicate, missing, ineffective, or insecure controls analyze data collected under the section \"Identify and describe infrastructure services\".\n\nMapping to OWASP projects\n\nOWASP ASVS, V1 \"Architecture, Design and Threat Modeling Requirements\", #1.1.6"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#020",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Enforcement of the principle of least privilege",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nTo define minimally needed microservice permissions analyze data collected under the following sections:\n\nIdentify and describe application-functionality services (parameter \"API definition\")\n\nIdentify \"service-to-storage\" relations\n\nIdentify \"service-to-service\" synchronous communications\n\nIdentify \"service-to-service\" asynchronous communications\n\nMapping to OWASP projects\n\nOWASP ASVS 4.0.3, V4 \"Access Control\", #4.1.3"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#021",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Sensitive data identification and classification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nTo verify that all sensitive data is identified and classified into protection levels analyze data collected under the following sections:\n\nIdentify and describe data assets\n\nIdentify \"asset-to-storage\" relations\n\nMapping to OWASP projects\n\nOWASP ASVS, V1 \"Architecture, Design and Threat Modeling Requirements\", #1.8.1"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#022",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "Proposition > Use collected information in secure software development practices > Application components business/security functions verification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "Implementation tips\n\nTo verify the definition and documentation of all application components in terms of the business or security functions they provide analyze data collected under the following sections (parameter \"Short description\"):\n\nIdentify and describe application-functionality services\n\nIdentify and describe infrastructure services\n\nMapping to OWASP projects\n\nOWASP ASVS, V1 \"Architecture, Design and Threat Modeling Requirements\", #1.11.1"
+  },
+  {
+   "chunk_id": "Microservices_based_Security_Arch_Doc_Cheat_Sheet#023",
+   "doc": "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Microservices_based_Security_Arch_Doc_Cheat_Sheet.html",
+   "text": "NIST SP 800-204: Security Strategies for Microservices-based Application Systems\n\nOWASP ASVS 4: Architecture, Design and Threat Modeling"
+  }
+ ]
+}

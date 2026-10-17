@@ -1,0 +1,161 @@
+{
+ "doc": "Clickjacking_Defense_Cheat_Sheet",
+ "title": "Clickjacking Defense Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#001",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "This cheat sheet is intended to provide guidance for developers on how to defend against Clickjacking, also known as UI redress attacks.\n\nThere are three main mechanisms that can be used to defend against these attacks:\n\nPreventing the browser from loading the page in frame using the X-Frame-Options or Content Security Policy (frame-ancestors) HTTP headers.\n\nPreventing session cookies from being included in cross-site iframe requests using the SameSite cookie attribute.\n\nImplementing JavaScript code in the page to attempt to prevent it being loaded in a frame (known as a \"frame-buster\").\n\nThese mechanisms address frame-based clickjacking. DoubleClickjacking uses separate windows and requires additional safeguards for sensitive actions.\n\nNote that these mechanisms are all independent of each other, and where possible more than one of them should be implemented in order to provide defense in depth."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#002",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with Content Security Policy (CSP) frame-ancestors directive",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "The frame-ancestors directive can be used in a Content-Security-Policy HTTP response header to indicate whether or not a browser should be allowed to render a page in a <frame> or <iframe>. Sites can use this to avoid Clickjacking attacks by ensuring that their content is not embedded into other sites.\n\nframe-ancestors allows a site to authorize multiple domains using the normal Content Security Policy semantics."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#003",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with Content Security Policy (CSP) frame-ancestors directive > Content-Security-Policy: frame-ancestors Examples",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "Common uses of CSP frame-ancestors:\n\nContent-Security-Policy: frame-ancestors 'none';\n\nThis prevents any domain from framing the content. This setting is recommended unless a specific need has been identified for framing.\n\nContent-Security-Policy: frame-ancestors 'self';\n\nThis only allows the current site to frame the content.\n\nContent-Security-Policy: frame-ancestors 'self' https://*.somesite.com https://myfriend.site.com;\n\nFor an HTTPS page, this allows its own origin, HTTPS subdomains of somesite.com, and https://myfriend.site.com to frame it. The two HTTPS host expressions use the default port (443). The wildcard matches subdomains, not the bare somesite.com host; add that host explicitly if required.\n\nNote that the single quotes are required around self and none, but may not occur around other source expressions.\n\nSee the following documentation for further details and more complex examples:\n\nhttps://w3c.github.io/webappsec-csp/#directive-frame-ancestors\n\nhttps://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy/frame-ancestors"
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#004",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with Content Security Policy (CSP) frame-ancestors directive > Limitations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "X-Frame-Options takes priority: Section \"Relation to X-Frame-Options\" of the CSP Spec says: \"If a resource is delivered with a policy that includes a directive named frame-ancestors and whose disposition is \"enforce\", then the X-Frame-Options header MUST be ignored\", but older browser versions (e.g., Chrome 40 & Firefox 35) ignored this requirement and followed the X-Frame-Options header instead."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#005",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with Content Security Policy (CSP) frame-ancestors directive > Browser Support",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "The following browsers support CSP frame-ancestors.\n\nReferences:\n\nMozilla Developer Network"
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#006",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with X-Frame-Options Response Headers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a <frame> or <iframe>. Sites can use this to avoid Clickjacking attacks, by ensuring that their content is not embedded into other sites. Set the X-Frame-Options header for all responses containing HTML content. The possible values are \"DENY\", \"SAMEORIGIN\", or \"ALLOW-FROM uri\""
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#007",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with X-Frame-Options Response Headers > X-Frame-Options Header Types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "There are three possible values for the X-Frame-Options header:\n\nDENY, which prevents any domain from framing the content. The \"DENY\" setting is recommended unless a specific need has been identified for framing.\n\nSAMEORIGIN, which only allows the current site to frame the content.\n\nALLOW-FROM uri, which permits the specified 'uri' to frame this page. (e.g., ALLOW-FROM http://www.example.com).\n\nThis is an obsolete directive that no longer works in modern browsers.\n\nCheck limitations below because this will fail open if the browser does not support it.\n\nOther browsers support the new CSP frame-ancestors directive instead. A few support both."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#008",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with X-Frame-Options Response Headers > Browser Support",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "The following browsers support X-Frame-Options headers.\n\nReferences:\n\nMozilla Developer Network\n\nIETF Draft\n\nX-Frame-Options Compatibility Test - Check this for the LATEST browser support info for the X-Frame-Options header"
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#009",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with X-Frame-Options Response Headers > Implementation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "To implement this protection, you need to add the X-Frame-Options HTTP Response header to any page that you want to protect from being clickjacked via framebusting. One way to do this is to add the HTTP Response Header manually to every page. A possibly simpler way is to implement a filter that automatically adds the header to every page or to add it at Web Application Firewall of Web/Application Server level."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#010",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with X-Frame-Options Response Headers > Common Defense Mistakes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "Meta-tags that attempt to apply the X-Frame-Options directive DO NOT WORK. For example, <meta http-equiv=\"X-Frame-Options\" content=\"deny\"> will not work. You must apply the X-FRAME-OPTIONS directive as HTTP Response Header as described above. The same rule also applies to the Content Security Policy (CSP) directive frame-ancestors, which must be configured as an HTTP Response Header, not in a <meta> tag."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#011",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with X-Frame-Options Response Headers > Limitations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "Per-page policy specification: The policy needs to be specified for every page, which can complicate deployment. Providing the ability to enforce it for the entire site, at login time for instance, could simplify adoption.\n\nProblems with multi-domain sites: The current implementation does not allow the website administrator to provide a list of domains that are allowed to frame the page. While listing allowed domains can be dangerous, in some cases a website administrator might have no choice but to use more than one hostname.\n\nALLOW-FROM browser support: The ALLOW-FROM option is obsolete and no longer works in modern browsers. BE CAREFUL ABOUT DEPENDING ON ALLOW-FROM. If you apply it and the browser does not support it, then you will have NO clickjacking defense in place.\n\nMultiple options not supported: There is no way to allow the current site and a third-party site to frame the same response. Browsers only honor one X-Frame-Options header and only one value on that header.\n\nNested Frames don't work with SAMEORIGIN and ALLOW-FROM: In the following situation, the http://framed.invalid/child frame does not load because ALLOW-FROM applies to the top-level browsing context, not that of the immediate parent. The solution is to use ALLOW-FROM in both the parent and child frames (but this prevents the child frame loading if the //framed.invalid/parent page is loaded as the top level document).\n\nX-Frame-Options Deprecated While the X-Frame-Options header is supported by the major browsers, it has been obsoleted in favor of the frame-ancestors directive from the CSP Level 2 specification.\n\nProxies Web proxies are notorious for adding and stripping headers. If a web proxy strips the X-Frame-Options header then the site loses its framing protection."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#012",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with SameSite Cookies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "Cookies marked SameSite=Strict or SameSite=Lax are withheld from cross-site iframe requests. This can prevent clickjacking that depends on those cookies for authentication. See the CSRF guidance on SameSite for its other security uses.\n\nSameSite does not block framing or withhold cookies from same-site requests. An attacker-controlled sibling subdomain with the same scheme can be same-site while remaining a different origin. Use CSP frame-ancestors to restrict which origins may frame the page, even when SameSite cookies are configured."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#013",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending with SameSite Cookies > Limitations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "If the Clickjacking attack does not require the user to be authenticated, this attribute will not provide any protection.\n\nAdditionally, while SameSite attribute is supported by most modern browsers, there are still some users (approximately 6% as of November 2020) with browsers that do not support it.\n\nThe use of this attribute should be considered as part of a defense-in-depth approach, and it should not be relied upon as the sole protective measure against Clickjacking."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#014",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Defending against DoubleClickjacking",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "DoubleClickjacking tricks a user into activating a sensitive control in another window during a double-click. The target page is a top-level window, so framing restrictions such as X-Frame-Options and CSP frame-ancestors do not prevent this attack.\n\nSameSite controls whether cookies accompany cross-site requests. Lax permits cookies on top-level navigations using safe HTTP methods, while Strict withholds them on the initial cross-site request. Neither policy verifies that the user intended the resulting action.\n\nFor pages your application controls, such as consent screens, payment confirmations, and account security settings:\n\nFor high-risk actions, require the user to review the action's details and complete transaction authorization. Enforce authorization on the server; an extra confirmation button alone is not a complete defense against UI redress.\n\nTreat disabling sensitive controls until prior interaction as a proposed supplementary mitigation, as described in Paulos Yibelo's disclosure. Mouse movement or a key press alone does not establish that the user understands or approves the action.\n\nIf you use this mitigation, render the controls disabled from the start and test that users can enable and activate them with mouse, keyboard, touch, and assistive technology. Click events support all these input methods; do not require every user to move a mouse or press a key.\n\nKeep the framing defenses above for frame-based attacks. Client-side interaction checks supplement these defenses and do not replace transaction authorization."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#015",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Best-for-now Legacy Browser Frame Breaking Script",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "One way to defend against clickjacking is to include a \"frame-breaker\" script in each page that should not be framed. The following methodology will prevent a webpage from being framed even in legacy browsers, that do not support the X-Frame-Options-Header.\n\nIn the document HEAD element, add the following:\n\nFirst apply an ID to the style element itself:\n\n```\n<style id=\"antiClickjack\">\n    body{display:none !important;}\n</style>\n```\n\nThen, delete that style by its ID immediately after in the script:\n\n```\n<script type=\"text/javascript\">\n    if (self === top) {\n        var antiClickjack = document.getElementById(\"antiClickjack\");\n        antiClickjack.parentNode.removeChild(antiClickjack);\n    } else {\n        top.location = self.location;\n    }\n</script>\n```\n\nThis way, everything can be in the document HEAD and you only need one method/taglib in your API."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#016",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "window.confirm() Protection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "The use of X-Frame-Options or a frame-breaking script is a more fail-safe method of clickjacking protection. However, in scenarios where content must be frameable, then a window.confirm() can be used to help mitigate Clickjacking by informing the user of the action they are about to perform.\n\nTreat window.confirm() as supplementary confirmation, not a guarantee that users will see a dialog or an origin label. Browsers can suppress simple dialogs, for example in a sandboxed frame without allow-modals; confirm() then returns false. Only perform the action after a true result, as below:\n\n```\n<script type=\"text/javascript\">\n    var action_confirm = window.confirm(\"Are you sure you want to delete your youtube account?\")\n    if (action_confirm) {\n        //... Perform action\n    } else {\n        //... The user does not want to perform the requested action.`\n    }\n</script>\n```"
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#017",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Insecure Non-Working Scripts DO NOT USE",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "Consider the following snippet which is NOT recommended for defending against clickjacking:\n\n```\n<script>if (top!=self) top.location.href=self.location.href</script>\n```\n\nThis simple frame breaking script attempts to prevent the page from being incorporated into a frame or iframe by forcing the parent window to load the current frame's URL. Unfortunately, multiple ways of defeating this type of script have been made public. We outline some here."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#018",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Insecure Non-Working Scripts DO NOT USE > Double Framing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "Some frame busting techniques navigate to the correct page by assigning a value to parent.location. This works well if the victim page is framed by a single page. However, if the attacker encloses the victim in one frame inside another (a double frame), then accessing parent.location becomes a security violation in all popular browsers, due to the descendant frame navigation policy. This security violation disables the counter-action navigation.\n\nVictim frame busting code:\n\n```\nif(top.location != self.location) {\n    parent.location = self.location;\n}\n```\n\nAttacker top frame:\n\n```\n<iframe src=\"attacker2.html\">\n```\n\nAttacker sub-frame:\n\n```\n<iframe src=\"http://www.victim.com\">\n```"
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#019",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Insecure Non-Working Scripts DO NOT USE > The onBeforeUnload Event",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "A user can manually cancel any navigation request submitted by a framed page. To exploit this, the framing page registers an onBeforeUnload handler which is called whenever the framing page is about to be unloaded due to navigation. The handler function returns a string that becomes part of a prompt displayed to the user.\n\nSay the attacker wants to frame PayPal. He registers an unload handler function that returns the string \"Do you want to exit PayPal?\". When this string is displayed to the user is likely to cancel the navigation, defeating PayPal's frame busting attempt.\n\nThe attacker mounts this attack by registering an unload event on the top page using the following code:\n\n```\n<script>\n    window.onbeforeunload = function(){\n        return \"Asking the user nicely\";\n    }\n</script>\n\n<iframe src=\"http://www.paypal.com\">\n```\n\nPayPal's frame busting code will generate a BeforeUnload event activating our function and prompting the user to cancel the navigation event."
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#020",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Insecure Non-Working Scripts DO NOT USE > No-Content Flushing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "While the previous attack requires user interaction, the same attack can be done without prompting the user. Modern browsers enable an attacker to automatically cancel the incoming navigation request in an onBeforeUnload event handler by repeatedly submitting a navigation request to a site responding with \"204 - No Content\".\n\nNavigating to a No Content site is effectively a NOP, but flushes the request pipeline, thus canceling the original navigation request. Here is sample code to do this:\n\n```\nvar preventbust = 0\nwindow.onbeforeunload = function() { killbust++ }\nsetInterval( function() {\n    if(killbust > 0){\n    killbust = 2;\n    window.top.location = 'http://nocontent204.com'\n    }\n}, 1);\n```\n\n```\n<iframe src=\"http://www.victim.com\">\n```"
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#021",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "Insecure Non-Working Scripts DO NOT USE > Restricted zones",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "Most frame busting relies on JavaScript in the framed page to detect framing and bust itself out. If JavaScript is disabled in the context of the subframe, the frame busting code will not run. There are unfortunately several ways of restricting JavaScript in a subframe:\n\nIn Chrome:\n\n```\n<iframe src=\"http://www.victim.com\" sandbox></iframe>\n```\n\nFirefox:\n\nActivate designMode in parent page. While designMode is still supported in modern browsers, its effectiveness as a clickjacking attack vector may vary in current browser versions.\n\n```\ndocument.designMode = \"on\";\n```"
+  },
+  {
+   "chunk_id": "Clickjacking_Defense_Cheat_Sheet#022",
+   "doc": "Clickjacking_Defense_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Clickjacking_Defense_Cheat_Sheet.html",
+   "text": "MDN: Content-Security-Policy frame-ancestors Directive\n\nMDN: X-Frame-Options"
+  }
+ ]
+}

@@ -1,0 +1,259 @@
+{
+ "doc": "Secure_Code_Review_Cheat_Sheet",
+ "title": "Secure Code Review Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#001",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Secure Code Review is the process of manually examining source code to identify security vulnerabilities that automated tools often miss. It involves analyzing application logic, data flow, and implementation details to detect security flaws that require human expertise and contextual understanding.\n\nManual Code Review complements automated security testing tools (SAST/DAST) by focusing on areas where human analysis provides the most value, including business logic validation, complex security implementations, and context-specific vulnerabilities. While automated tools can assist by highlighting potential areas of concern, the core analysis relies on human judgment and domain expertise.\n\nSecurity-Focused Review differs from functional code review by specifically targeting security concerns such as input validation, authentication mechanisms, authorization controls, cryptographic implementations, and potential attack vectors."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#002",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Introduction > Review Types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Baseline Reviews examine the entire codebase comprehensively. Use for:\n\nNew applications or major releases\n\nLegacy system onboarding\n\nCompliance requirements\n\nPost-incident analysis\n\nDiff-Based Reviews focus on code changes only. Use for:\n\nPull requests and commits\n\nDaily development workflow\n\nFeature completion\n\nContinuous security validation\n\nThis cheat sheet provides practical guidance for conducting effective manual security code reviews, with emphasis on both baseline and incremental review methodologies."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#003",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Methodology > Preparation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "For All Reviews:\n\nUnderstand application architecture and business requirements\n\nGather threat models and previous security findings\n\nIdentify critical assets and high-risk functions\n\nReview security requirements and documentation\n\nAdditional for Baseline Reviews:\n\nMap complete application boundaries and dependencies\n\nAnalyze overall security architecture\n\nReview security incident history\n\nAudit all third-party libraries\n\nAdditional for Diff-Based Reviews:\n\nIdentify modified files and affected components\n\nAssess impact on existing security controls\n\nUnderstand purpose of changes\n\nPrioritize high-risk modifications"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#004",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Methodology > Review Process",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Baseline Review Steps:\n\nArchitecture review for security anti-patterns\n\nEntry point analysis and input validation\n\nAuthentication and authorization verification\n\nData flow tracing\n\nBusiness logic analysis\n\nCryptographic implementation review\n\nError handling verification\n\nConfiguration and deployment review\n\nDiff-Based Review Steps:\n\nAnalyze impact on existing security controls\n\nIdentify new attack vectors\n\nVerify security at modified trust boundaries\n\nCheck new integrations\n\nEnsure no security regression\n\nApply relevant security patterns"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#005",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "For request forgery and redirect checks, also consult the CSRF Prevention, SSRF Prevention, and Unvalidated Redirects and Forwards cheat sheets."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#006",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Input Validation Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Check for missing server-side validation, improper sanitization, and weak input filtering. For more information, see Input Validation Cheat Sheet and Mass Assignment Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#007",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Injection Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "SQL Injection:\n\nLook for string concatenation in database queries and unsafe query construction. For more information, see SQL Injection Prevention Cheat Sheet.\n\nCross-Site Scripting (XSS):\n\nReview output encoding, DOM manipulation, and user input rendering. For more information, see Cross Site Scripting Prevention Cheat Sheet.\n\nPath Traversal:\n\nCheck for unsafe file path construction and directory traversal vulnerabilities. For more information, see File Upload Cheat Sheet.\n\nCommand Injection:\n\nIdentify direct command execution with user input and unsafe system calls. For more information, see OS Command Injection Defense Cheat Sheet.\n\nNoSQL Injection:\n\nExamine NoSQL query construction and parameter binding. For more information, see NoSQL Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#008",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Authentication & Session Management Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Review authentication mechanisms, session token generation, and user credential handling. For more information, refer to Authentication Cheat Sheet and Session Management Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#009",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Access Control Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Examine authorization checks, role-based access controls, and privilege escalation prevention. For more information, see Authorization Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#010",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Deserialization Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Insecure Deserialization:\n\nCheck for unsafe deserialization of untrusted data and object injection vulnerabilities. For more information, see Deserialization Cheat Sheet.\n\nXML External Entity (XXE):\n\nReview XML parsing configurations and external entity processing. For more information, see XML External Entity Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#011",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Cryptographic Implementation Flaws",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Examine encryption algorithms, key management, and cryptographic implementations. For more information, refer to Cryptographic Storage Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#012",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Code Pattern Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Focus on high-risk code patterns:\n\nInput processing and validation functions\n\nDatabase query construction and ORM usage\n\nFile operations and path handling\n\nAuthentication and session management logic\n\nAuthorization and access control checks\n\nCryptographic operations and key management\n\nError handling and logging mechanisms\n\nConfiguration loading and environment variables"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#013",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Data Flow Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Trace data through the application:\n\nIdentify Sources: User inputs, file uploads, API calls, database reads, environment variables\n\nFollow Processing: Validation, transformation, business logic, caching\n\nCheck Sinks: Database queries, file writes, output rendering, logging, external APIs\n\nValidate Boundaries: Input validation and output encoding at trust boundaries\n\nTrust Zones: Verify security controls at each trust boundary crossing\n\nData Classification: Ensure sensitive data receives appropriate protection"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#014",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Threat-Based Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Align review with common attack patterns:\n\nOWASP Top 10: Focus on prevalent web application risks\n\nSTRIDE Model: Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation\n\nAttack Trees: Map potential attack paths through the application\n\nAbuse Cases: Consider how features could be misused by attackers\n\nSecurity Controls: Verify defense-in-depth implementation"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#015",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Business Logic Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Use the Abuse Case Cheat Sheet to identify misuse scenarios.\n\nAnalyze application workflows for:\n\nState management and transition validation\n\nRace conditions and concurrency issues\n\nTransaction integrity and rollback mechanisms\n\nResource limits and quota enforcement\n\nAuthorization at each workflow step\n\nWorkflow bypass opportunities"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#016",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Checklists > Input Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Server-side validation: All inputs validated on server regardless of client-side checks\n\nAllowlist validation: Uses allowlists rather than blocklists for input validation\n\nOutput encoding: Context-appropriate encoding (HTML, JavaScript, CSS, URL)\n\nFile upload security: Content-based validation, size limits, safe storage\n\nSQL injection prevention: Parameterized queries or safely implemented stored procedures used, with user-controlled data values passed as parameters instead of concatenated into SQL\n\nLength limits: Input length restrictions enforced\n\nCharacter handling: Special characters and Unicode properly processed\n\nError messages: No sensitive information disclosed in error responses"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#017",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Checklists > Authentication & Session Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Password security: Strong hashing algorithms and salt usage (for more information, see Password Storage Cheat Sheet)\n\nAccount protection: Lockout mechanisms with appropriate thresholds\n\nSession management: Secure token generation (≥128 bits entropy)\n\nSession lifecycle: Proper invalidation on logout/timeout\n\nRe-authentication: Required for sensitive operations\n\nMulti-factor authentication: Implementation for high-risk accounts (for more information, see Multifactor Authentication Cheat Sheet)\n\nPassword reset: Secure, time-limited reset mechanisms (for more information, see Forgot Password Cheat Sheet)\n\nSession security: HttpOnly, Secure, SameSite cookie attributes\n\nConcurrent sessions: Appropriate limits and monitoring"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#018",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Checklists > Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Server-side enforcement: All access controls enforced server-side\n\nFail-safe defaults: Default deny access policy\n\nIDOR prevention: Proper authorization for resource access (see Insecure Direct Object Reference Prevention Cheat Sheet)\n\nFunction-level controls: Administrative functions properly protected\n\nRole validation: Role assignments cannot be manipulated\n\nPrivilege escalation: Horizontal and vertical escalation prevented\n\nCentralized decisions: Access control logic centralized\n\nPost-authentication checks: Authorization verified after authentication"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#019",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Checklists > Cryptography",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Strong algorithms: Modern algorithms (AES-256, RSA-2048+, ECDSA P-256+)\n\nKey management: Proper key generation, storage, and rotation (for more information, see Key Management Cheat Sheet)\n\nCertificate validation: Proper validation including hostname verification\n\nRandom generation: Cryptographically secure random number generation\n\nData protection: Encryption at rest and in transit\n\nIV/Nonce handling: Follow the selected mode's requirements for initialization vectors (IVs) and nonces. For example, cipher block chaining (CBC) requires unpredictable IVs, while Galois/Counter Mode (GCM) requires IV uniqueness under each key and permits deterministic generation\n\nLibrary maintenance: Up-to-date cryptographic libraries\n\nSide-channel protection: Consideration of timing and other side-channel attacks"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#020",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Checklists > Business Logic",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Workflow integrity: Proper state validation in multi-step processes\n\nRace condition prevention: Synchronization in concurrent operations\n\nTransaction atomicity: Proper rollback and consistency mechanisms\n\nResource limits: Rate limiting and resource quotas implemented (see Denial of Service Cheat Sheet)\n\nBusiness rule enforcement: Cannot bypass rules through direct API access"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#021",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Checklists > Configuration & Deployment",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Secure defaults: Security-focused default configurations\n\nEnvironment separation: Proper isolation between environments\n\nSecrets management: No hardcoded secrets, proper secret storage and rotation (for more information, see Secrets Management Cheat Sheet)\n\nError handling: Graceful error handling without information disclosure (for more information, see Error Handling Cheat Sheet)\n\nLogging security: Sensitive data not logged, proper log protection (for more information, see Logging Cheat Sheet)\n\nSecurity headers: Appropriate HTTP security headers configured (for more information, see HTTP Headers Cheat Sheet)\n\nTLS configuration: Strong cipher suites and protocol versions (for more information, see Transport Layer Security Cheat Sheet)\n\nDependency management: Up-to-date libraries without known vulnerabilities (for more information, see Vulnerable Dependency Management Cheat Sheet)"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#022",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Checklists > Security Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Security events: Authentication failures, authorization violations logged\n\nAnomaly detection: Unusual patterns and behaviors monitored\n\nAudit trails: Complete audit logs for sensitive operations\n\nReal-time alerts: Critical security events trigger immediate notifications\n\nLog integrity: Logs protected from tampering and unauthorized access\n\nIncident response: Clear procedures for security incident handling"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#023",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Tools and Techniques > Code Editors",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Use editors with security extensions:\n\nVisual Studio Code with ESLint, SonarLint\n\nIntelliJ IDEA with SpotBugs, SonarLint\n\nEclipse with security plugins\n\nVim/Neovim with security linters"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#024",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Tools and Techniques > Command-Line Pattern Detection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "```\n# Find hardcoded secrets\ngrep -ri \"password\\s*=\\|api_key\\s*=\\|secret\\s*=\" source/\n\n# Find unsafe functions\ngrep -r \"eval(\\|exec(\\|innerHTML\\|document\\.write\" source/\n\n# Find potential injections\ngrep -r \"SELECT.*+\\|executeQuery.*+\" source/\n```"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#025",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Tools and Techniques > Manual Review Focus Areas",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Human Expertise Advantages:\n\nBusiness Logic Flaws: Complex workflows and state management issues that require domain understanding\n\nContext-Specific Vulnerabilities: Security issues that depend on application-specific business rules\n\nAuthorization Logic: Complex permission models and access control implementations\n\nRace Conditions: Timing-based vulnerabilities in concurrent operations\n\nCryptographic Misuse: Proper implementation of cryptographic primitives and protocols\n\nArchitecture Security: High-level design flaws and security anti-patterns\n\nManual Analysis Techniques:\n\nCode Path Tracing: Following execution paths through complex business logic\n\nState Analysis: Understanding application state transitions and validation\n\nTrust Boundary Mapping: Identifying and analyzing security control points\n\nThreat Modeling Integration: Applying threat models to specific code implementations\n\nAttack Scenario Simulation: Mentally simulating attack paths through the code"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#026",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Tools and Techniques > Automated Tool Integration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Supporting Manual Reviews:\n\nSAST Tool Triage: Use automated findings to prioritize manual review areas\n\nDependency Scanning: Identify vulnerable libraries requiring manual assessment\n\nCode Quality Metrics: Focus manual effort on complex or frequently changed code\n\nPattern Detection: Use tools to highlight potential security anti-patterns for human analysis\n\nTool Integration Strategy:\n\nPre-Review Scanning: Run automated tools before manual review to identify obvious issues\n\nComplementary Analysis: Use tool findings to guide deeper manual investigation\n\nFalse Positive Filtering: Apply human judgment to validate automated findings\n\nCoverage Gaps: Focus manual review on areas automated tools cannot effectively analyze\n\nSecurity Metrics:\n\nManual Review Coverage: Percentage of critical code paths reviewed by humans\n\nFinding Quality: Ratio of valid security issues to total findings\n\nReview Efficiency: Time spent on manual review vs. security value delivered\n\nTrend Analysis: Security posture improvement over time"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#027",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Tools and Techniques > Documentation Templates",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Finding Report Template:\n\n```\nTitle: [Vulnerability Type] in [Component]\nSeverity: [Critical/High/Medium/Low]\nCWE: [CWE Number and Name]\nLocation: [File:Line or Function]\nDescription: [Detailed explanation of the vulnerability]\nImpact: [Security implications and potential attack scenarios]\nReproduction: [Steps to reproduce or proof of concept]\nRecommendation: [Specific fix guidance with code examples]\nReferences: [CWE links, OWASP references, vendor documentation]\nStatus: [Open/In Progress/Fixed/Accepted Risk]\nAssignee: [Developer responsible for fix]\nDue Date: [Target fix date]\n```\n\nReview Summary Template:\n\n```\nReview Summary\n==============\nApplication: [Application Name]\nVersion: [Version/Commit Hash]\nReviewer(s): [Names]\nReview Date: [Date]\nScope: [Files/Components Reviewed]\n\nFindings Summary:\n- Critical: [Count]\n- High: [Count] \n- Medium: [Count]\n- Low: [Count]\n- Informational: [Count]\n\nKey Recommendations:\n1. [Priority recommendation]\n2. [Priority recommendation]\n3. [Priority recommendation]\n\nOverall Risk Assessment: [Low/Medium/High/Critical]\n```"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#028",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Integration with SDLC > Review Timing > Baseline Review Integration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Project Initiation: Comprehensive security assessment of existing codebase\n\nMajor Releases: Full security review before significant version releases\n\nArchitecture Changes: Complete review when fundamental design changes occur\n\nCompliance Cycles: Periodic comprehensive reviews for regulatory requirements\n\nSecurity Incidents: Thorough review following security breaches or major vulnerabilities\n\nOnboarding Legacy Systems: Initial security assessment when bringing existing applications under secure development practices"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#029",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Integration with SDLC > Review Timing > Diff-Based Review Integration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Pull Requests: Security-focused review of code changes as part of standard PR process\n\nPre-commit Hooks: Lightweight security checks on developer commits\n\nFeature Completion: Security review of completed user stories or features\n\nSprint Reviews: Regular assessment of security implications of sprint deliverables\n\nHotfix Reviews: Rapid security assessment of emergency fixes\n\nContinuous Integration: Automated triggering of security reviews based on code changes"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#030",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Integration with SDLC > Review Timing > Hybrid Approach",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Risk-Based Scheduling: Combine baseline reviews for high-risk components with diff-based reviews for routine changes\n\nIncremental Baseline Updates: Gradually expand baseline review coverage over multiple development cycles\n\nTrigger-Based Reviews: Escalate from diff-based to baseline review when significant security concerns are identified\n\nFor CI/CD integration and automated security testing, for more information see CI CD Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#031",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Integration with SDLC > Team Collaboration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Roles:\n\nSecurity reviewers: Conduct analysis and provide guidance\n\nDevelopers: Implement fixes and follow secure coding practices\n\nSecurity champions: Bridge security and development teams\n\nBest Practices:\n\nUse standardized checklists and templates\n\nMaintain a knowledge base of common issues\n\nTrack metrics on review effectiveness\n\nProvide regular security training\n\nIntegrate with existing development workflows"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#032",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Advanced Techniques > Race Condition Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Focus on Time-of-Check vs Time-of-Use (TOCTOU) vulnerabilities and ensure atomic operations."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#033",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Advanced Techniques > Business Logic Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Analyze workflows for:\n\nState transitions and validation\n\nOpportunities to bypass steps or validation\n\nProper validation at each workflow step\n\nRollback mechanisms and cleanup on failures\n\nBehavior under concurrent access\n\nBoundary conditions and error scenarios"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#034",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Advanced Techniques > Security Architecture Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Review architecture patterns for consistent security enforcement and proper API security controls; see the Secure Product Design Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#035",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Advanced Techniques > Memory Safety",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Review buffer management, integer overflow protection, and resource limits."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#036",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "OWASP Code Review Guide, Version 2\n\nNIST SP 800-218: Secure Software Development Framework (SSDF) Version 1.1"
+  }
+ ]
+}

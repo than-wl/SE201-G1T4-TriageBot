@@ -1,0 +1,210 @@
+{
+ "doc": "GitHub_Actions_Security_Cheat_Sheet",
+ "title": "GitHub Actions Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#001",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "This cheat sheet provides guidance on securing GitHub Actions workflows, primarily for public GitHub repositories. The main goal is to prevent attacker-controlled code execution, which may lead to the following outcomes.\n\nSecrets exfiltration. CI/CD pipelines often use long-lived credentials to access external services (e.g., cloud provider credentials or package registry tokens). Such secrets can be exfiltrated (printing to logs, sending to external endpoints or embedding them in artifacts) via remote code execution.\n\nCompromise of GITHUB_TOKEN with write permissions. GitHub automatically provides each workflow run with a short-lived GITHUB_TOKEN that is scoped to the repository and has specific permissions. If this token is granted with write permissions and an attacker is able to exfiltrate or misuse the token, they could potentially modify repository contents, create or alter releases or interact with other GitHub resources.\n\nGitHub Actions cache poisoning. Workflows may reuse cached data across different workflow runs. If an attacker can inject malicious content into the cache and subsequent workflows (such as release pipelines) restore and use this cache, the poisoned data can be executed in a privileged context and potentially compromise the integrity of published release artifacts, obtain code execution in the privileged workflow and steal the production secrets.\n\nDenial-of-wallet attacks. CI/CD pipelines often integrate with paid external services, such as LLMs, for code review. If an attacker can repeatedly trigger pipelines or manipulate inputs to maximize resource consumption, this can lead to uncontrolled spending and financial impact."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#002",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Treat your CI/CD pipeline as a critical production code",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Because a CI/CD pipeline usually has access to sensitive credentials and functions/endpoints, it must be treated as a critical asset, potentially even more critical than the source code it processes. Therefore, secure software development best practices must be applied, including (but not limited to): threat modeling, secure code reviews, security validation and penetration testing.\n\nFor deeper guidance and recommended practices, see:\n\nNIST \"Strategies for the Integration of Software Supply Chain Security in DevSecOps CI/CD Pipeline\";\n\nOWASP CI/CD Security Cheat Sheet;\n\nOWASP Secure Pipeline Verification Standard."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#003",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Assume failure and have an incident response plan in place",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Assume breaches will happen and design for rapid response. Define clear incident response procedures with roles, communication and escalation paths. Continuously improve by actively learning from other incidents through publicly available post-mortems (e.g., Trivy post-mortem, Cline post-mortem)."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#004",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Enable static analysis for GitHub Actions workflows",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "[!IMPORTANT] CodeQL is freely available for open-source repositories on GitHub. Verify that CodeQL is enabled for your repositories and configured to scan GitHub Actions workflow files. CodeQL can be enabled via GitHub UI or by including a workflow file under .github/workflows folder:\n\nIf enabling via workflow, ensure that language: actions is included in the workflow.\n\nIf enabling via Settings → Advanced Security → Code scanning → CodeQL analysis, ensure that GitHub Actions appears under the Languages section.\n\nIf available, enable CodeQL actions scanning in your repositories to detect vulnerabilities in GitHub Actions workflows. In addition, use Zizmor for defense in depth. Periodically upgrade these tools, as new releases may contain updated detection rules.\n\nConfigure these tools to run on every relevant pull request and mark them as required status checks before merging. At a minimum, block merges when high or critical severity issues are detected.\n\nRun comprehensive workflow scans on a scheduled basis (e.g., daily) and ensure that findings are tracked and remediated over time.\n\nIf you need to enable scanning across several repositories, try to utilize a centralized reusable workflow or shared actions to standardize security practices (see this Grafana example)."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#005",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Harden repository settings",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "[!IMPORTANT] Please note that the Require approval for first-time contributors setting presents a security risk because an attacker can submit an initially legitimate-looking pull request (e.g., a typo fix) to gain trust and later submit subsequent PRs that introduce malicious changes which are executed in CI without requiring further approval.\n\nEnable the setting Require approval for all external contributors in the repository settings. This ensures that workflows triggered by pull requests from forks (i.e., users who are not members of the repository or organization) do not run automatically and therefore prevents untrusted code execution.\n\nRestrict default GITHUB_TOKEN permissions to Read repository contents and packages permissions in the repository settings. Explicitly grant additional permissions in the workflow file if required.\n\nEnforce strong branch protection rules. Configure branch protection to require pull request reviews, status checks, signed commits and CODEOWNERS approval before merging into protected branches. Tools such as the OpenSSF Scorecard can help audit these settings.\n\nRequire workflows to pass before merging via repository rulesets to enforce organizational or enterprise-level requirements — such as checking for required labels or validating commit messages — before code is merged."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#006",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Restrict egress traffic from GitHub-hosted runners",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Use solutions (e.g., Harden-Runner) to monitor and restrict egress traffic from GitHub-hosted runners to prevent secret exfiltration."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#007",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Use self-hosted runners with extra caution",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Self-hosted runners usually have access to internal networks and may cache credentials, secrets or store internal data. Because they execute arbitrary code by design, they can be used by an attacker to establish persistent remote access and exfiltrate secrets. In general, never use self-hosted runners with public repositories, as anyone who can fork the repository and open a pull request can potentially execute code on your runner.\n\nIf you use self-hosted runners for a public repository:\n\nUse standard secure software development best practices when enabling self-hosted runners (threat modeling, secure code reviews, security validation, penetration testing, patching and hardening).\n\nUse the Require approval for all external contributors option, review proposed changes and manually approve each workflow execution for all external contributors.\n\nUse ephemeral runners (e.g., container-based runners) and destroy the runner environment after each job execution to prevent persistence.\n\nDo not store sensitive data on runner machines, as any user who can invoke workflows has access to the runner environment.\n\nRestrict runner network access and avoid giving self-hosted runners access to sensitive infrastructure."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#008",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Segregate runners using runner groups and labels",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Use runner groups and labels to separate high-privilege runners from low-privilege runners. High-privilege runners may have access to sensitive resources, while low-privilege runners should not.\n\nThis separation gives more granular control over which repositories can access a runner group and which workflows can target specific runners, reducing the risk that a compromised or misconfigured workflow gains access to sensitive resources.\n\nFor example, consider creating:\n\nA runner group for container image build runners, limited to only the repositories that require those privileges.\n\nA runner group for runners with access to restricted networks.\n\nA separate runner group for low-privilege tasks such as linting and static analysis, used by repositories where secrets are absent or isolated in separate environments."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#009",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Maintain curated shared workflows and actions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "If you need to support several repositories, establish a centralized repository of curated, security-reviewed workflows/actions and reuse it across other repositories.\n\nFor a practical example, see grafana/shared-workflows."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#010",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Prevent artifact poisoning",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Artifact poisoning occurs when malicious or untrusted content is introduced into build artifacts, often via shared caches or previously stored dependencies (GitHub Actions Cache Poisoning). This can compromise the integrity of released software or lead to production secret exfiltration. To reduce this risk, disable all forms of caching in release or publishing workflows to avoid reusing potentially compromised artifacts or exfiltrating production secrets."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#011",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Be careful with AI assistant running in CI/CD pipeline",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Sometimes, an AI assistant is used directly in workflows, e.g., to review pull requests or triage submitted issues. This creates a risk of prompt injection attacks, where malicious input manipulates the AI assistant's behavior. If the workflow running the AI assistant has access to secrets or a GITHUB_TOKEN with write permissions and can be triggered by untrusted users (e.g., any GitHub account), this may lead to secret exfiltration or unauthorized actions. A real-world example is the \"clinejection\" attack.\n\nTo mitigate potential attacks, limit AI assistant capabilities — only enable the minimum tools and actions required for task execution."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#012",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "This section contains some recommendations. In general, a static code analyzer (CodeQL, Zizmor) should report such issues."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#013",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Avoid dangerous triggers > Avoid using the pull_request_target trigger",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Workflows triggered by pull_request_target run in the context of the base (target) repository and have access to the GITHUB_TOKEN with write permissions and GitHub secrets available to the workflow. If untrusted code from a PR is checked out and used, this may lead to code execution. There are some common patterns, like labeling workflows where untrusted code is not checked out, but in general, try to avoid the pull_request_target trigger.\n\n[!IMPORTANT] Never check out (via actions/checkout or GitHub CLI) and run untrusted code in this context."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#014",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Avoid dangerous triggers > Avoid using the workflow_run trigger",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "The workflow_run trigger automates tasks based on the execution of other workflows and can grant access to the GITHUB_TOKEN with write permissions and GitHub secrets. An attacker can modify triggering workflows via pull requests and cause privileged workflows to run. Even if the initial workflow is unprivileged, the triggered one may execute with higher permissions, enabling privilege escalation. Additionally, attackers can exploit artifact poisoning by injecting malicious files that downstream workflows use without verification, leading to potential code execution. If you need to implement workflow chains, use workflow_call with reusable workflows instead."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#015",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Avoid dangerous triggers > Use issue_comment trigger with extra care",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "This trigger can automate workflows (e.g., end-to-end tests) in response to comments on issues or pull requests and can grant access to the GITHUB_TOKEN with write permissions and GitHub secrets. Implementation may introduce a Time-of-Check to Time-of-Use (TOCTOU) issue, where an attacker can modify a pull request between comment approval and workflow execution to run malicious code. Additionally, this trigger can bypass pull request approval mechanisms, allowing attackers to execute workflows without proper review.\n\nTo secure the implementation with the issue_comment trigger:\n\nCheck if the triggering actor meets authorization criteria, e.g., allow workflow execution only if it was triggered by a trusted member of the specific GitHub org.\n\nUse the commit SHA in a comment that triggers the workflow: instead of using a /ok-to-test comment, design the workflow to accept /ok-to-test(<trusted_sha_commit>) and check out code only from <trusted_sha_commit> submitted by an authorized actor. This will help mitigate the checkout and execution of untrusted code."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#016",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Avoid dangerous triggers > Use issue_comment trigger with extra care",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Alternatively, consider replacing the issue_comment trigger with label-based triggers. When using the pull_request trigger with the labeled event, github.event.pull_request.head.sha contains the latest commit SHA for the pull request. Users with triage access can apply labels. Verify that the actor applying a workflow-triggering label is authorized for that operation; permission to label does not establish that the commit has been reviewed. Applying a label does not elevate workflow permissions. For pull requests from forks of public repositories, pull_request workflows still receive a read-only GITHUB_TOKEN and no other secrets, as described in GitHub's fork workflow restrictions. After reviewing the proposed code, check out the exact commit SHA available via github.event.pull_request.head.sha, which reflects the state of the pull request at the time the label was applied. Do not treat the label as approval for later commits.\n\n[!IMPORTANT] In general, never check out code using mutable references (e.g., pull request numbers or branch names) - always use immutable references such as a full commit SHA."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#017",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Use third-party GitHub Actions and reusable workflows securely > Use third-party actions with caution",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "In general, try to minimize third-party actions usage, e.g., use the GitHub API in your workflows when possible to implement required logic.\n\nWhile using third-party actions, verify the origin, check that the author is trusted and active, ensure that there are multiple active contributors. Check that the code is stable and safe to use, and that the action does not require unnecessary permissions."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#018",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Use third-party GitHub Actions and reusable workflows securely > Always pin all action and reusable workflow versions with a commit hash and check for impostor commits",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Check that the used commit belongs to the specified organization/repository. This will prevent dependency confusion attacks, as currently GitHub resolves the commit SHA, finds a matching object and executes it regardless of which fork it originated from. This check can be automated with the Zizmor impostor-commit rule."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#019",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Use third-party GitHub Actions and reusable workflows securely > Use automated dependency update tools",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Use tools such as Dependabot or Renovate to keep third-party GitHub Actions up to date.\n\nConfigure a delay between a dependency release and its adoption (e.g., a few days). This helps avoid immediately pulling in newly published malicious or compromised versions, allowing time for the community to detect and report issues. To configure this, Dependabot has a cooldown flag, Renovate has a minimumReleaseAge flag."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#020",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Minimize GITHUB_TOKEN permissions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Always set permissions: {} at the workflow level to disable all permissions by default. Then, grant only the specific permissions needed at the job level."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#021",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Require approval for deployments or publications to critical environments",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Use GitHub environments with required approval rules. Define a list of authorized accounts who must manually approve deployments to production or other critical environments before workflow execution."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#022",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Sanitize user input",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "An attacker may submit a malicious payload via context (e.g., via PR title) that could cause remote execution. To prevent injection, always use intermediate environment variables to pass any context into run: and similar code execution blocks. Although some input contexts may appear relatively safe, it is better to always follow this approach for consistency and security."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#023",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Protect secrets used in workflows > Try to eliminate all static credentials from your workflows",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Try to eliminate all static credentials (e.g., personal access tokens, static cloud keys) used in workflows. Migrate to OIDC-based short-lived authentication tokens (\"Trusted publishing\"). Currently, many major registries and cloud providers support this feature. For cloud deployment trust restrictions and credential handling, see the Workload Identity Federation Cheat Sheet."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#024",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Protect secrets used in workflows > Secure handling of static credentials (if elimination is unavoidable)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "If complete elimination cannot be achieved:\n\nNever hardcode secrets in workflow files.\n\nPass secrets at the step level, not the job level.\n\nPrefer environment-level secrets that are only accessible when a job targets a specific environment.\n\nRotate secrets regularly."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#025",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Protect secrets used in workflows > Eliminate secrets: inherit while reusing workflows",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "When invoking a reusable workflow, secrets: inherit passes all secrets available to the calling workflow, including secrets the called workflow may not need. Explicitly pass only the required secrets. Also review any environment selected by a job inside the reusable workflow: GitHub documents that the environment's secrets are used there and can override secrets passed by the caller. An explicit caller secret map does not remove that separate source of access."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#026",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Protect secrets used in workflows > Mask sensitive data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Mask all sensitive information that is not a GitHub secret by using ::add-mask::{value}. Masking a value prevents a string or variable from being printed in the log"
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#027",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Protect secrets used in workflows > Use secret scanning tools",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Implement secret scanning in both pre-commit and pull request stages to prevent accidental exposure of sensitive data in the repository:\n\nRun secret scanning locally (e.g., via pre-commit hooks) to catch issues before code is committed.\n\nEnforce scanning in pull requests to detect and block any leaked secrets before merging.\n\nAutomatically fail checks when potential secrets are detected to ensure remediation before proceeding."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#028",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "Write Secure GitHub Workflows > Protect secrets used in workflows > actions/checkout should be used with persist-credentials: false",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "Unless needed for git operations, actions/checkout should be used with persist-credentials: false. This prevents Git credentials from being persisted to the workflow's environment, reducing the risk of credential exposure if the workflow is compromised."
+  },
+  {
+   "chunk_id": "GitHub_Actions_Security_Cheat_Sheet#029",
+   "doc": "GitHub_Actions_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/GitHub_Actions_Security_Cheat_Sheet.html",
+   "text": "GitHub Actions: Secure Use Reference\n\nGitHub Actions: OpenID Connect"
+  }
+ ]
+}

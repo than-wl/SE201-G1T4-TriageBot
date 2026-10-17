@@ -1,0 +1,217 @@
+{
+ "doc": "Key_Management_Cheat_Sheet",
+ "title": "Key Management Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#001",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "This Key Management Cheat Sheet provides developers with guidance for implementation of cryptographic key management within an application in a secure manner. It is important to document and harmonize rules and practices for:\n\nKey life cycle management (generation, distribution, destruction)\n\nKey compromise, recovery and zeroization\n\nKey storage\n\nKey agreement"
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#002",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "General Guidelines and Considerations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Formulate a plan for the overall organization's cryptographic strategy to guide developers working on different applications and ensure that each application's cryptographic capability meets minimum requirements and best practices.\n\nIdentify the cryptographic and key management requirements for your application and map all components that process or store cryptographic key material."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#003",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Selection of the cryptographic and key management algorithms to use within a given application should begin with an understanding of the objectives of the application.\n\nFor example, if the application is required to store data securely, then the developer should select an algorithm suite that supports the objective of data at rest protection security. Applications that are required to transmit and receive data would select an algorithm suite that supports the objective of data in transit protection.\n\nWe have provided recommendations on the selection of crypto suites within an application based on application and security objectives. Application developers oftentimes begin the development of crypto and key management capabilities by examining what is available in a library.\n\nHowever, an analysis of the real needs of the application should be conducted to determine the optimal key management approach. Begin by understanding the security objectives of the application which will then drive the selection of cryptographic protocols that are best suited. For example, the application may require:\n\nConfidentiality of data at rest and confidentiality of data in transit.\n\nAuthenticity of the end device.\n\nAuthenticity of data origin.\n\nIntegrity of data in transit.\n\nKeys to create the data encryption keys.\n\nOnce the understanding of the security needs of the application is achieved, developers can determine what protocols and algorithms are required. Once the protocols and algorithms are understood, you can begin to define the different types of keys that will support the application's objectives.\n\nThere are a diverse set of key types and certificates to consider, for example:\n\nEncryption: Symmetric encryption keys, Asymmetric encryption keys (public and private).\n\nAuthentication of End Devices: Pre-shared symmetric keys, Trusted certificates, Trust Anchors.\n\nData Origin Authentication: HMAC.\n\nIntegrity Protection: Message Authentication Codes (MACs).\n\nKey Encryption Keys."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#004",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Algorithms and Protocols",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "According to NIST SP 800-57 Part 1, many algorithms and schemes that provide a security service use a hash function as a component of the algorithm.\n\nHash functions can be found in digital signature algorithms (FIPS186), Keyed-Hash Message Authentication Codes (HMAC) (FIPS198), key-derivation functions/methods (NIST Special Publications (SP) 800-56A, 800-56B, 800-56C and 800-108), and random number generators (NIST SP 800-90A). Approved hash functions are defined in FIPS180.\n\nNIST SP 800-57 Part 1 recognizes three basic classes of approved cryptographic algorithms: hash functions, symmetric- key algorithms and asymmetric-key algorithms. The classes are defined by the number of cryptographic keys that are used in conjunction with the algorithm.\n\nThe NSA released a report, Commercial National Security Algorithm Suite 2.0 which lists the cryptographic algorithms that are expected to remain strong even with advances in quantum computing."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#005",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Algorithms and Protocols > Cryptographic hash functions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Cryptographic hash functions do not require keys. Hash functions generate a relatively small digest (hash value) from a (possibly) large input in a way that is fundamentally difficult to reverse (i.e., it is hard to find an input that will produce a given output). Hash functions are used as building blocks for key management, for example,\n\nTo provide data authentication and integrity services (Section 4.2.3) – the hash function is used with a key to generate a message authentication code.\n\nTo compress messages for digital signature generation and verification (Section 4.2.4).\n\nTo derive keys in key-establishment algorithms (Section 4.2.5).\n\nTo generate deterministic random numbers (Section 4.2.7)."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#006",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Algorithms and Protocols > Symmetric-key algorithms",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Symmetric-key algorithms (sometimes known as secret-key algorithms) transform data in a way that is fundamentally difficult to undo without knowledge of a secret key. The key is \"symmetric\" because the same key is used for a cryptographic operation and its inverse (e.g., encryption and decryption).\n\nSymmetric keys are often known by more than one entity; however, the key shall not be disclosed to entities that are not authorized access to the data protected by that algorithm and key. Symmetric key algorithms are used, for example,\n\nTo provide data confidentiality (Section 4.2.2); the same key is used to encrypt and decrypt data.\n\nTo provide authentication and integrity services (Section 4.2.3) in the form of Message Authentication Codes (MACs); the same key is used to generate the MAC and to validate it. MACs normally employ either a symmetric key-encryption algorithm or a cryptographic hash function as their cryptographic primitive.\n\nAs part of the key-establishment process (Section 4.2.5).\n\nTo generate deterministic random numbers (Section 4.2.7)."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#007",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Algorithms and Protocols > Asymmetric-key algorithms",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Asymmetric-key algorithms, commonly known as public-key algorithms, use two related keys (i.e., a key pair) to perform their functions: a public key and a private key. The public key may be known by anyone; the private key should be under the sole control of the entity that \"owns\" the key pair. Even though the public and private keys of a key pair are related, knowledge of the public key does not reveal the private key. Asymmetric algorithms are used, for example,\n\nTo compute digital signatures (Section 4.2.4).\n\nTo establish cryptographic keying material (Section 4.2.5).\n\nTo generate random numbers (Section 4.2.7)."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#008",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Algorithms and Protocols > Message Authentication Codes (MACs)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Message Authentication Codes (MACs) provide data authentication and integrity. A MAC is a cryptographic checksum on the data that is used in order to provide assurance that the data has not changed and that the MAC was computed by the expected entity.\n\nAlthough message integrity is often provided using non-cryptographic techniques known as error detection codes, these codes can be altered by an adversary to effect an action to the adversary's benefit. The use of an approved cryptographic mechanism, such as a MAC, can alleviate this problem.\n\nIn addition, the MAC can provide a recipient with assurance that the originator of the data is a key holder (i.e., an entity authorized to have the key). MACs are often used to authenticate the originator to the recipient when only those two parties share the MAC key."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#009",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Algorithms and Protocols > Digital Signatures",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Digital signatures are used to provide authentication, integrity and non-repudiation. Digital signatures are used in conjunction with hash functions and are computed on data of any length (up to a limit that is determined by the hash function).\n\nFIPS186 specifies algorithms that are approved for the computation of digital signatures."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#010",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Algorithms and Protocols > Key Encryption Keys",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Symmetric key-wrapping keys are used to encrypt other keys using symmetric-key algorithms. Key-wrapping keys are also known as key encrypting keys."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#011",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Key Strength",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Review NIST SP 800-57 (Recommendation for Key Management) for recommended guidelines on key strength for specific algorithm implementations. Also, consider these best practices:\n\nEstablish what the application's minimum computational resistance to attack should be. Understanding the minimum computational resistance to attack should take into consideration the sophistication of your adversaries, how long data needs to be protected, where data is stored and if it is exposed. Identifying the computational resistance to attack will inform engineers as to the minimum length of the cryptographic key required to protect data over the life of that data. Consult NIST SP 800-131a for additional guidance on determining the appropriate key lengths for the algorithm of choice.\n\nWhen encrypting keys for storage or distribution, always encrypt a cryptographic key with another key of equal or greater cryptographic strength.\n\nWhen moving to Elliptic Curve-based algorithms, choose a key length that meets or exceeds the comparative strength of other algorithms in use within your system. Refer to NIST SP 800-57 Table 2.\n\nFormulate a strategy for the overall organization's cryptographic strategy to guide developers working on different applications and ensure that each application's cryptographic capability meets minimum requirements and best practices."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#012",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Memory Management Considerations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Keys stored in memory for a long time can become \"burned in\". This can be mitigated by splitting the key into components that are frequently updated. NIST SP 800-57).\n\nLoss or corruption of the memory media on which keys and/or certificates are stored, and recovery planning, according to NIST SP 800-57.\n\nPlan for the recovery from possible corruption of the memory media necessary for key or certificate generation, registration, and/or distribution systems, subsystems, or components as recommended in NIST SP 800-57."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#013",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Perfect Forward Secrecy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Ephemeral keys can provide perfect forward secrecy protection, which means a compromise of the server's long term signing key does not compromise the confidentiality of past sessions. Refer to TLS cheat sheet."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#014",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Key Usage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "According to NIST, in general, a single key should be used for only one purpose (e.g., encryption, authentication, key wrapping, random number generation, or digital signatures).\n\nThere are several reasons for this:\n\nThe use of the same key for two different cryptographic processes may weaken the security provided by one or both of the processes.\n\nLimiting the use of a key limits the damage that could be done if the key is compromised.\n\nSome uses of keys interfere with each other. For example, the length of time the key may be required for each use and purpose. Retention requirements of the data may differ for different data types."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#015",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Selection > Cryptographic Module Topics",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "According to NIST SP 800-133, cryptographic modules are the set of hardware, software, and/or firmware that implements security functions (including cryptographic algorithms and key generation) and is contained within a cryptographic module boundary to provide protection of the keys.\n\nAll cryptographic operations (such as key generation, encryption, decryption, and digital signing) should be performed inside the isolated cryptographic security module boundary so that plaintext key material is never exposed outside the module (OWASP Application Security Verification Standard (ASVS) 5.0 §13.3.3). For higher-assurance deployments (such as OWASP ASVS 5.0 Level 3), applications should use hardware-backed modules, such as a Hardware Security Module (HSM) or Trusted Platform Module (TPM), to significantly reduce the risk of key extraction or compromise in software memory."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#016",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Generation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Cryptographic keys shall be generated within cryptographic module with at least a FIPS 140-2 or 140-3 compliance. For explanatory purposes, consider the cryptographic module in which a key is generated to be the key-generating module.\n\nAny random value required by the key-generating module shall be generated within that module; that is, the Random Bit Generator that generates the random value shall be implemented within cryptographic module with at least a FIPS 140-2 or 140-3 compliance that generates the key.\n\nHardware cryptographic modules are preferred over software cryptographic modules for protection."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#017",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Distribution",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "The generated keys shall be transported (when necessary) using secure channels and shall be used by their associated cryptographic algorithm within at least a FIPS 140-2 or 140-3 compliant cryptographic modules. For additional detail for the recommendations in this section refer to NIST Special Paper 800-133."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#018",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Cryptographic keys, secrets, and API keys should never be committed to source code repositories or embedded in build artifacts (such as binaries, container images, or configuration files). Secrets and keys should be stored in a dedicated secrets-management solution or key vault (OWASP ASVS 5.0 §13.3.1).\n\nDevelopers must understand where cryptographic keys are stored within the application. Understand what memory devices the keys are stored on.\n\nKeys must be protected on both volatile and persistent memory, ideally processed within secure cryptographic modules.\n\nKeys should never be stored in plaintext format.\n\nEnsure all keys are stored in a cryptographic vault, such as a hardware security module (HSM) or isolated cryptographic service.\n\nIf you are planning on storing keys in offline devices/databases, then encrypt the keys using Key Encryption Keys (KEKs) prior to the export of the key material. KEK length (and algorithm) should be equivalent to or greater in strength than the keys being protected.\n\nEnsure that keys have integrity protections applied while in storage (consider dual purpose algorithms that support encryption and Message Code Authentication (MAC)).\n\nEnsure that standard application level code never reads or uses raw cryptographic keys in any way and use key management libraries.\n\nEnsure that keys and cryptographic operations are done inside the sealed vault.\n\nAll work should be done in the vault (such as key access, encryption, decryption, signing, etc).\n\nFor a more complete guide to storing sensitive information such as keys, see the Secrets Management Cheat Sheet."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#019",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Cryptoperiods and Rotation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "A cryptoperiod is the time span during which a specific cryptographic key is authorized for use. Limiting cryptoperiods restricts the amount of data protected by a single key and reduces the window of exposure if a key is compromised (NIST SP 800-57 Part 1 Rev. 5 Section 5.3). For storage-level rotation fundamentals and criteria, see the Cryptographic Storage Cheat Sheet.\n\nRepresentative cryptoperiods vary depending on the algorithm, key strength, operational environment, threat model, and sensitivity of the protected data. Organizations should define cryptoperiods through risk assessment in accordance with NIST SP 800-57 Part 1 Rev. 5.\n\nRotation Schedule: Establish and document a key rotation schedule based on the system's threat model and risk assessment (OWASP ASVS 5.0 §13.1.4, §13.3.4).\n\nRepresentative Cryptoperiod Examples:\n\nSymmetric Data Encryption Keys: Originator usage (encrypting new data) should be capped at up to 2 years for general low-volume applications, or on the order of a day or a week for high-volume or link-encryption systems (NIST SP 800-57 Part 1 Rev. 5 §5.3.6, item 6(b)). Recipient usage (decryption) should typically be limited to no more than 3 years beyond the originator usage period.\n\nTLS/HTTPS Server Keys and Certificates: Plan certificate renewal around the validity limits in the CA/Browser Forum Baseline Requirements §6.3.2. Set key-replacement schedules separately; renewing a certificate does not necessarily replace its key pair.\n\nAsymmetric Key Pairs: Operational cryptoperiods depend on key usage (NIST SP 800-57 Part 1 Rev. 5 Table 1 & §5.3.6):\n\nDigital Signature Keys: Private signing keys typically have an originator cryptoperiod of 1 to 3 years; public signature verification keys may be retained longer to verify archived signed data.\n\nKey Establishment Keys: Static key-agreement pairs typically have an originator cryptoperiod of up to 1 to 2 years; ephemeral pairs are used for a single key-agreement transaction."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#020",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Cryptoperiods and Rotation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Usage-Based Rotation Limits: Key rotation must account for usage volume in addition to calendar time. For example, when using Advanced Encryption Standard in Galois/Counter Mode (AES-GCM) with random 96-bit initialization vectors (IVs), limit each key to at most 2^32 (4,294,967,296) encryption operations across all devices sharing that key to limit IV-collision risk (NIST SP 800-38D §8.3).\n\nHandling Existing Encrypted Data (Envelope Encryption): To retire a Key Encryption Key (KEK), re-wrap stored Data Encryption Keys (DEKs) under the replacement KEK before destroying the old one. Rewrapping leaves the DEKs unchanged and does not reset their cryptoperiods or usage limits. Replacing a DEK for existing ciphertext requires re-encrypting that data. Managed services may retain old wrapping-key versions automatically; check the provider's rotation behavior. For key IDs and data-migration choices, see the Cryptographic Storage Cheat Sheet.\n\nAutomated Rotation: Prefer automated key rotation using Key Management Services (KMS) or automated certificate management protocols (such as Automated Certificate Management Environment (ACME)) to reduce operational error and ensure timely updates.\n\nManual Rotation Logging: When manual key rotation is required, rotation events should be logged with the timestamp, operator identity, and management authorization reference."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#021",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Escrow and Backup",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Data that has been encrypted with lost cryptographic keys will never be recovered. Therefore, it is essential that the application incorporate a secure key backup capability, especially for applications that support data at rest encryption for long-term data stores.\n\nWhen backing up keys, ensure that the database that is used to store the keys is encrypted using at least a FIPS 140-2 or 140-3 validated module. It is sometimes useful to escrow key material for use in investigations and for re-provisioning of key material to users in the event that the key is lost or corrupted.\n\nNever escrow keys used for performing digital signatures, but consider the need to escrow keys that support encryption. Oftentimes, escrow can be performed by the Certificate Authority (CA) or key management system that provisions certificates and keys, however in some instances separate APIs must be implemented to allow the system to perform the escrow for the application."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#022",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Accountability and Audit",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Accountability involves the identification of those that have access to, or control of, cryptographic keys throughout their lifecycles. Accountability can be an effective tool to help prevent key compromises and to reduce the impact of compromises once they are detected.\n\nEnforce the principle of least privilege for all key and secret assets (OWASP ASVS 5.0 §13.3.2). Access to cryptographic keys, key management interfaces, and secret material should be restricted strictly to authorized roles, services, and workloads with a verified operational need.\n\nAlthough it is preferred that no humans are able to view keys, as a minimum, the key management system should account for all individuals who are able to view plaintext cryptographic keys.\n\nIn addition, more sophisticated key-management systems may account for all individuals authorized to access or control any cryptographic keys, whether in plaintext or ciphertext form.\n\nAccountability provides three significant advantages:\n\nIt aids in the determination of when the compromise could have occurred and what individuals could have been involved.\n\nIt tends to protect against compromise, because individuals with access to the key know that their access to the key is known.\n\nIt is very useful in recovering from a detected key compromise to know where the key was used and what data or other keys were protected by the compromised key.\n\nCertain principles have been found to be useful in enforcing the accountability of cryptographic keys. These principles might not apply to all systems or all types of keys.\n\nSome of the principles that apply to long-term keys controlled by humans include:\n\nUniquely identifying keys.\n\nIdentifying the key user.\n\nIdentifying the dates and times of key use, along with the data that is protected.\n\nIdentifying other keys that are protected by a symmetric or private key.\n\nTwo types of audit should be performed on key management systems:"
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#023",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Accountability and Audit",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "The security plan and the procedures that are developed to support the plan should be periodically audited to ensure that they continue to support the Key Management Policy (NIST SP 800-57 Part 2).\n\nThe protective mechanisms employed should be periodically reassessed with respect to the level of security that they provide and are expected to provide in the future, and that the mechanisms correctly and effectively support the appropriate policies.\n\nNew technology developments and attacks should be taken into consideration. On a more frequent basis, the actions of the humans that use, operate and maintain the system should be reviewed to verify that the humans continue to follow established security procedures.\n\nStrong cryptographic systems can be compromised by lax and inappropriate human actions. Highly unusual events should be noted and reviewed as possible indicators of attempted attacks on the system."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#024",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Key Compromise and Recovery",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "The compromise of a key has the following implications:\n\nIn general, the unauthorized disclosure of a key used to provide confidentiality protection (i.e., via encryption) means that all information encrypted by that key could be exposed or known by unauthorized entities. The disclosure of a Certificate of Authorities's private signature key means that an adversary can create fraudulent certificates and Certificate Revocation Lists (CRLs).\n\nA compromise of the integrity of a key means that the key is incorrect - either that the key has been modified (either deliberately or accidentally), or that another key has been substituted; this includes a deletion (non-availability) of the key. The substitution or modification of a key used to provide integrity calls into question the integrity of all information protected by the key. This information could have been provided by, or changed by, an unauthorized entity that knows the key. The substitution of a public or secret key that will be used (at a later time) to encrypt data could allow an unauthorized entity (who knows the decryption key) to decrypt data that was encrypted using the encryption key.\n\nA compromise of a key's usage or application association means that the key could be used for the wrong purpose (e.g., for key establishment instead of digital signatures) or for the wrong application, and could result in the compromise of information protected by the key.\n\nA compromise of a key's association with the owner or other entity means that the identity of the other entity cannot be assured (i.e., one does not know who the other entity really is) or that information cannot be processed correctly (e.g., decrypted with the correct key)."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#025",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Key Compromise and Recovery",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "A compromise of a key's association with other information means that there is no association at all, or the association is with the wrong \"information\". This could cause the cryptographic services to fail, information to be lost, or the security of the information to be compromised. Certain protective measures may be taken in order to minimize the likelihood or consequences of a key compromise. Similar effect as ransomware, except that you can't pay the ransom and get the key back.\n\nThe following procedures are usually involved:\n\nLimiting the amount of time a symmetric or private key is in plaintext form.\n\nPreventing humans from viewing plaintext symmetric and private keys.\n\nRestricting plaintext symmetric and private keys to physically protected containers. This includes key generators, key-transport devices, key loaders, cryptographic modules, and key-storage devices.\n\nUsing integrity checks to ensure that the integrity of a key or its association with other data has not been compromised. For example, keys may be wrapped (i.e., encrypted) in such a manner that unauthorized modifications to the wrapping or to the associations will be detected.\n\nEmploying key confirmation (see NIST SP 800-57 Part 1 Section 4.2.5.5) to help ensure that the proper key was, in fact, established.\n\nEstablishing an accountability system that keeps track of each access to symmetric and private keys in plaintext form.\n\nProviding a cryptographic integrity check on the key (e.g., using a MAC or a digital signature).\n\nThe use of trusted timestamps for signed data. i. Destroying keys as soon as they are no longer needed.\n\nCreating a compromise-recovery plan, especially in the case of a CA compromise.\n\nA compromise-recovery plan is essential for restoring cryptographic security services in the event of a key compromise. A compromise-recovery plan shall be documented and easily accessible.\n\nThe compromise-recovery plan should contain:"
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#026",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Key Compromise and Recovery",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "The identification and contact info of the personnel to notify.\n\nThe identification and contact info of the personnel to perform the recovery actions.\n\nThe re-key method.\n\nAn inventory of all cryptographic keys and their use (e.g., the location of all certificates in a system).\n\nThe education of all appropriate personnel on the recovery procedures.\n\nAn identification and contact info of all personnel needed to support the recovery procedures.\n\nPolicies that key-revocation checking be enforced (to minimize the effect of a compromise).\n\nThe monitoring of the re-keying operations (to ensure that all required operations are performed for all affected keys).\n\nAny other recovery procedures, which may include:\n\nPhysical inspection of the equipment.\n\nIdentification of all information that may be compromised as a result of the incident.\n\nIdentification of all signatures that may be invalid, due to the compromise of a signing key.\n\nDistribution of new keying material, if required."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#027",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Key Management Lifecycle Best Practices > Zeroization and Destruction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Destruction is the final state in the cryptographic key lifecycle. Key management policies should account for the lifecycle key states described in NIST SP 800-57 Part 1 Rev. 5 Section 7 (such as pre-activation, active, suspended, deactivated, compromised, and destroyed).\n\nRevoke compromised keys promptly and stop using them to protect new data. Retain only tightly controlled access needed for recovery or migration of previously protected data. Destroy all copies of secret and private keys, including backup, archived, escrowed, and memory copies, as soon as they are no longer needed for decryption or recovery and retention requirements are satisfied. Public verification keys may be retained to verify archived signatures (NIST SP 800-57 Part 1 Rev. 5 Sections 7.5 and 8.3.4–8.3.5).\n\nCryptographic Erasure: For encrypted key material at rest, consider cryptographic erasure only when all copies of the protecting keys can be destroyed and no recoverable plaintext copies of the target material remain (NIST SP 800-88 Rev. 2 Section 3.2). Destroying a wrapping key does not erase plaintext copies of the keys it protected.\n\nSoftware Memory: Overwriting key material is best-effort in managed runtimes, where copies can survive in garbage-collected memory, immutable strings, or swapped-out pages. Use platform secure-memory or zeroization APIs where available; see Protecting Secrets in Memory.\n\nHardware Security Modules (HSMs): Use vendor-supplied zeroize or destroy commands to zeroize key material stored in volatile memory and non-volatile HSM storage.\n\nPhysical Media: Physically destroy obsolete storage media or cryptographic tokens containing key material in accordance with organizational sanitization standards."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#028",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Trust Stores",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Design controls to secure the trust store against injection of third-party root certificates. The access controls are managed and enforced on an entity and application basis.\n\nImplement integrity controls on objects stored in the trust store.\n\nDo not allow for export of keys held within the trust store without authentication and authorization.\n\nSetup strict policies and procedures for exporting key material from applications to network applications and other components.\n\nImplement a secure process for updating the trust store."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#029",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "Cryptographic Key Management Libraries",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "Use only reputable crypto libraries that are well maintained and updated, as well as tested and validated by third-party organizations (e.g., NIST/FIPS)."
+  },
+  {
+   "chunk_id": "Key_Management_Cheat_Sheet#030",
+   "doc": "Key_Management_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Key_Management_Cheat_Sheet.html",
+   "text": "NIST SP 800-57 Part 1 Rev. 5: Recommendation for Key Management\n\nNIST SP 800-38D: Galois/Counter Mode (GCM) and GMAC\n\nNIST SP 800-88 Rev. 2: Guidelines for Media Sanitization"
+  }
+ ]
+}

@@ -1,0 +1,147 @@
+{
+ "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+ "title": "Subdomain Takeover Prevention Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#001",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Subdomain takeover is a vulnerability that occurs when a DNS record (typically a CNAME) points to a cloud resource or third-party service that has been deprovisioned or no longer exists. An attacker can claim the orphaned resource and serve arbitrary content on the victim's subdomain.\n\nThis vulnerability is consistently among the most reported findings in bug bounty programs. Despite being well understood, it remains prevalent because it is fundamentally an operational problem: teams create DNS records when spinning up services but rarely have processes to clean them up during decommissioning.\n\nThe impact extends far beyond serving a defacement page. An attacker controlling a subdomain can:\n\nSteal session cookies scoped to the parent domain (e.g., cookies set on .example.com are sent to attacker-controlled.example.com)\n\nBypass Content Security Policy rules that trust wildcard subdomains (*.example.com)\n\nHost convincing phishing pages on a domain the organization's users and customers already trust\n\nCompromise OAuth and SSO flows that whitelist the subdomain as a valid redirect URI\n\nObtain valid TLS certificates for the subdomain from Certificate Authorities that use HTTP or email-based domain validation\n\nReceive email addressed to the subdomain if MX records are involved, enabling password resets or account verification on third-party services\n\nThis cheat sheet provides practical guidance for developers, DevOps engineers, and infrastructure teams to prevent subdomain takeovers, detect dangling records before attackers do, and respond effectively when they are discovered."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#002",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "How Subdomain Takeover Works > The Basic Mechanism",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "An organization creates a DNS record: blog.example.com CNAME example-blog.herokuapp.com\n\nThe Heroku app serves content on blog.example.com\n\nMonths later, the team decommissions the Heroku app but forgets to remove the DNS record\n\nThe CNAME still points to example-blog.herokuapp.com, which no longer exists\n\nAn attacker creates a new Heroku app with the name example-blog and claims the hostname\n\nThe attacker now controls what is served on blog.example.com"
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#003",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "How Subdomain Takeover Works > Why It Keeps Happening",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "The root cause is almost always a disconnect between infrastructure provisioning and DNS management:\n\nCloud resources are temporary, DNS records are persistent. Teams spin up and tear down services frequently, but DNS records tend to accumulate unless explicitly managed.\n\nDifferent teams own different parts. The team that created the cloud resource may not have access to DNS management, and the team that manages DNS may not know the resource was removed.\n\nNo automated link between resources and DNS. Most organizations have no mechanism to detect when a DNS target stops existing.\n\nShadow IT and forgotten proof-of-concepts. Developers create temporary subdomains for testing or demos and never clean them up.\n\nMergers, acquisitions, and reorganizations. DNS zones inherited from acquired companies are often poorly inventoried, and the original infrastructure owners are no longer available."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#004",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "How Subdomain Takeover Works > Record Types at Risk",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "CNAME records are the most common vector. If the canonical name resolves to a service that can be claimed, takeover is possible.\n\nA records pointing to released IP addresses can be vulnerable if the IP is reassigned and the attacker obtains it. This is common in cloud environments where elastic IPs are released back to the provider's pool.\n\nNS records delegating a subdomain to a third-party DNS provider are particularly dangerous. If the account at the DNS provider is closed, anyone who creates a new account can potentially claim the delegated zone and control all records under that subdomain.\n\nMX records pointing to deprovisioned mail services can allow an attacker to receive email for the subdomain. Beyond intercepting password reset emails, this enables a more severe attack: most Certificate Authorities accept email-based domain validation (DV) using addresses like admin@subdomain.example.com. An attacker controlling MX records can complete DV challenges and obtain legitimate TLS certificates for the subdomain, enabling transparent HTTPS phishing or man-in-the-middle attacks."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#005",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Cloud Provider Vulnerability Reference",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Not all cloud services are equally vulnerable. The key factor is whether the service allows a new customer to claim a previously used hostname or resource name. This table is a snapshot; cloud providers continuously update their policies, so always verify current behavior against the community-maintained can-i-take-over-xyz repository."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#006",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Cloud Provider Vulnerability Reference > High Risk: Takeover Possible When Resource Is Removed",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Provider/Service\n\nVulnerable Resource\n\nIndicator (CNAME Target)\n\nTakeover Mechanism\n\nAWS S3 (Website Hosting)\n\nS3 bucket\n\n*.s3.amazonaws.com, *.s3-website-*.amazonaws.com\n\nBucket names are globally unique across all AWS accounts. If a bucket is deleted, any AWS account can recreate it with the same name and serve content on the CNAME.\n\nAWS Elastic Beanstalk\n\nEnvironment\n\n*.elasticbeanstalk.com\n\nEnvironment CNAMEs are globally unique and released on environment termination. An attacker can create a new environment with the same CNAME prefix.\n\nAzure App Service\n\nWeb App\n\n*.azurewebsites.net\n\nApp names are globally unique. After deletion, any Azure tenant can create a new app with the same name. Azure offers a domain verification mechanism to mitigate this; see Prevention Strategies.\n\nAzure Traffic Manager\n\nProfile\n\n*.trafficmanager.net\n\nProfile names are globally unique and reclaimable after deletion.\n\nAzure CDN\n\nEndpoint\n\n*.azureedge.net\n\nEndpoint names are globally unique. A deleted endpoint name can be registered by another tenant.\n\nGitHub Pages (Custom Domains)\n\nUnverified custom domain\n\n*.github.io\n\nTakeover can occur when a domain still points to GitHub Pages after its repository is deleted or Pages is disabled, and the domain is not verified. Account or organization domain verification prevents other GitHub users from publishing to the verified domain and its immediate subdomains.\n\nHeroku\n\nApp\n\n*.herokuapp.com\n\nApp names are globally unique and released on app deletion. Any Heroku account can claim the name.\n\nShopify\n\nStore\n\nshops.myshopify.com\n\nCustom domain associations can be claimed by any Shopify store.\n\nNetlify\n\nSite\n\n*.netlify.app, *.netlify.com\n\nSite names are reclaimable after deletion.\n\nFastly\n\nCDN service\n\n*.fastly.net, *.global.ssl.fastly.net\n\nAn attacker with a Fastly account can add the victim's domain to their own Fastly service configuration.\n\nZendesk\n\nSupport portal\n\n*.zendesk.com"
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#007",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Cloud Provider Vulnerability Reference > High Risk: Takeover Possible When Resource Is Removed",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Support portal subdomain names can be reclaimed by new Zendesk accounts.\n\nCargo Collective\n\nPortfolio\n\n*.cargocollective.com\n\nPortfolio names are reclaimable.\n\nTumblr\n\nBlog\n\n*.tumblr.com\n\nCustom domain associations are released when a blog is deleted."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#008",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Cloud Provider Vulnerability Reference > Conditional Risk: Takeover Possible Under Specific Circumstances",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Provider/Service\n\nCondition\n\nDetails\n\nAWS CloudFront\n\nDangling DNS alone does not establish claimability\n\nAdding a new alternate domain name requires an attached trusted, valid TLS certificate covering that name. CloudFront checks the certificate subject alternative name. Verify these prerequisites rather than treating a deleted distribution as sufficient evidence of takeover, and remove stale DNS records.\n\nAWS Route 53 (NS Delegation)\n\nNS delegation to deleted hosted zone\n\nIf a subdomain's NS records delegate to a Route 53 hosted zone that has been deleted, an attacker can create a new hosted zone for the same subdomain and may receive the same NS server assignments, effectively taking control of all DNS records for that subdomain.\n\nGoogle Cloud Storage\n\nBucket deleted\n\nGCS bucket names are globally unique and can be reclaimed after deletion. Google imposes rate limits on bucket creation and may temporarily reserve recently deleted names, but this is not a documented security guarantee and should not be relied upon as a protection. Remove DNS records when decommissioning GCS buckets.\n\nCloudflare\n\nMisconfigured SaaS setup\n\nStandard Cloudflare usage requires domain ownership verification via nameserver delegation. However, Cloudflare for SaaS (custom hostnames) configurations should use the custom hostname verification feature to prevent hostname claim conflicts."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#009",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Cloud Provider Vulnerability Reference > Service Fingerprints for Detection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "When scanning for potential subdomain takeovers, look for these distinctive error responses that indicate the backend resource no longer exists:\n\nService\n\nError Response Pattern\n\nAWS S3\n\nNoSuchBucket, The specified bucket does not exist\n\nGitHub Pages\n\nThere isn't a GitHub Pages site here.\n\nHeroku\n\nNo such app, herokucdn.com/error-pages/no-such-app.html\n\nAzure App Service\n\n404 Web Site not found on *.azurewebsites.net\n\nShopify\n\nSorry, this shop is currently unavailable.\n\nNetlify\n\nNot Found - Request ID:\n\nFastly\n\nFastly error: unknown domain:\n\nZendesk\n\nHelp Center Closed"
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#010",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Prevention Strategies > 1. Manage DNS Record Lifecycle During Decommissioning",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "The correct order of operations when decommissioning a service is:\n\nRedirect or serve a maintenance page at the subdomain to avoid broken links and user confusion during the transition period\n\nUpdate or remove the DNS record pointing to the resource\n\nWait for DNS propagation (at least the TTL duration, typically 300 to 3600 seconds)\n\nThen decommission the cloud resource\n\nThe common mistake is doing these steps in reverse: deleting the cloud resource first, which creates an immediate window for takeover that persists until someone notices the dangling record.\n\nIn practice, immediately deleting the DNS record can cause disruption if the subdomain is linked from other pages, bookmarked by users, or indexed by search engines. Pointing the record to an internal server that returns an HTTP redirect to the main domain or a simple maintenance page is a reasonable intermediate step that eliminates the takeover risk while preserving a functional user experience during the transition."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#011",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Prevention Strategies > 2. Maintain a DNS Inventory Linked to Resource Ownership",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Keep a documented mapping between DNS records and the cloud resources they point to:\n\nWhat resource does each CNAME, A, or NS record resolve to?\n\nWhich team owns the resource?\n\nWhat project or service is it part of?\n\nWhen was it created and when is it expected to be decommissioned?\n\nWhat is the business justification for the subdomain?\n\nThis can be as simple as a spreadsheet for small organizations or integrated into a Configuration Management Database (CMDB) for larger ones. The critical requirement is that it is consulted and updated during every infrastructure change. Infrastructure-as-Code tools like Terraform, Pulumi, or AWS CDK can also serve as a living inventory when DNS records and cloud resources are managed in the same codebase."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#012",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Prevention Strategies > 3. Implement Automated Dangling Record Detection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Regularly scan DNS records to identify entries pointing to non-existent resources:\n\nScheduled scans: Run automated checks daily or weekly against all DNS records to verify that targets still resolve and respond with expected content, not cloud provider error pages.\n\nCI/CD integration: Add DNS validation to deployment and teardown pipelines. When a service is removed, the pipeline should verify that associated DNS records are also removed before marking the decommissioning as complete.\n\nDNS change monitoring: Alert when new CNAME records are created and when target resources return errors such as HTTP 404, NXDOMAIN, or cloud provider default error pages.\n\nOpen-source tools for detection:\n\ndnsReaper: Actively maintained subdomain takeover scanner supporting 40+ service fingerprints with signature-based detection\n\nnuclei: General-purpose vulnerability scanner with a dedicated set of subdomain takeover detection templates\n\ncan-i-take-over-xyz: Community-maintained reference documenting which services are and are not vulnerable, with proof-of-concept details"
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#013",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Prevention Strategies > 4. Use Domain Verification Where Available",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Several cloud providers offer domain verification mechanisms that prevent unauthorized users from associating a custom domain with their account. When available, these provide a strong defense layer:\n\nAzure App Service: Supports custom domain verification via TXT records. Adding a verification TXT record (e.g., asuid.subdomain TXT <verification-id>) ties the custom domain to a specific Azure subscription. Keep this TXT record in place even after decommissioning the App Service to prevent another tenant from claiming the domain.\n\nGoogle Cloud: Many GCP services require domain verification through Google Search Console or a DNS TXT record before a custom domain can be associated. Retain verification records as long as the DNS record exists.\n\nCloudflare: Standard setup requires domain ownership via nameserver delegation. Cloudflare for SaaS configurations should use the custom hostname verification feature.\n\nGitHub Pages: Verify the domain in the owning account or organization's Pages settings and retain the verification TXT record. This protects the verified domain and immediate subdomains, not arbitrary deeper names covered by wildcard DNS; see GitHub's verification scope and instructions.\n\nAWS CloudFront: New alternate domain names require a trusted certificate covering the name. A name already associated with another distribution cannot be added as the same alternate name. Continue removing stale DNS during decommissioning; protections differ across AWS services.\n\nWhere no domain verification is available, the DNS record itself is the only control. Removing it promptly on decommissioning is the only reliable protection."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#014",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Prevention Strategies > 5. Restrict Wildcard DNS Records",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Wildcard DNS records (*.example.com) are especially dangerous because they resolve for any subdomain, including those matching services that no longer exist. Any service that previously existed under the wildcard could potentially be taken over, and the organization may not even know which subdomains were in use.\n\nAvoid wildcard records unless absolutely necessary. If required:\n\nScope them as narrowly as possible (e.g., *.staging.example.com rather than *.example.com)\n\nCombine with a reverse proxy or load balancer that maintains an allowlist of valid hostnames and returns an error for unrecognized ones\n\nMonitor Certificate Transparency logs for unexpected certificate issuance on subdomains matching the wildcard"
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#015",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Prevention Strategies > 6. Establish a Decommissioning Checklist",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Create a formal checklist that teams must follow when removing any externally facing service:\n\nIdentify all DNS records (CNAME, A, MX, NS, TXT) associated with the service\n\nPoint the DNS record to a maintenance page or redirect (if immediate removal causes user-facing disruption)\n\nRemove or update DNS records\n\nWait for DNS propagation (at least the TTL duration)\n\nDecommission the cloud resource\n\nRevoke or let expire any SSL/TLS certificates issued for the subdomain\n\nUpdate the DNS inventory documentation\n\nRemove the subdomain from any OAuth redirect URI allowlists, CSP directives, or CORS configurations\n\nVerify that the subdomain no longer resolves or returns expected content\n\nRun a takeover detection scan against the subdomain to confirm it is not claimable"
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#016",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Prevention Strategies > 7. Limit the Blast Radius with Proper Security Scoping",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Even if a subdomain takeover occurs, limit the damage by properly scoping security controls:\n\nCookies: Do not scope session cookies to the parent domain (.example.com) unless necessary. Prefer setting cookies on the specific fully qualified subdomain (app.example.com). Use the __Host- cookie prefix where possible, which restricts the cookie to the exact origin.\n\nContent Security Policy: Avoid using *.example.com in CSP directives. Explicitly list trusted subdomains. A taken-over subdomain matching a CSP wildcard allows the attacker to inject scripts or exfiltrate data without violating the policy.\n\nCORS: Do not use wildcard subdomain patterns in Access-Control-Allow-Origin validation. Validate against an explicit allowlist of trusted origins.\n\nOAuth/SSO: Do not whitelist entire subdomain patterns in redirect URI validations. Use exact-match redirect URIs. A taken-over subdomain in an OAuth redirect allowlist enables token theft.\n\nEmail (SPF/DKIM/DMARC): If SPF records include mechanisms that match the taken-over subdomain's IP, the attacker can send SPF-authenticated email appearing to originate from your domain."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#017",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Monitoring and Detection > Continuous DNS Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Implement ongoing monitoring to catch dangling records before attackers do:\n\nCompare DNS records against live resources. For every CNAME in your zone, verify the target still exists and responds with expected content rather than a cloud provider error page.\n\nMonitor for service fingerprints. The error responses listed in the Service Fingerprints table above are strong indicators that a resource has been removed while the DNS record remains. Automated scanning for these patterns should run at least weekly.\n\nTrack DNS zone changes. Use version-controlled DNS management (e.g., Terraform, OctoDNS, or DNSControl) so all record additions and removals are reviewed, approved, and logged. This also creates an audit trail for investigating how a dangling record was introduced.\n\nMonitor Certificate Transparency logs. Use services like crt.sh or certspotter to alert on any certificate issuance for your subdomains. An unexpected certificate issued for a subdomain you don't control is a strong indicator that takeover has already occurred or is in progress."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#018",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Monitoring and Detection > Indicators of Compromise",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "Signs that a subdomain may have already been taken over:\n\nSubdomain suddenly serves unexpected content, a parking page, or a different application than expected\n\nSSL/TLS certificate for the subdomain was issued to an unknown entity or organization (visible in Certificate Transparency logs)\n\nUsers report phishing emails or pages appearing to come from the subdomain\n\nWeb application firewall or proxy logs show the subdomain resolving to an IP address outside your known infrastructure ranges\n\nDMARC aggregate reports show email being sent from the subdomain that your organization did not originate"
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#019",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "Incident Response",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "If a subdomain takeover is discovered:\n\nRemove the DNS record immediately. This is the fastest mitigation. It breaks the link between your domain and the attacker's resource. If the record cannot be removed quickly, update it to point to an IP or CNAME you control.\n\nRevoke or request revocation of any certificates issued for the subdomain during the takeover period. Check Certificate Transparency logs to identify all certificates that were issued.\n\nAssess the impact. Determine whether cookies scoped to the parent domain could have been stolen, whether phishing content was served and for how long, whether any OAuth or SSO flows referenced the subdomain, and whether the attacker could have received email for the subdomain (MX-based takeover).\n\nNotify affected users if there is evidence that sensitive data was exposed, credentials were phished, or session cookies were intercepted.\n\nInvestigate the root cause. Identify the process gap that allowed the dangling record to persist and update decommissioning procedures to prevent recurrence.\n\nScan all DNS zones owned by the organization for other dangling records. The same process gap likely affects other subdomains.\n\nDocument the incident with a timeline, impact assessment, and corrective actions for internal review and to improve organizational response to future occurrences."
+  },
+  {
+   "chunk_id": "Subdomain_Takeover_Prevention_Cheat_Sheet#020",
+   "doc": "Subdomain_Takeover_Prevention_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Subdomain_Takeover_Prevention_Cheat_Sheet.html",
+   "text": "OWASP WSTG 4.1: Test for Subdomain Takeover\n\nMicrosoft: Prevent Dangling DNS Entries and Avoid Subdomain Takeover"
+  }
+ ]
+}

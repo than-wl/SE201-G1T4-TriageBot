@@ -1,0 +1,308 @@
+{
+ "doc": "Mobile_Application_Security_Cheat_Sheet",
+ "title": "Mobile Application Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#001",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Mobile Application Security Cheat Sheet",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Mobile application development presents certain security challenges that are unique compared to web applications and other forms of software. This cheat sheet provides guidance on security considerations for mobile app development. It is not a comprehensive guide by any means, but rather a starting point for developers to consider security in their mobile app development."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#002",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Architecture & Design > 1. Secure by Design",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Opt for a secure design at the beginning of development, not as an afterthought.\n\nKeep in mind security principles like least privilege, defense in depth, and separation of concerns.\n\nFollow industry standards and best practices, such as:\n\nNational Institute of Standards and Technology (NIST)\n\nInternet Engineering Task Force (IETF)\n\nFor more information, see the Secure Product Design Cheat Sheet."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#003",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Architecture & Design > 2. Secure APIs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Ensure that your mobile app communicates securely with backend services.\n\nUse OAuth2, JWT, or similar for secure authentication.\n\nRegularly update and rotate any used API keys or tokens."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#004",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Architecture & Design > 3. Principle of Least Privilege",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Request only the permissions your app needs.\n\nThis applies not only to device permissions granted by the user, but also to permissions granted to the app by backend services.\n\nAvoid storing application files with overly permissive permissions.\n\nSecure by default: applications should have the most secure settings by default."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#005",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Architecture & Design > 4. Supply Chain",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Developing with third-party libraries and components introduces the possibility of security unknowns.\n\nEnsure app signing.\n\nUse only trusted and validated third-party libraries and components.\n\nEstablish security controls for app updates, patches, and releases.\n\nMonitor and detect security incidents of used third-party products.\n\nSee the Vulnerable Dependency Management Cheat Sheet for recommendations on managing third-party dependencies when vulnerabilities are discovered."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#006",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Authentication is a complex topic and there are many pitfalls. Authentication logic must be written and tested with extreme care. The tips here are only a starting point and barely scratch the surface. For more information, see the Authentication Cheat Sheet and M1: Insecure Authentication/Authorization from the OWASP Mobile Top 10."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#007",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization > 1. Don't Trust the Client",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Perform authentication/authorization server-side and only load data on the device after successful authentication.\n\nFor sensitive local data, encrypt it and protect encryption keys using platform key storage. If the design requires password-derived keys, use a dedicated password-based key derivation function with a unique random salt and an appropriate work factor; a password or a fast hash of it is not a suitable encryption key.\n\nDo not store user passwords on the device; use device-specific tokens that can be revoked.\n\nAvoid using spoofable values like device identifiers for authentication.\n\nAssume all client-side controls can be bypassed and perform them server-side as well.\n\nInclude client side code to detect code/binary tampering."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#008",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization > 2. Credential Handling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Do not hardcode credentials in the mobile app.\n\nEncrypt credentials in transmission.\n\nDo not store user credentials on the device. Consider using secure, revocable access tokens."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#009",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization > 3. Passwords and PIN Policy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "For account passwords, allow long passphrases without character-composition requirements and block common or compromised passwords, following NIST's password guidance. See password strength controls for length and other policy requirements.\n\nDo not allow short PINs such as 4 digits.\n\nUse platform specific secure storage mechanisms, such as Keychain (iOS) or Keystore (Android)."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#010",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization > 4. Biometric Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Use platform-supported methods for biometric authentication.\n\nAlways provide a fallback, such as a PIN."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#011",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization > 5. Session Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Sessions should timeout after inactivity.\n\nOffer a remote logout feature.\n\nUse randomly generated session tokens.\n\nSecure session data, both client and server side."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#012",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization > 6. Token Storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Store authentication tokens securely.\n\nHandle token expiration gracefully."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#013",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Authentication & Authorization > 7. Sensitive Operations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Require users to re-authenticate for sensitive operations like changing passwords or updating payment information.\n\nConsider requiring re-authentication before displaying highly sensitive information as well.\n\nRequire authorization checks on any backend functionality."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#014",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Data Storage & Privacy > 1. Data Encryption",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Encrypt sensitive data both at rest and in transit.\n\nStore private data on the device's internal storage.\n\nUse platform APIs for encryption. Do not attempt to implement your own encryption algorithms.\n\nLeverage hardware-based security features when available (e.g., Secure Enclave on iOS, Strongbox on Android) for key storage and cryptographic operations whenever available."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#015",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Data Storage & Privacy > 2. Data Leakage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Beware of caching, logging, and background snapshots. Ensure that sensitive data is not leaked through these mechanisms.\n\nSee the Logging Cheat Sheet for examples of data that should not be logged."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#016",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Data Storage & Privacy > 3. Use HTTPS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Always use HTTPS for network communications."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#017",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Data Storage & Privacy > 4. Third-Party Libraries",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Ensure all third-party libraries are secure and up to date."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#018",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Data Storage & Privacy > 5. Personally Identifiable Information (PII)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Minimize any PII to necessity.\n\nAttempt to replace PII with less critical information if possible.\n\nReduce PII, e.g. less frequent location updates.\n\nImplement automatic expiration and deletion of PII to minimize retention.\n\nAsk for user consent before collecting or using PII."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#019",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Network Communication > 1. Don't Trust the Network",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Assume that all network communication is insecure and can be intercepted."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#020",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Network Communication > 2. Use Secure Protocols",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Use HTTPS for all network communication.\n\nDo not override SSL certificate validation to allow self-signed or invalid certificates.\n\nAvoid mixed version SSL sessions.\n\nEncrypt data even if sent over SSL, in case of future SSL vulnerabilities.\n\nUse strong, industry standard cipher suites, with appropriate key lengths.\n\nUse certificates signed by a trusted CA provider\n\nAvoid sending sensitive data via SMS."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#021",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Network Communication > 3. Certificate Pinning",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Consider certificate pinning. See the Pinning Cheat Sheet for pros and cons of this approach."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#022",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "User Interface > 1. UI Data Masking",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Mask sensitive information on UI fields to prevent shoulder surfing."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#023",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "User Interface > 2. User Notifications",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Inform the user about security-related activities, such as logins from new devices."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#024",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "User Interface > 3. Input Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Validate and sanitize user input. See the Input Validation Cheat Sheet for more information."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#025",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "User Interface > 4. Output Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Validate and sanitize output to prevent injection and execution attacks."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#026",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Code Quality > 1. Static Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Use static analysis tools to identify vulnerabilities."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#027",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Code Quality > 2. Code Reviews",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Make security a focal point during code reviews."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#028",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Code Quality > 3. Update Libraries",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Keep all your libraries up to date to patch known vulnerabilities."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#029",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Application Integrity",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Disable debugging.\n\nInclude code to validate integrity of application code.\n\nObfuscate the app binary.\n\nImplement runtime anti-tampering controls:\n\nCheck for signs of debugging, hooking, or code injection.\n\nDetect if the app is running in an emulator or rooted/jailbroken device.\n\nVerify app signatures at runtime.\n\nApply appropriate responses to detected tampering (e.g., limiting functionality)."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#030",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Testing > 1. Penetration Testing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Perform ethical hacking to identify vulnerabilities.\n\nExample tests:\n\nCryptographic vulnerability assessment.\n\nAttempt to execute backend server functionality anonymously by removing any session tokens from POST/GET requests."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#031",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Testing > 2. Automated Tests",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Leverage automated tests to ensure that security features are working as expected and that access controls are enforced."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#032",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Testing > 3. Usability Testing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Ensure that security features do not harm usability, which could cause users to bypass security features."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#033",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Post-Deployment > 1. Incident Response",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Have a clear incident response plan in place."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#034",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Post-Deployment > 2. Updates",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Plan for regular updates and patches. In the case of mobile apps, this is especially important due to the delay between when a patch is released and when users actually receive the updated version due to app store review processes and the time it takes for users to update their apps.\n\nUse a mechanism to force users to update their app version when necessary."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#035",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Post-Deployment > 3. Monitoring and Analytics",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Use real-time monitoring to detect and respond to threats."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#036",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Platform-Specific Guidance > Android",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Use Android's ProGuard for code obfuscation.\n\nAvoid storing sensitive data in SharedPreferences. See the Android docs on working with data securely for more details.\n\nDisable backup mode to prevent sensitive data being stored in backups.\n\nUse Android Keystore with hardware backing (TEE or StrongBox) to securely store cryptographic keys.\n\nHow: Generate keys with hardware backing by specifying .setIsStrongBoxBacked(true) in KeyGenParameterSpec.Builder when available (Android 9+).\n\nVerify hardware-backed storage via KeyInfo.isInsideSecureHardware().\n\nFall back to regular hardware-backed keystore if Strongbox isn't available.\n\nConfigure key usage restrictions with .setUserAuthenticationRequired(true) for sensitive operations.\n\nSee Hardware-backed Keystore documentation.\n\nImplement Google's Play Integrity API for device and app integrity checks.\n\nHow: Obtain an integrity verdict from the device, validate server-side, and take action if integrity checks fail.\n\nThe SafetyNet Attestation API was fully turned down in January 2025. All developers must migrate to Play Integrity API.\n\nSee Play Integrity API documentation."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#037",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Platform-Specific Guidance > iOS and iPadOS > Shortcuts Permissions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "iOS/iPadOS Shortcuts allow for automation of app functions, which may enable sensitive actions even when the device is locked.\n\nThere are several scenarios in which a user can execute a Shortcut while the device is locked:\n\nIf a Shortcut is added as a widget to Today View, it can be accessed and executed while the device is locked.\n\nIf a Shortcut is assigned to the Action Button (on iPhone 15 Pro and iPhone 16 Pro models), it can be executed by pressing the Action Button while the device is locked.\n\nIf a Shortcut is assigned to the Control Center (on iOS/iPadOS 18+), it can be executed by pulling up the Control Center and pressing the Shortcut button while the device is locked.\n\nA Shortcut can be invoked via Siri while the device is locked.\n\nIf a Shortcut is added to the user's Home Screen (on iOS/iPadOS 18+), it can be directly executed by tapping the Shortcut button on the user's lock screen while the device is locked.\n\nIf a Shortcut is set to run at a specific interval or a specific time, it can execute even if the device is locked.\n\nSensitive app functionalities triggered via Shortcuts should always require device unlock before execution.\n\nHow: For sensitive App Intents (iOS/iPadOS 16+), set authenticationPolicy to .requiresLocalDeviceAuthentication. This requires unlocking the device running the intent if it is locked; it does not require fresh authentication when that device is already unlocked. Continue to enforce the app's session and authorization checks. isProtectedDataAvailable reports protected-file availability and can be true when content protection is disabled; do not use it as an authentication check."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#038",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Platform-Specific Guidance > iOS and iPadOS > Siri Permissions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Siri can access app functionalities through voice or Type to Siri commands, which is by default accessible even when the device is locked potentially enabling unauthorized actions.\n\nHow: Apply the App Intent authentication policy above to sensitive Siri actions. For explicit approval before destructive work, call requestConfirmation() and stop if the user cancels; confirmation does not replace authentication or authorization. For legacy SiriKit intents handled by the app, set the supported intent's Authentication level to Restricted While Locked in Xcode, which configures INIntentsRestrictedWhileLocked."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#039",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Platform-Specific Guidance > iOS and iPadOS > Deep Link Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Deep links offer direct access to specific app screens, which could potentially bypass authentication if not secured, allowing unauthorized users access to secure sections of the app.\n\nAn example of this on Microsoft Authenticator for iOS (which was remediated in July 2024) allowed users to bypass App Lock by simply navigating to msauth://microsoft.aad.brokerplugin/?, which would open Authenticator and dismiss the Face ID/Touch ID/passcode prompt.\n\nHow: Implement authentication checks on any view controllers or endpoints accessed via deep links. Configure and validate Universal Links using apple-app-site-association files for secure deep linking. Sanitize and validate all parameters received through deep links to prevent injection attacks. Ensure unauthorized users are redirected to the login screen, preventing direct access to sensitive parts of the app without proper authentication. (See Apple Developer's Supporting universal links in your app documentation for more information.)"
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#040",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Platform-Specific Guidance > iOS and iPadOS > WidgetKit Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Widgets on the lock screen may display sensitive data, potentially exposing it without the device being unlocked.\n\nHow: Mark sensitive views with privacySensitive(_:) and provide redacted placeholders so WidgetKit can honor the user's privacy settings. If the widget must hide its content while the device is locked, enable the Data Protection capability for the widget extension and select NSFileProtectionComplete. Follow Apple's widget privacy guidance."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#041",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Platform-Specific Guidance > iOS and iPadOS > Additional Security Considerations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Configure appropriate background refresh policies to prevent sensitive data updates while the device is locked.\n\nImplement proper privacy-related configurations in Info.plist for features requiring user permissions.\n\nUse App Groups with appropriate security configurations when sharing data between app and widgets.\n\nUse ATS (App Transport Security) to enforce strong security policies for network communication.\n\nDo not store sensitive data in plist files.\n\nUse Apple's Secure Enclave for secure cryptographic key storage and sensitive operations.\n\nHow: Create keys using SecKeyCreateRandomKey with kSecAttrTokenID set to kSecAttrTokenIDSecureEnclave.\n\nKeys created in the Secure Enclave never leave the secure hardware - only the operations using those keys are performed there.\n\nFor biometric operations, use LAContext with evaluatePolicy to perform authentication directly through the Secure Enclave without exposing biometric data to your application.\n\nConsider access control options like kSecAccessControlBiometryAny or kSecAccessControlUserPresence to require user authentication before key usage.\n\nSee Secure Enclave documentation.\n\nUse Apple's App Attest API (iOS 14+) to validate app integrity.\n\nHow: Generate attestation keys and assertions with DCAppAttestService and verify assertions server-side.\n\nComplement with Apple's DeviceCheck API for persistent device state tracking.\n\nSee App Attest documentation."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#042",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "Advanced Hardware Security & Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "Modern devices typically provide Trusted Execution Environments (TEE) or secure hardware modules. Leverage these through standard OS APIs.\n\nConsider additional runtime security measures (behavioral anomaly detection, runtime monitoring) to complement built-in OS protections in higher-risk scenarios.\n\nFor further reading, visit the OWASP Mobile Top 10 Project. For a more detailed framework for mobile security, see the OWASP Mobile Application Security Project."
+  },
+  {
+   "chunk_id": "Mobile_Application_Security_Cheat_Sheet#043",
+   "doc": "Mobile_Application_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Mobile_Application_Security_Cheat_Sheet.html",
+   "text": "OWASP MASVS-STORAGE-1: Secure Storage of Sensitive Data\n\nAndroid Keystore System\n\nApple Platform Security: The Secure Enclave"
+  }
+ ]
+}
