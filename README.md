@@ -79,6 +79,8 @@ This repository currently contains the project overview, team-owned planning mat
 | `Context/README.md`                  | Index of shared context and local-only material                                   |
 | `verification/openrouter_smoke.py`   | Five-case OpenRouter smoke test and offline validator self-test                  |
 | `verification/feasibility_checks.py` | Limited retrieval, evidence-helper, and Analyst–Skeptic–Chair feasibility pass |
+| `triagebot/nodes/score/evaluate.py`  | Evaluation harness: scores saved results against the hidden answer key          |
+| `tests/test_evaluate.py`             | Offline tests for the evaluation harness (no OpenRouter needed)                  |
 | `verification/requirements.txt`      | Python dependency for the verification scripts                                   |
 | `.env.example`                       | Safe template for local configuration                                            |
 
@@ -128,6 +130,29 @@ The council feasibility pass makes three additional paid model calls:
 ```
 
 Both scripts save detailed generated evidence under the ignored `Context/` folder. Review the budget and local input files before running paid checks.
+
+### 4. Score saved results
+
+The evaluator runs offline and needs no API key. It compares each configuration's saved verdicts with the OWASP answer key, which is read only at this stage and never enters a prompt. The scanner-only baseline is added automatically.
+
+Run the offline tests:
+
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m unittest discover -s tests -v
+```
+
+Score real results (paths are examples; generated inputs stay under the ignored `Context/tmp/`):
+
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m triagebot.nodes.score.evaluate `
+    --labels '.\Context\tmp\BenchmarkJava\expectedresults-1.2.csv' `
+    --cases '.\Context\tmp\checkpoint\selected_alerts.json' `
+    --config 'B-single-agent=.\Context\tmp\checkpoint\single_agent_results.json' `
+    --config 'C-council=.\Context\tmp\checkpoint\council_results.json' `
+    --config 'D-validated-council=.\Context\tmp\checkpoint\validated_council_results.json'
+```
+
+The command prints a Markdown metrics table for the checkpoint report and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts are counted as invalid and as human review, and human review is never counted as a removed false positive.
 
 ## Current feasibility evidence
 

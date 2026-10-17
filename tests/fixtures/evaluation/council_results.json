@@ -1,0 +1,16 @@
+{
+  "model": "fixture",
+  "results": [
+    {"case_id": "FixtureCase01", "verdict": "true_positive", "explanation": "Request parameter reaches the SQL string.",
+     "latency_seconds": 10.0, "usage": {"prompt_tokens": 1000, "completion_tokens": 200, "cost": 0.002}},
+    {"case_id": "FixtureCase02", "verdict": "false_positive", "explanation": "Assumed a guard that does not exist.",
+     "latency_seconds": 12.0, "usage": {"prompt_tokens": 1100, "completion_tokens": 210, "cost": 0.003}},
+    {"case_id": "FixtureCase03", "verdict": "false_positive", "explanation": "Value is overwritten by a constant.",
+     "latency_seconds": 8.0, "usage": {"prompt_tokens": 900, "completion_tokens": 150, "cost": 0.001}},
+    {"case_id": "FixtureCase04", "verdict": "true_positive", "explanation": "Missed the constant branch.",
+     "latency_seconds": 11.0, "usage": {"prompt_tokens": 1050, "completion_tokens": 190, "cost": 0.002}},
+    {"case_id": "FixtureCase05", "verdict": "human_review", "explanation": "Cited quote not found in source.",
+     "validation_errors": ["Unsupported source quote"],
+     "latency_seconds": 9.0, "usage": {"prompt_tokens": 950, "completion_tokens": 160, "cost": 0.002}}
+  ]
+}
