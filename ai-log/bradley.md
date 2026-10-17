@@ -29,3 +29,27 @@ triagebot/nodes/score/ and tests/ after Hong Yi's layout was merged into
 main. Added reading of the validator's `validated` field so its records are
 scored with their reasons. Added a test for clean human-review cases after
 the planted-bug check showed that gap; all four planted bugs are now caught.
+
+## 2026-10-17 | Checkpoint report first draft
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** CHECKPOINT_REPORT.md
+- **Outcome:** Kept
+
+### What I asked for
+A first draft of the checkpoint report covering everything the project
+brief asks for in the checkpoint document: test results and failures,
+progress against our proposal targets, changes since the proposal, and the
+AI-use declaration. Anything that depends on teammates' work or the final
+recorded run had to be left as a clearly marked placeholder, not guessed.
+
+### How I checked it
+Checked each stated fact against its source: checkpoint targets and success
+criteria against our proposal, earlier numbers against the feasibility and
+OpenRouter smoke reports in Context/, changes against doc/DESIGN_DECISIONS.md,
+and component status against the branches on GitHub. Confirmed that no
+result number is invented; every missing figure is marked [TBC].
+
+### What I kept or changed
+Kept as the working draft. Placeholders will be filled from teammates'
+components and the final run, and each member will confirm their own
+contribution paragraph before submission.
