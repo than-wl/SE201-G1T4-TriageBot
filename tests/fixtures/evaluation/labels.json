@@ -1,0 +1,7 @@
+[
+  {"case_id": "FixtureCase01", "vulnerable": true},
+  {"case_id": "FixtureCase02", "vulnerable": true},
+  {"case_id": "FixtureCase03", "vulnerable": false},
+  {"case_id": "FixtureCase04", "vulnerable": false},
+  {"case_id": "FixtureCase05", "vulnerable": false}
+]
