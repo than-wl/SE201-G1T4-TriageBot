@@ -53,12 +53,12 @@ Product code lives in `triagebot/`, one folder per pipeline node. Shared JSON co
 | Component | Owner | Location | Status |
 | --- | --- | --- | --- |
 | Shared contracts and package layout | Hong Yi | `triagebot/schemas.py`, `triagebot/` | Verified: merged to `main` |
-| Semgrep normalisation and answer-key mapping | Darren | `triagebot/nodes/ingest/` | `[TBC: Darren's branch, tests and status]` |
+| Semgrep normalisation and answer-key mapping | Darren | `triagebot/nodes/ingest/` | Verified: merged to `main`. Normalises all 1,909 Semgrep findings into the shared `NormalisedAlert` contract, maps them to the answer key with CWE matching, computes the full-benchmark scanner baseline, and produces the dev/test split and checkpoint sample. 48 offline tests |
 | OWASP guidance retrieval | Hong Yi | `triagebot/nodes/context/` | Partially verified: merged to `main`. Committed knowledge base of 137 OWASP Cheat Sheets (3,238 chunks); a CWE gate selects the mapped cheat sheets, keyword ranking returns up to 6 chunks within a 4,000-character budget, and alerts with no mapped CWE get curated general chunks flagged `cwe_matched=false`. Checked manually on a CWE-89 alert (section 6.4); no automated tests in the repository yet `[TBC: confirm with Hong Yi]` |
 | Single agent and council orchestration | Hong Yi | `triagebot/nodes/review/` | `[TBC: Hong Yi's branch, tests and status]` |
 | Deterministic validator | Lisa | `triagebot/nodes/validate/validator.py` | Verified offline: 32 tests on `checkpoint/lisa-validation` `[TBC: merge status]` |
 | Evaluation harness | Bradley | `triagebot/nodes/score/evaluate.py` | Verified offline: 14 tests, plus a check against the validator's real output `[TBC: merge status]` |
-| Pipeline wiring and command line | `[TBC]` | `triagebot/pipeline.py`, `triagebot/__main__.py` | `[TBC: currently a documented stub on main]` |
+| Pipeline wiring and command line | Darren (menu), Wei Lin (pipeline wiring) | `triagebot/pipeline.py`, `triagebot/__main__.py`, `triagebot/check.py` | Partially verified: `python -m triagebot` opens a terminal menu with a setup check. Option 1 (scanner baseline) works end to end; options 2 and 3 are placeholders until `triagebot/pipeline.py` is wired |
 | Integration and submission | Wei Lin | whole repository | `[TBC]` |
 
 ## 4. Simplified, stubbed and deferred components
@@ -70,8 +70,8 @@ Product code lives in `triagebot/`, one folder per pipeline node. Shared JSON co
 | Deterministic validation | Checks factual claims against source code | Checks JSON shape, allowed verdicts, exact file, line and quote of every citation, and identifiers named in the explanation. Does not check full source-to-sink reasoning | Simplified |
 | Categories | Per-category performance | SQL injection (CWE-89) only | Deferred: one category was agreed for the checkpoint |
 | Mutation tests | Small code changes that flip the correct verdict, to detect memorisation | Not run | Deferred |
-| Full benchmark run | 2,740 cases | Sample of about 100 CWE-89 findings `[TBC: final count]` | Deferred: cost and time |
-| Pipeline command line | One command for the whole flow | `[TBC]` | `[TBC]` |
+| Full benchmark run | 2,740 cases | Sample of about 100 CWE-89 findings 100 (50 real / 50 false alarms, from the development split) | Deferred: cost and time |
+| Pipeline command line | One command for the whole flow | Terminal menu: option 1 (scanner baseline) works; options 2 (triage one alert) and 3 (evaluate a sample) are placeholder functions awaiting the pipeline wiring | Partially built |
 
 ## 5. Test method
 
@@ -79,7 +79,15 @@ Product code lives in `triagebot/`, one folder per pipeline node. Shared JSON co
 
 **Scanner.** Semgrep 1.178.0 with the `p/java` ruleset.
 
-**Sample.** `[TBC: Darren's selection rule, random seed if used, final number of CWE-89 findings, and how many are genuine versus false positives.]`
+**Split and sample.** Every one of the 2,740 Benchmark cases is assigned once to a development or a test split: 50/50, stratified by vulnerability category and by real/not-real label, with a fixed random seed (201). Prompts and settings are tuned only on the development split; the test split is held back for the final evaluation, following the instructor's feedback to evaluate on unseen data.
+
+The checkpoint sample is drawn from the **development split only**:
+
+- **Pool:** SQL injection (CWE-89) cases where Semgrep raised an alert whose CWE matches the test case's category. The development split holds 121 real and 67 non-vulnerable such cases.
+- **Draw:** 100 cases, balanced at **50 real vulnerabilities and 50 false alarms**, with one alert per case (the CWE-matching alert; ties go to the lowest line number, then the rule ID). The draw is deterministic, using seed 201.
+- **Isolation:** the selection uses the answer key only to pick and balance cases. The sample file the pipeline reads (`selected_alerts.json`) contains alert fields only, with no labels.
+
+**A caveat on the balanced sample.** Among all SQL-injection test cases Semgrep flagged, about 38% (143 of 377) are false alarms. The 50/50 balance therefore makes the per-class rates ("genuine retained" and "false positives removed") easy to compare, but precision measured on the sample is not real-world precision.
 
 **Models.** Development runs used `google/gemini-3.5-flash-lite`. The recorded comparison uses the proposal model, `google/gemini-3.8-flash`. `[TBC: confirm the model, date and settings of the final run.]`
 
@@ -114,7 +122,7 @@ Two scoring rules matter for reading the results:
 ```powershell
 py -m triagebot.nodes.score.evaluate `
     --labels '.\Context\tmp\BenchmarkJava\expectedresults-1.2.csv' `
-    --cases  '[TBC: sample file]' `
+    --cases  '.\Context\tmp\checkpoint\selected_alerts.json' `
     --config 'B-single-agent=[TBC]' `
     --config 'C-council=[TBC]' `
     --config 'D-validated-council=[TBC]'
@@ -126,9 +134,40 @@ The evaluator is deterministic: the same saved inputs produce a byte-identical r
 
 ### 6.1 Scanner baseline on the full benchmark
 
-From the proposal's preliminary run: Semgrep flagged 1,515 of the 2,740 test cases, of which 520 (34%) were false positives. This mapping was filename based and is preliminary.
+**Ingest.** Semgrep 1.178.0 with the `p/java` ruleset produced 1,909 findings, all in Benchmark test files. There were no helper-file findings, unmapped paths, duplicates or findings without a CWE. 1,515 of the 2,740 test cases have at least one alert, and 1,225 have none.
 
-`[TBC: Darren's final baseline scorecard (true positives, false positives, false negatives, true negatives over the full benchmark), with unmapped findings, duplicates and rule or CWE mismatches counted.]`
+**Scoring method.** A test case counts as flagged by Semgrep only if one of its alerts names the same weakness (CWE) as the case's category in the answer key, which is how the Benchmark's own scoring works. One documented equivalence is accepted: Semgrep labels DES/3DES usage as CWE-326 (inadequate encryption strength), while the Benchmark labels the same code as CWE-327 (broken or risky algorithm). Three other mismatches were reviewed and rejected because the alert concerns a different weakness: an XSS rule (CWE-79) that fires on trust-boundary, SQL-injection and XPath test files.
+
+| | TP | FP | FN | TN | Precision | Recall | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| **Semgrep, CWE-matched (our baseline)** | 970 | 512 | 445 | 813 | 65.5% | 68.6% | 67.0% |
+| Semgrep, filename-matched (proposal's preliminary method) | 995 | 520 | 420 | 805 | 65.7% | 70.3% | 67.9% |
+
+The proposal's filename-based numbers were slightly inflated. The difference sits almost entirely in trust-boundary cases, where Semgrep flagged an unrelated XSS pattern (true positives drop from 68 to 43).
+
+**By category (CWE-matched):**
+
+| Category | Real | Caught | Missed | False alarms | Precision | Recall | F1 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Command injection | 126 | 112 | 14 | 96 | 53.8% | 88.9% | 67.1% |
+| Cross-site scripting | 246 | 202 | 44 | 108 | 65.2% | 82.1% | 72.7% |
+| Insecure cookie | 36 | 0 | 36 | 0 | – | 0.0% | – |
+| LDAP injection | 27 | 26 | 1 | 28 | 48.1% | 96.3% | 64.2% |
+| Path traversal | 133 | 120 | 13 | 106 | 53.1% | 90.2% | 66.9% |
+| SQL injection | 272 | 234 | 38 | 143 | 62.1% | 86.0% | 72.1% |
+| Trust boundary violation | 83 | 43 | 40 | 18 | 70.5% | 51.8% | 59.7% |
+| Weak encryption | 130 | 130 | 0 | 0 | 100.0% | 100.0% | 100.0% |
+| Weak hashing | 129 | 89 | 40 | 0 | 100.0% | 69.0% | 81.7% |
+| Weak randomness | 218 | 0 | 218 | 0 | – | 0.0% | – |
+| XPath injection | 15 | 14 | 1 | 13 | 51.9% | 93.3% | 66.7% |
+| **All** | **1,415** | **970** | **445** | **512** | **65.5%** | **68.6%** | **67.0%** |
+
+**What this means for TriageBot.** These results answer the instructor's question about whether the first stage bottlenecks the system:
+
+- **Noise to remove:** 512 of the 1,482 flagged test cases (34.5%) are false alarms. Removing them is TriageBot's job.
+- **Recall ceiling:** TriageBot can only filter alerts, never add them. On this scan, the whole system can therefore reach at most **68.6% recall**, even if TriageBot is perfect.
+- **Blind spots:** Semgrep's `p/java` ruleset catches no weak-randomness (0 of 218) or insecure-cookie (0 of 36) cases. Together they are 254 of the 445 missed vulnerabilities (57%).
+- **Planned next step:** test whether a broader first stage (for example the `p/security-audit` ruleset, or both rulesets combined) raises the recall ceiling, accepting more false alarms for TriageBot to filter, as the instructor suggested.
 
 ### 6.2 Checkpoint evaluation on the CWE-89 sample
 
@@ -175,7 +214,9 @@ These cases were deliberately selected and test names were visible to the model,
 | --- | --- | --- | --- |
 | Deterministic validator | 32 | Pass | Rejects a fabricated quote, wrong file, out-of-range line, malformed JSON, missing case, duplicate case and unsupported verdict. Each falls back to `human_review` with reasons |
 | Evaluation harness | 14 | Pass | Exact counts on a hand-checked five-case dataset; `human_review` never counted as a removal; missing and invalid results handled safely; output byte-identical across runs |
-| `[TBC: Darren's ingest tests]` | | | |
+| Ingest, answer-key mapping, split and baseline | 48 | Pass | Correct alert fields and benchmark-relative paths (including Windows-style input); CWE extraction for all metadata forms; duplicate collapse; helper-file and unmapped findings counted, not lost; **no answer-key field appears in any LLM-side output**; CWE versus filename matching on a wrong-CWE case; precision/recall/F1 on hand-computed counts, including zero denominators; split deterministic, disjoint, complete and stratified; sample dev-only, balanced and deterministic |
+| Terminal menu and setup check | 61 | Pass | Menu and subcommands call the same functions; friendly errors for missing inputs; setup check results on each operating system; re-scan safety (a failed scan never overwrites the saved one), with Semgrep and git mocked |
+| Recorded-scan normaliser | 8 | Pass | Only path strings are rewritten; no machine-specific paths remain |
 | Guidance retrieval (manual check, not an automated test) | 1 alert | Works | A CWE-89 SQL-injection alert matched four cheat sheets (Injection Prevention, Java Security, Query Parameterization, SQL Injection Prevention) and returned 2 chunks (3,866 characters). An alert with no CWE fell back to 6 general chunks flagged `cwe_matched=false` |
 | `[TBC: Hong Yi's council tests]` | | | |
 
@@ -200,7 +241,9 @@ The validator and evaluator were also run together: sample model output passed t
 
 - **One category, small sample.** Results for about 100 CWE-89 findings do not generalise to other vulnerability categories or to the full benchmark.
 - **Public benchmark.** OWASP Benchmark is public and test names are visible, so the model may recognise cases. Comments and hints are stripped from the LLM-facing copy, but mutation tests that would detect memorisation are deferred.
-- **Filename-based mapping.** The preliminary scanner baseline matched findings to cases by file name. `[TBC: state whether Darren's mapping also checks category and CWE.]`
+- **Scanner matching.** Findings are matched to test cases by file name **and** CWE (section 6.1). The one accepted CWE equivalence is documented in `triagebot/nodes/ingest/mapping.py` and was decided by inspecting the mismatch report, not by tuning for a higher score: the rejected pairs would have raised Semgrep's score.
+- **Scanner run-to-run variation.** A later re-scan with the same Semgrep version and ruleset produced 1,908 findings instead of 1,909. Semgrep's taint analysis hits time limits ("fixpoint timeouts") on about 300 file/rule pairs, and which ones time out varies between runs. Here, a timeout suppressed one LDAP finding (BenchmarkTest00530). We therefore score one committed, recorded scan (`data/semgrep/`), so that every result is reproducible.
+- **Balanced sample.** See section 5: precision on the 50/50 sample is not real-world precision.
 - **Keyword retrieval.** Guidance ranking is keyword based, so relevant guidance worded differently from the alert may be missed. In the manual check on a CWE-89 alert, the 4,000-character budget left room for only 2 of the 6 allowed chunks, and neither came from the SQL Injection Prevention Cheat Sheet, the most directly relevant document. `[TBC: Hong Yi to confirm whether the budget or ranking will be adjusted before the final run.]`
 - **Cost and latency for configuration D.** The validator's output records do not carry latency or token usage. `[TBC: either carry these through from configuration C, or state that D's cost equals C's plus negligible validation time.]`
 - **Single run.** Model output can vary between runs, and we report one recorded run. `[TBC: temperature and any repeat runs.]`
@@ -209,11 +252,11 @@ The validator and evaluator were also run together: sample model output passed t
 
 | Proposal target | Status | Evidence | If unmet, why |
 | --- | --- | --- | --- |
-| Semgrep baseline mapped to the answer key | `[TBC]` | `[TBC: Darren's scorecard]` | |
+| Semgrep baseline mapped to the answer key | **Met** | Section 6.1; `python -m triagebot baseline` (menu option 1); `baseline.json` | |
 | Main pipeline connected, stubs documented | `[TBC]` | Sections 3 and 4 | |
 | One category end to end with retrieval and council | `[TBC]` | `[TBC: demonstration case ID and command]` | |
 | About 100 findings, single agent versus council, metrics and failures | `[TBC]` | Sections 6.2 and 7.1 | |
-| Repository with setup, all-member contributions, AI-use log | Partially met `[TBC: update]` | README, commit history, `ai-log/` | `[TBC: list any member without a commit or log]` |
+| Repository with setup, all-member contributions, AI-use log | Partially met `[TBC: update]` | README, commit history, `ai-log/`; README Quick start and setup check; CI on Windows, macOS and Linux; `ai-log/darren.md` | `[TBC: list any member without a commit or log]` |
 
 ## 9. Changes since the proposal
 
@@ -228,6 +271,11 @@ The validator and evaluator were also run together: sample model output passed t
 | Team roles | Wei Lin on retrieval | Hong Yi built the retrieval knowledge base; Wei Lin owns repository scaffolding, final integration and submission | `[TBC: team to confirm wording]` |
 | Scope | Per-category performance and mutation tests | One category (CWE-89); mutation tests deferred | Time to the checkpoint; one reliable end-to-end path was prioritised |
 | AI-use disclosure | Disclosure log | One log per member under `ai-log/`, plus the team declaration in section 11 | Required by the SE201 AI Use Disclosure Policy v1.00 |
+| Metrics | Retained, removed, wrongly dismissed, human review | Adds precision, recall and F1, with the full-benchmark baseline in both views (given Semgrep's alerts, and end to end) | Instructor feedback on the proposal |
+| Evaluation data | About 100 findings | Fixed 50/50 stratified dev/test split (seed 201); the checkpoint sample comes from dev; test is held back for the final evaluation | Instructor feedback: evaluate on unseen data |
+| Scanner baseline method | Filename-based mapping | CWE-matched mapping with one documented equivalence; filename-based figures kept for comparison | Matches the Benchmark's scoring, and ensures TriageBot is scored on the same weakness the answer key labels (design decision 17) |
+| Scanner input | Scan run locally by each member | One recorded scan committed to the repository; optional re-scan in the menu | Re-scans vary slightly (section 7.3); a recorded scan makes results reproducible and setup faster |
+| Recall | Not analysed | Recall ceiling and per-category blind spots reported; a broader first stage planned | Instructor feedback on first-stage tuning and bottlenecks |
 
 ## 10. Next steps after the checkpoint
 
@@ -242,7 +290,7 @@ The validator and evaluator were also run together: sample model output passed t
 
 Each member has reviewed the paragraph describing their own work. `[TBC: tick when confirmed]`
 
-- **Darren:** `[TBC]` Semgrep integration, alert normalisation and answer-key mapping. `[ ] confirmed`
+- **Darren:** Ingest stage: normalising Semgrep findings into the shared alert contract, CWE-matched mapping to the answer key, the full-benchmark scanner baseline with precision, recall and F1, the shared metrics module, and the stratified dev/test split and checkpoint sample (48 tests). Also the terminal menu and setup check (`python -m triagebot`, with option 1 working), the recorded-scan setup, and the README Quick start with CI on three operating systems. `[ ] confirmed`
 - **Hong Yi:** Package scaffold and shared contracts, design decision record, offline OWASP Cheat Sheet knowledge base (137 sheets, 3,238 chunks), CWE-gated keyword retrieval over that knowledge base, `[TBC: council and single-agent orchestration]`. `[ ] confirmed`
 - **Lisa:** Deterministic validator with citation, identifier and case-ID checks and a `human_review` fallback, with 32 offline tests. `[ ] confirmed`
 - **Bradley:** Evaluation harness that scores all configurations against the hidden answer key, with 14 offline tests; this checkpoint report. `[ ] confirmed`
