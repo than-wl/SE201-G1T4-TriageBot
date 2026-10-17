@@ -167,3 +167,102 @@ which lets any member work on a clean clone with no key.
 **Consequence.** The Definition of Done for the AI workflow is provable
 without paid calls; live runs are limited to integration checks and the
 recorded final evaluation.
+
+## 11. The caller owns model-JSON parsing and never retries
+
+**Decision.** Each review role passes a request dict
+(`system`, `user`, `max_tokens`, `temperature`) to an injected caller;
+the caller adds the model/endpoint/auth, parses the model's JSON answer
+into a dict, and returns `{"_error": reason}` on any transport, auth, or
+billing failure instead of raising. Roles never auto-retry.
+
+**Why.** Keeping parsing in one place means every role sees the same
+shape and a malformed answer cannot crash a run mid-pipeline. The
+team's workflow rule is no automatic retries, so the failure path must
+degrade safely rather than propagate exceptions.
+
+**Consequence.** A failed call becomes a `human_review` report via the
+shared report helper (decision 13), and swapping live/fixture callers
+requires no role changes (decision 10).
+
+## 12. Review prompts live inside the review node
+
+**Decision.** All prompt text — role system prompts, the shared output
+contract, and the evidence-block renderer — lives in
+`triagebot/nodes/review/prompts.py`, not at the package top level.
+
+**Why.** The only consumers of prompt text are the four review roles;
+`triagebot/`'s top level stays limited to the contracts every module
+depends on (`schemas.py`, `config.py`), so a reader can see the
+dependency structure at a glance.
+
+**Consequence.** Prompt edits are reviewed inside the review node's
+pull requests, and prompt-text review (a future evaluation activity)
+has one file to audit.
+
+## 13. All strategies see one byte-identical evidence block
+
+**Decision.** The context payload is rendered by a single function into
+one evidence block that is embedded verbatim as the user message for
+every role and both strategies. Extracted facts appear as labelled
+hints to verify, and the block is framed as untrusted data that carries
+no instructions.
+
+**Why.** The proposal's core comparison (single agent vs council) is
+only meaningful if the evidence is identical by construction, not by
+convention. Facts must not become verdict logic — the model has to
+verify them against the code. Framing the block as data also bounds
+prompt injection through source comments or retrieved guidance.
+
+**Consequence.** Fairness is mechanically testable (byte-equality of
+user messages across strategies), the smoke test asserts it, and the
+untrusted-data framing complements the deterministic validator.
+
+## 14. Model reports are normalised in one shared helper
+
+**Decision.** Every role routes its parsed model dict through
+`triagebot/nodes/review/report.py`: identity fields (`role`, `case_id`)
+are stamped by code and never read from the model, unknown or missing
+verdicts coerce to `human_review`, list fields are shape-guarded, and a
+caller failure (decision 11) becomes a safe `human_review` report.
+
+**Why.** The model cannot be trusted to declare its own identity or to
+respect the verdict enum; all four roles must emit one shape for the
+validator; and failure handling should be written once, not four times.
+
+**Consequence.** Adding a fifth role means a prompt plus a thin wrapper;
+the validator (decision 8) stays the sole enforcer of evidence rules —
+the helper only normalises shape.
+
+## 15. Guidance citations are a separate additive field
+
+**Decision.** Agent reports carry `guidance: [{chunk_id, doc, section,
+url}]` next to the contractual `citations`. Guidance refs are copied
+only from the retrieved chunks listed in the evidence block; `citations`
+stays source-code evidence with the team document's exact shape.
+
+**Why.** Downstream reporting and evaluation benefit from knowing which
+cheat-sheet chunks a verdict actually relied on, while the team
+document's `citations` contract must not change under the validator
+author's feet.
+
+**Consequence.** The validator gains one additive rule (every guidance
+ref must match a listed chunk), and result files record code evidence
+and documentation evidence separately.
+
+## 16. AI assistance is disclosed per the SE201 policy
+
+**Decision.** Every commit containing AI-assisted work carries an
+`Assisted-by: <tool> (<model>)` trailer (the Linux/LLVM convention the
+policy adopts), and each team member keeps `ai-log/<member>.md` with one
+entry per significant use — tool, files, outcome (Kept/Changed/Rejected)
+plus what was asked, how it was checked, and what was kept or changed —
+committed with the work it describes.
+
+**Why.** The course's AI Use Disclosure Policy v1.00 requires both parts
+and treats undisclosed use as an academic integrity breach; committing
+entries with the work links log entry, diff, and trailer in one history.
+
+**Consequence.** PR review includes the log entry for the work; the
+checkpoint submission includes the `ai-log/` folder to date and a short
+team declaration (policy section 5.1) in the checkpoint document.

@@ -62,12 +62,20 @@ class Citation(TypedDict):
     quote: str            # exact substring of that source line
 
 
+class GuidanceRef(TypedDict):
+    chunk_id: str         # which retrieved chunk, e.g. "SQL_..._Cheat_Sheet#003"
+    doc: str              # cheat sheet name
+    section: str          # heading path within the sheet
+    url: str              # canonical source URL
+
+
 class AgentReport(TypedDict):
     role: str             # "single" | "analyst" | "skeptic" | "chair"
     case_id: str
     verdict: VerdictLabel
     explanation: str
     citations: list[Citation]
+    guidance: list[GuidanceRef]   # cheat-sheet chunks actually relied on
 
 
 class TriageResult(TypedDict):
@@ -75,3 +83,4 @@ class TriageResult(TypedDict):
     verdict: VerdictLabel
     explanation: str
     citations: list[Citation]
+    guidance: list[GuidanceRef]
