@@ -99,6 +99,14 @@ class UnsafeInputs(unittest.TestCase):
         self.assertEqual(reasons, {"Case2": ["Citation 1: wrong file"],
                                    "Case3": ["failed validation (no reason given)"]})
 
+    def test_valid_human_review_is_still_listed_for_the_report(self):
+        result = self.score([{"case_id": "Case1", "verdict": "true_positive"},
+                             {"case_id": "Case2", "verdict": "false_positive"},
+                             {"case_id": "Case3", "verdict": "human_review"}])
+        self.assertEqual(result["invalid_outputs"], 0)
+        self.assertEqual([(f["case_id"], f["outcome"]) for f in result["failures"]],
+                         [("Case3", "fp_human_review")])
+
     def test_duplicate_result_is_rejected(self):
         with self.assertRaises(ValueError):
             self.score([{"case_id": "Case1", "verdict": "true_positive"}] * 2)
