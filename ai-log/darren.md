@@ -99,3 +99,44 @@ report latency and cost. Keep Lisa's structure and style, and add regression tes
 
 - Kept Lisa's structure, required keys and message style; added optional fields, the guidance-reference check and the pass-through of latency, usage and model.
 - Left the guidance_chunks wiring to the pipeline owner and flagged it to the team.
+
+## 2026-10-18 — Terminal menu and scanner-baseline option
+
+- **Tool (model):** Claude Code (claude-opus-5-5); spec from Claude (Cowork)
+- **Files:** triagebot/__main__.py, tests/test_cli.py, README.md,
+  verification/requirements.txt (adds rich), ai-log/darren.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Add the TriageBot entry point: `python -m triagebot` opens a terminal menu, and the
+same actions are available as `baseline`, `triage` and `evaluate` subcommands that
+call the same functions. Make option 1 / `baseline` work by reusing the ingest
+functions (same outputs in Context/tmp/checkpoint/) and print the ingest summary, the
+CWE-matched table, the file-matched comparison, the recall ceiling, the two
+lowest-recall categories and the checkpoint sample, with friendly errors that point to
+the README Setup steps. Keep options 2 and 3 as marked placeholders for the pipeline
+owner, add offline tests, and update the README.
+
+Then redesign the option 1 screen for a first-time reader (our instructor) using `rich`:
+state the scan's provenance (Semgrep version, ruleset, saved date, alert count) and the
+answer key it is scored against; lead with plain-English CWE-matched headline numbers;
+show a table by vulnerability type with readable names; explain what the numbers mean
+for TriageBot (noise, recall ceiling, blind spots) and the checkpoint test set; move
+the file-matched comparison, mismatch pairs, ingest counts and file list behind
+`--details` / `d`. Add a re-scan option (`--rescan` / `r`) that re-runs Semgrep as in
+Setup, keeps the previous file and falls back to it on failure, and make the menu wait
+for Enter after each option. Tests render through a fixed-width colourless console and
+mock Semgrep.
+
+### How I checked it
+
+- Ran the menu myself with the venv Python: option 1 with the saved scan, the details view, and a real re-scan (1,909 alerts again; previous scan kept as a backup).
+- Read the baseline screen as a first-time viewer would and asked for a plain-English redesign (headline, readable category names, no internal jargon).
+- Ran the full suite: all tests pass.
+
+### What I kept or changed
+
+- Changed the baseline screen from a raw Markdown dump to a presentable rich layout; technical comparisons moved behind --details.
+- Kept the saved scan as the default (fast and offline for demos) and added an optional live re-scan with a backup of the previous result.
+- Pinned rich to the version Semgrep already installs, and added a friendly message if the environment isn't active.

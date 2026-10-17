@@ -19,7 +19,7 @@ The editable source of the diagram is [docs/architecture/TriageBot_Architecture_
 | Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Roles built; council orchestration pending |
 | Validate | Deterministic citation and format checks | `triagebot/nodes/validate/` | Built |
 | Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
-| Pipeline wiring and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Planned |
+| Pipeline wiring and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Menu built; options 2-3 pending pipeline |
 
 Shared data shapes passed between stages live in `triagebot/schemas.py`. Runtime settings (model, budgets, paths) live in `triagebot/config.py`. Model callers, the live OpenRouter caller and the offline fixture caller, live in `triagebot/llm/`. The reasoning behind these choices is recorded in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
 
@@ -156,13 +156,22 @@ Offline checks passed; fabricated quote, wrong file/line and malformed JSON reje
 
 The recorded results are in [docs/feasibility/OPENROUTER_SMOKE_REPORT.md](docs/feasibility/OPENROUTER_SMOKE_REPORT.md) and [docs/feasibility/FEASIBILITY_CHECK_REPORT.md](docs/feasibility/FEASIBILITY_CHECK_REPORT.md).
 
-### Planned: terminal menu
+### Terminal menu
 
-**Planned, not yet implemented.** `python -m triagebot` will open a terminal menu with three options:
+`python -m triagebot` with no arguments opens an interactive menu (terminal output uses `rich`, installed by the Setup `pip install` line). If it reports that TriageBot needs its Python environment, run it with `.\.verification-venv\Scripts\python.exe -m triagebot` or activate the venv first. Every option is also a non-interactive subcommand that calls the same function, for scripts:
 
-1. **Scanner baseline:** how good is Semgrep alone, scored against the answer key.
-2. **Triage one alert:** one finding through the whole pipeline, with every stage shown.
-3. **Evaluate a sample:** the same sample through each configuration, scored.
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m triagebot
+& '.\.verification-venv\Scripts\python.exe' -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details]
+& '.\.verification-venv\Scripts\python.exe' -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
+& '.\.verification-venv\Scripts\python.exe' -m triagebot evaluate [--sample PATH] [--mode single,council]
+```
+
+1. **Scanner baseline** (`baseline`), **working**, offline, no API key: how good is Semgrep alone, scored against the answer key. The screen states which scan it uses and what it is scored against, then gives the headline precision, recall and F1, a table by vulnerability type, what this means for TriageBot (false alarms to remove, the recall ceiling, blind spots) and the checkpoint test set; it also writes the ingest files to `Context/tmp/checkpoint/`. `--rescan` (or `r` at the menu prompt) re-runs the Semgrep scan from Setup first, keeping the old file as `semgrep-owasp.previous.json` and falling back to it if the scan fails; `--details` (or `d` after the screen) adds the file-matched comparison, CWE mismatch pairs, ingest counts and files written. A missing Semgrep JSON or answer key names the Setup step to run and exits with code 1.
+2. **Triage one alert** (`triage`), **planned**: one finding through the whole pipeline, with every stage shown.
+3. **Evaluate a sample** (`evaluate`), **planned**: the checkpoint sample through each configuration, scored.
+
+Options 2 and 3 print "Not yet available" and exit with code 2 until `triagebot/pipeline.py` is wired.
 
 ## 6. Current status
 
