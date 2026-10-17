@@ -266,3 +266,43 @@ entries with the work links log entry, diff, and trailer in one history.
 **Consequence.** PR review includes the log entry for the work; the
 checkpoint submission includes the `ai-log/` folder to date and a short
 team declaration (policy section 5.1) in the checkpoint document.
+
+## 17. Scanner baseline uses CWE-matched scoring
+
+**Decision.** In the scanner-only baseline, a Benchmark case counts as
+flagged only if one of its alerts carries the case's Benchmark CWE or a
+documented equivalent. Filename matching (any alert on the case's file
+counts as flagged) is still computed and reported next to it, for
+comparison with the proposal's preliminary figures.
+
+**Why.** Filename matching credits Semgrep for an alert that names a
+different weakness than the one the test case contains, such as an XSS
+rule firing on a trust-boundary test. Matching on CWE measures whether
+the scanner found the weakness the answer key describes. Some rules tag
+a neighbouring CWE for the same code pattern, so an exact-match rule
+alone would understate the scanner.
+
+**Consequence.** The equivalence table is data-driven: it lives in
+`triagebot/nodes/ingest/mapping.py` (`ACCEPTED_CWE_EQUIVALENTS`), and
+each entry, accepted or rejected, is decided from the mismatch report
+that ingest prints and records with its reason. The table currently
+accepts only CWE-326 for CWE-327 (Semgrep's DES/DESede rules).
+`baseline.json` records both modes and the table used.
+
+## 18. Fixed, stratified dev/test split
+
+**Decision.** The 2,740 Benchmark cases are split once into dev and test
+halves (seed 201, 50/50), stratified by category and answer-key label.
+Prompts, retrieval and other settings are tuned on dev cases only; the
+checkpoint sample is drawn from dev. The test split is reserved for the
+final evaluation.
+
+**Why.** Instructor feedback asked that the system be evaluated on data
+it was not tuned on. A fixed seed makes the split reproducible by every
+member, and stratifying keeps each category's share of real and false
+alerts the same in both halves.
+
+**Consequence.** `split.json` records the seed, fraction, per-stratum
+counts and full assignment. Changing the seed or fraction would
+invalidate the separation between tuning and final results, so it needs
+a team decision recorded here.

@@ -1,0 +1,90 @@
+{
+  "version": "1.178.0",
+  "results": [
+    {
+      "check_id": "java.lang.security.audit.formatted-sql-string.formatted-sql-string",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00001.java",
+      "start": {"line": 50, "col": 9}, "end": {"line": 51, "col": 30},
+      "extra": {"message": "Detected a formatted string in a SQL statement.", "severity": "ERROR",
+                "metadata": {"cwe": ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.formatted-sql-string.formatted-sql-string",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00002.java",
+      "start": {"line": 60, "col": 9}, "end": {"line": 60, "col": 40},
+      "extra": {"message": "Detected a formatted string in a SQL statement.", "severity": "ERROR",
+                "metadata": {"cwe": ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00003.java",
+      "start": {"line": 70, "col": 9}, "end": {"line": 70, "col": 55},
+      "extra": {"message": "Writing request data straight to the response.", "severity": "WARNING",
+                "metadata": {"cwe": ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.command-injection-process-builder.command-injection-process-builder",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00004.java",
+      "start": {"line": 44, "col": 5}, "end": {"line": 44, "col": 60},
+      "extra": {"message": "A formatted string reaches ProcessBuilder.", "severity": "ERROR",
+                "metadata": {"cwe": ["CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.command-injection-process-builder.command-injection-process-builder",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00004.java",
+      "start": {"line": 44, "col": 12}, "end": {"line": 45, "col": 3},
+      "extra": {"message": "A formatted string reaches ProcessBuilder.", "severity": "ERROR",
+                "metadata": {"cwe": ["CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00005.java",
+      "start": {"line": 80, "col": 9}, "end": {"line": 80, "col": 50},
+      "extra": {"message": "Writing request data straight to the response.", "severity": "WARNING",
+                "metadata": {"cwe": ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"]}}
+    },
+    {
+      "check_id": "java.servlets.security.servletresponse-writer-xss.servletresponse-writer-xss",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00005.java",
+      "start": {"line": 75, "col": 9}, "end": {"line": 75, "col": 48},
+      "extra": {"message": "Request data written by a servlet response writer.", "severity": "WARNING",
+                "metadata": {"cwe": ["CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.fixture-no-metadata.fixture-no-metadata",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00006.java",
+      "start": {"line": 66, "col": 9}, "end": {"line": 66, "col": 33},
+      "extra": {"message": "  File opened from a request parameter.  ", "severity": "INFO", "metadata": {}}
+    },
+    {
+      "check_id": "java.lang.security.audit.crypto.use-of-md5.use-of-md5",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00009.java",
+      "start": {"line": 55, "col": 9}, "end": {"line": 55, "col": 61},
+      "extra": {"message": "MD5 is a weak hash.", "severity": "WARNING",
+                "metadata": {"cwe": "CWE-328: Use of Weak Hash"}}
+    },
+    {
+      "check_id": "java.lang.security.audit.crypto.des-is-deprecated.des-is-deprecated",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\testcode\\BenchmarkTest00010.java",
+      "start": {"line": 58, "col": 9}, "end": {"line": 58, "col": 70},
+      "extra": {"message": "DES is deprecated.", "severity": "WARNING",
+                "metadata": {"cwe": ["CWE-327: Use of a Broken or Risky Cryptographic Algorithm", "CWE-326: Inadequate Encryption Strength"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.formatted-sql-string.formatted-sql-string",
+      "path": "Context\\tmp\\BenchmarkJava\\src\\main\\java\\org\\owasp\\benchmark\\helpers\\DatabaseHelper.java",
+      "start": {"line": 120, "col": 9}, "end": {"line": 120, "col": 40},
+      "extra": {"message": "Detected a formatted string in a SQL statement.", "severity": "ERROR",
+                "metadata": {"cwe": ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]}}
+    },
+    {
+      "check_id": "java.lang.security.audit.formatted-sql-string.formatted-sql-string",
+      "path": "Context\\tmp\\elsewhere\\Scratch.java",
+      "start": {"line": 3, "col": 1}, "end": {"line": 3, "col": 20},
+      "extra": {"message": "Detected a formatted string in a SQL statement.", "severity": "ERROR",
+                "metadata": {"cwe": ["CWE-89: Improper Neutralization of Special Elements used in an SQL Command ('SQL Injection')"]}}
+    }
+  ],
+  "errors": [{"type": "FixtureError", "message": "one recorded scanner error"}],
+  "paths": {"scanned": []}
+}

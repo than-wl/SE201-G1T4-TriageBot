@@ -5,7 +5,7 @@ significant use, committed with the work it describes.
 
 ## 2026-10-18 — Repository documentation grooming
 
-- **Tool (model):** Claude Code (claude-opus-5-5)
+- **Tool (model):** Claude Code (claude-opus-5-5); plan and prompt from Claude (Cowork)
 - **Files:** README.md, Context/README.md, CHECKPOINT_REPORT.md (path fixes only),
   checkpoint/CHECKPOINT_BRADLEY.md, checkpoint/CHECKPOINT_BRIEF.md,
   checkpoint/CHECKPOINT_DARREN.md, checkpoint/CHECKPOINT_TEAM_TASKS.md,
@@ -33,8 +33,41 @@ disclosure and safety rules, without changing any Python behaviour or tests.
 - Had Claude Code search for stale references to moved files.
 - Reviewed the rewritten README in Cowork.
 
-
 ### What I kept or changed
 
 - Kept the structure and README as written.
 - Left two old `doc/` references in teammates' AI logs unchanged, since they record what was true at the time.
+
+## 2026-10-18 — Ingest, answer-key mapping, split and scanner baseline
+
+- **Tool (model):** Claude Code (claude-opus-5-5); spec from Claude (Cowork)
+- **Files:** triagebot/nodes/ingest/normalise.py, triagebot/nodes/ingest/answer_key.py,
+  triagebot/nodes/ingest/mapping.py, triagebot/nodes/ingest/split.py,
+  triagebot/nodes/ingest/run.py, triagebot/nodes/score/metrics.py,
+  triagebot/config.py (additive), triagebot/schemas.py (additive), tests/test_ingest.py,
+  tests/fixtures/ingest/semgrep.json, tests/fixtures/ingest/expectedresults.csv,
+  README.md, docs/DESIGN_DECISIONS.md, ai-log/darren.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Build the ingest stage: normalise Semgrep JSON into NormalisedAlerts, load the OWASP
+answer key on the evaluation side only, and compute the scanner-only baseline per
+category in "file" and "cwe" modes with a CWE mismatch report. Add a stratified
+dev/test split, a balanced CWE-89 checkpoint sample, shared metrics functions, offline
+tests and a README section, without letting answer-key data reach any LLM-side output.
+
+### How I checked it
+
+- Reviewed the spec with Claude (Cowork) before running it, including the rule that no answer-key data reaches the LLM side.
+- Ran the offline test suite: 94 tests pass (46 existing, 48 new).
+- Sanity-checked the real-data run: 1,909 findings, 2,740 answer-key cases (1,415 / 1,325), and "file" mode reproduces the proposal's 995 TP / 520 FP exactly.
+- Reviewed the four CWE mismatch pairs and decided the equivalences myself: accepted CWE-326 for CWE-327 (same DES/3DES pattern), rejected CWE-79 for CWE-501, CWE-89 and CWE-643 (different weakness).
+- Checked that alerts.json and selected_alerts.json contain no answer-key fields, and reviewed the staged diff.
+
+### What I kept or changed
+
+- Kept the modules, tests and outputs as generated.
+- Changed the CWE equivalence table from empty to the single crypto pair after reviewing the mismatch report.
+- Asked for an empty BENCHMARK_ROOT to be treated as unset, and recorded decisions 17 and 18.
+- Kept both matching modes so the proposal's filename-based numbers stay comparable.

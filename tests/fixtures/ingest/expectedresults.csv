@@ -1,0 +1,11 @@
+# test name, category, real vulnerability, cwe, Benchmark version: 1.2, fixture
+BenchmarkTest00001,sqli,true,89
+BenchmarkTest00002,sqli,false,89
+BenchmarkTest00003,sqli,true,89
+BenchmarkTest00004,cmdi,true,78
+BenchmarkTest00005,xss,false,79
+BenchmarkTest00006,pathtraver,true,22
+BenchmarkTest00007,sqli,true,89
+BenchmarkTest00008,sqli,false,89
+BenchmarkTest00009,hash,false,328
+BenchmarkTest00010,crypto,true,327

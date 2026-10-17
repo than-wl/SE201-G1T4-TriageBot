@@ -4,6 +4,7 @@
 - ContextPayload  : payload builder -> review paths
 - AgentReport     : one role's output (Analyst / Skeptic / Chair / single agent)
 - Verdict         : review path -> validator -> evaluator
+- AnswerKeyEntry  : EVALUATION ONLY; answer-key row, never sent to a model
 
 Keeping every interface in one module is what makes the components
 independently testable and swappable.
@@ -84,3 +85,12 @@ class TriageResult(TypedDict):
     explanation: str
     citations: list[Citation]
     guidance: list[GuidanceRef]
+
+
+# --- EVALUATION ONLY ------------------------------------------------------
+# Answer-key shapes. Never part of a payload, prompt or LLM-side file.
+
+class AnswerKeyEntry(TypedDict):
+    category: str         # benchmark category, e.g. "sqli"
+    cwe: str              # "CWE-89"
+    vulnerable: bool      # answer key's "real vulnerability" column

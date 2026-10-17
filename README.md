@@ -14,7 +14,7 @@ The editable source of the diagram is [docs/architecture/TriageBot_Architecture_
 
 | Stage | What it does | Code location | Status |
 | --- | --- | --- | --- |
-| Ingest | Semgrep JSON to a normalised alert | `triagebot/nodes/ingest/` | In progress |
+| Ingest | Semgrep JSON to a normalised alert | `triagebot/nodes/ingest/` | Built |
 | Context payload | Source window, helper facts, retrieved guidance | `triagebot/nodes/context/` | Built |
 | Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Roles built; council orchestration pending |
 | Validate | Deterministic citation and format checks | `triagebot/nodes/validate/` | Built |
@@ -55,13 +55,30 @@ git clone https://github.com/OWASP-Benchmark/BenchmarkJava.git Context/tmp/Bench
 git -C Context/tmp/BenchmarkJava checkout 8b67a88d73b2594570fc21150705283de884620b
 ```
 
-The context payload reads source files from the benchmark checkout, so point `BENCHMARK_ROOT` at it:
+After `git checkout <commit>`, git prints a "detached HEAD" message: this is expected.
+
+If the benchmark is somewhere other than `Context/tmp/BenchmarkJava`, point `BENCHMARK_ROOT` at it:
 
 ```powershell
 $env:BENCHMARK_ROOT = (Resolve-Path '.\Context\tmp\BenchmarkJava').Path
 ```
 
+`BENCHMARK_ROOT` is optional when the benchmark is cloned to `Context/tmp/BenchmarkJava`; set it only to use another location.
+
 The benchmark's answer key is used only by the evaluation code after model calls are complete. It must never be sent to a model.
+
+In VS Code, the Python extension may auto-type a venv activation command onto the line you are pasting; if a command fails with a parse error, run it again on its own line.
+
+### Semgrep scan
+
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m pip install semgrep==1.178.0
+$env:PYTHONUTF8 = "1"
+& '.\.verification-venv\Scripts\semgrep.exe' scan --config p/java --json `
+    --output 'Context\tmp\semgrep-owasp.json' 'Context\tmp\BenchmarkJava\src\main\java'
+```
+
+The `p/java` ruleset is fetched from the Semgrep registry at run time, so ingest records the Semgrep version and scan date in `ingest_report.json` (our recorded run: 1.178.0, 1,909 findings, 0 errors).
 
 ### OpenRouter key (live runs only)
 
@@ -83,6 +100,23 @@ No network requests and no OpenRouter credits:
 ```powershell
 & '.\.verification-venv\Scripts\python.exe' -m unittest discover -s tests -v
 ```
+
+### Ingest and scanner baseline
+
+Offline, no API key. Reads the Semgrep JSON and the answer key (defaults from `triagebot/config.py`; override with `--semgrep`, `--answer-key`, `--out`), prints the scanner-only metrics per category and the checkpoint sample size:
+
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m triagebot.nodes.ingest.run
+```
+
+It writes to `Context/tmp/checkpoint/`:
+
+- `alerts.json`: every normalised alert (LLM side, no answer-key data)
+- `selected_alerts.json`: the checkpoint sample, accepted by the evaluator's `--cases` (LLM side)
+- `ingest_report.json`: Semgrep version, scan date, dropped, duplicate and unmapped counts
+- `split.json`: dev/test split and sample composition (evaluation side)
+- `scanner_predictions.json`: per-case scanner predictions, "file" and "cwe" modes (evaluation side)
+- `baseline.json`: per-category metrics for both modes and the CWE mismatch report (evaluation side)
 
 ### Score saved results
 
@@ -132,7 +166,7 @@ The recorded results are in [docs/feasibility/OPENROUTER_SMOKE_REPORT.md](docs/f
 
 ## 6. Current status
 
-The project is at the checkpoint stage. Feasibility is established: Semgrep has been run on the OWASP Benchmark, OpenRouter returned structured, cited results for five SQL injection cases, a limited Analyst–Skeptic–Chair pass ran on those cases, and the deterministic validator rejects malformed or unsupported citations. The context payload, review roles, validator and evaluator are built and tested offline; ingest is in progress, and the end-to-end wiring, council orchestration and the roughly 100-finding evaluation are still to come. See [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for the detailed status.
+The project is at the checkpoint stage. Feasibility is established: Semgrep has been run on the OWASP Benchmark, OpenRouter returned structured, cited results for five SQL injection cases, a limited Analyst–Skeptic–Chair pass ran on those cases, and the deterministic validator rejects malformed or unsupported citations. The ingest stage, context payload, review roles, validator and evaluator are built and tested offline; the end-to-end wiring, council orchestration and the roughly 100-finding evaluation are still to come. See [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for the detailed status.
 
 ## 7. Team and roles
 
