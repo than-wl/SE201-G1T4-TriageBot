@@ -78,6 +78,8 @@ This repository currently contains the project overview, team-owned planning mat
 | `checkpoint/Checkpoint_WEILIN_FINAL_INTEGRATION_AND_SUBMISSION.md` | Wei Lin's final integration and submission checklist |
 | `Context/README.md`                  | Index of shared context and local-only material                                   |
 | `verification/openrouter_smoke.py`   | Five-case OpenRouter smoke test and offline validator self-test                  |
+| `triagebot/nodes/validate/validator.py` | Deterministic validation gate: unsupported or unverifiable results become `human_review` |
+| `tests/test_validator.py`            | Offline tests for the validator (no OpenRouter needed)                            |
 | `verification/feasibility_checks.py` | Limited retrieval, evidence-helper, and Analyst–Skeptic–Chair feasibility pass |
 | `verification/requirements.txt`      | Python dependency for the verification scripts                                   |
 | `.env.example`                       | Safe template for local configuration                                            |
@@ -107,6 +109,12 @@ Expected result:
 
 ```text
 Offline checks passed; fabricated quote, wrong file/line and malformed JSON rejected.
+```
+
+Run the validator's offline unit tests from the repository root (standard library only, no network):
+
+```powershell
+& '.\.verification-venv\Scripts\python.exe' -m unittest discover -s tests -v
 ```
 
 ### 3. Configure an online smoke test, only when needed
