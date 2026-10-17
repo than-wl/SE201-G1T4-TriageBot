@@ -71,3 +71,31 @@ tests and a README section, without letting answer-key data reach any LLM-side o
 - Changed the CWE equivalence table from empty to the single crypto pair after reviewing the mismatch report.
 - Asked for an empty BENCHMARK_ROOT to be treated as unset, and recorded decisions 17 and 18.
 - Kept both matching modes so the proposal's filename-based numbers stay comparable.
+
+## 2026-10-18 — Validator fix: accept review report shape
+
+- **Tool (model):** Claude Code (claude-opus-5-5); spec from Claude (Cowork)
+- **Files:** triagebot/nodes/validate/validator.py, tests/test_validator.py,
+  docs/DESIGN_DECISIONS.md, ai-log/darren.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Fix the integration mismatch where every real `report.assemble()` output failed the
+validator's exact-key check ("Invalid result shape") and became human_review. Keep
+the required keys, allow role, guidance, latency_seconds, usage and model as optional,
+verify guidance refs against the retrieved chunks (decision 15), and carry guidance,
+latency, usage, model and role through to the validated record so evaluate.py can
+report latency and cost. Keep Lisa's structure and style, and add regression tests.
+
+### How I checked it
+
+- Reproduced the bug first: a real report.assemble() output failed shape validation and became human_review.
+- Ran the full suite: 103 tests pass (94 before, 9 new), none skipped.
+- Reviewed the two changed existing tests; both reflect the intended behaviour change, not a weakened check.
+- Reviewed the one unrequested change (single-object outputs with extra contract fields are now recognised) and kept it.
+
+### What I kept or changed
+
+- Kept Lisa's structure, required keys and message style; added optional fields, the guidance-reference check and the pass-through of latency, usage and model.
+- Left the guidance_chunks wiring to the pipeline owner and flagged it to the team.

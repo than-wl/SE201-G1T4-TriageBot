@@ -7,6 +7,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from triagebot.nodes.review import report  # noqa: E402
+from triagebot.nodes.score import evaluate  # noqa: E402
 from triagebot.nodes.validate import validator  # noqa: E402
 
 FILE_A = "testcode/BenchmarkTest00001.java"
@@ -70,7 +72,8 @@ class AcceptedTests(unittest.TestCase):
         outcome = run(list(reversed(good_pair())))
         self.assertEqual([r["case_id"] for r in outcome["results"]], list(CASES))
         self.assertEqual(set(outcome["results"][0]), {
-            "case_id", "verdict", "original_verdict", "validated", "explanation", "citations", "validation_errors"})
+            "case_id", "verdict", "original_verdict", "validated", "explanation", "citations", "guidance",
+            "validation_errors"})
 
 
 class RejectedTests(unittest.TestCase):
@@ -186,7 +189,7 @@ class RejectedTests(unittest.TestCase):
 
     def test_extra_or_missing_result_keys_rejected(self):
         extra = dict(result(), confidence=0.9)
-        self.assert_fallback(run([extra, good_pair()[1]]), reason="Invalid result shape")
+        self.assert_fallback(run([extra, good_pair()[1]]), reason="Unexpected field(s): confidence")
         missing = result()
         del missing["explanation"]
         self.assert_fallback(run([missing, good_pair()[1]]), reason="Invalid result shape")
@@ -219,6 +222,103 @@ class RejectedTests(unittest.TestCase):
     def test_empty_cases_is_programmer_error(self):
         with self.assertRaises(ValueError):
             validator.validate_results([], {})
+
+
+CHUNK = {"chunk_id": "SQL_Injection_Prevention_Cheat_Sheet#003", "doc": "SQL_Injection_Prevention_Cheat_Sheet",
+         "section": "Primary Defenses > Defense Option 1", "text": "Use prepared statements.",
+         "url": "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"}
+USAGE = {"prompt_tokens": 1200, "completion_tokens": 80, "cost": 0.0042}
+
+
+def ref(**changes):
+    return dict({k: CHUNK[k] for k in ("chunk_id", "doc", "section", "url")}, **changes)
+
+
+def with_chunks(chunks=(CHUNK,)):
+    return {case_id: dict(case, guidance_chunks=list(chunks)) for case_id, case in CASES.items()}
+
+
+def assembled(guidance=(), **parsed):
+    """A real review report: the parsed model dict routed through report.assemble()."""
+    body = {k: v for k, v in result(**parsed).items() if k != "case_id"}
+    return report.assemble("single", "BenchmarkTest00001", dict(body, guidance=list(guidance)))
+
+
+class ReviewReportTests(unittest.TestCase):
+    def record(self, item, cases=CASES):
+        return by_id(validator.validate_results([item, good_pair()[1]], cases))["BenchmarkTest00001"]
+
+    def test_assembled_review_report_passes_end_to_end(self):
+        # Regression: report.assemble() adds role and guidance, which used to fail "Invalid result shape".
+        record = self.record(assembled())
+        self.assertTrue(record["validated"], record["validation_errors"])
+        self.assertEqual(record["verdict"], "true_positive")
+        self.assertEqual(record["role"], "single")
+        self.assertEqual(record["guidance"], [])
+
+    def test_unknown_extra_field_still_fails(self):
+        record = self.record(dict(assembled(), confidence=0.9))
+        self.assertFalse(record["validated"])
+        self.assertIn("Unexpected field(s): confidence", record["validation_errors"])
+
+    def test_valid_guidance_refs_pass_and_are_carried(self):
+        record = self.record(assembled([ref()]), with_chunks())
+        self.assertTrue(record["validated"], record["validation_errors"])
+        self.assertEqual(record["guidance"], [ref()])
+
+    def test_mismatched_guidance_ref_fails(self):
+        cases = {"chunk_id": ref(chunk_id="SQL_Injection_Prevention_Cheat_Sheet#999"),
+                 "doc": ref(doc="XSS_Prevention_Cheat_Sheet"), "section": ref(section="Other"),
+                 "url": ref(url="https://example.com/")}
+        for field, bad in cases.items():
+            with self.subTest(field=field):
+                record = self.record(assembled([bad]), with_chunks())
+                self.assertFalse(record["validated"])
+                self.assertEqual(record["verdict"], "human_review")
+                self.assertEqual(record["guidance"], [])
+                self.assertTrue(any(e.startswith("Guidance 1:") for e in record["validation_errors"]),
+                                record["validation_errors"])
+
+    def test_malformed_guidance_fails(self):
+        for guidance in ("x", [{"chunk_id": CHUNK["chunk_id"]}], [dict(ref(), text="extra")]):
+            item = dict(assembled(), guidance=guidance)
+            self.assertFalse(self.record(item, with_chunks())["validated"])
+
+    def test_guidance_refs_without_chunks_fail(self):
+        record = self.record(assembled([ref()]))
+        self.assertFalse(record["validated"])
+        self.assertTrue(any("Cannot verify guidance references" in e for e in record["validation_errors"]))
+
+    def test_empty_or_missing_guidance_passes_without_chunks(self):
+        missing = assembled()
+        del missing["guidance"]
+        for item in (assembled(), missing):
+            self.assertTrue(self.record(item)["validated"])
+
+    def test_latency_usage_and_model_carried_on_pass_and_fail(self):
+        extras = {"latency_seconds": 2.5, "usage": USAGE, "model": "test/model"}
+        passed = self.record(dict(assembled(), **extras))
+        failed = self.record(dict(assembled(quote="fabricated"), **extras))
+        self.assertTrue(passed["validated"])
+        self.assertFalse(failed["validated"])
+        for record in (passed, failed):
+            for key, value in extras.items():
+                self.assertEqual(record[key], value)
+            self.assertEqual(record["role"], "single")
+
+    def test_validated_records_feed_evaluator_latency_and_cost(self):
+        first = dict(assembled(), latency_seconds=2.0, usage=USAGE)
+        second = dict(good_pair()[1], latency_seconds=4.0, usage=USAGE)
+        results = validator.validate_results([first, second], CASES)["results"]
+        labels = {"BenchmarkTest00001": True, "BenchmarkTest00002": False}
+        scored = evaluate.score("B-single", list(CASES), labels, results)
+        self.assertEqual(scored["invalid_outputs"], 0)
+        self.assertEqual(scored["genuine_retained"], 1)
+        self.assertEqual(scored["fp_removed"], 1)
+        self.assertEqual(scored["usage"]["latency_reported"], 2)
+        self.assertEqual(scored["usage"]["latency_mean_seconds"], 3.0)
+        self.assertEqual(scored["usage"]["cost_total"], 0.0084)
+        self.assertEqual(scored["usage"]["prompt_tokens_total"], 2400)
 
 
 class CompatibilityTests(unittest.TestCase):

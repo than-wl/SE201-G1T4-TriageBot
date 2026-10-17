@@ -250,6 +250,11 @@ author's feet.
 ref must match a listed chunk), and result files record code evidence
 and documentation evidence separately.
 
+**Implemented.** `validator.py` accepts `guidance` as an optional field: each
+ref must be exactly {chunk_id, doc, section, url} and match a caller-supplied
+`guidance_chunks` entry on all four; refs without supplied chunks fail, and an
+empty or missing list passes.
+
 ## 16. AI assistance is disclosed per the SE201 policy
 
 **Decision.** Every commit containing AI-assisted work carries an
