@@ -38,11 +38,12 @@ fetches web content (see design decision 2 in `doc/DESIGN_DECISIONS.md`).
   their dedicated prevention sheets and unions those with all incidental
   CWE mentions found in the text. Pinned names are validated against real
   filenames at build time.
-- **`common.json` is curated** from the cheat sheets whose guidance is
-  CWE-agnostic (secure code review, general injection rules, input
-  validation principles). Retrieval includes these chunks in every
-  payload; when an alert has no mappable CWE, they are the only guidance
-  sent and the payload is flagged `cwe_matched=false`.
+- **`common.json` is the gate-miss fallback**, curated from the cheat
+  sheets whose guidance is CWE-agnostic (secure code review, general
+  injection rules, input validation principles). An alert with a
+  mappable CWE receives chunks from its matched sheets alone; a gate
+  miss receives these common chunks instead and sets
+  `cwe_matched=false`, which routes the alert to human review.
 
 ## Rebuilding
 

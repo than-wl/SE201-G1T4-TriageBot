@@ -40,13 +40,13 @@ version, and prompt-injection surface through live web content is avoided.
 Sheet Series, chunked by section and indexed by CWE. Retrieval works in
 two stages: a CWE gate selects the documents mapped to the alert's CWE
 (via a build-time map of curated category pins unioned with detected
-mentions, because cheat sheets rarely state their own CWE id in prose),
-then keyword ranking orders the candidate chunks — matched documents plus
-a small always-included set of CWE-agnostic chunks — using terms derived
-from the alert (rule id, message, source/sink APIs), and the top few
-chunks become the payload's guidance. An alert with no mappable CWE
-receives only the always-included chunks and is flagged
-`cwe_matched=false`, which the validator routes to human review.
+mentions, because cheat sheets rarely state their own CWE id in prose).
+On a gate hit, keyword ranking orders the matched documents' chunks by
+terms derived from the alert (rule id, message, source/sink APIs) and
+the top-ranked chunks within a fixed budget become the payload's
+guidance. On a gate miss, a small curated set of CWE-agnostic review
+chunks is sent instead and the payload is flagged `cwe_matched=false`,
+which the validator routes to human review.
 
 Keyword ranking is the deliberately simplified checkpoint mechanism
 inside an otherwise complete retrieval component; the architecture
@@ -58,8 +58,9 @@ documented simplifications of component internals.
 retrieval needs no additional coupling to ingest. Keyword ranking is
 deterministic and dependency-free, making results reproducible and the
 KB easy to extend with new documentation files rather than code changes.
-The always-included set guarantees agents receive general review guidance
-even when the CWE gate misses.
+The curated fallback guarantees agents still receive general review
+guidance on a gate miss, without spending prompt budget on general
+material when specific guidance exists.
 
 **Consequence.** Adding a vulnerability category later means adding files
 to `triagebot/nodes/context/kb/`. The expected upgrade for the final
