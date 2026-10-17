@@ -8,6 +8,7 @@ is about it.
 
 Run from the repo root: python -m unittest discover -s tests
 """
+import ast
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
@@ -58,7 +59,13 @@ class TempDir(unittest.TestCase):
         self.semgrep = self.tmp / "semgrep-owasp.json"     # the local re-scan, so re-scans may replace it
         shutil.copy2(SEMGREP, self.semgrep)
         self.recorded = self.tmp / "data" / "recorded.json"
-        self.enterContext(mock.patch.multiple(cli.config, LOCAL_SCAN=self.semgrep, RECORDED_SCAN=self.recorded))
+        self.enter(mock.patch.multiple(cli.config, LOCAL_SCAN=self.semgrep, RECORDED_SCAN=self.recorded))
+
+    def enter(self, manager):
+        """Enter a context manager until the test ends (TestCase.enterContext is Python 3.11+)."""
+        value = manager.__enter__()
+        self.addCleanup(manager.__exit__, None, None, None)
+        return value
 
     def baseline_argv(self, *extra):
         return ["baseline", "--semgrep", str(self.semgrep), "--answer-key", str(ANSWER_KEY),
@@ -76,9 +83,9 @@ class TempDir(unittest.TestCase):
                 Path(command[command.index("--output") + 1]).write_text(
                     json.dumps({"version": "9.9.9", "results": [], "errors": []}), encoding="utf-8")
             return subprocess.CompletedProcess(command, returncode, "", stderr)
-        self.enterContext(mock.patch.object(cli, "_semgrep_exe", return_value=self.tmp / "semgrep.exe"))
-        self.enterContext(self.fake_benchmark())
-        return self.enterContext(mock.patch.object(cli.subprocess, "run", side_effect=run))
+        self.enter(mock.patch.object(cli, "_semgrep_exe", return_value=self.tmp / "semgrep.exe"))
+        self.enter(self.fake_benchmark())
+        return self.enter(mock.patch.object(cli.subprocess, "run", side_effect=run))
 
 
 def checks(**status):
@@ -92,7 +99,8 @@ def checks(**status):
 class Menu(TempDir):
     def setUp(self):
         super().setUp()
-        self.enterContext(mock.patch.object(cli.check, "run_checks", return_value=checks()))
+        self.enter(mock.patch.object(cli.check, "run_checks", return_value=checks()))
+        self.enter(mock.patch.object(cli, "_semgrep_exe", return_value=self.tmp / "semgrep.exe"))
 
     def run_menu(self, *answers):
         with mock.patch("builtins.input", side_effect=list(answers)) as fake:
@@ -119,11 +127,26 @@ class Menu(TempDir):
         self.assertIn("use the local re-scan from", printed)
         self.assertIn("Setup check", printed)
         self.assertIn("r = re-run Semgrep now (takes a few minutes, needs internet)", printed)
+        self.assertNotIn("re-scan unavailable", printed)
         self.assertIn("Semgrep raised alerts on 6 test cases", printed)
         self.assertIn("d = show technical details", printed)
         self.assertNotIn("Technical details", printed)
         for name in OUTPUT_FILES:
             self.assertTrue((self.out / name).is_file(), name)
+
+    def test_option_1_without_semgrep_offers_no_rescan(self):
+        old = self.semgrep.read_bytes()
+        with mock.patch.object(cli, "_semgrep_exe", return_value=None), \
+                mock.patch.object(cli.subprocess, "run") as run:
+            code, printed, prompts = self.run_menu("1", "r", "", "q")     # "r" is ignored
+        self.assertEqual((code, prompts), (0, 4))
+        self.assertIn("use the local re-scan from", printed)
+        self.assertIn("(re-scan unavailable: Semgrep not installed)", printed)
+        self.assertNotIn("r = re-run Semgrep now", printed)
+        self.assertNotIn("Semgrep is not installed", printed)                 # no re-scan attempted
+        self.assertIn("Semgrep raised alerts on 6 test cases", printed)
+        run.assert_not_called()
+        self.assertEqual(self.semgrep.read_bytes(), old)
 
     def test_option_1_details(self):
         code, printed, prompts = self.run_menu("1", "", "d", "", "q")
@@ -260,7 +283,7 @@ class Rescan(TempDir):
         self.assertEqual((code, errors), (0, ""))
         run.assert_not_called()
         self.assertIn("Semgrep is not installed", printed)
-        self.assertIn("pip install -r requirements-scan.txt", printed)
+        self.assertIn("pip install -r requirements.txt", printed)
         self.assertIn("Using the local re-scan from", printed)
         self.assertIn("Semgrep raised alerts on 6 test cases", printed)
         self.assertEqual(self.semgrep.read_bytes(), old)
@@ -285,6 +308,8 @@ class Rescan(TempDir):
         self.assertEqual((self.tmp / "semgrep-owasp.previous.json").read_bytes(), old)
         self.assertEqual(json.loads(self.semgrep.read_text(encoding="utf-8"))["version"], "9.9.9")
         self.assertIn("Semgrep 9.9.9", printed)
+        self.assertIn("This re-scan is now used instead of the recorded scan. To go back, delete or rename "
+                      f"{check.rel_path(self.semgrep)}.", " ".join(printed.split()))
 
     def test_no_saved_scan_and_no_semgrep_is_friendly(self):
         self.semgrep.unlink()
@@ -327,17 +352,51 @@ class MissingInputs(TempDir):
         self.assert_friendly(code, errors, "not valid JSON", "Re-run the scan")
 
 
+def run_triagebot(*argv, setup="", platform=None):
+    """python -m triagebot ARGV in a child process, after SETUP code (and a pretend platform)."""
+    pretend = f"import triagebot.check as c; c.platform = lambda: {platform!r}" if platform else ""
+    script = "; ".join(part for part in (
+        "import sys, runpy", setup, pretend, f"sys.argv = ['triagebot', *{list(argv)!r}]",
+        "runpy.run_module('triagebot', run_name='__main__')") if part)
+    return subprocess.run([sys.executable, "-c", script], cwd=ROOT, capture_output=True, text=True, timeout=60)
+
+
 class MissingRich(unittest.TestCase):
-    def test_friendly_exit_without_rich(self):
-        script = ("import sys, runpy; sys.modules['rich'] = None; "
-                  "runpy.run_module('triagebot', run_name='__main__')")
-        done = subprocess.run([sys.executable, "-c", script], cwd=ROOT, capture_output=True,
-                              text=True, timeout=60)
+    NO_RICH = "sys.modules['rich'] = None"
+
+    def test_friendly_exit_without_rich_shows_this_os_command(self):
+        for platform, command, other in (("win32", r".\.venv\Scripts\Activate.ps1", "source .venv/bin/activate"),
+                                         ("darwin", "source .venv/bin/activate", "Activate.ps1"),
+                                         ("linux", "source .venv/bin/activate", "Activate.ps1")):
+            with self.subTest(platform=platform):
+                done = run_triagebot(setup=self.NO_RICH, platform=platform)
+                self.assertEqual(done.returncode, 1)
+                self.assertIn("TriageBot needs its Python environment", done.stderr)
+                self.assertIn(f"Activate .venv ({command};", done.stderr)
+                self.assertNotIn(other, done.stderr)
+                self.assertIn("pip install -r requirements.txt", done.stderr)
+                self.assertNotIn("Traceback", done.stderr)
+
+    def test_check_without_rich_prints_plain_report(self):
+        done = run_triagebot("check", setup=self.NO_RICH, platform="darwin")
         self.assertEqual(done.returncode, 1)
-        self.assertIn("TriageBot needs its Python environment", done.stderr)
-        self.assertIn("Activate .venv", done.stderr)
-        self.assertIn("pip install -r requirements.txt", done.stderr)
-        self.assertNotIn("Traceback", done.stderr)
+        self.assertIn("MISSING  rich installed", done.stdout)
+        self.assertIn("To fix: source .venv/bin/activate", done.stdout)
+        self.assertEqual(run_triagebot("check", "--no-fail", setup=self.NO_RICH).returncode, 0)
+
+
+class PythonVersionGuard(unittest.TestCase):
+    def test_old_python_gets_one_plain_message(self):
+        done = run_triagebot(setup="sys.version_info = (3, 9, 18, 'final', 0)")
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(done.stderr.strip(),
+                         "TriageBot needs Python 3.10 or newer (you have 3.9). Install it from python.org or "
+                         "with `brew install python@3.12` on macOS, then recreate .venv.")
+        self.assertEqual(done.stdout, "")
+
+    def test_main_module_parses_on_python_3_8(self):
+        source = (ROOT / "triagebot/__main__.py").read_text(encoding="utf-8")
+        ast.parse(source, feature_version=(3, 8))          # raises SyntaxError if not
 
 
 class ScanResolution(TempDir):
@@ -434,6 +493,39 @@ class SetupChecks(TempDir):
         self.assertEqual(missing.status, check.MISSING)
         self.assertIn("pip install -r requirements.txt", missing.fix)
 
+    def test_fix_commands_follow_the_os(self):
+        cases = {"win32": (r".\.venv\Scripts\Activate.ps1", "py -m venv .venv", "python.org", "source "),
+                 "darwin": ("source .venv/bin/activate", "python3 -m venv .venv", "brew install python@3.12",
+                            "Activate.ps1"),
+                 "linux": ("source .venv/bin/activate", "python3 -m venv .venv", "package manager",
+                           "Activate.ps1")}
+        for platform, (activate, create, install, other) in cases.items():
+            with self.subTest(platform=platform), mock.patch.object(check, "platform", return_value=platform):
+                rich = check.check_rich(lambda name: None).fix
+                venv = check.check_venv("/same", "/same").fix
+                python = check.check_python((3, 9, 18)).fix
+                self.assertEqual(rich.splitlines(), [activate, "pip install -r requirements.txt"])
+                self.assertEqual(venv.splitlines(), [f"{create}   (first time only)", activate])
+                self.assertIn(install, python)
+                self.assertIn(create, python)
+                for fix in (rich, venv, python):
+                    self.assertNotIn(other, fix)
+
+    def test_virtual_environment_is_only_a_warning(self):
+        active = check.check_venv(str(self.tmp / ".venv"), str(self.tmp / "base"))
+        self.assertEqual((active.status, active.detail), (check.OK, "active (.venv)"))
+        inactive = check.check_venv(str(self.tmp), str(self.tmp))
+        self.assertEqual((inactive.status, inactive.required), (check.WARNING, False))
+        self.assertEqual(check.blocking([inactive]), [])
+
+    def test_no_fail_exits_zero_while_missing(self):
+        with mock.patch.object(cli.check, "run_checks", return_value=checks(bench=check.MISSING)):
+            self.assertEqual(capture(cli.main, ["check"])[0], 1)
+            code, printed, _ = capture(cli.main, ["check", "--no-fail"])
+        self.assertEqual(code, 0)
+        self.assertIn("MISSING", printed)
+        self.assertIn("To fix: OWASP Benchmark folder", printed)
+
     def test_benchmark_folder(self):
         self.assertEqual(check.check_benchmark(self.bench()).status, check.OK)
 
@@ -476,7 +568,7 @@ class SetupChecks(TempDir):
         warning = check.check_semgrep(lambda: None)
         self.assertEqual((warning.status, warning.required), (check.WARNING, False))
         self.assertIn("needed for re-scans", warning.detail)
-        self.assertIn("pip install -r requirements-scan.txt", warning.fix)
+        self.assertIn("pip install -r requirements.txt", warning.fix)
         self.assertEqual(check.check_semgrep(lambda: self.tmp / "semgrep.exe").status, check.OK)
         self.assertEqual(check.blocking([warning]), [])
 
@@ -485,9 +577,11 @@ class SetupChecks(TempDir):
                                                                              semgrep=check.WARNING)):
             code, printed, _ = capture(cli.main, ["check"])
         self.assertEqual(code, 1)
-        for word in ("Setup check", "OK", "MISSING", "WARNING", 'To fix "OWASP Benchmark folder":',
-                     "fix command"):
+        for word in ("Setup check", "OK", "MISSING", "WARNING", "To fix: OWASP Benchmark folder",
+                     "Optional: Semgrep installed", "fix command"):
             self.assertIn(word, printed)
+        self.assertNotIn("To fix: Semgrep installed", printed)
+        self.assertNotIn("Optional: OWASP Benchmark folder", printed)
         with mock.patch.object(cli.check, "run_checks", return_value=checks(semgrep=check.WARNING)):
             self.assertEqual(capture(cli.main, ["check"])[0], 0)
 
@@ -495,9 +589,18 @@ class SetupChecks(TempDir):
         out = io.StringIO()
         self.assertEqual(check.print_plain(checks(rich=check.MISSING), out=out), 1)
         self.assertIn("MISSING  rich installed", out.getvalue())
+        self.assertIn("To fix: fix command", out.getvalue())
+        out = io.StringIO()
+        check.print_plain(checks(semgrep=check.WARNING), out=out)
+        self.assertIn("Optional: fix command", out.getvalue())
+        self.assertNotIn("To fix:", out.getvalue())
 
 
 class MenuSetup(TempDir):
+    def setUp(self):
+        super().setUp()
+        self.enter(mock.patch.object(cli, "_semgrep_exe", return_value=self.tmp / "semgrep.exe"))
+
     def run_menu(self, results, *answers):
         with mock.patch.object(cli.check, "run_checks", side_effect=results) as checked, \
                 mock.patch.object(cli.subprocess, "run",

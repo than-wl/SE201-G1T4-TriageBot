@@ -1,0 +1,41 @@
+# Offline tests and the setup check on Windows, macOS and Linux.
+# Never clones the OWASP Benchmark and never calls OpenRouter: the tests use
+# fixtures and mocks, and no API key is configured. The setup check is
+# expected to report the Benchmark as MISSING here, so it runs with
+# --no-fail (it still prints the table).
+name: tests
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.12"]
+    env:
+      PYTHONUTF8: "1"          # same as TriageBot's own Semgrep runs; avoids cp1252 output on Windows
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+
+      - name: Install requirements
+        run: python -m pip install -r requirements.txt
+
+      - name: Offline tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Setup check (Benchmark expected MISSING)
+        run: python -m triagebot check --no-fail

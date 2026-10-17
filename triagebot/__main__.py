@@ -15,7 +15,7 @@ it then asks whether to use the current scan or re-run Semgrep, and
 afterwards offers the technical details.
 
 Non-interactive subcommands (same functions as the menu options):
-    python -m triagebot check
+    python -m triagebot check [--no-fail]
     python -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details]
                                  [--export-svg PATH]
     python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
@@ -36,13 +36,22 @@ saves the screen as an SVG (README screenshot).
 triage and evaluate are placeholders until triagebot/pipeline.py is
 wired; they print a notice and exit with code 2.
 
-check: prints the setup table; exit code 1 while a required item is MISSING.
+check: prints the setup table; exit code 1 while a required item is MISSING
+(0 with --no-fail, for CI, where the Benchmark is never cloned).
 
 Exit codes: 0 success, 1 missing or unreadable input, 2 not yet available.
 
 All output goes through rich; tests swap `console` and `err_console` for
 fixed-width, colourless consoles.
 """
+
+import sys
+
+# Runs before anything else, so this file must stay parseable by Python 3.8
+# (tests/test_cli.py checks it); the rest of TriageBot needs 3.10.
+if sys.version_info < (3, 10):
+    sys.exit("TriageBot needs Python 3.10 or newer (you have %d.%d). Install it from python.org or with "
+             "`brew install python@3.12` on macOS, then recreate .venv." % tuple(sys.version_info[:2]))
 
 import argparse
 from datetime import datetime
@@ -51,7 +60,6 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
-import sys
 
 try:
     from rich import box
@@ -60,11 +68,13 @@ try:
     from rich.table import Table
     from rich.text import Text
 except ImportError:
+    from triagebot import check as _check          # standard library only
     if __name__ == "__main__" and sys.argv[1:2] == ["check"]:
-        from triagebot import check as _check
-        sys.exit(_check.print_plain())
-    sys.exit("TriageBot needs its Python environment. Activate .venv (the prompt shows \"(.venv)\") "
-             "and run: pip install -r requirements.txt   (see README, Quick start).")
+        code = _check.print_plain()
+        sys.exit(0 if "--no-fail" in sys.argv else code)
+    sys.exit(f"TriageBot needs its Python environment. Activate .venv ({_check.activate_command()}; "
+             f"the prompt then shows \"(.venv)\") and run: pip install -r requirements.txt   "
+             f"(see README, Quick start).")
 
 from triagebot import check, config
 from triagebot.nodes.ingest import run
@@ -84,7 +94,7 @@ REVIEW_MODES = ("single", "council")
 
 SEMGREP_RULESET = "p/java"
 ANSWER_KEY_NAME = "OWASP Benchmark v1.2 answer key"
-INSTALL_SEMGREP = "pip install -r requirements-scan.txt"
+INSTALL_SEMGREP = "pip install -r requirements.txt"
 SETUP_HINT = "run python -m triagebot check for the fix"
 CLONE_PROMPT = "Clone the OWASP Benchmark now? (about 100 MB) \\[y/N]: "
 SVG_WIDTH = 110                # columns of the recorded screen
@@ -209,6 +219,8 @@ def rescan() -> bool:
     partial.replace(semgrep_path)
     console.print(f"[green]Scan complete[/] (exit code {completed.returncode}); "
                   f"saved to {_short(semgrep_path)}")
+    console.print("This re-scan is now used instead of the recorded scan. "
+                  f"To go back, delete or rename {check.rel_path(semgrep_path)}.", markup=False)
     return True
 
 
@@ -440,18 +452,19 @@ def show_check(checks) -> None:
     console.print(table)
     fixes = [c for c in checks if c.status != check.OK and c.fix]
     for c in fixes:
-        console.print(Text(f"To fix \"{c.name}\":", style="bold"))
+        label = "Optional:" if c.status == check.WARNING else "To fix:"
+        console.print(Text(f"{label} {c.name}", style="bold"))
         for line in c.fix.splitlines():
             console.print(f"  {line}", markup=False)
     if fixes:
         console.print()
 
 
-def setup_check() -> int:
+def setup_check(no_fail=False) -> int:
     """`check` subcommand: the table; exit code 1 while a required item is MISSING."""
     checks = check.run_checks()
     show_check(checks)
-    return 1 if check.blocking(checks) else 0
+    return 0 if no_fail or not check.blocking(checks) else 1
 
 
 def clone_benchmark(target=None) -> bool:
@@ -546,8 +559,12 @@ def _menu_baseline(semgrep, answer_key, out) -> None:
     when = scan_time(path)
     use = (f"use the {config.scan_source(path)} from {when}" if when
            else "use the saved scan (none found)")
-    choice = _ask(f"[bold]\\[Enter][/] {use}   [bold]r[/] = re-run Semgrep now "
-                  "(takes a few minutes, needs internet): ")
+    if _semgrep_exe():
+        choice = _ask(f"[bold]\\[Enter][/] {use}   [bold]r[/] = re-run Semgrep now "
+                      "(takes a few minutes, needs internet): ")
+    else:
+        _ask(f"[bold]\\[Enter][/] {use}   (re-scan unavailable: Semgrep not installed): ")
+        choice = ""
     ctx = prepare_baseline(semgrep, answer_key, out, rescan_first=choice == "r")
     if ctx is None:
         _ask("Press Enter to return to the menu")
@@ -604,7 +621,9 @@ def parser() -> argparse.ArgumentParser:
                                 epilog="With no subcommand, opens the interactive menu.")
     sub = p.add_subparsers(dest="command")
 
-    sub.add_parser("check", help="is this machine ready? Python, rich, benchmark, scan, Semgrep")
+    c = sub.add_parser("check", help="is this machine ready? Python, venv, rich, benchmark, scan, Semgrep")
+    c.add_argument("--no-fail", action="store_true",
+                   help="exit 0 even when something is MISSING (CI: report without failing the job)")
 
     b = sub.add_parser("baseline", help="menu option 1: score Semgrep alone against the answer key")
     b.add_argument("--semgrep", help=f"Semgrep JSON (default: {_short(config.LOCAL_SCAN)} if present, "
@@ -631,7 +650,7 @@ def parser() -> argparse.ArgumentParser:
 def main(argv=None) -> int:
     args = parser().parse_args(argv)
     if args.command == "check":
-        return setup_check()
+        return setup_check(args.no_fail)
     if args.command == "baseline":
         return baseline(args.semgrep, args.answer_key, args.out, args.rescan, args.details, args.export_svg)
     if args.command == "triage":

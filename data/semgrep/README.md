@@ -29,7 +29,7 @@ It contains **no answer-key data**: nothing from `expectedresults-1.2.csv`, no l
 With `.venv` activated and the benchmark cloned at the pinned commit (README, Quick start):
 
 ```bash
-pip install -r requirements-scan.txt
+pip install -r requirements.txt
 python -m triagebot baseline --rescan
 ```
 

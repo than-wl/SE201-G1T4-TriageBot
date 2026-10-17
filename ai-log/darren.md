@@ -147,10 +147,11 @@ mock Semgrep.
 - **Files:** data/semgrep/semgrep-owasp-p-java-1.178.0.json, data/semgrep/README.md,
   triagebot/nodes/ingest/record_scan.py, triagebot/check.py, triagebot/config.py,
   triagebot/__main__.py, triagebot/nodes/ingest/run.py, requirements.txt (moved from
-  verification/), requirements-scan.txt, .gitignore, README.md,
+  verification/; now also pins Semgrep), requirements-scan.txt (added, then merged into
+  requirements.txt and removed), .gitignore, README.md,
   docs/screenshots/baseline.svg, tests/test_cli.py, tests/test_record_scan.py,
   checkpoint/Checkpoint_WEILIN_FINAL_INTEGRATION_AND_SUBMISSION.md (path fixes only),
-  ai-log/darren.md
+  .github/workflows/tests.yml, ai-log/darren.md
 - **Outcome:** Changed
 
 ### What I asked for
@@ -166,6 +167,22 @@ problem, offers to clone a missing OWASP Benchmark only on an explicit "y", and 
 option 1 while something required is missing. Add `--export-svg` to save the baseline
 screen, and restructure the README around a quick start, results, usage, evaluation
 method, developer notes and troubleshooting. Offline tests mock git and Semgrep.
+
+Follow-up: merge `requirements-scan.txt` into `requirements.txt` so one `pip install`
+sets up everything (confirmed with `pip check`), and add a Troubleshooting entry for
+when Semgrep fails to install (TriageBot still works with the recorded scan). Polish:
+option 1 offers "r = re-run Semgrep now" only when Semgrep is found, the setup check
+labels WARNING fixes "Optional:" and MISSING fixes "To fix:", and a successful re-scan
+says it is now used instead of the recorded scan and how to go back.
+
+Cross-platform hardening: `python -m triagebot` first checks for Python 3.10+ and exits
+with one plain message on older versions (`__main__.py` stays parseable by Python 3.8
+so the check can run); every hint that shows a command (activating .venv, creating
+it, installing Python or the requirements) uses the current OS's variant; the README
+explains the macOS built-in Python 3.9 pitfall. Add a GitHub Actions workflow that runs
+the offline tests and `python -m triagebot check --no-fail` on Windows, macOS and Linux
+with Python 3.10 and 3.12 (never cloning the Benchmark or calling OpenRouter), with a
+status badge in the README.
 
 ### How I checked it
 

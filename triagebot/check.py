@@ -9,7 +9,8 @@ Each check is a Check(name, status, detail, fix, required):
   WARNING  optional (a re-scan needs Semgrep) or worth knowing (benchmark
            at a different commit than the recorded evidence)
 The benchmark-commit check is left out when git is unavailable or the
-benchmark is missing.
+benchmark is missing. Fix commands are shown for the current OS
+(PowerShell on Windows, a POSIX shell on macOS/Linux).
 """
 
 from dataclasses import dataclass
@@ -37,12 +38,38 @@ class Check:
     required: bool = True
 
 
+def platform() -> str:
+    """sys.platform; a function so tests can pretend to be another OS."""
+    return sys.platform
+
+
+def is_windows() -> bool:
+    return platform().startswith("win")
+
+
+def activate_command() -> str:
+    return r".\.venv\Scripts\Activate.ps1" if is_windows() else "source .venv/bin/activate"
+
+
+def create_venv_command() -> str:
+    return "py -m venv .venv" if is_windows() else "python3 -m venv .venv"
+
+
+def install_python_hint() -> str:
+    where = "https://www.python.org/downloads/"
+    if platform() == "darwin":
+        return f"Install Python 3.10+ from {where} or with: brew install python@3.12"
+    if is_windows():
+        return f"Install Python 3.10+ from {where}"
+    return f"Install Python 3.10+ with your package manager or from {where}"
+
+
 def benchmark_dir() -> Path:
     """Where the benchmark is, or should be cloned to."""
     return Path(config.BENCHMARK_ROOT or config.BENCHMARK_CLONE_DIR)
 
 
-def _rel(path) -> str:
+def rel_path(path) -> str:
     """Path relative to the repository root when inside it, with forward slashes."""
     path = Path(path)
     try:
@@ -58,7 +85,7 @@ def clone_commands(target=None) -> list[list[str]]:
 
 
 def _clone_fix(target) -> str:
-    return "\n".join(" ".join(command) for command in clone_commands(_rel(target)))
+    return "\n".join(" ".join(command) for command in clone_commands(rel_path(target)))
 
 
 def semgrep_exe() -> Path | None:
@@ -78,14 +105,23 @@ def check_python(version=None) -> Check:
     if version[:2] >= MIN_PYTHON:
         return Check("Python version", OK, f"{text} (3.10 or newer needed)")
     return Check("Python version", MISSING, f"{text}; 3.10 or newer needed",
-                 "Install Python 3.10+ from https://www.python.org/downloads/, then recreate .venv")
+                 f"{install_python_hint()}\nThen recreate the environment: {create_venv_command()}")
+
+
+def check_venv(prefix=None, base_prefix=None) -> Check:
+    """WARNING only: TriageBot also runs outside a venv if the packages are installed."""
+    prefix, base_prefix = prefix or sys.prefix, base_prefix or sys.base_prefix
+    if prefix != base_prefix:
+        return Check("Virtual environment", OK, f"active ({Path(prefix).name})", required=False)
+    return Check("Virtual environment", WARNING, "not active; using the system Python",
+                 f"{create_venv_command()}   (first time only)\n{activate_command()}", required=False)
 
 
 def check_rich(find_spec=importlib.util.find_spec) -> Check:
     if find_spec("rich") is not None:
         return Check("rich installed", OK, "terminal output library")
     return Check("rich installed", MISSING, "not installed in this Python",
-                 "pip install -r requirements.txt   (with .venv activated)")
+                 f"{activate_command()}\npip install -r requirements.txt")
 
 
 def check_benchmark(root=None) -> Check:
@@ -93,8 +129,8 @@ def check_benchmark(root=None) -> Check:
     missing = [part for part, ok in ((f"{TESTCODE.as_posix()}/", (root / TESTCODE).is_dir()),
                                      (ANSWER_KEY_NAME, (root / ANSWER_KEY_NAME).is_file())) if not ok]
     if not missing:
-        return Check("OWASP Benchmark folder", OK, _rel(root))
-    detail = f"{_rel(root)} not found" if not root.is_dir() else f"{_rel(root)}: missing {', '.join(missing)}"
+        return Check("OWASP Benchmark folder", OK, rel_path(root))
+    detail = f"{rel_path(root)} not found" if not root.is_dir() else f"{rel_path(root)}: missing {', '.join(missing)}"
     return Check("OWASP Benchmark folder", MISSING, detail, _clone_fix(root))
 
 
@@ -112,15 +148,15 @@ def check_commit(root=None, run=subprocess.run) -> Check | None:
         return Check("Benchmark at pinned commit", OK, head[:12], required=False)
     return Check("Benchmark at pinned commit", WARNING,
                  f"at {head[:12]}, recorded evidence uses {config.BENCHMARK_COMMIT[:12]}",
-                 f"git -C {_rel(root)} checkout {config.BENCHMARK_COMMIT}", required=False)
+                 f"git -C {rel_path(root)} checkout {config.BENCHMARK_COMMIT}", required=False)
 
 
 def check_scan(local=None, recorded=None) -> Check:
     path, source = config.effective_scan(local, recorded)
     if path.is_file():
-        return Check("Semgrep scan available", OK, f"{source} ({_rel(path)})")
-    return Check("Semgrep scan available", MISSING, f"neither {_rel(config.LOCAL_SCAN)} nor {_rel(path)} found",
-                 f"git restore {_rel(path)}   (restores the recorded scan)")
+        return Check("Semgrep scan available", OK, f"{source} ({rel_path(path)})")
+    return Check("Semgrep scan available", MISSING, f"neither {rel_path(config.LOCAL_SCAN)} nor {rel_path(path)} found",
+                 f"git restore {rel_path(path)}   (restores the recorded scan)")
 
 
 def check_semgrep(find=semgrep_exe) -> Check:
@@ -128,13 +164,13 @@ def check_semgrep(find=semgrep_exe) -> Check:
     if exe:
         return Check("Semgrep installed", OK, f"for re-scans ({exe.name})", required=False)
     return Check("Semgrep installed", WARNING, "not installed; needed for re-scans only",
-                 "pip install -r requirements-scan.txt", required=False)
+                 "pip install -r requirements.txt", required=False)
 
 
 def run_checks(run=subprocess.run) -> list[Check]:
     """Every check, in display order (the commit check only when it applies)."""
     bench = check_benchmark()
-    checks = [check_python(), check_rich(), bench]
+    checks = [check_python(), check_venv(), check_rich(), bench]
     if bench.status == OK:
         commit = check_commit(run=run)
         if commit:
@@ -157,6 +193,7 @@ def print_plain(checks=None, out=sys.stdout) -> int:
     print("TriageBot setup check", file=out)
     for c in checks:
         print(f"  {c.status:<8} {c.name}: {c.detail}", file=out)
-        for line in c.fix.splitlines():
-            print(f"           fix: {line}", file=out)
+        label = "Optional:" if c.status == WARNING else "To fix:"
+        for line in c.fix.splitlines() if c.status != OK else ():
+            print(f"           {label} {line}", file=out)
     return 1 if blocking(checks) else 0

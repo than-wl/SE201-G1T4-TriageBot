@@ -1,5 +1,7 @@
 # SE201 G1T4 — TriageBot
 
+[![tests](https://github.com/than-wl/SE201-G1T4-TriageBot/actions/workflows/tests.yml/badge.svg)](https://github.com/than-wl/SE201-G1T4-TriageBot/actions/workflows/tests.yml)
+
 TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
 **Status:** Checkpoint stage: scanner baseline working; AI triage pipeline being integrated.
@@ -37,7 +39,7 @@ The AI configurations are evaluated on a 100-case SQL injection sample; see [CHE
 
 Tested with Python 3.12.7 and Git 2.45 on Windows 11. Run every command from the repository root, in a terminal.
 
-**1. Prerequisites:** [Git](https://git-scm.com/downloads) and [Python 3.10 or newer](https://www.python.org/downloads/).
+**1. Prerequisites:** [Git](https://git-scm.com/downloads) and Python 3.10 or newer. On macOS the built-in `python3` may be 3.9; check with `python3 --version` and install a newer one from [python.org](https://www.python.org/downloads/) or Homebrew (`brew install python@3.12`) if needed. TriageBot stops with a clear message on an older Python.
 
 **2. Clone this repository**
 
@@ -54,7 +56,7 @@ cd SE201-G1T4-TriageBot
 | `.\.venv\Scripts\Activate.ps1` | `source .venv/bin/activate` |
 | `python -m pip install -r requirements.txt` | `python -m pip install -r requirements.txt` |
 
-The prompt now starts with `(.venv)`. Activate it again in every new terminal. From here on, `python` means the venv's Python on every platform.
+The last line installs everything, including Semgrep 1.178.0 for optional re-scans. The prompt now starts with `(.venv)`. Activate it again in every new terminal. From here on, `python` means the venv's Python on every platform.
 
 **4. Run TriageBot**
 
@@ -69,7 +71,7 @@ git clone https://github.com/OWASP-Benchmark/BenchmarkJava.git Context/tmp/Bench
 git -C Context/tmp/BenchmarkJava checkout 8b67a88d73b2594570fc21150705283de884620b
 ```
 
-Then choose `1` for the scanner baseline. No Semgrep install or scan is needed: the repository includes the recorded scan everyone scores ([data/semgrep/README.md](data/semgrep/README.md)).
+Then choose `1` for the scanner baseline. No Semgrep scan is needed: the repository includes the recorded scan everyone scores ([data/semgrep/README.md](data/semgrep/README.md)).
 
 ## 4. Using TriageBot
 
@@ -84,15 +86,15 @@ Then choose `1` for the scanner baseline. No Semgrep install or scan is needed: 
 The same actions as subcommands, for scripts:
 
 ```bash
-python -m triagebot check
+python -m triagebot check [--no-fail]
 python -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details] [--export-svg PATH]
 python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
 python -m triagebot evaluate [--sample PATH] [--mode single,council]
 ```
 
-- `check`: the setup check (Python version, rich, the Benchmark folder and its commit, the scan, Semgrep) with OK / MISSING / WARNING and the command that fixes each problem. Exit code 1 while something required is missing.
+- `check`: the setup check (Python version, virtual environment, rich, the Benchmark folder and its commit, the scan, Semgrep) with OK / MISSING / WARNING and the command that fixes each problem, shown for your OS. Exit code 1 while something required is missing; `--no-fail` always exits 0 (used by CI, where the Benchmark is never cloned).
 - `baseline`: menu option 1. It also writes the ingest files to `Context/tmp/checkpoint/` (`alerts.json`, `selected_alerts.json`, `ingest_report.json`, `split.json`, `scanner_predictions.json`, `baseline.json`).
-  - `--rescan` re-runs Semgrep into `Context/tmp/semgrep-owasp.json` (needs `pip install -r requirements-scan.txt` and internet; a few minutes). That local re-scan is then used instead of the recorded scan until you delete it; the previous one is kept as `semgrep-owasp.previous.json`, and a failed scan falls back to the current one.
+  - `--rescan` re-runs Semgrep into `Context/tmp/semgrep-owasp.json` (needs Semgrep from `requirements.txt` and internet; a few minutes). That local re-scan is then used instead of the recorded scan until you delete it; the previous one is kept as `semgrep-owasp.previous.json`, and a failed scan falls back to the current one.
   - `--details` adds the file-matched comparison, CWE mismatch pairs, ingest counts and files written.
   - `--export-svg PATH` also saves the screen as an SVG image (how the screenshot above was made).
 - `triage` and `evaluate`: print "Not yet available" and exit with code 2 until `triagebot/pipeline.py` is wired.
@@ -127,6 +129,8 @@ Run the offline tests (no network, no API key, no credits):
 python -m unittest discover -s tests -v
 ```
 
+**CI.** [.github/workflows/tests.yml](.github/workflows/tests.yml) runs these tests and `python -m triagebot check --no-fail` on every push and pull request, on Windows, macOS and Linux with Python 3.10 and 3.12. It never clones the Benchmark or calls OpenRouter.
+
 Ingest and scanner baseline as plain text (writes the same files as `baseline`):
 
 ```bash
@@ -141,7 +145,7 @@ python -m triagebot.nodes.score.evaluate --labels Context/tmp/BenchmarkJava/expe
 
 It prints a metrics table and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts count as invalid and as human review, and human review never counts as a removed false positive.
 
-**Re-scanning.** `pip install -r requirements-scan.txt` installs Semgrep 1.178.0, then `python -m triagebot baseline --rescan`. To update the committed recorded scan, follow [data/semgrep/README.md](data/semgrep/README.md).
+**Re-scanning.** `requirements.txt` installs Semgrep 1.178.0; run `python -m triagebot baseline --rescan`. To update the committed recorded scan, follow [data/semgrep/README.md](data/semgrep/README.md).
 
 **Live model calls.** Copy `.env.example` to `.env` and set your own `OPENROUTER_API_KEY` there. Never commit `.env` or paste a key into source files, issues or chat.
 
@@ -170,7 +174,7 @@ checkpoint/      TEMPORARY planning notes, removed before final submission
 
 ## 8. Troubleshooting
 
-- **"No module named rich", or no `(.venv)` at the start of the prompt:** the environment is not active. Activate it (Quick start step 3) and, if needed, `python -m pip install -r requirements.txt`.
+- **"No module named rich", or no `(.venv)` at the start of the prompt:** the environment is not active. Activate it (`.\.venv\Scripts\Activate.ps1` on Windows, `source .venv/bin/activate` on macOS/Linux) and, if needed, `python -m pip install -r requirements.txt`.
 - **PowerShell: "running scripts is disabled on this system":** allow scripts for this terminal only, then activate again:
 
   ```powershell
@@ -179,6 +183,8 @@ checkpoint/      TEMPORARY planning notes, removed before final submission
 
 - **VS Code types the activation command onto the line you pasted** and the command fails with a parse error: run your command again on its own line.
 - **"You are in 'detached HEAD' state" after the benchmark checkout:** expected; it means the benchmark is at the pinned commit.
+- **macOS: "TriageBot needs Python 3.10 or newer (you have 3.9)":** the built-in `python3` is too old. Check with `python3 --version`, install a newer one from [python.org](https://www.python.org/downloads/) or with `brew install python@3.12`, then delete `.venv` and recreate it with the new Python (for example `python3.12 -m venv .venv`).
+- **Semgrep fails to install:** TriageBot still works with the recorded scan. Install the rest with `pip install python-dotenv rich==15.0.0` (use the versions in `requirements.txt`); only re-scans need Semgrep.
 - **Semgrep fails on Windows with `UnicodeEncodeError`:** TriageBot's re-scan sets this for you; when running Semgrep by hand, first run `$env:PYTHONUTF8 = "1"`.
 - **VS Code uses the wrong Python:** Command Palette, "Python: Select Interpreter", then choose the one in `.venv`.
 
