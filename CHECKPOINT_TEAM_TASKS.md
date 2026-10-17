@@ -420,6 +420,8 @@ evaluation: add checkpoint metrics and failure report
 
 # Integration Order
 
+Wei Lin owns the final integration and submission gate. Use `Checkpoing_WEILIN_FINAL_INTEGRATION_AND_SUBMISSION.md` after the four component branches are ready. The component owners remain responsible for their own tests and explanations; Wei Lin checks that the combined system works, the evidence is recorded, and the final repository is safe to submit.
+
 The four components should remain independently testable, but integration happens in this order:
 
 1. Darren provides normalised alerts and the selected case list.
