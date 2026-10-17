@@ -1,0 +1,49 @@
+{
+ "doc": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+ "title": "Secure Integration of Third-Party Payment Gateways Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet#001",
+   "doc": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html",
+   "text": "Integrating third-party payment gateways allows businesses to securely outsource payment processing. These gateways handle sensitive data like cardholder information and offer reduced PCI DSS scope if integrated correctly.\n\nHowever, insecure integration can lead to severe vulnerabilities—ranging from payment spoofing and order manipulation to fraud and business logic flaws. This cheat sheet outlines secure practices for integrating any third-party payment gateway, focusing on a general flow. It identifies potential failure points at each step and provides practical recommendations to prevent common mistakes."
+  },
+  {
+   "chunk_id": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet#002",
+   "doc": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+   "section": "Understanding the Payment Flow",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html",
+   "text": "A typical third-party payment flow consists of five core steps:\n\nCart Preparation The user selects items and initiates checkout.\n\nOrder Initialization (Merchant Backend → Payment Gateway) The merchant backend creates a transaction or order via API and receives an order_id or payment_url.\n\nUser Redirection to Payment Gateway The user is redirected to the gateway-hosted payment page.\n\nPayment Execution (User → Gateway) The user completes or fails the payment.\n\nReturn and Verification (Payment Gateway → Merchant) The user is redirected to the merchant site (callback/return URL), and optionally, the gateway sends a server-to-server notification. The merchant verifies the result and proceeds with order fulfillment.\n\nThe following sequence diagram explains the steps above."
+  },
+  {
+   "chunk_id": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet#003",
+   "doc": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+   "section": "What Can Go Wrong at Each Step and How to Prevent It > 1. Sending Order data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html",
+   "text": "Risks:\n\nPrice tampering or product substitution via client-side manipulation.\n\nMissing server-side cart validation.\n\nMitigations:\n\nValidate all cart details (product IDs, prices, discounts) on the backend.\n\nRecalculate totals server-side using trusted data before order creation."
+  },
+  {
+   "chunk_id": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet#004",
+   "doc": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+   "section": "What Can Go Wrong at Each Step and How to Prevent It > 2. Redirect to webhook",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html",
+   "text": "Risks:\n\nTrusting unauthenticated or spoofed callbacks.\n\nProcessing orders before verifying payment status.\n\nRace conditions from multiple callbacks.\n\nReplaying callbacks to trigger repeated fulfillment (e.g., multiple shipments, account credits).\n\nAssuming user redirection parameters are trustworthy (these are untrusted and can be manipulated).\n\nMitigations:\n\nValidate all cart details (product IDs, prices, discounts) on the backend.\n\nAlways verify the payment status server-side with the gateway’s API before fulfilling the order.\n\nMatch the expected amount, currency, and order ID.\n\nValidate the authenticity of callbacks (e.g., HMAC signatures, secret tokens).\n\nImplement idempotency: only process an order once regardless of how many times the callback is received.\n\nTreat checkout expiry separately from webhook signature freshness. Gateways can retry delivery or send events out of order; verify late notifications and reconcile the current payment state instead of discarding them solely because the checkout expired. Use persistent duplicate-event records and idempotent fulfillment as described in the Webhook Security Cheat Sheet.\n\nOnly server-to-server callbacks should be trusted for payment verification and order fulfillment.\n\nLog all callback attempts for forensic analysis."
+  },
+  {
+   "chunk_id": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet#005",
+   "doc": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+   "section": "Logging and Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html",
+   "text": "Why it matters: Even with proper validation and logic, monitoring is crucial for detecting abuse, fraud attempts, or system misbehavior.\n\nRecommendations:\n\nLog all payment attempts (initiation, redirects, callbacks) with timestamps and IPs.\n\nAlert on:\n\nUnexpected order statuses (e.g., \"Paid\" without any gateway confirmation).\n\nExcessive callback attempts for the same order.\n\nPayment failures followed by repeated attempts with identical data.\n\nLog callback identifiers, validation outcomes, and order correlation data instead of raw headers and bodies. Exclude credentials and unnecessary personal or payment data; apply the Logging Cheat Sheet's data-exclusion guidance.\n\nDo not retain sensitive authentication data, such as card verification codes or PIN data, after authorization, even if encrypted. Restrict access to permitted investigation records and define their retention period.\n\nIncorporate fraud and risk scoring mechanisms to detect carding attacks and other suspicious activities during payment execution."
+  },
+  {
+   "chunk_id": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet#006",
+   "doc": "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html",
+   "text": "OWASP WSTG: Payment Functionality\n\nAdyen: API idempotency\n\nAdyen: Verify HMAC signatures"
+  }
+ ]
+}

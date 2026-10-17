@@ -1,0 +1,133 @@
+{
+ "doc": "Threat_Modeling_Cheat_Sheet",
+ "title": "Threat Modeling Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#001",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Threat modeling is an important concept for modern application developers to understand. The goal of this cheatsheet is to provide a concise, but actionable, reference for both those new to threat modeling and those seeking a refresher. The OWASP Threat Modeling project provides further information on various aspects of threat modeling."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#002",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Overview",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "In the context of application security, threat modeling is a structured, repeatable process used to gain actionable insights into the security characteristics of a particular system. It involves modeling a system from a security perspective, identifying applicable threats based on this model, and determining responses to these threats. Threat modeling analyzes a system from an adversarial perspective, focusing on ways in which an attacker can exploit a system.\n\nThreat modeling is ideally performed early in the SDLC, such as during the design phase. Moreover, it is not something that is performed once and never again. A threat model is something that should be maintained, updated and refined alongside the system. Ideally, threat modeling should be integrated seamlessly into a team's normal SDLC process; it should be treated as a standard and necessary step in the process, not an add-on.\n\nAccording to the Threat Modeling Manifesto, the threat modeling process should answer the following four questions:\n\nWhat are we working on?\n\nWhat can go wrong?\n\nWhat are we going to do about it?\n\nDid we do a good enough job?\n\nThese four questions will act as the foundation for the four major phases described below."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#003",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Advantages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Before turning to an overview of the process, it may be worth addressing the question: why threat model? Why bother adding more work to the development process? What are the benefits? The following section will briefly outline some answers to these questions."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#004",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Advantages > Identify Risks Early On",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Threat modeling seeks to identify potential security issues during the design phase. This allows security to be \"built-into\" a system rather than \"bolted-on\". This is far more efficient than having to identify and resolve security flaws after a system is in production."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#005",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Advantages > Increased Security Awareness",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Proper threat modeling requires participants to think creatively and critically about the security and threat landscape of a specific application. It challenges individuals to \"think like an attacker\" and apply general security knowledge to a specific context. Threat modeling is also typically a team effort with members being encouraged to share ideas and provide feedback on others. Overall, threat modeling can prove to be a highly educational activity that benefits participants."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#006",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Advantages > Improved Visibility of Target of Evaluation (TOE)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Threat modeling requires a deep understanding of the system being evaluated. To properly threat model, one must understand data flows, trust boundaries, and other characteristics of the system. Thus improved visibility into a system and its interactions is one advantage of threat modeling."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#007",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "There is no universally accepted industry standard for the threat modeling process, no \"right\" answer for every use case. However, despite this diversity, most approaches do include the processes of system modeling, threat identification, and risk response in some form. Inspired by these commonalities and guided by the four key questions of threat modeling discussed above, this cheatsheet will break the threat modeling down into four basic steps: application decomposition, threat identification and ranking, mitigations, and review and validation. There are processes that are less aligned to this, including the Process for Attack Simulation and Threat Analysis (PASTA) and Operationally Critical Threat, Asset, and Vulnerability Evaluation (OCTAVE), each of which has passionate advocates."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#008",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > System Modeling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "The step of system modeling seeks to answer the question \"what are we working on\"? Without understanding a system, one cannot truly understand what threats are most applicable to it; thus, this step provides a critical foundation for subsequent activities. Although different techniques may be used in this first step of threat modeling, data flow diagrams (DFDs) are arguably the most common approach.\n\nDFDs visually model a system, its data flows, and interactions with external entities. Create them using a diagramming tool or a whiteboard, and save them in a form the team can update. For complex systems, use a high-level overview alongside more detailed diagrams of individual components.\n\nRegardless of how a DFD or comparable model is generated, it is important that the solution provides a clear view of trust boundaries, data flows, data stores, processes, and the external entities which may interact with the system. These often represent possible attack points and provide crucial input for the subsequent steps.\n\nAnother approach to Data Flow Diagrams (DFD) could be the brainstorming technique, which is an effective method for generating ideas and discovering the project's domain. Applying brainstorming in this context can bring numerous benefits, such as increased team engagement, unification of knowledge and terminology, a shared understanding of the domain, and quick identification of key processes and dependencies. One of the main arguments for using brainstorming is its flexibility and adaptability to almost any scenario, including business logic. Additionally, this technique is particularly useful when less technical individuals participate in the session, as it eliminates barriers related to understanding and applying the components of DFD models and their correctness."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#009",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > System Modeling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Brainstorming engages all participants, fostering better communication and mutual understanding of issues. Every team member has the opportunity to contribute, which increases the sense of responsibility and involvement. During a brainstorming session, participants can collaboratively define and agree on key terms and concepts, leading to a unified language used in the project. This is especially important in complex projects where different teams might have different approaches to terminology. Due to the dynamic nature of brainstorming, the team can quickly identify key business processes and their interrelations.\n\nIntegrating the results of brainstorming with formal modeling techniques can lead to a better understanding of the domain and more effective system design."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#010",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > Cloud Threat Modeling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Most modern systems are cloud-native or hybrid. Traditional threat modeling techniques (like STRIDE or DFDs) often need adaptation for cloud architectures, which introduce:\n\nShared responsibility models\n\nManaged services and APIs\n\nMulti-tenant and identity federation considerations\n\nDynamic infrastructure (IaC, serverless, containers)\n\nCloud-native systems introduce unique considerations for threat modeling due to their distributed, service-oriented nature and shared responsibility model. In this context, the threat modeling process should account for:\n\nCloud architecture components: virtual networks, IAM roles, managed services, and storage buckets.\n\nShared responsibility: understanding which security controls are managed by the provider vs. the customer.\n\nDynamic environments: container orchestration, serverless functions, and ephemeral infrastructure.\n\nCompliance and data residency: ensuring that workloads meet jurisdictional and privacy requirements."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#011",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > Threat Identification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "After the system has been modeled, it is now time to address the question of \"what can go wrong?\". This question must be explored with the inputs from the first step in mind; that is, it should focus on identifying and ranking threats within the context of the specific system being evaluated. In attempting to answer this question, threat modelers have a wealth of data sources and techniques at their disposal. For illustration purposes, this cheatsheet will leverage STRIDE; however, in practice, other approaches may be used alongside or instead of STRIDE.\n\nSTRIDE is a mature and popular threat modeling technique and mnemonic originally developed by Microsoft employees. To facilitate threat identification, STRIDE groups threats into one of six general prompts and engineers are encouraged to systematically consider how these general threats may materialize within the context of the specific system being evaluated. Each STRIDE threat may be considered a violation of a desirable security attribute; the categories and associated desirable attributes are as follows:\n\nThreat Category\n\nViolates\n\nExamples\n\nSpoofing\n\nAuthentication\n\nAn attacker steals the authentication token of a legitimate user and uses it to impersonate the user.\n\nTampering\n\nIntegrity\n\nAn attacker abuses the application to perform unintended updates to a database.\n\nRepudiation\n\nAccounting\n\nAn attacker manipulates logs to cover their actions.\n\nInformation Disclosure\n\nConfidentiality\n\nAn attacker extracts data from a database containing user account info.\n\nDenial of Service\n\nAvailability\n\nAn attacker locks a legitimate user out of their account by performing many failed authentication attempts.\n\nElevation of Privileges\n\nAuthorization\n\nAn attacker tampers with a JWT to change their role.\n\nUse STRIDE's six categories as prompts while reviewing the system model. Brainstorm threats with the team and record which components, data flows, or trust boundaries they affect."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#012",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > Threat Identification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "After possible threats have been identified, people will frequently rank them. In theory, ranking should be based on the mathematical product of an identified threat's likelihood and its impact. A threat that is likely to occur and result in serious damage would be prioritized much higher than one that is unlikely to occur and would only have a moderate impact. However, these both can be challenging to calculate, and they ignore the work to fix a problem. Some advocate for including that in a single prioritization."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#013",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > Threat Identification > Choosing a Threat Modeling Technique",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Start with STRIDE for a technical design, and select another technique when the scope requires a different view. The Software Engineering Institute comparison of threat modeling methods explains that methods focus on different concerns and may be combined.\n\nWhen the team needs to analyze\n\nConsider\n\nHow to use it\n\nSecurity threats in a technical design\n\nSTRIDE\n\nApply the six threat categories above to components, data flows, and trust boundaries.\n\nA high-value attacker goal or multi-step attack\n\nAttack trees\n\nStart with the attacker's goal and decompose the alternative or required paths to reach it.\n\nAbuse of a valid workflow or business rule\n\nMisuse or abuse cases\n\nExplore actions performed out of order, repeatedly, concurrently, or for an unintended outcome.\n\nPrivacy properties and harms\n\nLINDDUN (Linking, Identifying, Non-repudiation, Detecting, Data disclosure, Unawareness and Unintervenability, Non-compliance)\n\nApply privacy-specific prompts that are not fully represented by STRIDE's security properties.\n\nApplication threats with business impact\n\nPASTA\n\nConnect business objectives and technical requirements to application threats.\n\nOrganization-wide risk to critical assets\n\nOCTAVE\n\nAssess organizational risk and plan a security strategy for critical assets.\n\nApplication and operational threats across many teams\n\nVAST (Visual, Agile, and Simple Threat Modeling)\n\nMaintain separate application and operational threat models within development workflows.\n\nDo not add techniques only to make the model appear comprehensive. State why each technique fits the scope and record any concerns it does not address."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#014",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > Response and Mitigations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Equipped with an understanding of both the system and applicable threats, it is now time to answer \"what are we going to do about it\"? Each threat identified earlier must have a response. Threat responses are similar, but not identical, to risk responses. Adam Shostack lists the following responses:\n\nMitigate: Take action to reduce the likelihood that the threat will materialize.\n\nEliminate: Simply remove the feature or component that is causing the threat.\n\nTransfer: Allocate contractual or financial responsibility to another party. Risk transfer does not itself reduce the likelihood or harmful consequences of an event; document who owns the remaining controls and residual risk.\n\nAccept: Do not mitigate, eliminate, or transfer the risk because none of the above options are acceptable given business requirements or constraints.\n\nDocument each threat's response and turn agreed mitigations into actionable security requirements. Record how the team will implement each mitigation and why it accepts any remaining risk. Keep these decisions current as the system changes, as recommended by NIST SP 800-218, practice PW.1.2."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#015",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Addressing Each Question > Review and Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Finally, it is time to answer the question \"did we do a good enough job\"? The threat model must be reviewed by all stakeholders, not just the development or security teams. Areas to focus on include:\n\nDoes the DFD (or comparable) accurately reflect the system?\n\nHave all threats been identified?\n\nFor each identified threat, has a response strategy been agreed upon?\n\nFor identified threats for which mitigation is the desired response, have mitigation strategies been developed which reduce risk to an acceptable level?\n\nHas the threat model been formally documented? Are artifacts from the threat model process stored in such a way that it can be accessed by those with \"need to know\"?\n\nCan the agreed upon mitigations be tested? Can success or failure of the requirements and recommendations from the threat model be measured?"
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#016",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Threat Modeling and the Development Team > Challenges",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Threat modeling can be challenging for development teams for several key reasons. Firstly, many developers lack sufficient knowledge and experience in the field of security, which hinders their ability to effectively use methodologies and frameworks, identify, and model threats. Without proper training and understanding of basic security principles, developers may overlook potential threats or incorrectly assess their risks.\n\nAdditionally, the threat modeling process can be complex and time-consuming. It requires a systematic approach and in-depth analysis, which is often difficult to reconcile with tight schedules and the pressure to deliver new functionalities. Development teams may feel a lack of tools and resources to support them in this task, leading to frustration and discouragement.\n\nAnother challenge is the communication and collaboration between different departments within the organization. Without effective communication between development teams, security teams, and other stakeholders, threat modeling can be incomplete or misdirected."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#017",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "Threat Modeling and the Development Team > Addressing the Challenges",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "In many cases, the solution lies in inviting members of the security teams to threat modeling sessions, which can significantly improve the process. Security specialists bring essential knowledge about potential threats that is crucial for effective identification, risk analysis, and mitigation. Their experience and understanding of the latest trends and techniques used by cybercriminals can provide key insights for learning and developing the competencies of development teams. Such joint sessions not only enhance developers' knowledge but also build a culture of collaboration and mutual support within the organization, leading to a more comprehensive approach to security.\n\nTo change the current situation, organizations should invest in regular IT security training for their development teams. These training sessions should be conducted by experts and tailored to the specific needs of the team. Additionally, it is beneficial to implement processes and tools that simplify and automate threat modeling. These tools can help in identifying and assessing threats, making the process more accessible and less time-consuming.\n\nIt is also important to promote a culture of security throughout the organization, where threat modeling is seen as an integral part of the Software Development Life Cycle (SDLC), rather than an additional burden. Regular review sessions and cross-team workshops can improve collaboration and communication, leading to a more effective and comprehensive approach to security. Through these actions, organizations can make threat modeling a less burdensome and more efficient process, bringing real benefits to the security of their systems."
+  },
+  {
+   "chunk_id": "Threat_Modeling_Cheat_Sheet#018",
+   "doc": "Threat_Modeling_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Threat_Modeling_Cheat_Sheet.html",
+   "text": "Threat Modeling Manifesto\n\nSEI: Threat Modeling — A Summary of Available Methods\n\nNIST SP 800-218: Secure Software Development Framework"
+  }
+ ]
+}

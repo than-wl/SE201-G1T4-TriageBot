@@ -1,0 +1,63 @@
+{
+ "doc": "Micro_Frontend_Security_Cheat_Sheet",
+ "title": "Micro-Frontend Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#001",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "Micro-frontends combine independently deployed features in a host application, also called a shell. Separate repositories and deployment teams do not create browser security boundaries: the same-origin policy separates origins, not individual features within a page.\n\nThis cheat sheet covers the security decisions involved in composing these applications:\n\nChoose which features may share the host's browser privileges.\n\nLimit communication and data sharing between applications.\n\nEnforce authorization on the server for every request.\n\nControl which remote code each host release loads.\n\nFor general browser security controls, see the Web Frontend Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#002",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "Choose and Enforce Runtime Boundaries",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "Document the origin, deployment owner, and required data access of each micro-frontend before choosing a composition mechanism.\n\nComposition\n\nSecurity decision\n\nRemote JavaScript loaded into the host, including Module Federation\n\nTrust the remote with the host page's privileges. A different download origin does not sandbox the executing code.\n\nWeb Components in the host page\n\nTreat components as part of the same application. Shadow DOM (Document Object Model) and scoped styles do not isolate their scripts from the host.\n\nCross-origin iframe\n\nUse when the feature must be separated from the host's DOM and origin storage. Restrict its capabilities and explicitly control messages crossing the boundary.\n\nHTML fragments assembled on a server or at the edge\n\nReview fragments and their scripts as host content. Assembly before delivery does not create a browser isolation boundary."
+  },
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#003",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "Choose and Enforce Runtime Boundaries > Isolate Features with Different Trust Levels",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "Serve a less-trusted feature from a dedicated origin in an iframe. Apply an iframe sandbox, granting only capabilities the feature requires. Leave top-level navigation and popup permissions disabled unless necessary.\n\nDo not combine allow-scripts and allow-same-origin for content on the host's own origin; that combination can let the embedded application remove its sandbox. allow-same-origin preserves the frame's original origin; it does not make a cross-origin frame same-origin with the host.\n\nWithout allow-same-origin, a sandboxed document has an opaque origin, reported as \"null\" in messages. Do not trust \"null\" as a sender identity. If sensitive messaging requires an identifiable origin, use a dedicated cross-origin frame with a sandbox policy that preserves that origin.\n\nOrigin separation limits direct access to the host's DOM and storage. It does not authorize backend requests or make data deliberately sent to the frame confidential from that frame."
+  },
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#004",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "Choose and Enforce Runtime Boundaries > Control Remote Code and Deployments",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "For remotes executing in the host page, treat permission to publish a remote as permission to change the host's running application:\n\nLoad only approved HTTPS remote URLs from host-controlled configuration. Do not let query parameters or other untrusted input choose executable code.\n\nSelect immutable, reviewed releases, including entry scripts and their dependent chunks. Keep a known-good release available for rollback.\n\nSeparate deployment credentials for the shell and each remote. This limits direct changes to other deployments, but does not contain a compromised remote already trusted to execute in the shell. See the CI/CD Security Cheat Sheet.\n\nUse Subresource Integrity where the loader supports it. Verify coverage of dynamically loaded chunks; checking an entry script alone does not verify everything it later loads. Integrity checks detect changed bytes, not malicious behavior in an approved release.\n\nApply the host's Content Security Policy (CSP) to remote loading. A permitted script source is still trusted code; CSP does not isolate one allowed micro-frontend from another."
+  },
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#005",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "Restrict Cross-Application Communication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "Apply the general web messaging guidance to every host/frame pair: set an exact targetOrigin, match event.origin exactly, and validate message data. In addition, following the postMessage security guidance:\n\nDefine a small message contract for each pair. Accept only the message types and payload fields that the receiving feature needs.\n\nCheck event.source against the expected frame's contentWindow or the expected parent window, not only the origin. Several frames can share one origin.\n\nPass the minimum data needed for the operation. Avoid broadcasting credentials or sensitive state to every feature.\n\nThese checks identify the sending origin and window, not the current user's permissions. A message requesting a privileged operation must still lead to server-side authorization. They also do not protect against compromised code running inside the expected sender.\n\nA shared in-page event bus has no browser-enforced identity boundary between its participants. Do not use event names or application identifiers as proof of authority."
+  },
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#006",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "Enforce Backend Authorization and Limit Shared Data > Authorize Every Request on the Server",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "Neither the shell nor a remote micro-frontend can enforce authorization in client-side code. Route guards, hidden controls, and client-side role checks only affect presentation and can be bypassed.\n\nEnforce permissions for the requested operation, resource, and tenant on every backend request, regardless of which frontend initiated it. Do not trust a role, tenant identifier, or permission flag supplied by the shell or a remote. Use a shared server-side policy where appropriate so independently developed features apply consistent checks. See the Authorization Cheat Sheet."
+  },
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#007",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "Enforce Backend Authorization and Limit Shared Data > Keep Sensitive State Out of Shared Runtimes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "Browser storage is separated by origin. Storage key prefixes, separate state stores, and component boundaries do not provide security isolation between scripts in the same page. Treat data exposed in the page or origin storage as available to every remote executing there.\n\nKeep session identifiers out of localStorage and sessionStorage. When using a backend-for-frontend, keep upstream access tokens on the server and use a session cookie configured according to the Session Management Cheat Sheet. An HttpOnly cookie prevents JavaScript from reading the cookie, but compromised code in the host can still make authenticated requests. Apply cross-site request forgery protection to cookie-authenticated operations.\n\nReturn only data the authenticated user is authorized to access. Clear shared state and cached responses on logout or tenant changes to avoid displaying stale data. This cleanup does not replace backend tenant checks or protect information already exposed to a compromised remote."
+  },
+  {
+   "chunk_id": "Micro_Frontend_Security_Cheat_Sheet#008",
+   "doc": "Micro_Frontend_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Micro_Frontend_Security_Cheat_Sheet.html",
+   "text": "MDN: Same-Origin Policy\n\nMDN: postMessage Security Concerns\n\nMDN: iframe Sandbox"
+  }
+ ]
+}

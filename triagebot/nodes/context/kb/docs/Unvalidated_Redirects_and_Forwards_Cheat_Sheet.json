@@ -1,0 +1,70 @@
+{
+ "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+ "title": "Unvalidated Redirects and Forwards Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#001",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "Unvalidated redirects and forwards are possible when a web application accepts untrusted input that could cause the web application to redirect the request to a URL contained within untrusted input. By modifying untrusted URL input to a malicious site, an attacker may successfully launch a phishing scam and steal user credentials.\n\nBecause the server name in the modified link is identical to the original site, phishing attempts may have a more trustworthy appearance. Unvalidated redirect and forward attacks can also be used to maliciously craft a URL that would pass the application's access control check and then forward the attacker to privileged functions that they would normally not be able to access."
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#002",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Safe URL Redirects",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "When we want to redirect a user automatically to another page (without an action of the visitor such as clicking on a hyperlink) you might implement a code such as the following:\n\nJava\n\n```\nresponse.sendRedirect(\"http://www.mysite.com\");\n```\n\nPHP\n\n```\n<?php\n/* Redirect browser */\nheader(\"Location: http://www.mysite.com\");\n/* Exit to prevent the rest of the code from executing */\nexit;\n?>\n```\n\nASP .NET\n\n```\nResponse.Redirect(\"~/folder/Login.aspx\")\n```\n\nRails\n\n```\nredirect_to login_path\n```\n\nRust actix web\n\n```\n  Ok(HttpResponse::Found()\n        .insert_header((header::LOCATION, \"https://mysite.com/\"))\n        .finish())\n```\n\nIn the examples above, the URL is being explicitly declared in the code and cannot be manipulated by an attacker."
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#003",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Dangerous URL Redirects",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "The following examples demonstrate unsafe redirect and forward code."
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#004",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Dangerous URL Redirects > Dangerous URL Redirect Example 1",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "The following Java code receives the URL from the parameter named url (GET or POST) and redirects to that URL:\n\n```\nresponse.sendRedirect(request.getParameter(\"url\"));\n```\n\nThe following PHP code obtains a URL from the query string (via the parameter named url) and then redirects the user to that URL. Additionally, the PHP code after this header() function will continue to execute, so if the user configures their browser to ignore the redirect, they may be able to access the rest of the page.\n\n```\n$redirect_url = $_GET['url'];\nheader(\"Location: \" . $redirect_url);\n```\n\nA similar example of C# .NET Vulnerable Code:\n\n```\nstring url = request.QueryString[\"url\"];\nResponse.Redirect(url);\n```\n\nAnd in Rails:\n\n```\nredirect_to params[:url]\n```\n\nRust actix web\n\n```\n  Ok(HttpResponse::Found()\n        .insert_header((header::LOCATION, query_string.path.as_str()))\n        .finish())\n```\n\nThe above code is vulnerable to an attack if no validation or extra method controls are applied to verify the certainty of the URL. This vulnerability could be used as part of a phishing scam by redirecting users to a malicious site.\n\nIf no validation is applied, a malicious user could create a hyperlink to redirect your users to an unvalidated malicious website, for example:\n\n```\n http://example.com/example.php?url=http://malicious.example.com\n```\n\nThe user sees the link directing to the original trusted site (example.com) and does not realize the redirection that could take place"
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#005",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Dangerous URL Redirects > Dangerous URL Redirect Example 2",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "ASP .NET MVC 1 & 2 websites are particularly vulnerable to open redirection attacks. In order to avoid this vulnerability, you need to apply MVC 3.\n\nThe code for the LogOn action in an ASP.NET MVC 2 application is shown below. After a successful login, the controller returns a redirect to the returnUrl. You can see that no validation is being performed against the returnUrl parameter.\n\nASP.NET MVC 2 LogOn action in AccountController.cs (see Microsoft Docs link provided above for the context):\n\n```\n[HttpPost]\n public ActionResult LogOn(LogOnModel model, string returnUrl)\n {\n   if (ModelState.IsValid)\n   {\n     if (MembershipService.ValidateUser(model.UserName, model.Password))\n     {\n       FormsService.SignIn(model.UserName, model.RememberMe);\n       if (!String.IsNullOrEmpty(returnUrl))\n       {\n         return Redirect(returnUrl);\n       }\n       else\n       {\n         return RedirectToAction(\"Index\", \"Home\");\n       }\n     }\n     else\n     {\n       ModelState.AddModelError(\"\", \"The user name or password provided is incorrect.\");\n     }\n   }\n\n   // If we got this far, something failed, redisplay form\n   return View(model);\n }\n```"
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#006",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Dangerous URL Redirects > Dangerous Forward Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "When applications allow user input to forward requests between different parts of the site, the application must check that the user is authorized to access the URL, perform the functions it provides, and it is an appropriate URL request.\n\nIf the application fails to perform these checks, an attacker crafted URL may pass the application's access control check and then forward the attacker to an administrative function that is not normally permitted.\n\nExample:\n\n```\nhttp://www.example.com/function.jsp?fwd=admin.jsp\n```\n\nThe following code is a Java servlet that will receive a GET request with a URL parameter named fwd in the request to forward to the address specified in the URL parameter. The servlet will retrieve the URL parameter value from the request and complete the server-side forward processing before responding to the browser.\n\n```\npublic class ForwardServlet extends HttpServlet\n{\n  protected void doGet(HttpServletRequest request, HttpServletResponse response)\n                    throws ServletException, IOException {\n    String query = request.getQueryString();\n    if (query.contains(\"fwd\"))\n    {\n      String fwd = request.getParameter(\"fwd\");\n      try\n      {\n        request.getRequestDispatcher(fwd).forward(request, response);\n      }\n      catch (ServletException e)\n      {\n        e.printStackTrace();\n      }\n    }\n  }\n}\n```"
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#007",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Preventing Unvalidated Redirects and Forwards",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "Safe use of redirects and forwards can be done in a number of ways:\n\nSimply avoid using redirects and forwards.\n\nIf used, do not allow the URL as user input for the destination.\n\nWhere possible, have the user provide short name, ID or token which is mapped server-side to a full target URL.\n\nThis provides the highest degree of protection against the attack tampering with the URL.\n\nBe careful that this doesn't introduce an enumeration vulnerability where a user could cycle through IDs to find all possible redirect targets\n\nIf user input can’t be avoided, ensure that the supplied value is valid, appropriate for the application, and is authorized for the user.\n\nFor local return URLs, use a framework helper that rejects non-local destinations, such as ASP.NET Core LocalRedirect or IsLocalUrl.\n\nIf external destinations are required, allow-list explicitly approved destinations using the parsed URL components, as described below.\n\nForce all redirects to first go through a page notifying users that they are going off of your site, with the destination clearly displayed, and have them click a link to confirm."
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#008",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "Preventing Unvalidated Redirects and Forwards > Validating URLs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "Use a maintained URL parser compatible with the redirect API and browser URL interpretation. Compare the parsed scheme, canonical host, and effective port against an explicit allowlist; constrain the path when only specific endpoints are permitted. Reject userinfo and ambiguous input, and redirect using the validated URL rather than transforming it afterward. Do not use raw prefix or suffix matching: GitLab demonstrates how userinfo and misleading hostnames bypass such checks. A server-side mapping from an approved destination ID remains preferable to accepting arbitrary URLs."
+  },
+  {
+   "chunk_id": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet#009",
+   "doc": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Unvalidated_Redirects_and_Forwards_Cheat_Sheet.html",
+   "text": "CWE Entry 601 on Open Redirects\n\nMicrosoft: Prevent Open Redirect Attacks in ASP.NET Core"
+  }
+ ]
+}

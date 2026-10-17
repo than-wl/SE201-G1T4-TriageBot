@@ -1,0 +1,119 @@
+{
+ "doc": "NoSQL_Security_Cheat_Sheet",
+ "title": "NoSQL Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#001",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "NoSQL databases (MongoDB, CouchDB, Cassandra etc.) power many modern applications with flexible schemas and horizontal scale. This cheat sheet summarizes guidance to reduce risk when using NoSQL systems."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#002",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Threats & Common Failure Modes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "NoSQL Injection — Unsafe construction of query objects or query strings from untrusted input.\n\nExposed Management Interfaces — Admin GUIs, database ports or REST endpoints exposed to the internet.\n\nWeak/No Authentication & Authorization — Default open access or excessive privileges for clients.\n\nInsecure Network Exposure — No TLS, open ports, insufficient network segmentation.\n\nInsecure Defaults — Default admin accounts, default passwords, unsecured configs.\n\nPoor Access Control Models — Coarse roles allowing lateral abuse.\n\nInsecure Serialization / Deserialization — Remote code execution via unsafe object deserialization.\n\nMisconfigured CORS / Public APIs — APIs accidentally allow cross-origin requests or wide access.\n\nCredential & Secret Leaks — Hardcoded DB credentials in code, images, CI logs.\n\nUnsafe Backup Exposure — Backups left unencrypted or publicly accessible.\n\nSupply-chain / Dependency Risks — Vulnerable drivers, ORMs/ODMs, or plugins."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#003",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Secure-by-Design Principles",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Treat all input as untrusted — validate, sanitize, and normalize.\n\nUse least privilege — narrow roles for users, services, and operators.\n\nDefense in depth — combine network controls, auth, input validation, and monitoring.\n\nSecure defaults — change default ports/accounts, enable auth and TLS by default.\n\nAutomate secrets & rotation — vaults and short-lived credentials.\n\nMonitor & audit — log access and detect anomalies."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#004",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Prevent NoSQL Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Unsafe (string-based filter building — Node.js / MongoDB):\n\n```\n// DANGEROUS: building query from untrusted input\nconst q = \"{ name: '\" + req.query.name + \"' }\";\nconst filter = eval(\"(\" + q + \")\"); // NEVER do this\ndb.collection('users').find(filter)\n```\n\nSafe (use driver query objects / parameterization):\n\nBuilding a query object does not prevent operator injection when an untrusted value is itself an object. For example, MongoDB interprets { name: { $ne: \"\" } } as a not-equal query. Validate the expected scalar type before constructing the filter; do not pass client-supplied objects through as field values.\n\n```\nconst name = req.query.name;\nif (typeof name !== 'string') throw new Error(\"Invalid name\");\nconst filter = { name };\ndb.collection('users').find(filter)\n```\n\nAdditional pattern rejection:\n\n```\n// Reject a pattern in the serialized request body.\nif (JSON.stringify(req.body).includes('\"$')) throw Error(\"Invalid input\");\n```\n\nThis JSON.stringify() check is a denylist, not an operator allowlist. It also rejects ordinary string values that begin with $, and it does not validate allowed fields or their types. Use field-specific validation before building queries.\n\nNotes:\n\nDo not accept raw JSON fragments from the client to execute as queries.\n\nDisallow client-controlled query operators (like $where, $regex, or $expr) unless strictly required and validated.\n\nFor text-based search parameters, use safe driver APIs (e.g., $text with controlled input)."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#005",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Use Secure Driver / ODM Patterns",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Prefer high-level APIs (ODM/ORM) that build queries safely (e.g., Mongoose, Spring Data, Datastax driver patterns).\n\nAvoid .eval()-like functionality and raw query execution from untrusted data.\n\nSanitize and validate any raw expressions before passing to the DB."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#006",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Use Secure Driver / ODM Patterns > Example — PyMongo safe usage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "```\nfrom pymongo import MongoClient\nclient = MongoClient(uri, tls=True)\ncollection = client.mydb.users\nif not isinstance(email_input, str):\n    raise ValueError(\"Invalid email\")\nuser = collection.find_one({\"email\": email_input})\n```"
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#007",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Authentication & Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Enable authentication (do not run databases unauthenticated).\n\nUse role-based access control (RBAC), least privilege for service accounts.\n\nUse separate users for admin/backup/readonly/application.\n\nUse identity federation or short-lived credentials when supported (e.g., AWS IAM -> DynamoDB).\n\nFor more information please check following cheat sheets:\n\nAuthentication Cheat Sheet\n\nAuthorization Cheat Sheet"
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#008",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Network & Transport Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Bind services to internal interfaces, not 0.0.0.0.\n\nUse network segmentation / private subnets and security groups.\n\nEnforce TLS (in transit encryption) for driver connections and admin consoles.\n\nTurn off remote management or restrict it to admin networks/VPNs."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#009",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Configuration Hardening",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Change default ports and disable sample/demo users.\n\nTurn off or restrict features that execute code on the server, such as MongoDB server-side JavaScript.\n\nRequire TLS for internal replication links where supported."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#010",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Secrets Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Do not hardcode DB credentials — use a secret manager (Vault, AWS Secrets Manager, Azure Key Vault).\n\nAvoid baking credentials into container images or environment variables in CI logs.\n\nRotate credentials regularly and use ephemeral tokens when possible."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#011",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Logging, Monitoring & Auditing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Enable audit logging (connection attempts, admin actions, failed auth).\n\nSend logs to a tamper-evident SIEM.\n\nAlert on anomalous patterns (spike in queries, slow queries, large data exports).\n\nMonitor for suspicious commands (e.g., admin actions, $where, map-reduce jobs)."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#012",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Practical Defenses & Examples > Backups & Snapshots",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Encrypt backups at rest and during transfer.\n\nRestrict access to backup storage.\n\nSanitize backups for PII as required by policy.\n\nValidate restore procedures regularly."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#013",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Quick NoSQL Security Checklist",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Enable authentication & RBAC\n\nEnforce TLS for client and node communication\n\nBind DB to internal IPs / use private networks\n\nUse least privilege service accounts\n\nDisallow client-controlled query operators unless validated\n\nAvoid raw query execution / eval on server\n\nStore credentials in secret manager & rotate them\n\nHarden configs (disable unsafe defaults)\n\nEncrypt and secure backups\n\nMonitor/audit DB access and admin actions\n\nKeep DB and drivers patched"
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#014",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Do’s and Don’ts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Do:\n\nUse driver query objects rather than building query strings.\n\nValidate and whitelist user-supplied fields (columns/keys).\n\nRestrict management interfaces and require MFA for admin access.\n\nAutomate security testing in CI/CD pipelines.\n\nDon’t:\n\nExpose DB ports/admin consoles to the public Internet.\n\nAccept raw JSON queries from clients or eval untrusted strings.\n\nUse root/admin DB accounts for application connections.\n\nRely only on network controls to protect badly written queries."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#015",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "Examples of Dangerous Patterns (brief)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "Accepting client-controlled $where expressions executes untrusted JavaScript inside MongoDB and can consume excessive resources. Use standard query operators instead, and disable server-side scripting when it is not needed.\n\nConcatenating user input into query language strings or shell commands for DB tools.\n\nLeaving MongoDB unsecured (no auth) listening on public IP."
+  },
+  {
+   "chunk_id": "NoSQL_Security_Cheat_Sheet#016",
+   "doc": "NoSQL_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/NoSQL_Security_Cheat_Sheet.html",
+   "text": "MongoDB: Security Checklist for Self-Managed Deployments\n\nAmazon DynamoDB: Preventative Security Best Practices\n\nWSTG - Testing for NoSQL Injection"
+  }
+ ]
+}

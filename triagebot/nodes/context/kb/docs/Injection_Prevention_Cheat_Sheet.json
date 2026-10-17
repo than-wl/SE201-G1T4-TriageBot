@@ -1,0 +1,182 @@
+{
+ "doc": "Injection_Prevention_Cheat_Sheet",
+ "title": "Injection Prevention Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#001",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "This article is focused on providing clear, simple, actionable guidance for preventing the entire category of Injection flaws in your applications. Injection attacks, especially SQL Injection, are unfortunately very common.\n\nApplication accessibility is a very important factor in protection and prevention of injection flaws. Only the minority of all applications within a company/enterprise are developed in house, where as most applications are from external sources. Open source applications give at least the opportunity to fix problems, but closed source applications need a different approach to injection flaws.\n\nInjection flaws occur when an application sends untrusted data to an interpreter. Injection flaws are very prevalent, particularly in legacy code, often found in SQL queries, LDAP queries, XPath queries, OS commands, program arguments, etc. Injection flaws are easy to discover when examining code, but more difficult via testing. Scanners and fuzzers can help attackers find them.\n\nDepending on the accessibility different actions must be taken in order to fix them. It is always the best way to fix the problem in source code itself, or even redesign some parts of the applications. But if the source code is not available or it is simply uneconomical to fix legacy software only virtual patching makes sense."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#002",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Application Types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "Three classes of applications can usually be seen within a company. Those 3 types are needed to identify the actions which need to take place in order to prevent/fix injection flaws."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#003",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Application Types > A1: New Application",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "A new web application in the design phase, or in early stage development."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#004",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Application Types > A2: Productive Open Source Application",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "An already productive application, which can be easily adapted. A Model-View-Controller (MVC) type application is just one example of having a easily accessible application architecture."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#005",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Application Types > A3: Productive Closed Source Application",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "A productive application which cannot or only with difficulty be modified."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#006",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "There are several forms of injection targeting different technologies including SQL queries, LDAP queries, XPath queries and OS commands."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#007",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "The most famous form of injection is SQL Injection where an attacker can modify existing database queries. For more information see the SQL Injection Prevention Cheat Sheet.\n\nBut also LDAP, SOAP, XPath and REST based queries can be susceptible to injection attacks allowing for data retrieval or control bypass."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#008",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > SQL Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "An SQL injection attack consists of insertion or \"injection\" of either a partial or complete SQL query via the data input or transmitted from the client (browser) to the web application.\n\nA successful SQL injection attack can read sensitive data from the database, modify database data (insert/update/delete), execute administration operations on the database (such as shutdown the DBMS), recover the content of a given file existing on the DBMS file system or write files into the file system, and, in some cases, issue commands to the operating system. SQL injection attacks are a type of injection attack, in which SQL commands are injected into data-plane input in order to affect the execution of predefined SQL commands.\n\nSQL Injection attacks can be divided into the following three classes:\n\nInband: data is extracted using the same channel that is used to inject the SQL code. This is the most straightforward kind of attack, in which the retrieved data is presented directly in the application web page.\n\nOut-of-band: data is retrieved using a different channel (e.g., an email with the results of the query is generated and sent to the tester).\n\nInferential or Blind: there is no actual transfer of data, but the tester is able to reconstruct the information by sending particular requests and observing the resulting behavior of the DB Server.\n\nHow to test for the issue During code review\n\nplease check for any queries to the database are not done via prepared statements.\n\nIf dynamic statements are being made please check if the data is sanitized before used as part of the statement.\n\nAuditors should always look for uses of sp_execute, execute or exec within SQL Server stored procedures. Similar audit guidelines are necessary for similar functions for other vendors.\n\nAutomated Exploitation"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#009",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > SQL Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "Most of the situation and techniques below here can be performed in a automated way using some tools. In this article the tester can find information how to perform an automated auditing using SQLMap\n\nEqually Static Code Analysis Data flow rules can detect of unsanitized user controlled input can change the SQL query.\n\nStored Procedure Injection\n\nWhen using dynamic SQL within a stored procedure, the application must properly sanitize the user input to eliminate the risk of code injection. If not sanitized, the user could enter malicious SQL that will be executed within the stored procedure.\n\nTime delay Exploitation technique\n\nThe time delay exploitation technique is very useful when the tester find a Blind SQL Injection situation, in which nothing is known on the outcome of an operation. This technique consists in sending an injected query and in case the conditional is true, the tester can monitor the time taken to for the server to respond. If there is a delay, the tester can assume the result of the conditional query is true. This exploitation technique can be different from DBMS to DBMS (check DBMS specific section).\n\n```\nhttp://www.example.com/product.php?id=10 AND IF(version() like '5%', sleep(10), 'false'))--\n```\n\nIn this example the tester is checking whether the MySql version is 5.x or not, making the server delay the answer by 10 seconds. The tester can increase the delay time and monitor the responses. The tester also doesn't need to wait for the response. Sometimes they can set a very high value (e.g. 100) and cancel the request after some seconds.\n\nOut of band Exploitation technique"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#010",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > SQL Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "This technique is very useful when the tester find a Blind SQL Injection situation, in which nothing is known on the outcome of an operation. The technique consists of the use of DBMS functions to perform an out of band connection and deliver the results of the injected query as part of the request to the tester's server. Like the error based techniques, each DBMS has its own functions. Check for specific DBMS section.\n\nRemediation Defense Option 1: Prepared Statements (with Parameterized Queries)\n\nPrepared statements ensure that an attacker is not able to change the intent of a query, even if SQL commands are inserted by an attacker. In the safe example below, if an attacker were to enter the userID of tom' or '1'='1, the parameterized query would not be vulnerable and would instead look for a username which literally matched the entire string tom' or '1'='1.\n\nDefense Option 2: Stored Procedures\n\nThe difference between prepared statements and stored procedures is that the SQL code for a stored procedure is defined and stored in the database itself, and then called from the application.\n\nBoth of these techniques have the same effectiveness in preventing SQL injection so your organization should choose which approach makes the most sense for you. Stored procedures are not always safe from SQL injection. However, certain standard stored procedure programming constructs have the same effect as the use of parameterized queries when implemented safely* which is the norm for most stored procedure languages.\n\nNote: 'Implemented safely' means the stored procedure does not include any unsafe dynamic SQL generation.\n\nDefense Option 3: Allow-List Input Validation"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > SQL Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "Various parts of SQL queries aren't legal locations for the use of bind variables, such as the names of tables or columns, and the sort order indicator (ASC or DESC). In such situations, input validation or query redesign is the most appropriate defense. For the names of tables or columns, ideally those values come from the code, and not from user parameters.\n\nBut if user parameter values are used to make different for table names and column names, then the parameter values should be mapped to the legal/expected table or column names to make sure unvalidated user input doesn't end up in the query. Please note, this is a symptom of poor design and a full rewrite should be considered if time allows.\n\nDefense Option 4: Escaping All User-Supplied Input\n\nThis technique should only be used as a last resort, when none of the above are feasible. Input validation is probably a better choice as this methodology is frail compared to other defenses and we cannot guarantee it will prevent all SQL Injection in all situations.\n\nThis technique is to escape user input before putting it in a query. It's usually only recommended to retrofit legacy code when implementing input validation isn't cost effective.\n\nExample code - Java Safe Java Prepared Statement Example\n\nThe following code example uses a PreparedStatement, Java's implementation of a parameterized query, to execute the same database query.\n\n```\n// This should REALLY be validated too\nString custname = request.getParameter(\"customerName\");\n// Perform input validation to detect attacks\nString query = \"SELECT account_balance FROM user_data WHERE user_name = ?\";\nPreparedStatement pstmt = connection.prepareStatement(query);\npstmt.setString(1, custname);\nResultSet results = pstmt.executeQuery();\n```\n\nWe have shown examples in Java, but practically all other languages, including Cold Fusion, and Classic ASP, support parameterized query interfaces.\n\nSafe Java Stored Procedure Example"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#012",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > SQL Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "The following code example uses a CallableStatement, Java's implementation of the stored procedure interface, to execute the same database query. The sp_getAccountBalance stored procedure would have to be predefined in the database and implement the same functionality as the query defined above.\n\n```\n// This should REALLY be validated\nString custname = request.getParameter(\"customerName\");\ntry {\n CallableStatement cs = connection.prepareCall(\"{call sp_getAccountBalance(?)}\");\n cs.setString(1, custname);\n ResultSet results = cs.executeQuery();\n // Result set handling...\n} catch (SQLException se) {\n // Logging and error handling...\n}\n```"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#013",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > LDAP Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "LDAP Injection is an attack used to exploit web based applications that construct LDAP statements based on user input. When an application fails to properly sanitize user input, it's possible to modify LDAP statements through techniques similar to SQL Injection. LDAP injection attacks could result in the granting of permissions to unauthorized queries, and content modification inside the LDAP tree. For more information on LDAP Injection attacks, visit LDAP injection.\n\nLDAP injection attacks are common due to two factors:\n\nThe lack of safer, parameterized LDAP query interfaces\n\nThe widespread use of LDAP to authenticate users to systems.\n\nHow to test for the issue During code review\n\nPlease check for any queries to the LDAP escape special characters, see here.\n\nAutomated Exploitation\n\nScanner module of tool like OWASP ZAP have module to detect LDAP injection issue.\n\nRemediation Use the right LDAP encoding function\n\nLDAP distinguished names and LDAP search filters require different escaping rules, defined by RFC 4514 and RFC 4515, respectively. Avoid custom escaping code and use a library encoder for the correct context. See the LDAP Injection Prevention Cheat Sheet for current defenses and examples."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#014",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > XPath Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "See the XPath Injection Prevention Cheat Sheet for defenses and a parameterized query example."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#015",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Scripting languages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "All scripting languages used in web applications have a form of an eval call which receives code at runtime and executes it. If code is crafted using unvalidated and unescaped user input code injection can occur which allows an attacker to subvert application logic and eventually to gain local access.\n\nEvery time a scripting language is used, the actual implementation of the 'higher' scripting language is done using a 'lower' language like C. If the scripting language has a flaw in the data handling code 'Null Byte Injection' attack vectors can be deployed to gain access to other areas in memory, which results in a successful attack."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#016",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Operating System Commands",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "OS command injection is a technique used via a web interface in order to execute OS commands on a web server. The user supplies operating system commands through a web interface in order to execute OS commands.\n\nAny web interface that is not properly sanitized is subject to this exploit. With the ability to execute OS commands, the user can upload malicious programs or even obtain passwords. OS command injection is preventable when security is emphasized during the design and development of applications."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#017",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Operating System Commands > How to test for the issue",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "During code review\n\nCheck if any command execute methods are called and in unvalidated user input are taken as data for that command.\n\nOut side of that, appending a semicolon to the end of a URL query parameter followed by an operating system command, will execute the command. %3B is URL encoded and decodes to semicolon. This is because the ; is interpreted as a command separator.\n\nExample: http://sensitive/something.php?dir=%3Bcat%20/etc/passwd\n\nIf the application responds with the output of the /etc/passwd file then you know the attack has been successful. Many web application scanners can be used to test for this attack as they inject variations of command injections and test the response.\n\nEqually Static Code Analysis tools check the data flow of untrusted user input into a web application and check if the data is then entered into a dangerous method which executes the user input as a command."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#018",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Operating System Commands > Remediation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "If it is considered unavoidable the call to a system command incorporated with user-supplied, the following two layers of defense should be used within software in order to prevent attacks\n\nParameterization - If available, use structured mechanisms that automatically enforce the separation between data and command. These mechanisms can help to provide the relevant quoting, encoding.\n\nInput validation - the values for commands and the relevant arguments should be both validated. There are different degrees of validation for the actual command and its arguments:\n\nWhen it comes to the commands used, these must be validated against a list of allowed commands.\n\nIn regards to the arguments used for these commands, they should be validated using the following options:\n\nPositive or allowlist input validation - where are the arguments allowed explicitly defined\n\nAllow-list Regular Expression - where is explicitly defined a list of good characters allowed and the maximum length of the string. Ensure that metacharacters like & | ; $ > < \\ \\ !` and whitespaces are not part of the Regular Expression. For example, the following regular expression only allows lowercase letters and numbers, and does not contain metacharacters. The length is also being limited to 3-10 characters:\n\n^[a-z0-9]{3,10}$"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#019",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Operating System Commands > Example code - Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "Incorrect Usage\n\n```\nProcessBuilder b = new ProcessBuilder(\"C:\\\\DoStuff.exe -arg1 -arg2\");\n```\n\nThis creates a builder with one command-list element, not a program followed by two arguments. ProcessBuilder represents the executable and its arguments as a list. The snippet does not start a process or demonstrate shell-command injection.\n\nCorrect Usage\n\nThis illustrative example starts a process with a modified working directory and passes the executable and each argument separately. Keep the executable and working directory trusted, and validate any untrusted arguments for the invoked program. Argument separation does not replace argument validation.\n\n```\nProcessBuilder pb = new ProcessBuilder(\"TrustedCmd\", \"TrustedArg1\", \"TrustedArg2\");\nMap<String, String> env = pb.environment();\npb.directory(new File(\"TrustedDir\"));\nProcess p = pb.start();\n```"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#020",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Network Protocols",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "Web applications often communicate with network daemons (like SMTP, IMAP, FTP) where user input becomes part of the communication stream. Here it is possible to inject command sequences to abuse an established session."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#021",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Injection Prevention Rules > Rule #1 (Perform proper input validation)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "Perform proper input validation. Positive or allowlist input validation with appropriate canonicalization is also recommended, but is not a complete defense as many applications require special characters in their input."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#022",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Injection Prevention Rules > Rule #2 (Use a safe API)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "The preferred option is to use a safe API which avoids the use of the interpreter entirely or provides a parameterized interface. Be careful of APIs, such as stored procedures, that are parameterized, but can still introduce injection under the hood."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#023",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Injection Prevention Rules > Rule #3 (Contextually escape user data)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "If a parameterized API is not available, you should carefully escape special characters using the specific escape syntax for that interpreter."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#024",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Other Injection Cheatsheets",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "SQL Injection Prevention Cheat Sheet\n\nOS Command Injection Defense Cheat Sheet\n\nLDAP Injection Prevention Cheat Sheet\n\nInjection Prevention Cheat Sheet in Java"
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#025",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "RFC 4514: LDAP Distinguished Names\n\nRFC 4515: LDAP Search Filters\n\nOracle JDBC: Using Prepared Statements"
+  }
+ ]
+}

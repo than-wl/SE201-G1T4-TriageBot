@@ -1,0 +1,350 @@
+{
+ "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+ "title": "Zero Trust Architecture Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#001",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "This cheat sheet will help you implement Zero Trust Architecture (ZTA) in your organization. Zero Trust means \"never trust, always verify\" - you don't trust anyone or anything by default, even if they're inside your network.\n\nTraditional security works like a castle with walls. Once you're inside, you can access everything. Zero Trust is different - it checks every person and device every time they try to access something, just like having security guards at every door. This approach prevents attackers who get inside your network from moving around and stealing data."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#002",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "These principles come from NIST SP 800-207:"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#003",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles > 1. All Data Sources and Computing Services are Resources",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Everything in your network is a resource that needs protection - servers, databases, cloud services, IoT devices, and user devices. Don't assume anything is safe just because it's \"internal\" to your network. Each resource needs its own security controls."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#004",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles > 2. All Communication is Secured Regardless of Network Location",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Every connection must be encrypted and authenticated, whether it's between your office and the cloud, between internal systems, or from home to work. Network location doesn't determine trust level. Use strong encryption (TLS 1.3 or better) for everything."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#005",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles > 3. Access to Resources is Granted on a Per-Session Basis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Authorize each resource session with the least privileges needed. Authorization for one resource must not automatically grant access to another. NIST SP 800-207, Section 2.1 permits a sufficiently recent trust evaluation; it does not require a new interactive login for every request. Set session expiration and reauthentication requirements according to resource sensitivity and risk."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#006",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles > 4. Access is Determined by Dynamic Policy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Access decisions consider multiple factors: who's asking, what device they're using, where they're connecting from, what time it is, and how they normally behave. These policies change based on risk. Someone accessing payroll during work hours from their work laptop is low risk. The same person downloading lots of data at 2 AM from a coffee shop is high risk."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#007",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles > 5. Monitor and Measure the Security Posture of All Assets",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Continuously check the health and security of all devices and systems. If you can't see it, you can't protect it. This includes monitoring for patches, antivirus status, configuration changes, and suspicious behavior. Assets that fall out of compliance lose access."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#008",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles > 6. All Authentication and Authorization is Dynamic and Strictly Enforced",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Enforce authentication and authorization before granting access, and reevaluate ongoing sessions according to policy. Trigger reauthentication or reauthorization when policy requires it, such as after a time limit, a request for another resource, or suspicious activity. Revoke access when the applicable policy no longer permits it, balancing security with availability and usability as described in NIST SP 800-207, Section 2.1."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#009",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Principles > 7. Collect Information to Improve Security Posture",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Collect asset posture, traffic, and access-request data to improve security decisions. Assess and mitigate the privacy risks of this monitoring, as described in NIST SP 800-207, Section 6.2. Apply the Logging Cheat Sheet guidance on excluding sensitive data and protecting collected logs."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#010",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Core Zero Trust Architecture Components",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Zero Trust uses three main parts that work together:\n\nPolicy Engine - This makes decisions about whether to allow or block access. It looks at user identity, device health, location, behavior, and risk scores. The tricky part is making policies that are secure but don't make work impossible.\n\nPolicy Administrator - This takes the decision from the Policy Engine and tells the enforcement systems what to do. When the Policy Engine says \"allow access but require extra verification,\" the Policy Administrator figures out the details and sends commands to the right systems.\n\nPolicy Enforcement Point - These actually block or allow access attempts. This includes firewalls, proxy servers, application gateways, and API gateways. The important thing is that enforcement happens everywhere, not just at your network edge.\n\nThese components decide, establish, monitor, and terminate resource access according to policy; this does not require a new interactive login at every enforcement point."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#011",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Zero Trust tackles security problems that traditional approaches can't handle effectively. Here's how it works in practice:"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#012",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges > Traditional vs. Zero Trust Responses",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Attack Scenario\n\nTraditional Security Response\n\nZero Trust Response\n\nStolen credentials\n\nReset password, add basic MFA\n\nContinuous risk assessment, device verification, behavioral analysis - access denied even with valid credentials if risk is high\n\nInsider threat\n\nTrust employees inside network perimeter\n\nVerify every action regardless of user location, role, or tenure - no implicit trust\n\nLateral movement\n\nPerimeter security with flat internal network\n\nMicro-segmentation blocks movement between systems, each connection verified\n\nCompromised device\n\nVPN access grants network access\n\nDevice health continuously monitored, access immediately revoked if compromise detected\n\nPrivileged account abuse\n\nPermanent admin rights with periodic reviews\n\nJust-in-time access with automatic expiration and continuous monitoring\n\nData exfiltration\n\nNetwork monitoring and DLP at perimeter\n\nData-level access controls with real-time behavior analysis"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#013",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges > Modern Threats That Require Zero Trust",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Some contemporary attack patterns are specifically designed to bypass traditional security. Zero Trust provides the advanced capabilities needed to defend against them:\n\nSupply Chain Attacks - Malicious code hidden in trusted software (like SolarWinds) bypasses perimeter security completely. Zero Trust responds with application-level identity verification, runtime behavior monitoring, and micro-segmentation to limit damage.\n\nCloud Configuration Drift - Misconfigured cloud resources expose data outside traditional network boundaries. Zero Trust uses policy-as-code, continuous compliance monitoring, and resource-level access controls to prevent unauthorized data access.\n\nAPI-First Attacks - Direct attacks on APIs bypass network security entirely. Zero Trust requires authentication and authorization for every API call, validates request schemas, and uses behavioral analysis to detect abuse patterns.\n\nIdentity-Based Attacks - Sophisticated attacks like Pass-the-Hash and Golden Ticket steal identity tokens to impersonate legitimate users. Zero Trust uses short-lived tokens with continuous validation, device binding, and behavioral analysis to detect unusual access patterns."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#014",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges > ZTA Decision-Making in Action",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Here are three examples that show how Zero Trust actually works when it's set up correctly:"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#015",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges > ZTA Decision-Making in Action > Case Study 1: Working Late from Home",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "What happened: A finance manager needed to check payroll data from home at 11:30 PM to prepare for an early morning meeting. She'd never accessed payroll outside normal work hours before.\n\nHow Zero Trust handled it:\n\nThe system noticed several risk factors: weird time (way outside 9-5), home network instead of office, and sensitive data (payroll has personal info and salaries). But it also saw good signs: company laptop with current security, valid device certificate, and the right job role.\n\nInstead of just blocking her, the system asked for extra verification - she had to use her hardware security key and approve a notification on her phone. Then it let her in but with limits: 90-minute session, detailed logging of everything she did, and extra verification needed if she tried to download large amounts of data.\n\nWhy this worked: She could finish her urgent work without calling IT, but the system kept strong security controls that matched the risk level."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#016",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges > ZTA Decision-Making in Action > Case Study 2: New Contractor Laptop",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "What happened: An external contractor working on a software project needed to access the development systems from a brand-new laptop that had never connected before.\n\nHow Zero Trust handled it:\n\nThe system saw an unknown device trying to connect and immediately blocked direct network access. But instead of just saying \"no,\" it sent the contractor to a secure browser platform where he could access only the development tools he needed.\n\nAll his work happened in an isolated cloud environment - he could write code, read documentation, and work with the team, but nothing actually touched his laptop. The whole session was recorded for security review, and he couldn't download files or access anything outside his project.\n\nWhy this worked: The contractor stayed productive without creating security risks, and the company kept complete control over its code and data."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#017",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges > ZTA Decision-Making in Action > Case Study 3: Cross-Team Project Access",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "What happened: A marketing manager suddenly started looking at engineering documents she'd never accessed before. The access was legitimate (for a cross-team project), but the system couldn't know that automatically.\n\nHow Zero Trust handled it:\n\nThe unusual access pattern triggered a medium-risk alert. Instead of blocking her right away, the system required manager approval through an automated workflow. It sent notifications to her boss and the engineering team lead explaining what she wanted to access.\n\nOnce approved, she got temporary access that would expire in 24 hours. During that time, everything she viewed was logged in detail, and the security team got a summary of what she accessed. If she needed more time, she'd have to request an extension with a business reason.\n\nWhy this worked: Cross-team collaboration wasn't blocked by security rules, but the company maintained visibility and control over sensitive technical information."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#018",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "How Zero Trust Addresses Modern Security Challenges > ZTA Decision-Making in Action > What These Cases Show",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "In each situation, Zero Trust didn't just say \"yes\" or \"no\" - it made smart decisions that balanced security with business needs. The system looked at multiple risk factors, applied appropriate controls, and kept detailed records for compliance and investigation.\n\nThis smart approach is what separates good Zero Trust implementations from basic access control. The technology adapts to the situation instead of forcing users to work around rigid security rules.\n\nNow that you understand the principles and approach, let's get into the practical details of implementation. Start with identity and access management - this is the foundation everything else builds on."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#019",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Identity and Access Management > Multi-Factor Authentication (MFA)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "You need MFA for everyone - employees, contractors, and partners. Here's what works best:\n\nMost Secure (Highly Phishing-Resistant):\n\nFIDO2 hardware security keys: Use with a PIN, biometric activation, or a separate password to provide MFA\n\nWebAuthn-based platform authenticators: Passkeys with required user verification using a device PIN or biometrics\n\nSmart cards or PIV cards: PKI-based authentication\n\nBiometrics alone do not provide MFA. They can activate a physical cryptographic authenticator, combining possession of that authenticator with a biometric match. See NIST SP 800-63B-4, Section 3.2.3 and the Passkey Security Cheat Sheet.\n\nGood Options:\n\nMobile apps: TOTP-based authenticator applications\n\nBackup codes: For when primary methods fail\n\nAvoid:\n\nSMS-based MFA: Vulnerable to SIM swapping and phishing attacks\n\nSet up conditional access so high-risk situations require stronger authentication. OMB M-22-09 mandates phishing-resistant MFA for U.S. federal agencies."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#020",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Identity and Access Management > Managing User Accounts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Use one identity system: Don't have multiple user databases\n\nAutomate account creation: Set up role-based access automatically\n\nReview access regularly: Check who has access every quarter\n\nSeparate admin accounts: Don't use regular accounts for administration\n\nFollow comprehensive authentication best practices when implementing user account management."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#021",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Identity and Access Management > Access Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Follow these rules for giving people access:\n\nLeast privilege: Give the minimum access needed to do the job\n\nJust-in-time access: Provide elevated access only when needed for a specific task\n\nNo permanent admin rights: Remove always-on administrative privileges\n\nSmart decisions: Consider user role, location, and device when granting access"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#022",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Device Security > Trusting Devices",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Before you trust any device, make sure it meets your standards:\n\nRegister all devices: Keep a list of approved devices with unique certificates\n\nContinuous health assessment: Real-time monitoring of antivirus status, OS patches, security configurations, and device security posture\n\nCertificate-based device identity: Use PKI certificates to uniquely identify and authenticate each device\n\nVulnerability scanning: Regular assessment of device security posture and patch levels\n\nRevoke trust when compromised: Automatically remove access if device security is compromised"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#023",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Device Security > Protecting Endpoints",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Every device needs these protections:\n\nAnti-malware software: Real-time protection against viruses and malware\n\nBehavior monitoring: Watch for suspicious device activity\n\nFull disk encryption: Encrypt all data on the device\n\nRemote wipe: Ability to erase lost or stolen devices"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#024",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Network Architecture > Micro-Segmentation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Instead of one big network, create small isolated segments:\n\nSeparate by application: Each app gets its own network segment\n\nBlock by default: Don't allow traffic unless specifically permitted\n\nMonitor internal traffic: Watch data moving between systems\n\nUse encrypted communications: All communication between systems must be encrypted"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#025",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Network Architecture > Network Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Implement these network protections:\n\nDNS filtering: Block access to malicious websites\n\nWeb filtering: Control what websites users can visit\n\nLimit remote access: Prefer access to specific resources over broad network access. During migration, restrict and monitor any VPN access that remains necessary; a VPN connection alone must not authorize access to other resources.\n\nMonitor traffic: Analyze all network connections"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#026",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Application and Data Protection > Securing Applications",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Protect your applications with these controls:\n\nIdentity-aware proxy: Check user identity before allowing app access\n\nWeb Application Firewalls (WAFs): Use request filtering as defense in depth for common attack patterns, such as those covered by OWASP CRS. A WAF does not replace application authorization or business-rule enforcement; enforce access control in trusted server-side code.\n\nAPI security gateways: Authenticate every API call, validate request schemas, and enforce rate limits for microservices communication using REST security best practices\n\nSecure development: Build security into your development process"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#027",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Application and Data Protection > Protecting Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Keep your data safe with these methods:\n\nClassify data: Label data by sensitivity level\n\nUse encryption: Protect data whether it's stored or moving with proper cryptographic storage\n\nPrevent data loss: Monitor and block unauthorized data transfers\n\nLog all access: Record who accesses what data and when"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#028",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Monitoring and Analytics > Security Operations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Set up these monitoring capabilities:\n\nSIEM integration: Collect and analyze logs from all systems\n\nThreat hunting: Actively look for signs of attack\n\nAutomated response: Automatically block suspicious activity\n\nBehavior analysis: Learn normal patterns and detect anomalies"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#029",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Monitoring and Analytics > Key Metrics to Track",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Monitor these important numbers:\n\nHow often authentication succeeds vs. fails\n\nNumber of security policy violations\n\nHow quickly you detect threats (MTTD)\n\nHow quickly you respond to incidents (MTTR)"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#030",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Implementation Steps",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Plan migration around your resources, risks, and dependencies. NIST SP 800-207, Section 7 recommends incremental migration and allows existing and Zero Trust workflows to coexist. The phases below are illustrative activities, not a fixed schedule."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#031",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Implementation Steps > Phase 1: Get the Basics Right",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Before you invest in new Zero Trust technologies, you need to know what you're protecting:\n\nFigure out what you have - Make a list of all users, devices, applications, and how data moves around. This sounds easy but takes longer than you think. You'll find forgotten systems, shadow IT, and connections nobody documented.\n\nSet up strong MFA everywhere - Use phishing-resistant MFA as described in Multi-Factor Authentication, rather than treating a biometric match alone as MFA. Plan for user training since this changes how people log in.\n\nNarrow remote access - Move suitable workflows to application-specific access, such as Zero Trust Network Access (ZTNA). Test authentication and resource authorization before retiring existing access paths. Restrict and monitor legacy VPN paths during the transition rather than treating network admission as authorization.\n\nControl admin access - Set up privileged access management (PAM) for administrative accounts. Remove permanent admin rights and switch to temporary access. This may slow some processes initially."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#032",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Implementation Steps > Phase 2: Add Zero Trust Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Now you start building actual Zero Trust capabilities:\n\nBreak up your network - Split your flat network into smaller, separate segments. Start with your most important applications. This is technically hard and network teams might not like the extra work.\n\nMonitor devices constantly - Set up systems that continuously check device health, updates, and security. Devices that aren't secure automatically lose access or get limited access. This creates pressure for people to keep their devices updated.\n\nSecure applications properly - Enforce identity-aware access at application entry points and resource-level authorization within the application. WAF filtering complements these checks; it does not establish the user's right to access an object or perform a business action."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#033",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Implementation Steps > Phase 3: Advanced Capabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Build advanced capabilities:\n\nAdd behavior monitoring - Use systems that learn how users and devices normally act. When behavior looks weird, the system can automatically change access or ask for more verification. This needs machine learning and lots of data.\n\nAutomate responses - Build tools that can automatically isolate compromised accounts, quarantine suspicious devices, and update security policies based on new threats. The goal is to respond faster than humans can.\n\nUse your data - Take all the security data you're collecting and use it to improve your policies. This phase is about fine-tuning rather than building new stuff."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#034",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Implementation Steps > Phase 4: Keep Getting Better (Ongoing)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Zero Trust is never done:\n\nStay current - Update threat intelligence, adjust risk scoring, and change policies based on new attack methods. What worked last year might not work now.\n\nPlan ahead - Start thinking about post-quantum cryptography, new authentication methods, and AI-powered security tools.\n\nMeasure what matters - Track how fast you detect threats, how fast you respond, how many policy violations happen, and whether users are happy. Use this data to keep improving.\n\nUse the CISA Zero Trust Maturity Model v2.0 to assess progress across identity, devices, networks, applications and workloads, and data. Its Traditional, Initial, Advanced, and Optimal stages describe capabilities, not calendar deadlines; pillars may progress at different rates."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#035",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Legacy System Challenges > Common Problems",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Legacy systems present some of the biggest challenges in Zero Trust implementations, and they're often where attackers focus their efforts because these systems are harder to secure.\n\nWeak authentication is probably the most common issue. Many older systems only support basic username/password authentication with no option for multi-factor authentication. Some were built when passwords were considered sufficient, and adding modern authentication requires significant modification or replacement. This creates a security gap where your most sensitive systems often have the weakest authentication.\n\nNetwork dependencies are another major problem. Older systems were designed for flat, trusted networks where everything inside the perimeter was considered safe. These systems often require direct network access between components and can't work properly when you implement micro-segmentation. They expect to communicate freely with other systems without going through identity checks.\n\nNo encryption is unfortunately common in legacy environments. Many older systems send data in plain text because they were designed for internal networks that were considered secure. Adding encryption often requires significant changes to both the systems and the network infrastructure they depend on.\n\nLimited logging makes it hard to monitor legacy systems for security threats. Older systems often don't provide the detailed security logs you need for modern threat detection and compliance requirements. You can't manage what you can't measure, and poor logging leaves blind spots in your security monitoring."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#036",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Legacy System Challenges > Solutions That Work",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "You can protect legacy systems without completely replacing them, though it requires creative approaches:\n\nSecurity proxies and wrappers let you add modern authentication and security controls in front of systems that can't support them natively. The proxy handles strong authentication, multi-factor verification, session management, and other Zero Trust verification, then passes authenticated requests to the legacy system using whatever method it understands. This might include identity-aware proxies, application firewalls, or API gateways. This approach works particularly well for web-based legacy applications.\n\nNetwork isolation puts legacy systems in separate, heavily monitored network zones with very restricted access. You can't apply Zero Trust principles directly to these systems, but you can control how they communicate with everything else. Monitor all traffic to and from these zones and require modern authentication for any access to the zone itself.\n\nProtocol translation helps when you have systems that use old authentication methods but can't be modified. Translation gateways can convert modern authentication tokens (like SAML or OAuth) to whatever format the legacy system expects (like Kerberos or basic auth), bridging the gap between old and new security approaches.\n\nEnhanced monitoring becomes critical for systems that can't log properly on their own. Use network-based detection tools to monitor traffic patterns, connection attempts, and data flows for systems that don't provide detailed security logs. This won't give you the same visibility as modern applications, but it's better than having no monitoring at all."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#037",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Cloud Security > Multi-Cloud Considerations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "When using multiple cloud providers:\n\nConnect identities: Use the same login across all clouds\n\nSecure connections: Encrypt communication between cloud environments\n\nConsistent policies: Apply the same security rules everywhere\n\nCentralized monitoring: See security events from all clouds in one place"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#038",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Cloud Security > Container Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "For containerized applications:\n\nService mesh: Automatically handle identity and encryption between containers\n\nNetwork policies: Control which containers can talk to each other\n\nScan images: Check container images for vulnerabilities\n\nRuntime protection: Monitor container behavior for threats"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#039",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Common Mistakes to Avoid > Technical Mistakes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Relying only on network security - Many organizations think they can just add network controls and call it Zero Trust. But Zero Trust is fundamentally about identity-based security, not network security. If you're still thinking in terms of \"inside\" and \"outside\" the network, you're missing the point. Focus on verifying identity and device health for every access request, regardless of where it comes from.\n\nNot monitoring enough - Zero Trust generates massive amounts of security data, and some organizations get overwhelmed and don't use it effectively. You need comprehensive logging and analysis capabilities, not just basic monitoring. Without proper visibility, you can't detect threats, tune policies, or prove compliance. Invest in SIEM tools and security analytics platforms that can handle the data volume, following comprehensive logging practices.\n\nMaking security too hard for users - If your Zero Trust implementation makes it painful for people to do their jobs, they'll find workarounds that bypass your security. The key is balancing security with user experience. Use risk-based authentication so low-risk activities are seamless, and only add friction when the risk level justifies it. Test your policies with real users before rolling them out.\n\nForgetting about legacy systems - Many Zero Trust projects focus on new, cloud-native applications and ignore older systems that can't support modern authentication. These legacy systems often contain your most sensitive data and become the weakest links in your security chain. You need a strategy for protecting systems that can't be easily upgraded."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#040",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Common Mistakes to Avoid > Organizational Mistakes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "No executive support - Zero Trust implementation requires significant changes to how people work, substantial budget for new tools, and coordination across multiple teams. Without strong leadership commitment and budget approval, your project will stall when it encounters resistance or resource constraints. Get executive sponsorship before you start, not after you run into problems.\n\nSkipping user training - Zero Trust changes how people authenticate, access applications, and handle security alerts. If you don't invest in educating your staff about why these changes are necessary and how to work with them, you'll face constant resistance and support tickets. Plan for comprehensive training programs, not just email announcements.\n\nSkipping migration validation - Pilot changes on selected workflows, verify that legitimate access still works, and monitor policy decisions before expanding deployment. Choose the next workflow based on risk and dependencies, as described in NIST SP 800-207, Section 7.3.\n\nVendor lock-in - Zero Trust involves many different technologies, and some vendors will try to sell you a complete \"Zero Trust platform\" that locks you into their ecosystem. Keep your options open by choosing solutions that support open standards and can integrate with multiple vendors. Your security architecture should be flexible enough to adapt as threats and technologies evolve."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#041",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Compliance Benefits",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Zero Trust architecture helps organizations meet various compliance requirements:"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#042",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Compliance Benefits > Framework Mapping",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Compliance Standard\n\nZero Trust Controls That Help\n\nSOC 2\n\nStrong access controls, continuous monitoring, audit logging\n\nISO 27001\n\nRisk-based access decisions, information security management\n\nPCI DSS\n\nNetwork segmentation, encrypted communications, access monitoring\n\nHIPAA\n\nGranular access controls, data encryption, audit trails\n\nGDPR\n\nPrivacy-by-design, data access logging, breach detection\n\nOMB M-22-09\n\nPhishing-resistant MFA, device certificates, encrypted DNS"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#043",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Technology Components",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Zero Trust requires several technology categories working together:\n\nIdentity and Access Management: Strong authentication (MFA) and risk-based access decisions\n\nZero Trust Network Access (ZTNA): Resource-specific access controls, with restricted legacy access paths during migration\n\nWeb Application Security: Protect applications and APIs from OWASP Top 10 attacks\n\nSecurity Monitoring: Real-time visibility and automated response to threats"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#044",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Technology Components > Policy-as-Code + Continuous Verification + Telemetry Signals",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "The following are implementation options for cloud-native workloads, not universal Zero Trust requirements. NIST SP 800-207, Section 2.1 defines technology-agnostic principles. For implementation guidance, see Kubernetes policy management and CI/CD Security."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#045",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Technology Components > Policy-as-Code + Continuous Verification + Telemetry Signals > 1. Policy-as-Code (PaC)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Policy-as-code can make supported policy changes version-controlled, testable, and auditable. Choose enforcement mechanisms that fit the resources and workflows being protected.\n\nKey principles:\n\nVersion-controlled policies\n\nTested within CI/CD pipelines\n\nAutomatically enforced at deployment\n\nTraceable via audit logs\n\nRecommended tools:\n\nOpen Policy Agent (OPA) / Gatekeeper\n\nKyverno\n\nCilium Network Policies\n\nCloud provider policy engines (AWS SCP, Azure Policy, GCP Org Policy)\n\nUse cases:\n\nAdmission control\n\nWorkload security (privileges, capabilities, runtime profiles)\n\nNetwork segmentation (L3–L7)\n\nImage and artifact security\n\nRBAC enforcement"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#046",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Technology Components > Policy-as-Code + Continuous Verification + Telemetry Signals > 2. Continuous Verification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Automated deployment and configuration checks can help enforce workload security policies. They complement the resource-access authentication and authorization described above.\n\nVerification examples:\n\nWorkload identity verification (SPIFFE/SPIRE, IAM)\n\nImage signature validation (cosign / sigstore)\n\nSecurity quality gates (SAST, IaC scanning, image scanning)\n\nRBAC drift detection\n\nNetwork policy drift detection\n\nAutomated enforcement at admission\n\nAdmission checks can reject deployments that violate configured policies; they do not replace runtime resource authorization."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#047",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Technology Components > Policy-as-Code + Continuous Verification + Telemetry Signals > 3. Telemetry Signals",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Zero Trust decisions rely on telemetry signals collected continuously across all layers.\n\nSuggested signals to collect:\n\nIdentity telemetry: user + service + workload identity correlation\n\nNetwork telemetry: anomalous east-west traffic, failed login attempts\n\nRuntime telemetry: syscall anomalies, unauthorized execs, file system changes\n\nDeployment telemetry: manifest change anomalies, signature mismatches\n\nVulnerability telemetry: CVSS, exploitability, runtime reachability\n\nRecommended tools:\n\nCilium Hubble\n\nFalco or Tetragon (eBPF-based runtime signals)\n\nOpenTelemetry (OTel)\n\nIstio / Linkerd telemetry"
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#048",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "Technology Components > Policy-as-Code + Continuous Verification + Telemetry Signals > 4. Zero Trust Security Loop",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "Policy-as-Code → Policies are defined in code repositories and tested.\n\nContinuous Verification → Every change and deployment is validated against policies.\n\nTelemetry Signals → Runtime signals provide continuous monitoring.\n\nFeedback Loop → Collected signals are used to refine policies.\n\nUse this feedback loop to improve the selected controls without treating a particular tool or deployment pipeline as proof of Zero Trust."
+  },
+  {
+   "chunk_id": "Zero_Trust_Architecture_Cheat_Sheet#049",
+   "doc": "Zero_Trust_Architecture_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Zero_Trust_Architecture_Cheat_Sheet.html",
+   "text": "NIST SP 800-207: Zero Trust Architecture\n\nCISA: Zero Trust Maturity Model, Version 2.0"
+  }
+ ]
+}

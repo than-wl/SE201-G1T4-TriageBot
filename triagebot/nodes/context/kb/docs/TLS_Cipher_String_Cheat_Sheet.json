@@ -1,0 +1,14 @@
+{
+ "doc": "TLS_Cipher_String_Cheat_Sheet",
+ "title": "DEPRECATED: TLS Cipher String Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/TLS_Cipher_String_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "TLS_Cipher_String_Cheat_Sheet#001",
+   "doc": "TLS_Cipher_String_Cheat_Sheet",
+   "section": "DEPRECATED: TLS Cipher String Cheat Sheet",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/TLS_Cipher_String_Cheat_Sheet.html",
+   "text": "The TLS Cipher String Cheat Sheet has been deprecated.\n\nPlease visit the Transport Layer Security Cheat Sheet instead."
+  }
+ ]
+}

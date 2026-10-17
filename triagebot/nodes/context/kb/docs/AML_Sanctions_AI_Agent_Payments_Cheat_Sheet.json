@@ -1,0 +1,308 @@
+{
+ "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+ "title": "AML and Sanctions Compliance for AI Agent Payments Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#001",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "AI agents are initiating regulated financial transactions in production. Mastercard Agent Pay, Visa Intelligent Commerce, and Google A2A payments are live. Using an AI agent does not remove applicable Anti-Money Laundering (AML) or sanctions obligations. Determine the requirements for the institution, transaction, customer relationship, and jurisdiction before implementing the controls below.\n\nThis cheat sheet provides practical controls for fintechs, banks, and payment processors when autonomous AI agents -- rather than human users in browser sessions -- initiate or facilitate regulated payments. It covers agent identity verification, entity screening, audit trail requirements, and fail-closed enforcement.\n\nUse the MCP authentication and authorization guidance when exposing screening tools through MCP. Message-level signing is an optional additional control, not a core MCP requirement. The signed-audit and receipt design in Sections 4 and 8-10 is one option for systems that need verification beyond a transport connection."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#002",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Regulatory Context",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "The applicable obligations depend on the institution's regulated role, the transaction, and the jurisdictions involved. Have compliance owners identify the requirements the payment service must enforce:\n\nBank Secrecy Act (BSA): US BSA regulations establish recordkeeping, reporting, and other requirements for covered financial institutions and businesses. Determine which requirements apply to the service's activities.\n\nOffice of Foreign Assets Control (OFAC) Sanctions: Comply with applicable sanctions prohibitions and blocking requirements. Screening supports those controls, but OFAC does not impose a general requirement to scan names or use screening software. Complete the necessary analysis before concluding a transaction.\n\nFinancial Crimes Enforcement Network (FinCEN): Apply Customer Identification Program (CIP) and Customer Due Diligence (CDD) requirements to the relevant customers and beneficial owners under the institution's applicable rules and exceptions. The CDD rule covers specified types of financial institutions; authenticating software does not identify the legal customer. CIP guidance distinguishes an account owner from a person merely acting as that owner's agent.\n\nUK Financial Sanctions: The Office of Financial Sanctions Implementation (OFSI) provides guidance on applying the sanctions requirements relevant to the parties and activities. OFSI assesses whether due diligence is appropriate to the sanctions risk and transaction; it does not prescribe one level or type of due diligence for every case.\n\nEU Sanctions: Identify the applicable sanctions regimes and legal acts. The European Commission's sanctions resources distinguish the consolidated list of designated parties from the legal acts governing sanctions; a list check alone does not establish compliance with every restriction."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#003",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Regulatory Context",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Funds-Transfer Recordkeeping: Follow the requirements applicable to the institution's role and payment type. The FFIEC examination manual describes thresholds, exceptions, and required originator and beneficiary information; it does not establish a universal requirement for a cryptographic software-agent identity."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#004",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Regulatory Context > Key Principle",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Separate legal customer and counterparty identification from software authentication and authorization. Record which customer an agent acts for and what it may do as an application security control. Have compliance owners define the required screening, monitoring, reporting, and retention rules; do not treat an agent credential or a successful list match check as proof that all legal obligations are satisfied."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#005",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 1: Agent Identity Before Screening",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Before an agent is permitted to access sanctions screening services or initiate a payment, its identity must be cryptographically verified. Self-declared identity headers (e.g. X-Agent-ID, X-Agent-Role) without cryptographic proof MUST be rejected. For protected MCP endpoints, follow the MCP authorization profile and validate authorization on every request."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#006",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 1: Agent Identity Before Screening > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Require agents to present a cryptographic identity credential (e.g. signed passport, ECDSA key pair, or verifiable credential) before accessing screening endpoints.\n\nBind the agent's identity to the screening request so the audit trail proves which specific agent performed the check.\n\nVerify the agent's trust level before granting access. Not all agents should have the same level of access to sanctions data. Use graduated trust levels (e.g. L0 to L4) with increasing access rights.\n\nRecord the agent's public key fingerprint or passport ID in every screening request log entry."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#007",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 1: Agent Identity Before Screening > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Accept self-declared identity claims without cryptographic verification.\n\nAllow agents to access screening endpoints without authentication.\n\nTrust caller-supplied identity headers merely because TLS terminates at a proxy. If forwarding a validated client-certificate identity, accept it only over a trusted proxy path and remove caller-supplied certificate headers.\n\nAllow agents to escalate their own trust level or modify their own permissions."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#008",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 2: Entity Screening",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Entity screening against global sanctions lists (OFAC SDN, UK Sanctions List, EU Consolidated, UN Consolidated) remains fundamentally unchanged when agents are the callers. The screening engine matches names, addresses, vessels, and identifiers against the lists. What changes is the context around the screening request. The authoritative source for the United States is the OFAC Sanctions List Search."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#009",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 2: Entity Screening > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Screen all counterparties (individuals, businesses, vessels, addresses) against applicable sanctions lists before processing a payment.\n\nInclude the agent's identity and trust level in the screening context so that downstream systems can distinguish agent-initiated screens from human-initiated screens.\n\nReturn structured, machine-readable screening results to the agent. Agents cannot interpret PDF reports or HTML pages. Results should be JSON with clear match/no-match/partial-match indicators and match scores.\n\nEnforce minimum match thresholds. An agent should not be able to override or lower the match threshold below the institution's configured minimum.\n\nLog every screening request and result with the agent's cryptographic identity, a timestamp, and a unique request nonce."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#010",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 2: Entity Screening > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Allow agents to bypass screening by calling payment endpoints directly without a prior screening step.\n\nAccept unsigned or invalidly signed results when the chosen message-signing profile requires signatures. TLS protects the connection, but does not prevent a compromised component from changing data after termination.\n\nAllow agents to cache screening results beyond a configurable time window. Sanctions lists are updated frequently and stale results create compliance gaps.\n\nExpose raw sanctions list data to agents. Agents should call a screening API, not download the full list."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#011",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 3: Agent Operator Screening",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Identify the customer and organization responsible for operating the agent. Determine which parties require sanctions screening and due diligence under the institution's approved compliance program. Do not assume that every developer, deployer, or operator is the legal customer merely because it provides the software; FinCEN's CIP guidance makes customer identification depend on the account relationship. Bind the authenticated agent to the verified account and its delegated permissions as an application security control."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#012",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 3: Agent Operator Screening > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Verify the organization responsible for the agent during onboarding and screen the parties identified by the institution's compliance program against applicable sanctions lists.\n\nDefine rescreening triggers and frequency in the compliance program, including relevant list and ownership changes; restrict agent access when the required assessment does not permit the relationship to continue.\n\nRecord the operator's screening status as part of the agent's trust profile.\n\nRequire agents to declare their operator identity as part of their cryptographic passport or identity credential."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#013",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 3: Agent Operator Screening > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Assume that because an agent was verified once, its operator remains non-sanctioned indefinitely.\n\nAllow agents to operate without a declared operator. Anonymous agents MUST NOT access sanctions screening services.\n\nAccept operator identity claims without independent verification against business registries or KYB (Know Your Business) databases."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#014",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 4: Signed Audit Trail",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Keep tamper-evident audit records that associate the authenticated agent with the screening request and result. The following bullets describe an optional signed, hash-chained audit design. The MCPS Internet-Draft separately proposes a message-signing and replay-protection layer; it is an individual work in progress, not an adopted MCP standard. Select a reviewed, interoperable profile when this protection is needed, and apply the log-protection controls regardless of the chosen design."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#015",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 4: Signed Audit Trail > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Sign every screening request with the agent's private key, including a unique nonce and timestamp.\n\nSign every screening response with the server's private key, including its own nonce and timestamp.\n\nChain audit entries using cryptographic hashes (each entry includes the SHA-256 hash of the previous entry) to create a tamper-evident log.\n\nInclude in each audit entry: agent identity (public key fingerprint or passport ID), tool invoked, hash of the screening arguments (not the raw arguments, for privacy), screening result (match/no-match/partial), timestamp, and the hash of the previous audit entry.\n\nRetain audit records for the period required by applicable regulations (typically 5 years for BSA/AML).\n\nMake audit records exportable in a machine-readable format for regulatory examination."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#016",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 4: Signed Audit Trail > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Rely on application-level logging (e.g. console.log, syslog) as the sole audit trail. These logs are not tamper-evident and can be modified without detection.\n\nStore audit records on the agent's device or in agent-controlled storage. Audit records must be stored on infrastructure controlled by the financial institution.\n\nOmit the agent's identity from audit records. A screening record that does not identify which agent performed the check is useless for regulatory purposes.\n\nAllow gaps in the hash chain. A broken chain indicates tampering or data loss and must trigger an alert."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#017",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 5: Fail-Closed Enforcement",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Treat an incomplete or unavailable screening result as unresolved, never as clearance. Withhold transaction execution while the required assessment is unresolved; use bounded retries, manual review, or rejection according to the institution's approved policy. OFAC advises financial institutions not to conclude transactions before the necessary analysis is complete. A service failure is not itself a confirmed sanctions match; compliance owners must define the appropriate response for each case."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#018",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 5: Fail-Closed Enforcement > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Hold or reject the payment when required screening cannot be completed; do not release it unless the required assessment permits proceeding.\n\nReturn a clear, structured error to the agent indicating that screening failed and the transaction cannot proceed.\n\nLog all screening failures with the same level of detail as successful screens, including the reason for failure.\n\nAlert compliance teams when screening failure rates exceed a threshold, as this may indicate a denial-of-service attack designed to force fail-open behavior.\n\nImplement circuit breakers that halt agent-initiated payments entirely if the screening service is unavailable for an extended period."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#019",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 5: Fail-Closed Enforcement > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Allow transactions to proceed when screening results are unavailable, ambiguous, or timed out.\n\nImplement fallback logic that bypasses screening under any condition.\n\nAllow agents to retry screening indefinitely without rate limiting (this could be used to probe for timing-based information leakage).\n\nReturn generic errors that do not distinguish between \"screening service unavailable\" and \"screening completed with a match.\""
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#020",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 6: Trust-Tiered Rate Limiting",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Not all agents should be treated equally. Unverified or low-trust agents should be rate-limited more aggressively than verified, high-trust agents. Rate limiting should be based on the agent's cryptographic identity, not IP address (which can be shared or spoofed). This pattern operationalises OWASP API Security Top 10 API4:2023 (Unrestricted Resource Consumption) in the agent-payment context."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#021",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 6: Trust-Tiered Rate Limiting > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Implement per-agent rate limits based on cryptographic identity (public key fingerprint or passport ID).\n\nSet lower rate limits for newly registered or low-trust agents (e.g. L0/L1) and higher limits for verified, high-trust agents (e.g. L3/L4).\n\nInclude rate limit status in screening responses (remaining quota, reset time) so agents can adjust their behavior.\n\nDowngrade an agent's rate limit allocation if anomalous behavior is detected (e.g. sudden spike in screening requests, unusual entity patterns)."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#022",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 6: Trust-Tiered Rate Limiting > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Apply rate limits based solely on IP address. Multiple agents may share an IP, and a single agent may use multiple IPs.\n\nSet rate limits so high that they provide no meaningful protection against abuse.\n\nAllow agents to circumvent rate limits by creating multiple identities. Tie agent identities to verified operator accounts to prevent sybil attacks."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#023",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 7: Self-Hosted vs Hosted Screening Architecture",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Institutions must decide whether to run their own screening engine or use a hosted screening API. Both architectures are valid, but each has different security considerations when agents are the callers. The microservice-boundary trust posture in this section follows NIST SP 800-209 (Security Guidelines for Storage Infrastructure) applied to the screening service plane."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#024",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 7: Self-Hosted vs Hosted Screening Architecture > Self-Hosted Screening",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "The institution maintains the sanctions lists, the matching engine, and the screening API on its own infrastructure.\n\nAgent requests stay within the institution's network boundary.\n\nThe institution has full control over list update frequency, matching algorithms, and data retention.\n\nRequires operational investment in list ingestion, normalization, and matching quality."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#025",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 7: Self-Hosted vs Hosted Screening Architecture > Hosted Screening (Third-Party API)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "The institution calls a third-party screening API (e.g. a sanctions screening provider).\n\nAgent identity credentials and screening data leave the institution's network boundary.\n\nThe institution must ensure the third-party provider meets applicable regulatory requirements.\n\nData minimization principles apply -- send only the minimum data needed for screening, not the agent's full context."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#026",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 7: Self-Hosted vs Hosted Screening Architecture > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Encrypt all screening requests in transit (TLS 1.2 minimum) regardless of architecture.\n\nIf the threat model requires verification across untrusted intermediaries, use a reviewed message-signing profile supported by both endpoints; define trusted keys, signed fields, replay handling, and verification failures.\n\nVerify the screening provider's response signatures when the agreed profile requires them."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#027",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 7: Self-Hosted vs Hosted Screening Architecture > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Send agent private keys or full identity credentials to a third-party screening provider. Send only the minimum identity attributes needed.\n\nAssume TLS protects data after the connection terminates. Protect each subsequent connection and decide which intermediaries are trusted to read or modify requests."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#028",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 8: Receipt Canonicalization (RFC 8785 / JCS)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "When systems independently serialize the same JSON object for hashing or signature verification, they need an agreed byte representation. JSON permits variable key order, whitespace, and number formatting, so two systems can produce different bytes for the same logical object.\n\nJSON Canonicalization Scheme (JCS), RFC 8785 provides one deterministic JSON representation for that use case. It is not required for every signed-token format: a JSON Web Signature (JWS) verifier checks the encoded signing input rather than reserializing the payload. Cross-system verification also needs an agreed signature profile and a trusted verification key. Canonicalization alone supplies neither."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#029",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 8: Receipt Canonicalization (RFC 8785 / JCS) > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "If the receipt profile calls for independently serializing JSON, canonicalize the agreed payload before signing and before verification.\n\nUse the hashing and signing procedure required by the chosen signature profile and API; do not add a separate prehash unless that profile requires it.\n\nRecord the canonicalization and signature profile used so a verifier can reproduce the signing input."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#030",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 8: Receipt Canonicalization (RFC 8785 / JCS) > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "For a profile that requires reconstructing signed JSON, don't rely on framework-default or pretty-printed serialization; key order and whitespace can differ across systems.\n\nDon't assume two services emit identical JSON for the same object; they usually will not."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#031",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 9: Cross-Agent Payment Accountability",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Agent payments can traverse multiple agents. When downstream services rely on a signed screening receipt, they must verify it using a key bound to a trusted screening issuer. Digital signatures provide data-origin and integrity assurance; they do not prove that the issuer performed screening correctly. The receipt records the issuer's assertions about the entities, lists, and decision, so the verifier still needs a policy for which screening issuers it trusts.\n\nBind each receipt to the specific transaction (include the transaction or intent hash in the signed payload) and propagate it end-to-end. Each hop verifies the inbound receipt and, if it takes its own action, appends its own signed receipt, producing a verifiable chain of accountability across agents. See Optional Message-Level Integrity for the additional threat model and profile requirements."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#032",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 9: Cross-Agent Payment Accountability > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Attach the signed compliance receipt to the transaction and propagate it across every agent hop.\n\nBind each receipt to the transaction by signing over the transaction or intent hash.\n\nAt each hop, verify the signature, trusted issuer, transaction binding, and acceptable screening freshness before relying on the receipt; append a new signed receipt for any action taken."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#033",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 9: Cross-Agent Payment Accountability > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Don't keep the receipt only in the issuing system's logs, because downstream agents then cannot prove screening occurred.\n\nDon't let a downstream agent rely on an upstream agent's unverifiable claim that screening happened."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#034",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 10: Binding Sanctions-List Freshness to the Receipt",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "A receipt stating \"screened, no match\" is meaningless without which version of the list, and as of when. Sanctions lists change frequently; a clean screen against a stale list is a compliance gap. Bind the list version and timestamp into the signed receipt so screening freshness is itself non-tamperable and auditable. Public sanctions sources such as the OFAC Sanctions List Search and the EU Consolidated Sanctions List change frequently, so the version screened against must be recorded."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#035",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 10: Binding Sanctions-List Freshness to the Receipt > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Include the sanctions-list source(s), version or publication date, and screening timestamp inside the signed receipt.\n\nBind each screening result and list version to the specific transaction or payment intent in the signed data, so a later verifier can distinguish it from another transaction.\n\nEnforce the verifier's maximum acceptable list age and screening age; do not let an issuer-supplied age limit override that policy.\n\nRetain evidence of the list version used and the screening service's update history. A signed timestamp or version protects the recorded assertion from alteration; it does not independently establish that the list was current or actually used."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#036",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 10: Binding Sanctions-List Freshness to the Receipt > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Don't assert a screening result without recording the list version and date it was screened against.\n\nDon't treat \"screened\" as a boolean; a clean result against an out-of-date list is not compliant."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#037",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 11: Regulatory Mapping",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "The controls in this cheat sheet map to common AML and sanctions obligations. This mapping is illustrative and is not legal advice; obligations vary by jurisdiction. For underlying obligations see, for example, the Bank Secrecy Act and FinCEN Customer Due Diligence Requirements.\n\nControl (this cheat sheet)\n\nMaps to\n\nAgent identity before screening (Section 1)\n\nTechnical attribution and authorization; does not replace applicable customer or beneficial-owner identification\n\nEntity and operator screening (Sections 2-3)\n\nScreening parties identified by the applicable sanctions compliance program; not a universal legal duty to screen every software operator\n\nSigned audit trail and receipt (Sections 4, 8-10)\n\nRecordkeeping; FATF Recommendation 11; multi-year retention (BSA, EU AMLD)\n\nSanctions-list freshness in receipt (Section 10)\n\nEvidence of which list data supported the assessment; list screening alone does not establish compliance\n\nFail-closed enforcement (Section 5)\n\nPreventing execution while required checks are unresolved; distinguish this technical gate from legal blocking obligations for confirmed sanctions matches\n\nTrust-tiered limits (Section 6)\n\nRisk-based approach (FATF Recommendation 1); monitoring thresholds"
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#038",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 11: Regulatory Mapping > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Treat this table as a starting point and confirm specific obligations with qualified counsel for each operating jurisdiction."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#039",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 11: Regulatory Mapping > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Don't rely on a single jurisdiction's lists or rules for a cross-border agent payment system."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#040",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 12: Do's and Don'ts Summary",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "The consolidated controls below align with the AI-system-specific verification requirements in the OWASP Artificial Intelligence Security Verification Standard (AISVS), in particular Chapter 10 (MCP Security Requirements)."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#041",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 12: Do's and Don'ts Summary > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Verify agent identity cryptographically before every screening request.\n\nWhen using a message-signing profile, sign and verify screening requests and responses and enforce its replay controls.\n\nScreen counterparties and relevant operator entities as defined by the institution's applicable compliance program.\n\nProtect screening audit records against unauthorized changes and deletion; use hash chaining when the chosen audit design requires it.\n\nWithhold transaction execution on a screening error, timeout, or ambiguous result until the required assessment permits proceeding.\n\nRate limit based on cryptographic agent identity, not IP address.\n\nApply graduated trust levels with different access rights and rate limits.\n\nRe-screen relevant parties according to the compliance program's list-change and other review triggers.\n\nMake audit records exportable for regulatory examination."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#042",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "Section 12: Do's and Don'ts Summary > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "Accept self-declared agent identity without cryptographic proof.\n\nAllow transactions to proceed when screening fails or is unavailable.\n\nStore audit records in agent-controlled infrastructure.\n\nCache screening results beyond a configurable time window.\n\nAllow agents to lower match thresholds or override screening results.\n\nTreat transport protection as protection from a compromised component after TLS termination.\n\nAllow anonymous agents to access screening services.\n\nAssume that a one-time identity check is sufficient for ongoing access."
+  },
+  {
+   "chunk_id": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet#043",
+   "doc": "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/AML_Sanctions_AI_Agent_Payments_Cheat_Sheet.html",
+   "text": "FinCEN: Customer Due Diligence Requirements for Financial Institutions\n\nNIST SP 800-53 Rev. 5: Security and Privacy Controls\n\nOFAC: A Framework for Compliance Commitments"
+  }
+ ]
+}

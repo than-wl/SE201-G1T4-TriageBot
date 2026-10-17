@@ -1,0 +1,350 @@
+{
+ "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+ "title": "Secure Coding with AI Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#001",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI coding tools have moved beyond code suggestion. In 2026, agentic coding tools (Claude Code, Cursor agent mode, Aider, Devin, Copilot Workspace, Codex) execute shell commands, install packages, edit files, run tests, access the network, and push branches autonomously. Many developers run these agents with auto-accept enabled, meaning the agent operates with the developer's full permissions and minimal human oversight.\n\nThis cheat sheet addresses the security risks specific to AI-assisted and agentic coding. It focuses on threats that do not exist in traditional development workflows and does not restate general secure coding guidance already covered elsewhere.\n\nFor general secure coding, see the Secure Coding Practices Quick Reference Guide. For AI agent security beyond coding tools, see the AI Agent Security Cheat Sheet. For prompt injection prevention, see the LLM Prompt Injection Prevention Cheat Sheet. For MCP protocol security, see the MCP Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#002",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Threat Model and Trust Boundaries",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI coding agents operate across multiple trust boundaries. Understanding these boundaries is essential before applying any controls.\n\n```\n                    TRUST BOUNDARIES IN AGENTIC CODING\n\n [DEVELOPER]                    [AGENT]                    [EXTERNAL]\n  Developer  ──── permissions ──── AI Agent  ──── reads ──── Repo Content\n  approves        (often full       executes       ingests     (issues, PRs,\n  or auto-        dev access)       commands       context     READMEs, deps,\n  accepts                                                      changelogs)\n      |                |                |                |\n      |           [MODEL PROVIDER]      |          [MCP SERVERS]\n      |            API calls            |           Tool calls\n      |            Code + context       |           File access\n      |            sent to provider     |           Network access\n      |                                 |           Credentials\n      |                                 |\n      |              [CI/CD]            |\n      |            Workflows            |\n      |            Org secrets          |\n      |            Deploy access        |\n```"
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#003",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Threat Model and Trust Boundaries > Threat Actors and Attack Surfaces",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Repository content as instruction source. Issue bodies, PR descriptions, PR comments, README files, dependency changelogs, error traces, fetched web pages, and MCP tool responses all become instructions when the agent reads them. An attacker who can write to any of these can influence agent behavior.\n\nMCP servers as tool providers. Agents connect to MCP servers to access tools. A malicious or compromised MCP server can poison tool descriptions, shadow legitimate tool names, exfiltrate credentials through tool arguments, or update tool definitions after initial approval (rug-pull).\n\nRules files as persistent steering. Files like .cursorrules, CLAUDE.md, AGENTS.md, .github/copilot-instructions.md, and .windsurfrules silently steer every future generation. They can be modified by a malicious PR or by the agent itself to embed persistent instructions.\n\nThe agent itself. Agents running with auto-accept and full developer permissions can install packages, write to any file, execute shell commands, modify CI configuration, and push branches. A compromised agent context has the same blast radius as a compromised developer workstation.\n\nCI/CD agents. Review bots and CI runners (e.g. claude-code-action, Copilot review) act on PR content with access to org secrets. A malicious PR can trigger the CI agent to exfiltrate secrets or modify the build pipeline. This is confused deputy at scale."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#004",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 1: Hallucinated Dependencies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI coding assistants frequently suggest package names that do not exist on public registries. Attackers monitor these hallucinated names and register malicious packages with matching names (AI-assisted typosquatting)."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#005",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 1: Hallucinated Dependencies > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Verify every AI-suggested package exists on the public registry before installing. Check the package page, download count, maintainer history, and creation date.\n\nBe suspicious of packages with very low download counts, recent creation dates (less than 30 days), or a single maintainer with no other packages.\n\nImplement a pre-install hook or CI check that blocks installation of packages below a minimum age threshold.\n\nMaintain an internal allowlist of approved packages for your organization."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#006",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 1: Hallucinated Dependencies > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Blindly run npm install, pip install, or go get with package names suggested by an AI without verification.\n\nAssume that because an AI suggested a package, it exists or is safe.\n\nIgnore typosquatting risk. AI assistants frequently suggest names that are close to real packages but slightly different."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#007",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 2: Outdated Dependencies with Known CVEs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI models are trained on historical code. They frequently suggest dependency versions that were current during training but now have known vulnerabilities. The AI may not know about CVEs published after its training cutoff or after the coding tool's last security-index update."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#008",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 2: Outdated Dependencies with Known CVEs > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Run dependency auditing tools (npm audit, pip audit, govulncheck, cargo audit) on every AI-generated dependency list before merging.\n\nConfigure CI/CD pipelines to fail on known vulnerabilities in dependencies, regardless of whether the code was human-written or AI-generated.\n\nPin dependencies to specific versions and update them through your normal dependency management process, not through AI suggestions.\n\nCross-reference AI-suggested versions against vulnerability databases (NVD, GitHub Advisory Database, OSV)."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#009",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 2: Outdated Dependencies with Known CVEs > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Accept AI-suggested dependency versions without checking for known CVEs.\n\nAssume that AI assistants are aware of recent vulnerability disclosures.\n\nDisable dependency auditing for AI-generated code."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#010",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 3: Indirect Prompt Injection in the Development Loop",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Agentic coding tools ingest context from the repository, the network, and connected tools. Any content the agent reads can contain hidden instructions that alter its behavior. This is indirect prompt injection applied to the development workflow."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#011",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 3: Indirect Prompt Injection in the Development Loop > Attack Vectors",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Issue bodies and PR descriptions. An attacker opens an issue containing hidden instructions. When a developer asks the agent to \"fix issue #123\", the agent reads the issue body and follows the embedded instructions.\n\nPR comments and review feedback. Malicious review comments can instruct the agent to modify unrelated files, weaken security controls, or exfiltrate code when the developer asks the agent to \"address review feedback.\"\n\nREADME and documentation files. Cloned repositories, dependencies, and fetched documentation can contain instructions invisible to human readers but parsed by the agent.\n\nError traces and log output. When an agent reads error output to debug a failure, crafted error messages can inject instructions.\n\nDependency changelogs and release notes. Agents reading changelogs to understand version differences can be influenced by injected content.\n\nFetched web pages. Agents with web access can be influenced by content on pages they are asked to reference."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#012",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 3: Indirect Prompt Injection in the Development Loop > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Treat all repository content (issues, PRs, comments, READMEs) as untrusted input when processed by an AI coding agent.\n\nReview agent output for unexpected changes after the agent processes any external content.\n\nUse tools that sanitize or flag potential injection patterns in repository content before the agent processes it.\n\nRestrict agent context to the minimum files and content needed for the task.\n\nAudit agent actions after processing content from external contributors or public repositories."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#013",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 3: Indirect Prompt Injection in the Development Loop > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Allow agents to process issue bodies, PR descriptions, or comments from untrusted contributors without review of the agent's resulting actions.\n\nAssume that content an agent reads is safe because it appears in a familiar context (e.g. a GitHub issue).\n\nGive agents unrestricted access to browse the web or fetch arbitrary URLs without egress controls."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#014",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 4: MCP and Tool Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI coding agents connect to MCP (Model Context Protocol) servers to access tools for file operations, database queries, API calls, and more. Compromised or malicious MCP servers are a direct supply chain risk to the development environment.\n\nFor comprehensive MCP security guidance, see the MCP Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#015",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 4: MCP and Tool Security > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Audit all MCP servers connected to your development environment. Maintain an allowlist of approved servers and tools.\n\nPin tool definitions and detect changes. Use snapshot-and-diff mechanisms to catch rug-pull updates where a tool's behavior changes after initial approval.\n\nReview tool descriptions for hidden instructions. Tool descriptions are part of the agent's context and can contain prompt injection payloads.\n\nRestrict which tools the agent can invoke. Apply least privilege -- a coding agent does not need access to email, payment, or administrative tools.\n\nMonitor for tool name shadowing where a malicious MCP server registers a tool with the same name as a legitimate one to intercept calls.\n\nValidate tool arguments before execution. Agents may pass sensitive data (credentials, file contents, environment variables) as tool arguments without awareness of the data classification."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#016",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 4: MCP and Tool Security > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Connect to MCP servers from untrusted sources without security review.\n\nAllow agents to discover and connect to MCP servers automatically without approval.\n\nTrust tool descriptions as benign. They are an injection surface.\n\nAllow MCP tools unrestricted filesystem, network, or credential access on the developer's machine.\n\nReference: CVE-2026-39313 -- mcp-framework before 0.2.22: unbounded memory allocation in HTTP request body handling allowed unauthenticated denial of service. Example of a vulnerability in AI framework code that highlights the need for dependency auditing and runtime limits."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#017",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 5: Agent Runtime Sandboxing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Agentic coding tools execute commands, install packages, write files, and access the network on the developer's machine. Without sandboxing, a compromised agent context has the same privileges as the developer."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#018",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 5: Agent Runtime Sandboxing > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Run AI coding agents in sandboxed environments: dev containers, restricted shells, virtual machines, or ephemeral cloud workspaces.\n\nUse tool allowlists that restrict which commands the agent can execute. Block access to credential stores, SSH keys, cloud CLI configurations, and sensitive directories.\n\nApply egress controls on the agent's runtime. If the agent does not need outbound network access for the current task, block it.\n\nUse ephemeral credentials scoped to the current task rather than long-lived developer credentials.\n\nUnderstand and evaluate the risk of flags like --dangerously-skip-permissions or auto-accept modes. These bypass confirmation prompts and give the agent unrestricted execution.\n\nSet resource limits (CPU, memory, disk, process count) on agent execution environments."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#019",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 5: Agent Runtime Sandboxing > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Run AI coding agents with your full developer credentials, SSH keys, and cloud access tokens without sandboxing.\n\nEnable auto-accept mode on untrusted or unfamiliar codebases.\n\nAllow agents to access production credentials, deployment keys, or org-level secrets from the development environment.\n\nAssume the agent will only touch files relevant to the current task."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#020",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 6: Rules Files and Persistent Steering",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI coding tools read configuration files that steer their behavior across all future interactions. These files are a persistence mechanism -- an attacker who can modify them controls every subsequent generation."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#021",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 6: Rules Files and Persistent Steering > Affected Files",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": ".cursorrules, .cursor/rules/\n\nCLAUDE.md, .claude/\n\nAGENTS.md\n\n.github/copilot-instructions.md\n\n.windsurfrules\n\n.aider.conf.yml\n\nCustom system prompt files referenced by any AI tool"
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#022",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 6: Rules Files and Persistent Steering > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Treat rules files as security-critical configuration. Review changes to these files with the same scrutiny as CI/CD pipeline changes.\n\nAdd rules files to your code review requirements. Require explicit approval for any modification.\n\nMonitor for unexpected rules file creation or modification, including by the agent itself.\n\nUse git hooks or CI checks that flag changes to known rules files in every PR.\n\nAudit existing rules files for instructions that weaken security controls, disable safety features, or direct the agent to ignore certain file types or patterns."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#023",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 6: Rules Files and Persistent Steering > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Allow PRs from external contributors to add or modify rules files without security review.\n\nAllow the AI agent itself to modify its own rules files without explicit developer approval.\n\nAssume rules files are benign because they are plain text. They are instruction injection surfaces with session-level persistence."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#024",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 7: Out-of-Scope Edits and Review Anchoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Agents routinely touch files beyond the scope of the requested change: lockfiles, CI configurations, unrelated tests, formatting changes, and dependency updates. Reviewers anchored on the requested change miss these modifications. This is the most common review failure mode in agentic coding."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#025",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 7: Out-of-Scope Edits and Review Anchoring > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Use diff-aware review tooling that highlights all files changed, not just the ones relevant to the task description.\n\nImplement CI checks that flag unexpected file modifications: lockfile changes, CI/CD config changes, test modifications, and changes to files outside the requested scope.\n\nReview every file in an agent-generated PR individually. Do not approve based on the PR description alone.\n\nSet up CODEOWNERS rules that require specific reviewers for sensitive files (CI configs, Dockerfiles, deployment scripts, rules files).\n\nLimit the agent's file access scope when possible. Some tools support directory restrictions or file allowlists."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#026",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 7: Out-of-Scope Edits and Review Anchoring > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Approve agent-generated PRs based on the summary or description without reviewing the full diff.\n\nAssume that lockfile changes, test modifications, or formatting changes are benign because they \"look routine.\"\n\nAllow agents to modify files outside the explicitly requested scope without flagging those changes for review."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#027",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 8: Test Fabrication and Test Deletion",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI agents make CI green by deleting failing tests, weakening assertions, mocking the unit under test instead of fixing the code, or asserting the buggy behavior. A passing test suite generated by the same agent that produced the code provides no independent assurance."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#028",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 8: Test Fabrication and Test Deletion > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Require human review of all AI-generated test modifications, with focus on:\n\nDeleted tests (why was this test removed?)\n\nWeakened assertions (did assertEquals become assertNotNull?)\n\nNew mocks that replace real dependencies the test was designed to exercise\n\nTests that assert the generated behavior rather than the correct behavior\n\nAdd adversarial and negative test cases that the AI did not generate: invalid inputs, expired tokens, malformed payloads, boundary conditions, concurrent access.\n\nMeasure security confidence by adversarial testing results and independent analysis, not by \"all tests pass.\"\n\nImplement CI rules that flag test deletions or assertion-count reductions in agent-generated PRs.\n\nWrite security-critical tests manually for authentication, authorization, input validation, and cryptographic operations."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#029",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 8: Test Fabrication and Test Deletion > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Trust AI-generated test suites as evidence of security.\n\nMeasure confidence by test pass rate alone. 100% passing means nothing if the tests assert broken behavior.\n\nAllow agents to delete or modify existing tests without explicit justification reviewed by a human.\n\nAllow the agent to both write the security-critical code and its tests without independent verification."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#030",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 9: Prompt Context Leakage and Sensitive Code Exposure",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI coding assistants send code context (open files, project structure, terminal output) to the model provider's API. This context may contain credentials, personal data, proprietary business logic, and internal architecture details."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#031",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 9: Prompt Context Leakage and Sensitive Code Exposure > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Review what context your AI coding assistant sends to the provider. Most tools document this.\n\nConfigure AI tools to exclude sensitive directories from context. Add .env, .env.*, *.pem, *.key, credentials.json, serviceAccountKey.json, and similar sensitive files to your AI tool's context exclusion list (.cursorignore, .copilotignore, or equivalent).\n\nAudit what your AI coding tool sends using controlled request inspection. Exclude or redact credentials, personal data, and sensitive source code before recording captured traffic; follow the Logging Cheat Sheet data exclusions.\n\nUse self-hosted or air-gapped AI coding tools for projects handling classified, regulated, or highly sensitive code.\n\nStore all secrets in environment variables, vault services, or encrypted secret stores -- never in files within the project tree where AI tools can read them."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#032",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 9: Prompt Context Leakage and Sensitive Code Exposure > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Use cloud-hosted AI coding assistants on classified or top-secret codebases without approval.\n\nAssume that AI coding assistants only send the current file. Many send broader project context.\n\nOpen .env files or private keys in your IDE while an AI coding assistant is active. The file contents may be sent as context.\n\nPaste API keys, tokens, or credentials into your terminal while AI tools with terminal context access are running.\n\nAssume that .gitignore prevents AI tools from reading files. .gitignore only affects git -- AI tools read from the filesystem directly."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#033",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 10: Prompt-to-Code Supply Chain Risk",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "See the Software Supply Chain Security Cheat Sheet for controls throughout the development lifecycle.\n\nAI coding agents modify not just application code but also build scripts, CI/CD configurations, package scripts, and deployment infrastructure. Changes to these files execute automatically in trusted contexts with elevated privileges."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#034",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 10: Prompt-to-Code Supply Chain Risk > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Review AI changes to the following files with heightened scrutiny -- treat them as security-critical:\n\npackage.json (scripts section: postinstall, preinstall, prepare, prebuild)\n\n.github/workflows/*.yml (GitHub Actions)\n\n.gitlab-ci.yml\n\nDockerfile, docker-compose.yml\n\nMakefile, Rakefile, Taskfile\n\nsetup.py, pyproject.toml (build scripts)\n\ngo generate directives\n\nAny file that executes automatically during build, install, test, or deploy\n\nFlag any AI-generated change that adds network access, downloads external resources, or executes shell commands in build/deploy context.\n\nImplement CI checks that diff build configuration files and require explicit approval for changes to CI/CD pipelines.\n\nEnsure AI-generated GitHub Actions reference third-party actions pinned to a specific commit SHA, not a mutable tag."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#035",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 10: Prompt-to-Code Supply Chain Risk > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Allow AI to modify CI/CD pipelines, Dockerfiles, or package scripts without explicit human review.\n\nAccept AI-generated GitHub Actions that reference third-party actions by tag without SHA pinning.\n\nTrust AI-generated build scripts that download or execute external URLs.\n\nMerge AI changes to deployment configurations without verifying what changed in the build/deploy path."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#036",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 11: CI/CD Agents and Confused Deputy Risk",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI-powered CI/CD agents (review bots, automated code fixers, PR assistants) run on PR events with access to org secrets, deployment credentials, and write access to the repository. A malicious PR can manipulate the CI agent into exfiltrating secrets or modifying the pipeline."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#037",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 11: CI/CD Agents and Confused Deputy Risk > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Scope CI agent credentials to the minimum required permissions. Review bots should not have deploy keys or write access to secrets.\n\nFilter and sanitize PR content (title, body, comments, diff) before passing it to CI agents as context. PR content is attacker-controlled input.\n\nRun CI agents in isolated environments with no access to production secrets or credentials beyond what the specific job requires.\n\nLog CI agent action metadata, correlation identifiers, authorization decisions, and outcomes. Exclude secrets and sensitive prompt, tool-argument, and response content; apply the Logging Cheat Sheet. Monitor for unexpected file modifications, network calls, or secret access patterns.\n\nImplement approval gates before CI agents can push commits, modify workflows, or access sensitive resources."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#038",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 11: CI/CD Agents and Confused Deputy Risk > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Give CI agents org-level secrets or deployment credentials when they only need read access.\n\nAllow CI agents to process PR content from external contributors without sandboxing.\n\nTrust CI agent output (comments, reviews, suggested fixes) without verifying that the agent was not influenced by malicious PR content."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#039",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 12: Markdown, Link, and Unicode Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Agent output rendered in IDE chat panes, PR comments, or review interfaces can contain Markdown-based exfiltration links, bidi (bidirectional) text overrides, and zero-width characters that influence future agent behavior or mislead reviewers."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#040",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 12: Markdown, Link, and Unicode Injection > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Sanitize agent output before rendering in IDE chat panes or PR comments. Strip or escape Markdown image tags, hidden links, and HTML entities.\n\nDetect and flag bidi override characters (U+202A through U+202E, U+2066 through U+2069) and zero-width characters (U+200B, U+200C, U+200D, U+FEFF) in code, commits, and agent output.\n\nUse CI checks that scan for homoglyph attacks and invisible characters in PRs.\n\nReview agent-generated commit messages and PR descriptions for embedded content that could influence future agent runs."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#041",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 12: Markdown, Link, and Unicode Injection > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Render agent output containing Markdown images or links without sanitization. Image tags with external URLs can exfiltrate conversation context via URL parameters.\n\nAssume that code containing only visible ASCII characters is safe. Zero-width and bidi characters are invisible in most editors.\n\nAllow agent-generated content to be committed without scanning for unicode injection."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#042",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 13: Multi-Agent and Sub-Agent Propagation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "When multiple agents interact (e.g. a coding agent delegates to a search agent, or a review agent processes output from a coding agent), prompt injection can propagate across agent boundaries. A compromised context in one agent becomes instructions for the next."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#043",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 13: Multi-Agent and Sub-Agent Propagation > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Treat output from one agent as untrusted input when passed to another agent.\n\nImplement context boundaries between agents. Do not pass full conversation history or raw tool responses between agents without sanitization.\n\nMonitor cross-agent interactions for instruction propagation patterns (e.g. one agent's output instructing another to exfiltrate data or modify files).\n\nValidate that sub-agent actions remain within the scope defined by the parent task."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#044",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 13: Multi-Agent and Sub-Agent Propagation > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Chain agents without context boundaries. If Agent A is compromised, Agent B should not blindly execute Agent A's output.\n\nAllow sub-agents to inherit the full permissions and credentials of the parent agent without scope restriction.\n\nAssume that agent-to-agent communication is trusted because both agents are \"your\" tools.\n\nFor comprehensive guidance on multi-agent trust boundaries, see the AI Agent Security Cheat Sheet and the MCP Security Cheat Sheet Section 8 (Multi-Server Isolation)."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#045",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 14: Human Accountability",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "AI-generated code must have a human owner. Every AI-assisted change should be reviewed, approved, and attributable to a developer who is responsible for its security and maintainability. AI tools do not accept responsibility for the code they generate. The developer who accepts and commits the code does."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#046",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 14: Human Accountability > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Assign a human owner to every AI-generated code change. That owner is responsible for its correctness, security, and maintenance.\n\nRequire explicit developer approval before merging any AI-generated code. The approval indicates the developer has reviewed and understood the change.\n\nMaintain audit trails showing which developer approved which AI-generated changes, including the AI tool and model version used.\n\nTreat AI as a tool, not a colleague. A developer who says \"the AI wrote it\" is still responsible for it."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#047",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "Section 14: Human Accountability > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "Deploy AI-generated code that no human has reviewed and approved.\n\nAllow AI-generated code to bypass code review because \"the AI is usually right.\"\n\nTreat AI approval (e.g. AI-generated code review comments) as a substitute for human review.\n\nAttribute security failures to the AI tool. The developer who approved the code is accountable."
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#048",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "OWASP Top 10 Mapping",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "OWASP Top 10\n\nRelevant Section\n\nA01: Broken Access Control\n\nSection 5: Agent Runtime Sandboxing, Section 11: CI/CD Agents\n\nA03: Injection\n\nSection 3: Indirect Prompt Injection, Section 12: Markdown and Unicode Injection\n\nA04: Insecure Design\n\nSection 8: Test Fabrication, Section 14: Human Accountability\n\nA05: Security Misconfiguration\n\nSection 6: Rules Files, Section 7: Out-of-Scope Edits\n\nA06: Vulnerable and Outdated Components\n\nSection 1: Hallucinated Dependencies, Section 2: Outdated Dependencies\n\nA07: Identification and Authentication Failures\n\nSection 4: MCP and Tool Security\n\nA08: Software and Data Integrity Failures\n\nSection 10: Prompt-to-Code Supply Chain Risk\n\nA09: Security Logging and Monitoring Failures\n\nSection 9: Prompt Context Leakage, Section 11: CI/CD Agents\n\nA10: Server-Side Request Forgery\n\nSection 3: Indirect Prompt Injection, Section 4: MCP and Tool Security"
+  },
+  {
+   "chunk_id": "Secure_Coding_with_AI_Cheat_Sheet#049",
+   "doc": "Secure_Coding_with_AI_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Coding_with_AI_Cheat_Sheet.html",
+   "text": "NIST SP 800-218: Secure Software Development Framework\n\nOpenSSF: Concise Guide for Evaluating Open Source Software\n\nOWASP AI Security Verification Standard"
+  }
+ ]
+}

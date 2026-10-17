@@ -1,0 +1,91 @@
+{
+ "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+ "title": "LDAP Injection Prevention Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#001",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "The Lightweight Directory Access Protocol (LDAP) allows an application to remotely perform operations such as searching and modifying records in directories. LDAP injection results from inadequate input sanitization and validation and allows malicious users to glean restricted information using the directory service. For general information about LDAP please visit lightweight directory access protocol (LDAP).\n\nLDAP Injection is an attack used to exploit web based applications that construct LDAP statements based on user input. When an application fails to properly sanitize user input, it's possible to modify LDAP statements through techniques similar to SQL Injection.\n\nThis cheatsheet is focused on providing clear, simple, actionable guidance for preventing LDAP Injection flaws in your applications. LDAP injection attacks are common due to two factors:\n\nThe lack of safer, parameterized LDAP query interfaces\n\nThe widespread use of LDAP to authenticate users to systems.\n\nLDAP injection attacks could result in the granting of permissions to unauthorized queries, and content modification inside the LDAP tree.\n\nPrimary Defenses:\n\nEscape all variables using the right LDAP encoding function\n\nUse a framework that escapes automatically.\n\nAdditional Defenses:\n\nLeast Privilege\n\nAllow-List Input Validation"
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#002",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Primary Defenses > Defense Option 1: Escape all variables using the right LDAP encoding function > Distinguished Name Escaping",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "The main way LDAP stores names is based on DN (distinguished name). You can think of this like a unique identifier. These are sometimes used to access resources, like a username.\n\nA DN might look like this\n\ncn=Richard Feynman, ou=Physics Department, dc=Caltech, dc=edu\n\nor\n\nuid=inewton, ou=Mathematics Department, dc=Cambridge, dc=com\n\nAn allowlist can be used to restrict input to a list of valid characters. Characters and character sequences that must be excluded from allowlists — including Java Naming and Directory Interface (JNDI) metacharacters and LDAP special characters — are listed in the following list.\n\nThe exhaustive list is the following: \\ # + < > , ; \" = and leading or trailing spaces.\n\nSome \"special\" characters that are allowed in Distinguished Names and do not need to be escaped include:\n\n```\n* ( ) . & - _ [ ] ` ~ | @ $ % ^ ? : { } ! '\n```"
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#003",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Primary Defenses > Defense Option 1: Escape all variables using the right LDAP encoding function > Search Filter Escaping",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "Each DN points to exactly 1 entry, which can be thought of sort of like a row in a RDBMS. For each entry, there will be 1 or more attributes which are analogous to RDBMS columns. If you are interested in searching through LDAP for users with certain attributes, you may do so with search filters.\n\nIn a search filter, you can use standard boolean logic to get a list of users matching an arbitrary constraint. Search filters are written in Polish notation AKA prefix notation.\n\nExample:\n\n```\n(&(ou=Physics)(|\n(manager=cn=Freeman Dyson,ou=Physics,dc=Caltech,dc=edu)\n(manager=cn=Albert Einstein,ou=Physics,dc=Princeton,dc=edu)\n))\n```\n\nWhen building LDAP queries in application code, you MUST escape any untrusted data that is added to any LDAP query. There are two forms of LDAP escaping. Encoding for LDAP Search and Encoding for LDAP DN (distinguished name). The proper escaping depends on whether you are sanitizing input for a search filter, or you are using a DN as a username-like credential for accessing some resource.\n\nSome \"special\" characters that are allowed in search filters and must be escaped include:\n\n```\n* ( ) \\ NUL\n```\n\nFor more information on search filter escaping visit RFC4515."
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#004",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Primary Defenses > Defense Option 1: Escape all variables using the right LDAP encoding function > Safe Java Escaping Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "The following example validates userSN with an allowlist. With Java's default predefined character classes, it accepts ASCII letters, digits, underscores, and whitespace (including tabs and line breaks); * also permits an empty string. This illustrative rule is not a general validation policy for personal names. Choose an allowlist that matches the application's requirements and apply the appropriate LDAP escaping for values outside that restricted set.\n\n```\n// String userSN = \"Sherlock Holmes\"; // Valid\n// ... beginning of LDAPInjection.searchRecord()...\nsc.setSearchScope(SearchControls.SUBTREE_SCOPE);\nString base = \"dc=example,dc=com\";\n\nif (!userSN.matches(\"[\\\\w\\\\s]*\")) {\n throw new IllegalArgumentException(\"Invalid input\");\n}\n\nString filter = \"(sn = \" + userSN + \")\";\n// ... remainder of LDAPInjection.searchRecord()... \n```\n\nWhen a database field must include special characters, it is critical to ensure that the authentic data is stored in sanitized form in the database and also that any user input is normalized before the validation or comparison takes place. Using characters that have special meanings in JNDI and LDAP in the absence of a comprehensive normalization and allowlisting-based routine is discouraged. Special characters must be transformed to sanitized, safe values before they are added to the allowlist expression against which input will be validated. Likewise, normalization of user input should occur before the validation step (source: Prevent LDAP injection).\n\nThe OWASP ESAPI Encoder API provides encodeForLDAP(String) for search-filter values and encodeForDN(String) for distinguished-name values. Choose the method for the LDAP context where the value will be used."
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#005",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Primary Defenses > Defense Option 1: Escape all variables using the right LDAP encoding function > Insecure vs Secure Java LDAP Query Construction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "❌ Insecure Example (vulnerable to LDAP Injection)\n\n```\n// User input directly concatenated into the filter\nString filter = \"(&(uid=\" + userInput + \")(objectClass=person))\";\nNamingEnumeration<SearchResult> results =\n    ctx.search(\"ou=users,dc=example,dc=com\", filter, controls);\n\n\n✅ Secure Example (using parameterized filter)\n\n// User input safely passed as a parameter\nString filter = \"(&(uid={0})(objectClass=person))\";\nNamingEnumeration<SearchResult> results =\n    ctx.search(\"ou=users,dc=example,dc=com\", filter, new Object[]{ userInput }, controls);\n```"
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#006",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Primary Defenses > Defense Option 1: Escape all variables using the right LDAP encoding function > Safe C Sharp .NET TBA Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": ".NET AntiXSS (now the Encoder class) has LDAP encoding functions including Encoder.LdapFilterEncode(string), Encoder.LdapDistinguishedNameEncode(string) and Encoder.LdapDistinguishedNameEncode(string, bool, bool).\n\nEncoder.LdapFilterEncode encodes input according to RFC4515 where unsafe values are converted to \\XX where XX is the representation of the unsafe character.\n\nUse Encoder.LdapDistinguishedNameEncode for distinguished-name attribute values. In DN string escaping, \\XX represents an escaped byte using two hexadecimal digits; selected special characters can instead be prefixed with a backslash. Escape leading spaces or # and trailing spaces. A leading # followed by hexadecimal pairs represents an entire attribute value encoded using Basic Encoding Rules (BER), not individual character escapes.\n\nLdapDistinguishedNameEncode(string, bool, bool) is also provided so you may turn off the initial or final character escaping rules, for example if you are concatenating the escaped distinguished name fragment into the midst of a complete distinguished name."
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#007",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Primary Defenses > Defense Option 2: Use Frameworks that Automatically Protect from LDAP Injection > Safe .NET Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "We recommend using LINQ to LDAP (for .NET Framework 4.5 or lower until it has been updated) in DotNet. It provides automatic LDAP encoding when building LDAP queries. Contact the Readme file in the project repository."
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#008",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Additional Defenses",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "Beyond adopting one of the two primary defenses, we also recommend adopting all of these additional defenses in order to provide defense in depth. These additional defenses are:\n\nLeast Privilege\n\nAllow-List Input Validation"
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#009",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Additional Defenses > Least Privilege",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "To minimize the potential damage of a successful LDAP injection attack, you should minimize the privileges assigned to the LDAP binding account in your environment."
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#010",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Additional Defenses > Enabling Bind Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "Authenticated LDAP bind establishes an authenticated authorization state; it does not prevent user input from changing a search filter constructed by the application. Continue to apply the primary injection defenses, including search-filter escaping, even when the application binds with valid credentials.\n\nWhen using name/password authentication, reject empty passwords before binding. A nonempty name with an empty password can perform an unauthenticated bind that establishes anonymous authorization; a successful result in that case does not prove the user's identity. Require authenticated access to protected directory data and use a least-privileged binding account."
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#011",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "Additional Defenses > Allow-List Input Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "Input validation can be used to detect unauthorized input before it is passed to the LDAP query. For more information please see the Input Validation Cheat Sheet."
+  },
+  {
+   "chunk_id": "LDAP_Injection_Prevention_Cheat_Sheet#012",
+   "doc": "LDAP_Injection_Prevention_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/LDAP_Injection_Prevention_Cheat_Sheet.html",
+   "text": "RFC 4515: LDAP String Representation of Search Filters\n\nRFC 4514: LDAP String Representation of Distinguished Names"
+  }
+ ]
+}

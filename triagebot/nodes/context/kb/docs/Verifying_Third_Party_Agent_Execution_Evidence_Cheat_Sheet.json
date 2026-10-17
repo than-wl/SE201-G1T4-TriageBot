@@ -1,0 +1,91 @@
+{
+ "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+ "title": "Verifying Third-Party Agent Execution Evidence Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#001",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "This cheat sheet helps developers assess execution records supplied by an agent, a Model Context Protocol (MCP) server, or a service they do not control. A supplier can sign a record that omits actions or describes a run that never happened. Verify the specific claim you need, and identify who could fabricate the evidence supporting it.\n\nSupply-chain Levels for Software Artifacts (SLSA) verification guidance separates checking signatures and artifact identity from deciding which producers to trust. Apply the same distinction to execution records. Use these outcomes for each question below:\n\nOutcome\n\nWhat the evidence supports\n\nIndependently re-checkable\n\nAnother reviewer can verify the stated property using authenticated evidence and trust material the supplier does not exclusively control. This does not establish other properties of the execution.\n\nSupplier assertion\n\nThe supplier claims the property, but independent evidence is missing. The record can still help with debugging and routine operations.\n\nNo information\n\nThe evidence does not let you assess this property of the execution. Do not infer that the run was clean.\n\nA signature may establish who made an assertion without establishing that the assertion is true. Do not use supplier assertions alone to resolve an incident attribution or dispute involving that supplier.\n\nFor producing and protecting your own logs, see the Logging Cheat Sheet. For optional message integrity and replay protection between agent and server, see MCP Security Section 7. These checks assess individual records; they do not establish end-to-end completeness across a chain of delegated actions."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#002",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Six Questions to Ask About an Execution Record > 1. Who could have written or altered it?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "List the component, host, recorder, operator, and signing-key holder. Count independent parties, not processes: several services under one supplier's control remain one party. A recorder fed only by the component preserves that component's account of events. A signing service that accepts arbitrary content from the component does not independently confirm the content.\n\nIdentify an observer that obtains event data independently of the component's own reports.\n\nKeep its records where the component and supplier cannot rewrite them.\n\nCorroborate the supplier's record against calls recorded at a gateway or other boundary you control.\n\nA boundary recorder covers only what crosses that boundary. It cannot establish local file writes or in-process actions, and it cannot inspect encrypted request bodies without access to their plaintext. Where independent observation is unavailable, classify the account of execution as a supplier assertion and limit the decisions you base on it."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#003",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Six Questions to Ask About an Execution Record > 2. What does the timing evidence actually establish?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "A timestamp written by the supplier is a supplier assertion. To check freshness, send a fresh, unpredictable challenge value (a nonce) and require it to be signed together with the execution claims. Verify the signature and compare the returned nonce with the one you sent.\n\nRFC 9334 Section 10 explains the limit: a matching nonce bounds signing to after the challenge was generated; it does not show when the individual claims were captured. A trusted timestamp bound to the signed record can establish that it existed by a particular time, but does not establish that its contents describe real events.\n\nRecord which timing property you checked. Do not label capture as contemporaneous merely because a signature is fresh or a record appears in a transparency log. That claim needs evidence from an observer positioned to witness the execution."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#004",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Six Questions to Ask About an Execution Record > 3. Does it identify the intended artifact and execution?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "A valid signature on a record about another artifact or run does not answer your question.\n\nRecompute a collision-resistant digest of the expected artifact and compare it with the signed subject. Obtain the expected artifact or digest independently of the report being assessed.\n\nSeparately match the signed execution identifier or challenge to the run you intended to review.\n\nCheck which relevant inputs are covered, such as tool definitions, configuration, prompts, model version, and policy. A binary digest alone does not identify these inputs.\n\nAn artifact digest can legitimately stay the same across many runs. The problem is using that digest as the only binding to an execution. A matched digest establishes artifact identity; a matched run identifier establishes which execution the supplier is claiming to describe. Neither establishes that the reported actions occurred."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#005",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Six Questions to Ask About an Execution Record > 4. Would an omitted event be detectable?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "Define the execution or time window and the events an independent observer was positioned to see. Reconcile the record against an expected-event list or per-execution sequence that the supplier cannot silently redefine. A supplier-maintained sequence counts only what the supplier chose to include.\n\nA transparency log can make changes after entry detectable; it cannot reveal an event that was never submitted. RFC 9162 describes inclusion and consistency checks and warns that a log can present inconsistent views to different clients. Verify those proofs and check how the deployment detects inconsistent views, such as by comparing signed log states across independent observers. The log operator remains a trust dependency.\n\nA log's total entry count is not an execution's event count. Unrelated entries can increase it while events from the run are missing. Likewise, injecting one expected event and finding it in the returned record is a useful spot-check, not a completeness test. Any coverage claim must remain limited to the events the independent observer could see and reconcile."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#006",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Six Questions to Ask About an Execution Record > 5. What happens when recording or delivery fails?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "Determine whether the component continues and drops events, buffers and retries, or stops execution. Check buffer overflow behavior as well as normal operation.\n\nIn an environment you control, interrupt the recording path and observe whether execution continues and gaps become visible.\n\nWhere you cannot test, request evidence from an outage or an exercised failure scenario. Treat documentation alone as a supplier assertion.\n\nPreserve independently observed delivery failures outside the component's control. A gap marker written solely by the component is still its assertion, even when stored elsewhere.\n\nA test establishes the behavior observed under its conditions; it does not prove that another execution had no gaps. An empty report from a recorder that may have dropped events provides no basis for declaring that run clean. Stopping execution on every logging failure is not automatically appropriate: it turns a recording outage into an availability failure. Choose the behavior according to the action's risk and make any loss of evidence visible."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#007",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Six Questions to Ask About an Execution Record > 6. Can the reviewer verify it without being able to forge it?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "Use a maintained verifier with trusted signer identities, keys or certificate roots, and permitted algorithms configured independently of the record. A key packaged with the record is not a trust anchor merely because it verifies that record; it must connect to trust you already established. The SLSA verification steps illustrate checking the signature, subject digest, and expected producer before relying on provenance.\n\nValidate applicable certificate paths and revocation information, as described in RFC 9334 Section 12.4. Do not accept a signature solely because the cryptographic calculation succeeds.\n\nPublic-key verification does not require the signing secret. By contrast, everyone holding the shared secret needed to verify a message authentication code can also create one. Such a record cannot independently attribute authorship between those key holders. Asking the supplier's service whether its own record is valid also leaves the supplier as the source of the assertion."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#008",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Six Questions to Ask About an Execution Record > Worked Examples",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "These examples describe evidence after the stated checks, rather than assigning guarantees to a file format.\n\nEvidence and checks performed\n\nWhat you may conclude\n\nWhat remains unestablished\n\nVendor-exported traces, with no independent corroboration\n\nThe vendor supplied these claims.\n\nWhether the actions occurred and whether the record is complete.\n\nA signed record verified against your trusted signer, with artifact digest and run identifier matched to your expectations\n\nThat signer asserted these bytes about the expected artifact and run.\n\nWhether the assertions are true or complete.\n\nThe same record, with verified log inclusion and consistency evidence plus an independently trusted timestamp over the signed record\n\nThe signed record existed by the supported time and is included in the checked log state.\n\nWhen events were captured, whether they occurred, or whether any were omitted before submission.\n\nThe record reconciled against events captured by an independent boundary observer\n\nWhether the record includes the events that observer saw in the stated window.\n\nInternal actions, other boundaries, or events outside the observer's coverage."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#009",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Do's and Don'ts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "Keep the verification policy and expected values outside the evidence under review, following the separation in SLSA verification guidance."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#010",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Do's and Don'ts > Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "State the exact property being checked: signer, artifact, execution binding, timing, or coverage.\n\nRecord the trust assumptions and limits alongside each result.\n\nReconcile supplier reports with observations you control when possible.\n\nExercise recording failures in an environment you control and preserve the results."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#011",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "Do's and Don'ts > Don't",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "Treat a valid signature or log inclusion proof as proof that an action occurred.\n\nConfuse a stable artifact digest with a unique execution identifier.\n\nTreat a fresh signature as proof of live capture, or a successful spot-check as proof of completeness.\n\nTreat missing entries as evidence that nothing happened when recording could have failed."
+  },
+  {
+   "chunk_id": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet#012",
+   "doc": "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet.html",
+   "text": "SLSA: Verifying Artifacts\n\nRFC 9334: Remote ATtestation procedureS (RATS) Architecture\n\nRFC 9162: Certificate Transparency Version 2.0"
+  }
+ ]
+}

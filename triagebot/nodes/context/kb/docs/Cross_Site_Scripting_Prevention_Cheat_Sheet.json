@@ -1,0 +1,224 @@
+{
+ "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+ "title": "Cross Site Scripting Prevention Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#001",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "This cheat sheet helps developers prevent XSS vulnerabilities.\n\nCross-Site Scripting (XSS) is a misnomer. Originally this term was derived from early versions of the attack that were primarily focused on stealing data cross-site. Since then, the term has widened to include injection of basically any content. XSS attacks are serious and can lead to account impersonation, observing user behavior, loading external content, stealing sensitive data, and more.\n\nThis cheatsheet contains techniques to prevent or limit the impact of XSS. Since no single technique will solve XSS, using the right combination of defensive techniques will be necessary to prevent XSS."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#002",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Framework Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Fortunately, applications built with modern web frameworks have fewer XSS bugs, because these frameworks steer developers towards good security practices and help mitigate XSS by using templating, auto-escaping, and more. However, developers need to know that problems can occur if frameworks are used insecurely, such as:\n\nescape hatches that frameworks use to directly manipulate the DOM\n\nReact’s dangerouslySetInnerHTML without sanitizing the HTML\n\nUnvalidated URL values: React 19 blocks javascript: URLs in src and href, but this does not replace application-specific URL validation\n\nAngular’s bypassSecurityTrustAs* functions\n\nLit's unsafeHTML function\n\nPolymer's inner-h-t-m-l attribute and htmlLiteral function\n\nTemplate injection\n\nOut of date framework plugins or components\n\nand more\n\nWhen you use a modern web framework, you need to know how your framework prevents XSS and where it has gaps. There will be times where you need to do something outside the protection provided by your framework, which means that Output Encoding and HTML Sanitization can be critical. OWASP will be producing framework specific cheatsheets for React, Vue, and Angular."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#003",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "XSS Defense Philosophy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "In order for an XSS attack to be successful, an attacker must be able to insert and execute malicious content in a webpage. Thus, all variables in a web application needs to be protected. Ensuring that all variables go through validation and are then escaped or sanitized is known as perfect injection resistance. Any variable that does not go through this process is a potential weakness. Frameworks make it easy to ensure variables are correctly validated and escaped or sanitized.\n\nHowever, no framework is perfect and security gaps still exist in popular frameworks like React and Angular. Output encoding and HTML sanitization help address those gaps."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#004",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "When you need to safely display data exactly as a user types it in, output encoding is recommended. Variables should not be interpreted as code instead of text. This section covers each form of output encoding, where to use it, and when you should not use dynamic variables at all.\n\nFirst, when you wish to display data as the user typed it in, start with your framework’s default output encoding protection. Automatic encoding and escaping functions are built into most frameworks.\n\nIf you’re not using a framework or need to cover gaps in the framework then you should use an output encoding library. Each variable used in the user interface should be passed through an output encoding function. A list of output encoding libraries is included in the appendix.\n\nThere are many different output encoding methods because browsers parse HTML, JS, URLs, and CSS differently. Using the wrong encoding method may introduce weaknesses or harm the functionality of your application."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#005",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding > Output Encoding for “HTML Contexts”",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "“HTML Context” refers to inserting a variable between two basic HTML tags like a <div> or <b>. For example:\n\n```\n<div> $varUnsafe </div>\n```\n\nAn attacker could modify data that is rendered as $varUnsafe. This could lead to an attack being added to a webpage. For example:\n\n```\n<div> <script>alert`1`</script> </div> // Example Attack\n```\n\nIn order to add a variable to a HTML context safely to a web template, use HTML entity encoding for that variable.\n\nHere are some examples of encoded values for specific characters:\n\nWhen displaying text with JavaScript, assign it to the textContent property of an ordinary element such as a <div>. This creates a text node without parsing HTML; it does not HTML-encode the value. Pass the original text without pre-encoding it. Do not use it for untrusted script or style content; HTMLScriptElement.textContent sets executable code.\n\n```\n&    &amp;\n<    &lt;\n>    &gt;\n\"    &quot;\n'    &#x27;\n```"
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#006",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding > Output Encoding for “HTML Attribute Contexts”",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Use HTML attribute encoding for data inserted into ordinary text attributes, such as title or value. Keep element and attribute names fixed. Attributes containing URLs, CSS, HTML, or JavaScript need controls for those additional contexts.\n\nThe placeholder below represents data already encoded for a quoted HTML attribute:\n\n```\n<input value=\"ENCODED DATA\">\n```\n\nAlways surround attribute values with double (\") or single (') quotation marks. Use your framework's or library's attribute encoder to protect the surrounding quotes and other HTML syntax. Spaces do not end a quoted value, so encoding every space or every non-alphanumeric character is unnecessary. The HTML parsing rules distinguish quoted values from unquoted ones, where whitespace ends the value.\n\nHTML attribute encoding alone does not protect JavaScript in an event-handler attribute: the HTML parser decodes character references before the JavaScript is interpreted. Encoding more characters as HTML entities does not remove that second context. Prefer addEventListener() with trusted handler functions and pass user values as data. For unavoidable legacy templates, follow the library's documented JavaScript-in-HTML context for data inside a quoted JavaScript string within a quoted HTML attribute; an encoder cannot make untrusted handler code safe.\n\nWhen updating an existing element from JavaScript, element.setAttribute(\"title\", value) assigns the value directly; it does not HTML-encode it. Do not pre-encode a runtime value for this ordinary text attribute. Keep the attribute name fixed and safe: event-handler attributes and srcdoc can interpret their values as code or HTML."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#007",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding > Output Encoding for “JavaScript Contexts”",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "When a server template inserts string data into an inline script, use an encoder documented for both the JavaScript string and the enclosing HTML script. The placeholder below represents data already encoded for that location; the template supplies the quotes:\n\n```\n<script>const message = \"ENCODED DATA\";</script>\n```\n\nDo not insert untrusted code, identifiers, or expressions. Use a maintained encoder and follow its context contract instead of escaping quotes manually or applying a generic \\xHH rule. The OWASP Java Encoder context guide distinguishes script blocks, quoted event-handler strings, and standalone JavaScript. Support for ordinary template literals depends on the library and version; it does not imply support for tagged templates or ${...} expression bodies.\n\nThese encoders protect string placement, not subsequent use: passing the resulting value to eval() or another code-interpreting sink remains unsafe.\n\nFor JSON, verify that the Content-Type header is application/json and not text/html to prevent XSS."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#008",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding > Output Encoding for “CSS Contexts”",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "“CSS Contexts” refer to variables placed into inline CSS, which is common when developers want their users to customize the look and feel of their webpages. Since CSS is surprisingly powerful, it has been used for many types of attacks. Variables should only be placed in a CSS property value. Other “CSS Contexts” are unsafe and you should not place variable data in them.\n\n```\n<style> selector { property : $varUnsafe; } </style>\n<style> selector { property : \"$varUnsafe\"; } </style>\n<span style=\"property : $varUnsafe\">Oh no</span>\n```\n\nWhen changing styles with JavaScript, use a fixed property such as element.style.color with a value from an application-defined allowlist. CSS property assignment sets a CSS value; it does not automatically CSS-encode it. Do not let untrusted input choose the property or supply an entire declaration block. Properties that accept URLs require URL validation as well."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#009",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding > Output Encoding for “URL Contexts”",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "“URL Contexts” refer to variables placed into a URL. Most commonly, a developer will add a parameter or URL fragment to a URL base that is then displayed or used in some operation. Use URL Encoding for these scenarios.\n\n```\n<a href=\"http://www.owasp.org?test=$varUnsafe\">link</a >\n```\n\nEncode all characters with the %HH encoding format. Make sure any attributes are fully quoted, same as JS and CSS."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#010",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding > Output Encoding for “URL Contexts” > Common Mistake",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "There will be situations where you use a URL in different contexts. The most common one would be adding it to an href or src attribute of an <a> tag. In these scenarios, you should do URL encoding, followed by HTML attribute encoding.\n\n```\nurl = \"https://site.com?data=\" + urlencode(parameter)\n<a href='attributeEncode(url)'>link</a>\n```\n\nWhen using JavaScript to construct a URL, use encodeURIComponent() to encode each untrusted query parameter value. It encodes a URL component; it does not validate a complete URL.\n\nBase64url represents bytes using a URL-safe alphabet. Protocols such as JSON Web Tokens (JWTs) use an unpadded form that encodeURIComponent() leaves unchanged. Use base64url only when the receiver expects it. After decoding, apply the output encoding or sanitization required by the destination context."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#011",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Output Encoding > Dangerous Contexts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Output encoding is not perfect. It will not always prevent XSS. These locations are known as dangerous contexts. Dangerous contexts include:\n\n```\n<script>Directly in a script</script>\n<!-- Inside an HTML comment -->\n<style>Directly in CSS</style>\n<div ToDefineAnAttribute=test />\n<ToDefineATag href=\"/test\" />\n```\n\nOther areas to be careful with include:\n\nCallback functions\n\nWhere URLs are handled in code such as this CSS { background-url : “javascript:alert(xss)”; }\n\nUntrusted JavaScript event-handler code (for example, an entire onclick value). Prefer trusted functions registered with addEventListener(); see the HTML Attribute Contexts section for legacy string interpolation.\n\nUnsafe JS functions like eval(), setInterval(), setTimeout()\n\nDon't place variables into dangerous contexts as even with output encoding, it will not prevent an XSS attack fully."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "HTML Sanitization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "When users need to author HTML, developers may let users change the styling or structure of content inside a WYSIWYG editor. Output encoding in this case will prevent XSS, but it will break the intended functionality of the application. The styling will not be rendered. In these cases, HTML Sanitization should be used.\n\nHTML Sanitization will strip dangerous HTML from a variable and return a safe string of HTML. OWASP recommends DOMPurify for HTML Sanitization.\n\n```\nlet clean = DOMPurify.sanitize(dirty);\n```\n\nThere are some further things to consider:\n\nIf you sanitize content and then modify it afterwards, you can easily void your security efforts.\n\nIf you sanitize content and then send it to a library for use, check that it doesn’t mutate that string somehow. Otherwise, again, your security efforts are void.\n\nYou must regularly patch DOMPurify or other HTML Sanitization libraries that you use. Browsers change functionality and bypasses are being discovered regularly."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#013",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Safe Sinks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Security professionals often talk in terms of sources and sinks. If you pollute a river, it'll flow downstream somewhere. It’s the same with computer security. XSS sinks are places where variables are placed into your webpage.\n\nThankfully, many sinks where variables can be placed are safe. This is because these sinks treat the variable as text and will never execute it. Try to refactor your code to remove references to unsafe sinks like innerHTML, and instead use textContent or value.\n\n```\nelem.textContent = dangerVariable;\nelem.insertAdjacentText(\"beforeend\", dangerVariable);\nelem.className = dangerVariable;\nelem.setAttribute(safeName, dangerVariable);\nformfield.value = dangerVariable;\ndocument.createTextNode(dangerVariable);\nelem.innerHTML = DOMPurify.sanitize(dangerVar);\n```\n\ndocument.createElement() is not a text sink: its argument selects the element name. Use a constant or allowlist for that name; do not pass untrusted input directly. The createElement() documentation describes this argument.\n\n```\nconst allowedTags = new Set([\"p\", \"span\"]);\nconst tagName = allowedTags.has(input) ? input : \"span\";\nconst element = document.createElement(tagName);\n```\n\nCreating an element does not execute its name as markup, but the selected element still has browser-defined behavior. For example, a dynamically created script element can execute when later code populates and inserts it (HTML Standard). Treat subsequent content and attribute assignments as separate security decisions.\n\nValidate attributes separately. Allowing a tag name does not make later DOM operations safe.\n\ninsertAdjacentText() requires a position and a text value. In the example, \"beforeend\" appends a text node inside the element. Use text sinks on ordinary elements, not script or style elements."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#014",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Safe Sinks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Safe HTML Attributes include: align, alink, alt, bgcolor, border, cellpadding, cellspacing, class, color, cols, colspan, coords, dir, face, height, hspace, ismap, lang, marginheight, marginwidth, multiple, nohref, noresize, noshade, nowrap, ref, rel, rev, rows, rowspan, scrolling, shape, span, summary, tabindex, title, usemap, valign, value, vlink, vspace, width.\n\nFor attributes not reported above, ensure that if JavaScript code is provided as a value, it cannot be executed."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#015",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Other Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Framework Security Protections, Output Encoding, and HTML Sanitization will provide the best protection for your application. OWASP recommends these in all circumstances.\n\nConsider adopting the following controls in addition to the above.\n\nCookie Attributes - These change how JavaScript and browsers can interact with cookies. Cookie attributes try to limit the impact of an XSS attack but don’t prevent the execution of malicious content or address the root cause of the vulnerability.\n\nContent Security Policy - An allowlist that prevents content being loaded. It’s easy to make mistakes with the implementation so it should not be your primary defense mechanism. Use a CSP as an additional layer of defense and have a look at the cheatsheet here.\n\nTrusted Types - On Chromium-based browsers, enable Trusted Types by adding Content-Security-Policy: require-trusted-types-for 'script'. This causes DOM XSS sinks (innerHTML, outerHTML, document.write, script.src, etc.) to reject plain strings, forcing all assignments to go through a vetted policy. It is one of the few controls that eliminates entire classes of DOM XSS rather than mitigating them. Combine with a default policy that delegates to a sanitizer (e.g. DOMPurify) for legacy code paths.\n\nWeb Application Firewalls - These look for known attack strings and block them. WAF’s are unreliable and new bypass techniques are being discovered regularly. WAFs also don’t address the root cause of an XSS vulnerability. In addition, WAFs also miss a class of XSS vulnerabilities that operate exclusively client-side. WAFs are not recommended for preventing XSS, especially DOM-Based XSS."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Other Controls > XSS Prevention Rules Summary",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "These snippets of HTML demonstrate how to render untrusted data safely in a variety of different contexts.\n\nData Type: String Context: HTML Body Code: <span>UNTRUSTED DATA </span> Sample Defense: HTML Entity Encoding (rule #1)\n\nData Type: String Context: Safe HTML Attributes Code: <input type=\"text\" name=\"fname\" value=\"UNTRUSTED DATA \"> Sample Defense: Quote the value and use HTML attribute encoding. Keep attribute names fixed and use ordinary text attributes; apply additional controls for URL, CSS, HTML, or JavaScript values.\n\nData Type: String Context: GET Parameter Code: <a href=\"/site/search?value=UNTRUSTED DATA \">clickme</a> Sample Defense: URL Encoding (rule #5).\n\nData Type: String Context: Untrusted URL in a SRC or HREF attribute Code: <a href=\"UNTRUSTED URL \">clickme</a> <iframe src=\"UNTRUSTED URL \" /> Sample Defense: Canonicalize input, URL Validation, Safe URL verification, Allow-list http and HTTPS URLs only (Avoid the JavaScript Protocol to Open a new Window), Attribute encoder.\n\nData Type: String Context: CSS Value Code: HTML <div style=\"width: UNTRUSTED DATA ;\">Selection</div> Sample Defense: Strict structural validation (rule #4), CSS hex encoding, Good design of CSS features.\n\nData Type: String Context: JavaScript Variable Code: <script>var currentValue='UNTRUSTED DATA ';</script> <script>someFunction('UNTRUSTED DATA ');</script> Sample Defense: Insert string data only inside a quoted string, using an encoder that also protects the enclosing HTML script context. Do not rely on quote escaping alone.\n\nData Type: HTML Context: HTML Body Code: <div>UNTRUSTED HTML</div> Sample Defense: HTML validation (JSoup, AntiSamy, HTML Sanitizer...).\n\nData Type: String Context: DOM XSS Code: <script>document.write(\"UNTRUSTED INPUT: \" + document.location.hash );<script/> Sample Defense: DOM based XSS Prevention Cheat Sheet |"
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#017",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Other Controls > Output Encoding Rules Summary",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "The purpose of output encoding (as it relates to Cross Site Scripting) is to convert untrusted input into a safe form where the input is displayed as data to the user without executing as code in the browser. The following charts provides a list of critical output encoding methods needed to stop Cross Site Scripting.\n\nEncoding Type: HTML Entity Encoding Mechanism: Convert & to &amp;, Convert < to &lt;, Convert > to &gt;, Convert \" to &quot;, Convert ' to &#x27;\n\nEncoding Type: HTML Attribute Encoding Encoding Mechanism: Use a framework or library encoder for quoted HTML text attributes and surround the value with \" or '. Encoding every space or non-alphanumeric character is unnecessary. This does not validate URLs or encode JavaScript, CSS, or HTML contained in an attribute.\n\nEncoding Type: URL Encoding Encoding Mechanism: Use standard percent encoding, as specified in the W3C specification, to encode parameter values. Be cautious and only encode parameter values, not the entire URL or path fragments of a URL.\n\nEncoding Type: JavaScript Encoding Encoding Mechanism: Use a library encoder for JavaScript string data in the actual surrounding context. It must protect the string delimiters and, when embedded in HTML, the enclosing script or attribute. Follow the library's supported contexts; hex or Unicode escapes alone are not a substitute for that contract.\n\nEncoding Type: CSS Hex Encoding Encoding Mechanism: CSS encoding supports both \\XX and \\XXXXXX formats. To ensure proper encoding, consider these options: (a) Add a space after the CSS encode (which will be ignored by the CSS parser), or (b) use the full six-character CSS encoding format by zero-padding the value. For example, A becomes \\41 (short format) or \\000041 (full format). Alphanumeric characters (letters A to Z, a to z, and digits 0 to 9) remain unencoded."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#018",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Defending against XSS is hard. For that reason, some have sought shortcuts to preventing XSS.\n\nWe're going to examine two common anti-patterns that frequently show up in ancient posts, but are still commonly cited as solutions in modern posts about XSS defense on programmer forums such as Stack Overflow and other developer hangouts."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#019",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Sole Reliance on Content-Security-Policy (CSP) Headers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "First, let us be clear, we are a strong proponent of CSP when it is used properly. In the context of XSS defense, CSP works best when it it is:\n\nUsed as a defense-in-depth technique.\n\nCustomized for each individual application rather than being deployed as a one-size-fits-all enterprise solution.\n\nWhat we are against is a blanket CSP policy for the entire enterprise. Problems with that approach are:"
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#020",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Sole Reliance on Content-Security-Policy (CSP) Headers > Problem 1 - Assumption Browser Versions Support CSP Equally",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "There usually is an implicit assumption that all the customer browsers support all the CSP constructs that your blanket CSP policy is using. Furthermore, this assumption often is done without testing the explicitly the User-Agent request header to see if it indeed is a supported browser type and rejecting the use of the site if it is not. Why? Because most businesses don't want to turn away customers if they are using an outdated browser that doesn't support some CSP Level 2 or Level 3 construct that they are relying on for XSS prevention. (Statistically, almost all browsers support CSP Level 1 directives, so unless you are worried about Grandpa pulling out his old Windows 98 laptop and using some ancient version of Internet Explorer to access your site, CSP Level 1 support can probably be assumed.)"
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#021",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Sole Reliance on Content-Security-Policy (CSP) Headers > Problem 2 - Issues Supporting Legacy Applications",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Mandatory universal enterprise-wide CSP response headers are inevitably going to break some web applications, especially legacy ones. This causes the business to push-back against AppSec guidelines and inevitably results in AppSec issuing waivers and/or security exceptions until the application code can be patched up. But these security exceptions allow cracks in your XSS armor, and even if the cracks are temporary they still can impact your business, at least on a reputational basis."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#022",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Reliance on HTTP Interceptors",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "The other common anti-pattern that we have observed is the attempt to deal with validation and/or output encoding in some sort of interceptor such as a Spring Interceptor that generally implements org.springframework.web.servlet.HandlerInterceptor or as a JavaEE servlet filter that implements javax.servlet.Filter. While this can be successful for very specific applications (for instance, if you validate that all the input requests that are ever rendered are only alphanumeric data), it violates the major tenet of XSS defense where perform output encoding as close to where the data is rendered is possible. Generally, the HTTP request is examined for query and POST parameters but other things HTTP request headers that might be rendered such as cookie data, are not examined. The common approach that we've seen is someone will call either ESAPI.validator().getValidSafeHTML() or ESAPI.encoder.canonicalize() and depending on the results will redirect to an error page or call something like ESAPI.encoder().encodeForHTML(). Aside from the fact that this approach often misses tainted input such as request headers or \"extra path information\" in a URI, the approach completely ignores the fact that the output encoding is completely non-contextual. For example, how does a servlet filter know that an input query parameter is going to be rendered in an HTML context (i.e., between HTML tags) rather than in a JavaScript context such as within a <script> tag or used with a JavaScript event handler attribute? It doesn't. And because JavaScript and HTML encoding are not interchangeable, you leave yourself still open to XSS attacks."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#023",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Reliance on HTTP Interceptors",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "Unless your filter or interceptor has full knowledge of your application and specifically an awareness of how your application uses each parameter for a given request, it can't succeed for all the possible edge cases. And we would contend that it never will be able to using this approach because providing that additional required context is way too complex of a design and accidentally introducing some other vulnerability (possibly one whose impact is far worse than XSS) is almost inevitable if you attempt it.\n\nThis naive approach usually has at least one of these four problems."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#024",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Reliance on HTTP Interceptors > Problem 1 - Encoding for specific context not satisfactory for all URI paths",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "One problem is the improper encoding that can still allow exploitable XSS in some URI paths of your application. An example might be a 'lastname' form parameter from a POST that normally is displayed between HTML tags so that HTML encoding is sufficient, but there may be an edge case or two where lastname is actually rendered as part of a JavaScript block where the HTML encoding is not sufficient and thus it is vulnerable to XSS attacks."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#025",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Reliance on HTTP Interceptors > Problem 2 - Interceptor approach can lead to broken rendering caused by improper or double encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "A second problem with this approach can be the application can result in incorrect or double encoding. E.g., suppose in the previous example, a developer has done proper output encoding for the JavaScript rendering of lastname. But if it is already been HTML output encoded too, when it is rendered, a legitimate last name like \"O'Hara\" might come out rendered like \"O\\'Hara\".\n\nWhile this second case is not strictly a security problem, if it happens often enough, it can result in business push-back against the use of the filter and thus the business may decide on disabling the filter or a way to specify exceptions for certain pages or parameters being filtered, which in turn will weaken any XSS defense that it was providing."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#026",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Reliance on HTTP Interceptors > Problem 3 - Interceptors not effective against DOM-based XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "The third problem with this is that it is not effective against DOM-based XSS. To do that, one would have to have an interceptor or filter scan all the JavaScript content going as part of an HTTP response, try to figure out the tainted output and see if it it is susceptible to DOM-based XSS. That simply is not practical."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#027",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Reliance on HTTP Interceptors > Problem 4 - Interceptors not effective where data from responses originates outside your application",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "The last problem with interceptors is that they generally are oblivious to data in your application's responses that originate from other internal sources such as an internal REST-based web service or even an internal database. The problem is that unless your application is strictly validating that data at the point that it is retrieved (which generally is the only point your application has enough context to do a strict data validation using an allow-list approach), that data should always be considered tainted. But if you are attempting to do output encoding or strict data validation all of tainted data on the HTTP response side of an interceptor (such as a Java servlet filter), at that point, your application's interceptor will have no idea of there is tainted data present from those REST web services or other databases that you used. The approach that generally is used on response-side interceptors attempting to provide XSS defense has been to only consider the matching \"input parameters\" as tainted and do output encoding or HTML sanitization on them and everything else is considered safe. But sometimes it's not? While it frequently is assumed that all internal web services and all internal databases can be \"trusted\" and used as it, this is a very bad assumption to make unless you have included that in some deep threat modeling for your application."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#028",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Reliance on HTTP Interceptors > Problem 4 - Interceptors not effective where data from responses originates outside your application",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "For example, suppose you are working on an application to show a customer their detailed monthly bill. Let's assume that your application is either querying a foreign (as in not part of your specific application) internal database or REST web service that your application uses to obtain the user's full name, address, etc. But that data originates from another application which you are assuming is \"trusted\" but actually has an unreported persistent XSS vulnerability on the various customer address-related fields. Furthermore, let's assume that you company's customer support staff can examine a customer's detailed bill to assist them when customers have questions about their bills. So nefarious customer decides to plant an XSS bomb in the address field and then calls customer service for assistance with the bill. Should a scenario like that ever play out, an interceptor attempting to prevent XSS is going to miss that completely and the result is going to be something much worse than just popping an alert box to display \"1\" or \"XSS\" or \"pwn'd\"."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#029",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Common Anti-patterns: Ineffective Approaches to Avoid > Summary",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "One final note: If deploying interceptors / filters as an XSS defense was a useful approach against XSS attacks, don't you think that it would be incorporated into all commercial Web Application Firewalls (WAFs) and be an approach that OWASP recommends in this cheat sheet?"
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#030",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Related Articles",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "See the XSS Filter Evasion Cheat Sheet for examples that illustrate why filtering alone is insufficient."
+  },
+  {
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#031",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html",
+   "text": "OWASP Java Encoder: Output Contexts and Boundaries\n\nDOMPurify Documentation"
+  }
+ ]
+}

@@ -1,0 +1,182 @@
+{
+ "doc": "Django_REST_Framework_Cheat_Sheet",
+ "title": "Django REST Framework (DRF) Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#001",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "This cheat sheet provides Django REST Framework security advice for developers. It is a basic set of guidelines for Django REST developers who need to secure fundamental aspects of an application.\n\nFor the original analysis of unsafe deserialization and serializer field selection, see sections 4.4.1.12 and 4.4.1.18 of Django REST Framework (DRF) Secure Code Guidelines."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#002",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "What is a view in Django?",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "A view in Django is a Python class or a function that returns a web response after it receives a web request. That response can be in simple HTTP, an HTML template, or an HTTP redirect request that redirects a user to another page."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#003",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Settings",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To configure the Django REST Framework (DRF), you will need to access the namespace REST_FRAMEWORK. Normally, you will find this namespace in the settings.py file. From a security perspective, the most relevant items are:"
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#004",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Settings > DEFAULT_AUTHENTICATION_CLASSES",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "A list of authentication classes that are used by default to identify which user is authenticated by accessing the request.user or request.auth properties. These classes are 'rest_framework.authentication.SessionAuthentication' (session authentication) and 'rest_framework.authentication.BasicAuthentication' (basic authentication)."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#005",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Settings > DEFAULT_PERMISSION_CLASSES",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "A list of permission classes that defines the default set of permissions that Django checks before a view can be accessed. Since the default is 'rest_framework.permissions.AllowAny', that means unless the default permission class is changed, everybody can access every view by default."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#006",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Settings > DEFAULT_THROTTLE_CLASSES",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "A list of throttle classes that determines the default set of throttles checked at the start of a view. By default, there is no throttling in place since the default class is empty."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#007",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Settings > DEFAULT_PAGINATION_CLASS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "The default class to use for queryset pagination. In Django, pagination is disabled by default. Without proper pagination, Denial of Service (DoS) problems or attacks could occur if there’s a lot of data."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#008",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "The OWASP API Security Top 10 is a list of the most critical security risks for APIs that was developed by the Open Worldwide Application Security Project (OWASP). It is designed to help organizations identify and prioritize the most significant risks to their APIs so that they can implement appropriate controls to mitigate those risks.\n\nThis section uses the 2019 version of the API Security Top 10. The best approach to securing your web API is to start at the top threat (A1 below) and work your way down. This will ensure that any time spent on security will be spent most effectively because you will cover the top threats first. After you look at the Top 10, it is generally advisable to assess for other threats or get a professional penetration test."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#009",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API1:2019 Broken Object Level Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "When using object-level permissions, you should make sure that the object can be accessed by the user using the method .check_object_permissions(request, obj).\n\nExample:\n\n```\ndef get_object(self):\n    obj = get_object_or_404(self.get_queryset(), pk=self.kwargs[\"pk\"])\n    self.check_object_permissions(self.request, obj)\n    return obj\n```\n\nDO NOT override the method get_object() without checking if the request should have access to that object."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#010",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API2:2019 Broken User Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To prevent broken user authentication, use the setting value DEFAULT_AUTHENTICATION_CLASSES with the correct classes for your project and have authentication on every non-public API endpoint. Do not overwrite the authentication class on a class-based (variable authentication_classes) or function-based (decorator authentication_classes) view unless you are confident about the change and understand the impact."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#011",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API3:2019 Excessive Data Exposure",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To prevent this problem, only display the minimum amount of required information. Make sure you review the serializer and the information you are displaying. If the serializer is inheriting from ModelSerializer, DO NOT use the exclude Meta property."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#012",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API4:2019 Lack of Resources & Rate Limiting",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "Configure DEFAULT_THROTTLE_CLASSES and DEFAULT_THROTTLE_RATES for application usage policies, and review any per-view overrides. DRF explicitly warns that its built-in throttling is not a security defense against brute force or denial-of-service attacks. Its cache operations are non-atomic, so concurrent requests can exceed the configured limit.\n\nEnforce abuse controls at the reverse proxy or API gateway as well as in the application. Apply request-size and resource limits; see the Denial of Service Cheat Sheet for layered defenses."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#013",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API5:2019 Broken Function Level Authorization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To stop this problem, change the default value ('rest_framework.permissions.AllowAny') of DEFAULT_PERMISSION_CLASSES. Use the setting value DEFAULT_PERMISSION_CLASSES with the correct classes for your project.\n\nDO NOT use rest_framework.permissions.AllowAny except for public API endpoints and DO NOT overwrite the authorization class on a class-based (variable permission_classes) or function-based (decorator permission_classes) view unless you are confident about the change and understand the impact."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#014",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API6:2019 Mass Assignment",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "For DRF APIs, explicitly allowlist the fields in ModelSerializer.Meta.fields; avoid Meta.exclude and fields = \"__all__\", which can expose newly added model fields. Follow the serializer field selection guidance. Fields that clients may read but must not change should be read-only: use Meta.read_only_fields for generated fields, or read_only=True on explicitly declared fields. These serializer controls do not replace authorization checks for the requested operation."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#015",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API7:2019 Security Misconfiguration",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To stop this problem, you must have a repeatable hardening process leading to fast and easy deployment of a properly locked down environment. Have an automated process to continuously assess the effectiveness of the configuration and settings in all environments.\n\nDO NOT use default passwords. Set the Django settings DEBUG and DEBUG_PROPAGATE_EXCEPTIONS to False. Ensure API can only be accessed by the specified HTTP verbs. All other HTTP verbs should be disabled. Set SECRET_KEY to a random value and NEVER hardcode secrets.\n\nDO validate, filter, and sanitize all client-provided data, or other data coming from integrated systems."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#016",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API8:2019 Injection > SQLi",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To prevent this problem, use parametrized queries. Be careful when using dangerous methods like raw(), extra() and custom SQL (via cursor.execute()). DO NOT add user input to dangerous methods (raw(), extra(), cursor.execute())."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#017",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API8:2019 Injection > RCE",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To stop this problem, use the Loader=yaml.SafeLoader for YAML files. DO NOT load user-controlled YAML files using the method load().\n\nAlso, DO NOT add user input to dangerous methods (eval(), exec() and execfile()) and DO NOT load user-controlled pickle files, which includes the pandas method pandas.read_pickle()."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#018",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API9:2019 Improper Assets Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "To prevent this problem, create an inventory of all API hosts. In this inventory, document the important aspects of each host. Focus on the API version and the API environment (e.g., production, staging, test, development) and determine who should have network access to the host (e.g., public, internal, partners). Make sure you document all aspects of your API such as authentication, errors, redirects, rate limiting, cross-origin resource sharing (CORS) policy and endpoints, including their parameters, requests, and responses."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#019",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API10:2019 Insufficient Logging & Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "For proper logging and monitoring capabilities, do the following:\n\n--Log all failed authentication attempts, denied access, and input validation errors with sufficient user context to identify suspicious or malicious accounts.\n\n--Create logs in a format suited to be consumed by a log management solution and include enough detail to identify the malicious actor.\n\n--Handle logs as sensitive data, and their integrity should be guaranteed at rest and transit.\n\n--Configure a monitoring system to continuously monitor the infrastructure, network, and the API functioning.\n\n--Use a Security Information and Event Management (SIEM) system to aggregate and manage logs from all components of the API stack and hosts.\n\n--Configure custom dashboards and alerts, enabling suspicious activities to be detected and responded to earlier.\n\n--Establish effective monitoring and alerting so suspicious activities are detected and responded to in a timely fashion.\n\nDO NOT:\n\n--Log generic error messages such as: Log.Error(\"Error was thrown\"); rather log the stack trace, error message and user ID who caused the error.\n\n--Log sensitive data such as user's passwords, API Tokens or PII."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#020",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Other Security Risks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "Below is a list of security risks for APIs not discussed in the OWASP API Security Top 10."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#021",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Other Security Risks > Business Logic Bugs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "Be aware of possible business logic errors that result in security bugs. Since business logic bugs are difficult to impossible to detect using automated tools, the best ways to prevent business logic security bugs are use threat models, do security design reviews, do code reviews, pair programs and write unit tests."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#022",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Other Security Risks > Secret Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "Secrets should never be hardcoded. The best practice is to use a Secret Manager. For more information review OWASP Secrets Management Cheat Sheet"
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#023",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "Updating Django and DRF and Having a Process for Updating Dependencies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "All applications have dependencies and those dependencies can have vulnerabilities. One good practice is to audit the dependencies your project is using. In general, it is important to have a process for updating dependencies. A sample process might define three mechanisms for triggering an update of response:\n\n--Every month/quarter dependencies in general are updated. --Every week important security vulnerabilities are considered and potentially trigger an update. --In EXCEPTIONAL conditions, emergency updates may need to be applied.\n\nThe Django Security team has information on How Django discloses security issues.\n\nWhen a library is under consideration, consider the \"Security Health\" of the library. How often it's updated? Does it have known vulnerabilities? Does it have an active community? etc. Some tools can help with this task (E.g. Snyk Advisor)"
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#024",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "SAST Tools",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "There are several excellent open-source static analysis security tools for Python that are worth considering, including:\n\nBandit – Bandit is a tool designed to find common security issues in Python. Bandit processes each file, builds an Abstract Syntax Tree (AST) from it, and runs appropriate plugins against the AST nodes. Once Bandit has finished scanning all the files it generates a report. Bandit was originally developed within the OpenStack Security Project and later rehomed to PyCQA.\n\nSemgrep – Semgrep is a fast, open-source, static analysis engine for finding bugs, detecting vulnerabilities in third-party dependencies, and enforcing code standards. Developed by “Return To Corporation” (usually referred to as r2c) and open-source contributors. It works based on rules, which can focus on security, language best practices, or something else. Creating a rule is easy and semgrep is very powerful. For Django there are 29 rules.\n\nPyCharm Security – Pycharm-security is a plugin for PyCharm, or JetBrains IDEs with the Python plugin. The plugin looks at Python code for common security vulnerabilities and suggests fixes. It can also be executed from a Docker container. It has about 40 checks and some are Django specific."
+  },
+  {
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#025",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_REST_Framework_Cheat_Sheet.html",
+   "text": "Security in Django\n\nDjango REST framework permissions\n\nDjango REST framework settings"
+  }
+ ]
+}

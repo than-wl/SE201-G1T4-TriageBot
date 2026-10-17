@@ -1,0 +1,105 @@
+{
+ "doc": "Django_Security_Cheat_Sheet",
+ "title": "Django Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#001",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "The Django framework is a powerful Python web framework, and it comes with built-in security features that can be used out-of-the-box to prevent common web vulnerabilities. This cheat sheet lists actions and security tips developers can take to develop secure Django applications. It aims to cover common vulnerabilities to increase the security posture of your Django application. Each item has a brief explanation and relevant code samples that are specific to the Django environment.\n\nThe Django framework provides some built-in security features that aim to be secure-by-default. These features are also flexible to empower a developer to re-use components for complex use-cases. This opens up scenarios where developers unfamiliar with the inner workings of the components can configure them in an insecure way. This cheat sheet aims to enumerate some such use cases."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#002",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "General Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Always keep Django and your application's dependencies up-to-date to keep up with security vulnerabilities.\n\nEnsure that the application is never in DEBUG mode in a production environment. Never run DEBUG = True in production.\n\nUse packages like django_ratelimit or django-axes to prevent brute-force attacks."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#003",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Use django.contrib.auth app for views and forms for user authentication operations such as login, logout, password change, etc. Include the module and its dependencies django.contrib.contenttypes and django.contrib.sessions in the INSTALLED_APPS setting in the settings.py file.\n\n```\nINSTALLED_APPS = [\n    # ...\n    'django.contrib.auth',\n    'django.contrib.contenttypes',\n    'django.contrib.sessions',\n    # ...\n]\n```\n\nUse the @login_required decorator to ensure that only authenticated users can access a view. The sample code below illustrates usage of @login_required.\n\n```\nfrom django.contrib.auth.decorators import login_required\n\n# User is redirected to default login page if not authenticated.\n@login_required\ndef my_view(request):\n  # Your view logic\n\n# User is redirected to custom '/login-page/' if not authenticated.\n@login_required(login_url='/login-page/')\ndef my_view(request):\n  # Your view logic\n```\n\nUse password validators for enforcing password policies. Add or update the AUTH_PASSWORD_VALIDATORS setting in the settings.py file to include specific validators required by your application.\n\n```\nAUTH_PASSWORD_VALIDATORS = [\n  {\n    # Checks the similarity between the password and a set of attributes of the user.\n    'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',\n    'OPTIONS': {\n      'user_attributes': ('username', 'email', 'first_name', 'last_name'),\n      'max_similarity': 0.7,\n    }\n  },\n  {\n    # Checks whether the password meets a minimum length.\n    'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',\n    'OPTIONS': {\n      'min_length': 8,\n    }\n  },\n  {\n    # Checks whether the password occurs in a list of common passwords\n    'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',\n  },\n  {\n    # Checks whether the password isn’t entirely numeric\n    'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',\n  }\n]\n```"
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#004",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Store passwords using make-password utility function to hash a plain-text password.\n\n```\nfrom django.contrib.auth.hashers import make_password\n#...\nhashed_pwd = make_password('plaintext_password')\n```\n\nCheck a plaintext password against a hashed password by using the check-password utility function.\n\n```\nfrom django.contrib.auth.hashers import check_password\n#...\nplain_pwd = 'plaintext_password'\nhashed_pwd = 'hashed_password_from_database'\n\nif check_password(plain_pwd, hashed_pwd):\n  print(\"The password is correct.\")\nelse:\n  print(\"The password is incorrect.\")\n```"
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#005",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Key Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "The SECRET_KEY parameter in settings.py is used for cryptographic signing and should be kept confidential. Consider the following recommendations:\n\nGenerate a key at least 50 characters or more, containing a mix of letters, digits, and symbols.\n\nEnsure that the SECRET_KEY is generated using a strong random generator, such as get_random_secret_key() function in Django.\n\nAvoid hard coding the SECRET_KEY value in settings.py or any other location. Consider storing the key-value in environment variables or secrets managers.\n\n```\nimport os\nSECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')\n```\n\nRegularly rotate the key, keeping in mind that this action can invalidate sessions, password reset tokens, etc. Rotate the key immediately it if it ever gets exposed."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#006",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Headers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Include the django.middleware.security.SecurityMiddleware module in the MIDDLEWARE setting in your project's settings.py to add security-related headers to your responses. This module is used to set the following parameters:\n\nSECURE_CONTENT_TYPE_NOSNIFF: Set this key to True. Protects against MIME type sniffing attacks by enabling the header X-Content-Type-Options: nosniff.\n\nSECURE_HSTS_SECONDS: A positive value adds HTTP Strict Transport Security (HSTS) to HTTPS responses, instructing supporting browsers to use HTTPS for the specified period. It does not reject HTTP requests on the server or protect a browser's first connection before it knows the policy; preloading addresses that initial-connection gap.\n\nInclude the django.middleware.clickjacking.XFrameOptionsMiddleware module in the MIDDLEWARE setting in your project's settings.py (This module should be listed after the django.middleware.security.SecurityMiddleware module as ordering is important). This module is used to set the following parameters:\n\nX_FRAME_OPTIONS: Set this key to 'DENY' or 'SAMEORIGIN'. This setting adds the X-Frame-Options header to all HTTP responses. This protects against clickjacking attacks."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#007",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Content Security Policy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Django 6.0 and later provide built-in Content Security Policy (CSP) support. Enable django.middleware.csp.ContentSecurityPolicyMiddleware and configure SECURE_CSP to enforce a policy, or SECURE_CSP_REPORT_ONLY to monitor violations without blocking content. Follow Django's CSP configuration guide. Earlier versions require a third-party library such as django-csp or configuration of HTTP response headers.\n\nFor more details:\n\nOWASP Content Security Policy Cheat Sheet\n\nDjango Security Documentation"
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#008",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Cookies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "SESSION_COOKIE_SECURE: Set this key to True in the settings.py file. This will send the session cookie over secure (HTTPS) connections only.\n\nCSRF_COOKIE_SECURE: Set this key to True in the settings.py file. This will ensure that the CSRF cookie is sent over secure connections only.\n\nWhenever you set a custom cookie in a view using the HttpResponse.set_cookie() method, make sure to set its secure parameter to True.\n\n```\nresponse = HttpResponse(\"Some response\")\nresponse.set_cookie('my_cookie', 'cookie_value', secure=True)\n```"
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#009",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Cross Site Request Forgery (CSRF)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Include the django.middleware.csrf.CsrfViewMiddleware module in the MIDDLEWARE setting in your project's settings.py to add CSRF related headers to your responses.\n\nIn forms use the {% csrf_token %} template tag to include the CSRF token. A sample is shown below.\n\n```\n<form method=\"post\">\n    {% csrf_token %}\n    <!-- Your form fields here -->\n</form>\n```\n\nFor AJAX calls, the CSRF token for the request has to be extracted prior to being used in the AJAX call.\n\nAdditional recommendations and controls can be found at Django's Cross Site Request Forgery protection documentation."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#010",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Cross Site Scripting (XSS)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "The recommendations in this section are in addition to XSS recommendations already mentioned previously.\n\nUse the built-in template system to render templates in Django. Refer to Django's Automatic HTML escaping documentation to learn more.\n\nTry to avoid using the safe filter (or mark_safe function) to disable Django's automatic template escaping. If you do need to use it, make sure the input is from a trusted source. Extra caution is required when handling user-controlled inputs.\n\nUse the json_script template filter for passing data to JavaScript in Django templates.\n\nRefer to Django's Cross Site Scripting (XSS) protection documentation to learn more."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#011",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "HTTPS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Include the django.middleware.security.SecurityMiddleware module in the MIDDLEWARE setting in your project's settings.py if not already added.\n\nSet the SECURE_SSL_REDIRECT = True in the settings.py file to ensure that all communication is over HTTPS. This will redirect any HTTP requests automatically to HTTPS. This is also a 301 (permanent) redirect, so your browser will remember the redirect for subsequent requests.\n\nConfigure SECURE_PROXY_SSL_HEADER only behind a trusted proxy that strips client-supplied copies of the chosen header and sets its HTTPS-indicating value only for requests originally received over HTTPS. Prevent clients from bypassing that proxy to supply the trusted header directly. If these conditions cannot be guaranteed, leave the setting at None; see Django's proxy-header security warning."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#012",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Admin panel URL",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "It is advisable to modify the default URL leading to the admin panel (example.com/admin/), in order to slightly increase the difficulty for automated attacks. Here’s how to do it:\n\nIn the default app folder within your project, locate the urls.py file managing the top-level URLs. Within the file, modify the urlpatterns variable, a list, so that the URL leading to admin.site.urls is different from \"admin/\". This approach adds an extra layer of security by obscuring the common endpoint used for administrative access."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#013",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "Django's built-in command check --deploy",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Django has built-in command check --deploy for security checks. Example:\n\n```\n$ ./manage.py check --deploy\nSystem check identified some issues:\n\nWARNINGS:\n?: (security.W004) You have not set a value for the SECURE_HSTS_SECONDS setting. If your entire site is served only over SSL, you may want to consider setting a value and enabling HTTP Strict Transport Security. Be sure to read the documentation first; enabling HSTS carelessly can cause serious, irreversible problems.\n?: (security.W008) Your SECURE_SSL_REDIRECT setting is not set to True. Unless your site should be available over both SSL and non-SSL connections, you may want to either set this setting True or configure a load balancer or reverse-proxy server to redirect all connections to HTTPS.\n?: (security.W009) Your SECRET_KEY has less than 50 characters, less than 5 unique characters, or it's prefixed with 'django-insecure-' indicating that it was generated automatically by Django. Please generate a long and random value, otherwise many of Django's security-critical features will be vulnerable to attack.\n?: (security.W012) SESSION_COOKIE_SECURE is not set to True. Using a secure-only session cookie makes it more difficult for network traffic sniffers to hijack user sessions.\n?: (security.W016) You have 'django.middleware.csrf.CsrfViewMiddleware' in your MIDDLEWARE, but you have not set CSRF_COOKIE_SECURE to True. Using a secure-only CSRF cookie makes it more difficult for network traffic sniffers to steal the CSRF token.\n?: (security.W018) You should not have DEBUG set to True in deployment.\n?: (security.W020) ALLOWED_HOSTS must not be empty in deployment.\n\nSystem check identified 7 issues (0 silenced).\n```\n\nYou can harden your Django project by addressing the warnings generated by this command."
+  },
+  {
+   "chunk_id": "Django_Security_Cheat_Sheet#014",
+   "doc": "Django_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Django_Security_Cheat_Sheet.html",
+   "text": "Django 5.2: Clickjacking Protection\n\nDjango 5.2: Security Middleware"
+  }
+ ]
+}

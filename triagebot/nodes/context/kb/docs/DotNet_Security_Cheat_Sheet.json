@@ -1,0 +1,392 @@
+{
+ "doc": "DotNet_Security_Cheat_Sheet",
+ "title": "DotNet Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#001",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "This page intends to provide quick basic .NET security tips for developers."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#002",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Introduction > The .NET Framework",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "The .NET Framework is Microsoft's principal platform for enterprise development. It is the supporting API for ASP.NET, Windows Desktop applications, Windows Communication Foundation services, SharePoint, Visual Studio Tools for Office and other technologies.\n\nThe .NET Framework constitutes a collection of APIs that facilitate the usage of an advanced type system, managing data, graphics, networking, file operations, and more - essentially covering the vast majority of requirements for developing enterprise applications within the Microsoft ecosystem. It is a nearly ubiquitous library that is strongly named and versioned at the assembly level."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#003",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Introduction > Updating the Framework",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "The .NET Framework is kept up-to-date by Microsoft with the Windows Update service. Developers do not normally need to run separate updates to the Framework. Windows Update can be accessed at Windows Update or from the Windows Update program on a Windows computer.\n\nIndividual frameworks can be kept up to date using NuGet. As Visual Studio prompts for updates, build it into your lifecycle.\n\nRemember that third-party libraries have to be updated separately and not all of them use NuGet. ELMAH for instance, requires a separate update effort."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#004",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Introduction > Security Announcements",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Receive security notifications by selecting the \"Watch\" button at the following repositories:\n\n.NET Core Security Announcements\n\nASP.NET Core & Entity Framework Core Security Announcements"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#005",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "This section contains general guidance for .NET applications. This applies to all .NET applications, including ASP.NET, WPF, WinForms, and others.\n\nThe OWASP Top 10 lists the most prevalent and dangerous threats to web security in the world today and is reviewed every few years and updated with the latest threat data. This section of the cheat sheet is based on this list. Your approach to securing your web application should be to start at the top threat A1 below and work down; this will ensure that any time spent on security will be spent most effectively and cover the top threats first and lesser threats afterwards. After covering the Top 10 it is generally advisable to assess for other threats or get a professionally completed Penetration Test."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#006",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A01 Broken Access Control > Weak Account management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Ensure cookies are sent with the HttpOnly flag set to prevent client side scripts from accessing the cookie:\n\n```\nCookieHttpOnly = true,\n```\n\nReduce the time period a session can be stolen in by reducing session timeout and removing sliding expiration:\n\nThe decision to use sliding expiration depends on your application's threat model. Setting SlidingExpiration to false enforces an absolute session lifetime, which limits how long a stolen session can be reused, at the cost of reduced usability for long-lived interactive sessions. For some applications, enabling sliding expiration (true) may be preferred for user experience, as it keeps the session alive as long as the user is active. This convenience comes with increased risk if a session is compromised.\n\n```\nExpireTimeSpan = TimeSpan.FromMinutes(60),\nSlidingExpiration = false\n```\n\nSee here for an example of a full startup code snippet.\n\nEnsure cookies are sent over HTTPS in production. This should be enforced in the config transforms:\n\n```\n<httpCookies requireSSL=\"true\" />\n<authentication>\n    <forms requireSSL=\"true\" />\n</authentication>\n```\n\nProtect LogOn, Registration and password reset methods against brute force attacks by throttling requests (see code below). Consider also using ReCaptcha.\n\n```\n[HttpPost]\n[AllowAnonymous]\n[ValidateAntiForgeryToken]\n[AllowXRequestsEveryXSecondsAttribute(Name = \"LogOn\",\nMessage = \"You have performed this action more than {x} times in the last {n} seconds.\",\nRequests = 3, Seconds = 60)]\npublic async Task<ActionResult> LogOn(LogOnViewModel model, string returnUrl)\n```\n\nDO NOT: Roll your own authentication or session management. Use the one provided by .NET.\n\nDO NOT: Tell someone if the account exists on LogOn, Registration or Password reset. Say something like 'Either the username or password was incorrect', or 'If this account exists then a reset token will be sent to the registered email address'. This protects against account enumeration."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#007",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A01 Broken Access Control > Weak Account management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "The feedback to the user should be identical whether or not the account exists, both in terms of content and behavior. E.g., if the response takes 50% longer when the account is real then membership information can be guessed and tested."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#008",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A01 Broken Access Control > Missing function-level access control",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Authorize users on all externally facing endpoints. The .NET framework has many ways to authorize a user, use them at method level:\n\n```\n[Authorize(Roles = \"Admin\")]\n[HttpGet]\npublic ActionResult Index(int page = 1)\n```\n\nor better yet, at controller level:\n\n```\n[Authorize]\npublic class UserController\n```\n\nYou can also check roles in code using identity features in .net: System.Web.Security.Roles.IsUserInRole(userName, roleName)\n\nYou can find more information in the Authorization Cheat Sheet and Authorization Testing Automation Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#009",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A01 Broken Access Control > Insecure Direct object references",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "When you have a resource (object) which can be accessed by a reference (in the sample below this is the id), you need to ensure that the user is intended to have access to that resource.\n\n```\n// Insecure\npublic ActionResult Edit(int id)\n{\n  var user = _context.Users.FirstOrDefault(e => e.Id == id);\n  return View(\"Details\", new UserViewModel(user);\n}\n\n// Secure\npublic ActionResult Edit(int id)\n{\n  var user = _context.Users.FirstOrDefault(e => e.Id == id);\n  // Establish user has right to edit the details\n  if (user.Id != _userIdentity.GetUserId())\n  {\n        HandleErrorInfo error = new HandleErrorInfo(\n            new Exception(\"INFO: You do not have permission to edit these details\"));\n        return View(\"Error\", error);\n  }\n  return View(\"Edit\", new UserViewModel(user);\n}\n```\n\nMore information can be found in the Insecure Direct Object Reference Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#010",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > General cryptography guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Never, ever write your own cryptographic functions.\n\nWherever possible, try and avoid writing any cryptographic code at all. Instead try and either use pre-existing secrets management solutions or the secret management solution provided by your cloud provider. For more information, see the OWASP Secrets Management Cheat Sheet.\n\nIf you cannot use a pre-existing secrets management solution, try and use a trusted and well known implementation library rather than using the libraries built into .NET as it is far too easy to make cryptographic errors with them.\n\nMake sure your application or protocol can easily support a future change of cryptographic algorithms."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#011",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Hashing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Use a strong hashing algorithm.\n\nIn .NET (both Framework and Core), the strongest hashing algorithm for general hashing requirements is System.Security.Cryptography.SHA512.\n\nFor new ASP.NET Core applications, use ASP.NET Core Identity and its PasswordHasher<TUser> for password storage. Microsoft advises against calling KeyDerivation.Pbkdf2 directly for this purpose; it is a low-level primitive intended for integration with existing cryptographic systems.\n\nDo not use general-purpose hashes such as SHA-512 directly for password storage.\n\nRefer to the Password Storage Cheat Sheet for more information."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#012",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Passwords",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Follow the Authentication Cheat Sheet for password length and breached-password screening. Allow long passphrases without mandatory character-composition rules."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#013",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Encryption",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Use a strong encryption algorithm such as AES-256 where personally identifiable data needs to be restored to its original format.\n\nDO: Protect encryption keys more than any other asset. Find more information about storing encryption keys at rest in the Key Management Cheat Sheet.\n\nDO: Use TLS 1.2+ for your entire site. Get a free certificate LetsEncrypt.org and automate renewals.\n\nDO NOT: Allow SSL, this is now obsolete.\n\nDO: Have a strong TLS policy (see SSL Best Practices), use TLS 1.2+ wherever possible. Then check the configuration using SSL Test or TestSSL.\n\nMore information on Transport Layer Protection can be found in the Transport Layer Security Cheat Sheet.\n\nDO: Ensure headers are not disclosing information about your application. See HttpHeaders.cs, Dionach StripHeaders, disable via web.config or Startup.cs.\n\ne.g Web.config\n\n```\n<system.web>\n    <httpRuntime enableVersionHeader=\"false\"/>\n</system.web>\n<system.webServer>\n    <security>\n        <requestFiltering removeServerHeader=\"true\" />\n    </security>\n    <httpProtocol>\n        <customHeaders>\n            <add name=\"X-Content-Type-Options\" value=\"nosniff\" />\n            <add name=\"X-Frame-Options\" value=\"DENY\" />\n            <add name=\"X-Permitted-Cross-Domain-Policies\" value=\"master-only\"/>\n            <add name=\"X-XSS-Protection\" value=\"0\"/>\n            <remove name=\"X-Powered-By\"/>\n        </customHeaders>\n    </httpProtocol>\n</system.webServer>\n```\n\ne.g Startup.cs\n\n```\napp.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());\napp.UseXContentTypeOptions();\napp.UseReferrerPolicy(opts => opts.NoReferrer());\napp.UseXXssProtection(options => options.FilterDisabled());\napp.UseXfo(options => options.Deny());\n\napp.UseCsp(opts => opts\n .BlockAllMixedContent()\n .StyleSources(s => s.Self())\n .StyleSources(s => s.UnsafeInline())\n .FontSources(s => s.Self())\n .FormActions(s => s.Self())\n .FrameAncestors(s => s.Self())\n .ImageSources(s => s.Self())\n .ScriptSources(s => s.Self())\n );\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#014",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Encryption",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "More information about headers can be found at the OWASP Secure Headers Project."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#015",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Encryption for storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Use the Windows Data Protection API (DPAPI) for secure local storage of sensitive data.\n\nWhere DPAPI cannot be used, follow the algorithm guidance in the OWASP Cryptographic Storage Cheat Sheet.\n\nThe following code snippet shows an example of using AES-GCM to perform encryption/decryption of data. It is strongly recommended to have a cryptography expert review your final design and code, as even the most trivial error can severely weaken your encryption.\n\nThe code is based on example from here: https://www.scottbrady91.com/c-sharp/aes-gcm-dotnet\n\nA few constraints/pitfalls with this code:\n\nIt does not take into account key rotation or management which is a whole topic in itself.\n\nIt is important to use a different nonce for every encryption operation, even if the same key is used.\n\nThe key will need to be stored securely.\n\nClick here to view the \"AES-GCM symmetric encryption\" code snippet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#016",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Encryption for storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "```\n// Code based on example from here:\n// https://www.scottbrady91.com/c-sharp/aes-gcm-dotnet\n\npublic class AesGcmSimpleTest\n{\n    public static void Main()\n    {\n\n        // Key of 32 bytes / 256 bits for AES\n        var key = new byte[32];\n        RandomNumberGenerator.Fill(key);\n\n        // MaxSize = 12 bytes / 96 bits and this size should always be used.\n        var nonce = new byte[AesGcm.NonceByteSizes.MaxSize];\n        RandomNumberGenerator.Fill(nonce);\n\n        // Tag for authenticated encryption\n        var tag = new byte[AesGcm.TagByteSizes.MaxSize];\n\n        var message = \"This message to be encrypted\";\n        Console.WriteLine(message);\n\n        // Encrypt the message\n        var cipherText = AesGcmSimple.Encrypt(message, nonce, out tag, key);\n        Console.WriteLine(Convert.ToBase64String(cipherText));\n\n        // Decrypt the message\n        var message2 = AesGcmSimple.Decrypt(cipherText, nonce, tag, key);\n        Console.WriteLine(message2);\n\n\n    }\n}\n\n\npublic static class AesGcmSimple\n{\n\n    public static byte[] Encrypt(string plaintext, byte[] nonce, out byte[] tag, byte[] key)\n    {\n        using(var aes = new AesGcm(key))\n        {\n            // Tag for authenticated encryption\n            tag = new byte[AesGcm.TagByteSizes.MaxSize];\n\n            // Create a byte array from the message to encrypt\n            var plaintextBytes = Encoding.UTF8.GetBytes(plaintext);\n\n            // Ciphertext will be same length in bytes as plaintext\n            var ciphertext = new byte[plaintextBytes.Length];\n\n            // perform the actual encryption\n            aes.Encrypt(nonce, plaintextBytes, ciphertext, tag);\n            return ciphertext;\n        }\n    }\n\n    public static string Decrypt(byte[] ciphertext, byte[] nonce, byte[] tag, byte[] key)\n    {\n        using(var aes = new AesGcm(key))\n        {\n            // Plaintext will be same length in bytes as Ciphertext\n            var plaintextBytes = new byte[ciphertext.Length];\n\n            // perform the actual decryption\n            aes.Decrypt(nonce, ciphertext, tag, plaintextBytes);\n\n            return Encoding.UTF8.GetString(plaintextBytes);\n        }\n    }\n}\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#017",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Encryption for transmission",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Again, follow the algorithm guidance in the OWASP Cryptographic Storage Cheat Sheet.\n\nThe following code snippet shows an example of using Elliptic Curve/Diffie-Hellman (ECDH) together with AES-GCM to perform encryption/decryption of data between two different sides without the need to transfer the symmetric key between the two sides. Instead, the sides exchange public keys and can then use ECDH to generate a shared secret which can be used for the symmetric encryption.\n\nAgain, it is strongly recommended to have a cryptography expert review your final design and code, as even the most trivial error can severely weaken your encryption.\n\nNote that this code sample relies on the AesGcmSimple class from the previous section.\n\nA few constraints/pitfalls with this code:\n\nIt does not take into account key rotation or management which is a whole topic in itself.\n\nThe code deliberately enforces a new nonce for every encryption operation but this must be managed as a separate data item alongside the ciphertext.\n\nThe private keys will need to be stored securely.\n\nThe code does not consider the validation of public keys before use.\n\nOverall, there is no verification of authenticity between the two sides.\n\nClick here to view the \"ECDH asymmetric encryption\" code snippet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#018",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A02 Cryptographic Failures > Encryption for transmission",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "```\npublic class ECDHSimpleTest\n{\n    public static void Main()\n    {\n        // Generate ECC key pair for Alice\n        var alice = new ECDHSimple();\n        byte[] alicePublicKey = alice.PublicKey;\n\n        // Generate ECC key pair for Bob\n        var bob = new ECDHSimple();\n        byte[] bobPublicKey = bob.PublicKey;\n\n        string plaintext = \"Hello, Bob! How are you?\";\n        Console.WriteLine(\"Secret being sent from Alice to Bob: \" + plaintext);\n\n        // Note that a new nonce is generated with every encryption operation in line with\n        // in line with the AES GCM security\n        byte[] tag;\n        byte[] nonce;\n        var cipherText = alice.Encrypt(bobPublicKey, plaintext, out nonce, out tag);\n        Console.WriteLine(\"Ciphertext, nonce, and tag being sent from Alice to Bob: \" + Convert.ToBase64String(cipherText) + \" \" + Convert.ToBase64String(nonce) + \" \" + Convert.ToBase64String(tag));\n\n        var decrypted = bob.Decrypt(alicePublicKey, cipherText, nonce, tag);\n        Console.WriteLine(\"Secret received by Bob from Alice: \" + decrypted);\n\n        Console.WriteLine();\n\n        string plaintext2 = \"Hello, Alice! I'm good, how are you?\";\n        Console.WriteLine(\"Secret being sent from Bob to Alice: \" + plaintext2);\n\n        byte[] tag2;\n        byte[] nonce2;\n        var cipherText2 = bob.Encrypt(alicePublicKey, plaintext2, out nonce2, out tag2);\n        Console.WriteLine(\"Ciphertext, nonce, and tag being sent from Bob to Alice: \" + Convert.ToBase64String(cipherText2) + \" \" + Convert.ToBase64String(nonce2) + \" \" + Convert.ToBase64String(tag2));\n\n        var decrypted2 = alice.Decrypt(bobPublicKey, cipherText2, nonce2, tag2);\n        Console.WriteLine(\"Secret received by Alice from Bob: \" + decrypted2);\n    }\n}\n\n\npublic class ECDHSimple\n{\n\n    private ECDiffieHellmanCng ecdh = new ECDiffieHellmanCng();\n\n    public byte[] PublicKey\n    {\n        get\n        {\n            return ecdh.PublicKey.ToByteArray();\n        }\n    }\n\n    public byte[] Encrypt(byte[] partnerPublicKey, string message, out byte[] nonce, out byte[] tag)\n    {\n        // Generate the AES Key and Nonce\n        var aesKey = GenerateAESKey(partnerPublicKey);\n\n        // Tag for authenticated encryption\n        tag = new byte[AesGcm.TagByteSizes.MaxSize];\n\n        // MaxSize = 12 bytes / 96 bits and this size should always be used.\n        // A new nonce is generated with every encryption operation in line with\n        // the AES GCM security model\n        nonce = new byte[AesGcm.NonceByteSizes.MaxSize];\n        RandomNumberGenerator.Fill(nonce);\n\n        // return the encrypted value\n        return AesGcmSimple.Encrypt(message, nonce, out tag, aesKey);\n    }\n\n\n    public string Decrypt(byte[] partnerPublicKey, byte[] ciphertext, byte[] nonce, byte[] tag)\n    {\n        // Generate the AES Key and Nonce\n        var aesKey = GenerateAESKey(partnerPublicKey);\n\n        // return the decrypted value\n        return AesGcmSimple.Decrypt(ciphertext, nonce, tag, aesKey);\n    }\n\n    private byte[] GenerateAESKey(byte[] partnerPublicKey)\n    {\n        // Derive the secret based on this side's private key and the other side's public key\n        byte[] secret = ecdh.DeriveKeyMaterial(CngKey.Import(partnerPublicKey, CngKeyBlobFormat.EccPublicBlob));\n\n        byte[] aesKey = new byte[32]; // 256-bit AES key\n        Array.Copy(secret, 0, aesKey, 0, 32); // Copy first 32 bytes as the key\n\n        return aesKey;\n    }\n}\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#019",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A03 Injection > SQL Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Using an object relational mapper (ORM) or stored procedures is the most effective way of countering the SQL Injection vulnerability.\n\nDO: Use parameterized queries where a direct SQL query must be used. More Information can be found in the Query Parameterization Cheat Sheet.\n\nE.g., using Entity Framework:\n\n```\nvar sql = @\"Update [User] SET FirstName = @FirstName WHERE Id = @Id\";\ncontext.Database.ExecuteSqlCommand(\n    sql,\n    new SqlParameter(\"@FirstName\", firstname),\n    new SqlParameter(\"@Id\", id));\n```\n\nDO NOT: Concatenate strings anywhere in your code and execute them against your database (Known as dynamic SQL).\n\nNote: You can still accidentally do this with ORMs or Stored procedures so check everywhere. For example:\n\n```\nstring sql = \"SELECT * FROM Users WHERE UserName='\" + txtUser.Text + \"' AND Password='\"\n                + txtPassword.Text + \"'\";\ncontext.Database.ExecuteSqlCommand(sql); // SQL Injection vulnerability!\n```\n\nDO: Practice Least Privilege - connect to the database using an account with a minimum set of permissions required to do its job, not the database administrator account."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#020",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A03 Injection > OS Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "General guidance about OS Injection can be found in the OS Command Injection Defense Cheat Sheet.\n\nDO: Use System.Diagnostics.Process.Start to call underlying OS functions.\n\ne.g\n\n```\nvar process = new System.Diagnostics.Process();\nvar startInfo = new System.Diagnostics.ProcessStartInfo();\nstartInfo.FileName = \"validatedCommand\";\nstartInfo.Arguments = \"validatedArg1 validatedArg2 validatedArg3\";\nprocess.StartInfo = startInfo;\nprocess.Start();\n```\n\nDO NOT: Assume that this mechanism will protect against malicious input designed to break out of one argument and then tamper with another argument to the process. This will still be possible.\n\nDO: Use allowlist validation on all user supplied input wherever possible. Input validation prevents improperly formed data from entering an information system. For more information please see the Input Validation Cheat Sheet.\n\ne.g Validating user input using IPAddress.TryParse Method\n\n```\n//User input\nstring ipAddress = \"127.0.0.1\";\n\n//check to make sure an ip address was provided\nif (!string.IsNullOrEmpty(ipAddress))\n{\n // Create an instance of IPAddress for the specified address string (in\n // dotted-quad, or colon-hexadecimal notation).\n if (IPAddress.TryParse(ipAddress, out var address))\n {\n  // Display the address in standard notation.\n  return address.ToString();\n }\n else\n {\n  //ipAddress is not of type IPAddress\n  ...\n }\n    ...\n}\n```\n\nDO: Try to only accept characters which are simple alphanumeric.\n\nDO NOT: Assume you can sanitize special characters without actually removing them. Various combinations of \\, ' and @ may have an unexpected impact on sanitization attempts.\n\nDO NOT: Rely on methods without a security guarantee.\n\ne.g. .NET Core 2.2 and greater and .NET 5 and greater support ProcessStartInfo.ArgumentList which performs some character escaping but the object includes a disclaimer that it is not safe with untrusted input."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#021",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A03 Injection > OS Injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Look at alternatives to passing raw untrusted arguments via command-line parameters such as encoding using Base64 (which would safely encode any special characters as well) and then decode the parameters in the receiving application."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#022",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A03 Injection > LDAP injection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Almost any characters can be used in Distinguished Names. However, some must be escaped with the backslash \\ escape character. A table showing which characters that should be escaped for Active Directory can be found at the in the LDAP Injection Prevention Cheat Sheet.\n\nNote: The space character must be escaped only if it is the leading or trailing character in a component name, such as a Common Name. Embedded spaces should not be escaped.\n\nMore information can be found in the LDAP Injection Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#023",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A04 Insecure Design",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Insecure design refers to security failures in the design of the application or system. This is different than the other items in the OWASP Top 10 list which refer to implementation failures. The topic of secure design is therefore not related to a specific technology or language and is therefore out of scope for this cheat sheet. See the Secure Product Design Cheat Sheet for more information."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#024",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A05 Security Misconfiguration > Debug and Stack Trace",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Ensure debug and trace are off in production. This can be enforced using web.config transforms:\n\n```\n<compilation xdt:Transform=\"RemoveAttributes(debug)\" />\n<trace enabled=\"false\" xdt:Transform=\"Replace\"/>\n```\n\nDO NOT: Use default passwords\n\nDO: Redirect a request made over HTTP to HTTPS:\n\nE.g, Global.asax.cs:\n\n```\nprotected void Application_BeginRequest()\n{\n    #if !DEBUG\n    // SECURE: Ensure any request is returned over SSL/TLS in production\n    if (!Request.IsLocal && !Context.Request.IsSecureConnection) {\n        var redirect = Context.Request.Url.ToString()\n                        .ToLower(CultureInfo.CurrentCulture)\n                        .Replace(\"http:\", \"https:\");\n        Response.Redirect(redirect);\n    }\n    #endif\n}\n```\n\nE.g., Startup.cs in Configure():\n\n```\n  app.UseHttpsRedirection();\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#025",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A05 Security Misconfiguration > Cross-site request forgery",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO NOT: Send sensitive data without validating Anti-Forgery-Tokens (.NET / .NET Core).\n\nDO: Send the anti-forgery token with every POST/PUT request:\n\nUsing .NET Framework\n\n```\nusing (Html.BeginForm(\"LogOff\", \"Account\", FormMethod.Post, new { id = \"logoutForm\",\n                        @class = \"pull-right\" }))\n{\n    @Html.AntiForgeryToken()\n    <ul class=\"nav nav-pills\">\n        <li role=\"presentation\">\n        Logged on as @User.Identity.Name\n        </li>\n        <li role=\"presentation\">\n        <a href=\"javascript:document.getElementById('logoutForm').submit()\">Log off</a>\n        </li>\n    </ul>\n}\n```\n\nThen validate it at the method or preferably the controller level:\n\n```\n[HttpPost]\n[ValidateAntiForgeryToken]\npublic ActionResult LogOff()\n```\n\nMake sure the tokens are removed completely for invalidation on logout.\n\n```\n/// <summary>\n/// SECURE: Remove any remaining cookies including Anti-CSRF cookie\n/// </summary>\npublic void RemoveAntiForgeryCookie(Controller controller)\n{\n    string[] allCookies = controller.Request.Cookies.AllKeys;\n    foreach (string cookie in allCookies)\n    {\n        if (controller.Response.Cookies[cookie] != null &&\n            cookie == \"__RequestVerificationToken\")\n        {\n            controller.Response.Cookies[cookie].Expires = DateTime.Now.AddDays(-1);\n        }\n    }\n}\n```\n\nUsing .NET Core 2.0 or later\n\nStarting with .NET Core 2.0 it is possible to automatically generate and verify the antiforgery token.\n\nWith FormTagHelper enabled, a form with method=\"post\" and an absent or empty action automatically gets an antiforgery token unless token generation is disabled. This does not apply to every form. You can check whether tag helpers are enabled in your main _ViewImports.cshtml file:\n\n```\n@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers\n```\n\nIHtmlHelper.BeginForm generates an antiforgery token by default for methods other than GET. Token generation must be paired with server-side validation, as described below."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#026",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A05 Security Misconfiguration > Cross-site request forgery",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "For forms that need antiforgery protection without automatic token generation, add the token explicitly:\n\n```\n<form action=\"RelevantAction\" >\n@Html.AntiForgeryToken()\n</form>\n```\n\nTo automatically validate all requests other than GET, HEAD, OPTIONS and TRACE you need to add a global action filter with the AutoValidateAntiforgeryToken attribute inside your Startup.cs as mentioned in the following article:\n\n```\nservices.AddMvc(options =>\n{\n    options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());\n});\n```\n\nIf you need to disable the attribute validation for a specific method on a controller you can add the IgnoreAntiforgeryToken attribute to the controller method (for MVC controllers) or parent class (for Razor pages):\n\n```\n[IgnoreAntiforgeryToken]\n[HttpDelete]\npublic IActionResult Delete()\n```\n\n```\n[IgnoreAntiforgeryToken]\npublic class UnsafeModel : PageModel\n```\n\nIf you need to also validate the token on GET, HEAD, OPTIONS and TRACE requests you can add the ValidateAntiforgeryToken attribute to the controller method (for MVC controllers) or parent class (for Razor pages):\n\n```\n[HttpGet]\n[ValidateAntiforgeryToken]\npublic IActionResult DoSomethingDangerous()\n```\n\n```\n[HttpGet]\n[ValidateAntiforgeryToken]\npublic class SafeModel : PageModel\n```\n\nIn case you can't use a global action filter, add the AutoValidateAntiforgeryToken attribute to your controller classes or razor page models:\n\n```\n[AutoValidateAntiforgeryToken]\npublic class UserController\n```\n\n```\n[AutoValidateAntiforgeryToken]\npublic class SafeModel : PageModel\n```\n\nUsing .Net Core or .NET Framework with AJAX\n\nYou will need to attach the anti-forgery token to AJAX requests.\n\nIf you are using jQuery in an ASP.NET Core MVC view this can be achieved using this snippet:"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#027",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A05 Security Misconfiguration > Cross-site request forgery",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "```\n@inject  Microsoft.AspNetCore.Antiforgery.IAntiforgery antiforgeryProvider\n$.ajax(\n{\n    type: \"POST\",\n    url: '@Url.Action(\"Action\", \"Controller\")',\n    contentType: \"application/x-www-form-urlencoded; charset=utf-8\",\n    data: {\n        id: id,\n        '__RequestVerificationToken': '@antiforgeryProvider.GetAndStoreTokens(this.Context).RequestToken'\n    }\n})\n```\n\nIf you are using the .NET Framework, you can find some code snippets here.\n\nMore information can be found in the Cross-Site Request Forgery Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#028",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A06 Vulnerable and Outdated Components",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Keep the .NET framework updated with the latest patches\n\nDO: Keep your NuGet packages up to date\n\nDO: Run the OWASP Dependency Checker against your application as part of your build process and act on any high or critical level vulnerabilities.\n\nDO: Include SCA (software composition analysis) tools in your CI/CD pipeline to ensure that any new vulnerabilities in your dependencies are detected and acted upon."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#029",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A07 Identification and Authentication Failures",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Use ASP.NET Core Identity. ASP.NET Core Identity framework is well configured by default, where it uses secure password hashes and an individual salt. Identity uses the PBKDF2 hashing function for passwords, and generates a random salt per user.\n\nDO: Configure password length and composition settings according to NIST’s password guidance: at least 15 characters when passwords can be used without multifactor authentication (MFA), or at least eight when only used with MFA, without mandatory character-composition rules.\n\nThis ASP.NET Core Identity example assumes passwords can be used without MFA. Identity’s default password validator measures length in UTF-16 code units, so add Unicode code-point length validation to enforce NIST’s minimum. These settings also do not implement breached-password screening; follow the Authentication Cheat Sheet for the complete policy.\n\n```\n//Startup.cs\nservices.Configure<IdentityOptions>(options =>\n{\n // Password settings\n options.Password.RequireDigit = false;\n options.Password.RequiredLength = 15;\n options.Password.RequireNonAlphanumeric = false;\n options.Password.RequireUppercase = false;\n options.Password.RequireLowercase = false;\n options.Password.RequiredUniqueChars = 1;\n\n options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);\n options.Lockout.MaxFailedAccessAttempts = 3;\n\n options.SignIn.RequireConfirmedEmail = true;\n\n options.User.RequireUniqueEmail = true;\n});\n```\n\nDO: Set a cookie policy\n\ne.g\n\n```\n//Startup.cs\nservices.ConfigureApplicationCookie(options =>\n{\n options.Cookie.HttpOnly = true;\n options.ExpireTimeSpan = TimeSpan.FromMinutes(60);\n // See the discussion in A01 for trade-offs on using sliding expiration.\n options.SlidingExpiration = false;\n});\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#030",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A08 Software and Data Integrity Failures",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Digitally sign assemblies and executable files\n\nDO: Use Nuget package signing\n\nDO: Review code and configuration changes to avoid malicious code or dependencies being introduced\n\nDO NOT: Send unsigned or unencrypted serialized objects over the network\n\nDO: Perform integrity checks or validate digital signatures on serialized objects received from the network\n\nDO NOT: Use the BinaryFormatter type which is dangerous and not recommended for data processing. .NET offers several in-box serializers that can handle untrusted data safely:\n\nXmlSerializer and DataContractSerializer to serialize object graphs into and from XML. Do not confuse DataContractSerializer with NetDataContractSerializer.\n\nBinaryReader and BinaryWriter for reading and writing primitive data types (such as Int32, Double, Boolean, and String) in binary format.\n\nThe System.Text.Json APIs to serialize object graphs into JSON."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#031",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A09 Security Logging and Monitoring Failures",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Ensure all login, access control, and server-side input validation failures are logged with sufficient user context to identify suspicious or malicious accounts.\n\nDO: Establish effective monitoring and alerting so suspicious activities are detected and responded to in a timely fashion.\n\nDO NOT: Log generic error messages such as: csharp Log.Error(\"Error was thrown\");. Instead, log the stack trace, error message and user ID who caused the error.\n\nDO NOT: Log sensitive data such as user's passwords."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#032",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A09 Security Logging and Monitoring Failures > Logging",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "What logs to collect and more information about logging can be found in the Logging Cheat Sheet.\n\n.NET Core comes with a LoggerFactory, which is in Microsoft.Extensions.Logging. More information about ILogger can be found here.\n\nHere's how to log all errors from the Startup.cs, so that anytime an error is thrown it will be logged:\n\n```\npublic void Configure(IApplicationBuilder app, IHostingEnvironment env)\n{\n    if (env.IsDevelopment())\n    {\n        _isDevelopment = true;\n        app.UseDeveloperExceptionPage();\n    }\n\n    //Log all errors in the application\n    app.UseExceptionHandler(errorApp =>\n    {\n        errorApp.Run(async context =>\n        {\n            var errorFeature = context.Features.Get<IExceptionHandlerFeature>();\n            var exception = errorFeature.Error;\n\n            Log.Error(String.Format(\"Stacktrace of error: {0}\",exception.StackTrace.ToString()));\n        });\n    });\n\n    app.UseAuthentication();\n    app.UseMvc();\n }\n}\n```\n\nE.g. injecting into the class constructor, which makes writing unit test simpler. This is recommended if instances of the class will be created using dependency injection (e.g. MVC controllers). The below example logs unsuccessful login attempts and sets lockoutOnFailure: true so failed password attempts count toward the configured lockout threshold for accounts with lockout enabled."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#033",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A09 Security Logging and Monitoring Failures > Logging",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "```\npublic class AccountsController : Controller\n{\n        private ILogger _Logger;\n\n        public AccountsController(ILogger logger)\n        {\n            _Logger = logger;\n        }\n\n        [HttpPost]\n        [AllowAnonymous]\n        [ValidateAntiForgeryToken]\n        public async Task<IActionResult> Login(LoginViewModel model)\n        {\n            if (ModelState.IsValid)\n            {\n                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);\n                if (result.Succeeded)\n                {\n                    //Log all successful log in attempts\n                    Log.Information(String.Format(\"User: {0}, Successfully Logged in\", model.Email));\n                    //Code for successful login\n                    //...\n                }\n                else\n                {\n                    //Log all incorrect log in attempts\n                    Log.Information(String.Format(\"User: {0}, Incorrect Password\", model.Email));\n                }\n             }\n            ...\n        }\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#034",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A09 Security Logging and Monitoring Failures > Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Monitoring allow us to validate the performance and health of a running system through key performance indicators.\n\nIn .NET a great option to add monitoring capabilities is Application Insights.\n\nMore information about Logging and Monitoring can be found here."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#035",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A10 Server-Side Request Forgery (SSRF)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO: Validate and sanitize all user input before using it to make a request\n\nDO: Use an allowlist of allowed protocols and domains\n\nDO: Use IPAddress.TryParse() and Uri.CheckHostName() to ensure that IP addresses and domain names are valid\n\nDO NOT: Follow HTTP redirects\n\nDO NOT: Forward raw HTTP responses to the user\n\nFor more information please see the Server-Side Request Forgery Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#036",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > OWASP 2013 & 2017",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Below are vulnerabilities that were included in the 2013 or 2017 OWASP Top 10 list that were not included in the 2021 list. These vulnerabilities are still relevant but were not included in the 2021 list because they have become less prevalent."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#037",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > OWASP 2013 & 2017 > A04:2017 XML External Entities (XXE)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "XXE attacks occur when an XML parse does not properly process user input that contains external entity declarations in the doctype of an XML payload.\n\nThis article discusses the most common XML Processing Options for .NET.\n\nPlease refer to the XXE cheat sheet for more detailed information on preventing XXE and other XML Denial of Service attacks."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#038",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > OWASP 2013 & 2017 > A07:2017 Cross-Site Scripting (XSS)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO NOT: Trust any data the user sends you. Prefer allowlists (always safe) over denylists.\n\nYou get encoding of all HTML content with MVC3. To properly encode all content whether HTML, JavaScript, CSS, LDAP, etc., use the Microsoft AntiXSS library:\n\nInstall-Package AntiXSS\n\nThen set in config:\n\n```\n<system.web>\n<httpRuntime targetFramework=\"4.5\"\nenableVersionHeader=\"false\"\nencoderType=\"Microsoft.Security.Application.AntiXssEncoder, AntiXssLibrary\"\nmaxRequestLength=\"4096\" />\n```\n\nDO NOT: Use the [AllowHTML] attribute or helper class @Html.Raw unless you are absolutely sure that the content you are writing to the browser is safe and has been escaped properly.\n\nDO: Enable a Content Security Policy. This will prevent your pages from accessing assets they should not be able to access (e.g. malicious scripts):\n\n```\n<system.webServer>\n    <httpProtocol>\n        <customHeaders>\n            <add name=\"Content-Security-Policy\"\n                value=\"default-src 'none'; style-src 'self'; img-src 'self';\n                font-src 'self'; script-src 'self'\" />\n```\n\nMore information can be found in the Cross Site Scripting Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#039",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > OWASP 2013 & 2017 > A08:2017 Insecure Deserialization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "DO NOT: Accept Serialized Objects from Untrusted Sources\n\nDO: Validate User Input\n\nMalicious users are able to use objects like cookies to insert malicious information to change user roles. In some cases, hackers are able to elevate their privileges to administrator rights by using a pre-existing or cached password hash from a previous session.\n\nDO: Prevent Deserialization of Domain Objects\n\nDO: Run the Deserialization Code with Limited Access Permissions If a deserialized hostile object tries to initiate a system process or access a resource within the server or the host's OS, it will be denied access and a permission flag will be raised so that a system administrator is made aware of any anomalous activity on the server.\n\nMore information about Insecure Deserialization can be found in the Deserialization Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#040",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > OWASP 2013 & 2017 > A10:2013 Unvalidated redirects and forwards",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "A protection against this was introduced in MVC 3 template. Here is the code:\n\n```\npublic async Task<ActionResult> LogOn(LogOnViewModel model, string returnUrl)\n{\n    if (ModelState.IsValid)\n    {\n        var logonResult = await _userManager.TryLogOnAsync(model.UserName, model.Password);\n        if (logonResult.Success)\n        {\n            await _userManager.LogOnAsync(logonResult.UserName, model.RememberMe);  \n            return RedirectToLocal(returnUrl);\n...\n```\n\n```\nprivate ActionResult RedirectToLocal(string returnUrl)\n{\n    if (Url.IsLocalUrl(returnUrl))\n    {\n        return Redirect(returnUrl);\n    }\n    else\n    {\n        return RedirectToAction(\"Landing\", \"Account\");\n    }\n}\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#041",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > Other advice",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Protect against Clickjacking and Man-in-the-Middle attack from capturing an initial Non-TLS request: Set the X-Frame-Options and Strict-Transport-Security (HSTS) headers. Full details here\n\nProtect against a man-in-the-middle attack for a user who has never been to your site before. Register for HSTS preload\n\nMaintain security testing and analysis on Web API services. They are hidden inside MVC sites, and are public parts of a site that will be found by an attacker. All of the MVC guidance and much of the WCF guidance applies to Web API as well.\n\nAlso see the Unvalidated Redirects and Forwards Cheat Sheet."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#042",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > Other advice > Sample project",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "For more information on all of the above and code samples incorporated into a sample MVC5 application with an enhanced security baseline go to Security Essentials Baseline project."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#043",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Guidance for specific topics",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "This section contains guidance for specific topics in .NET."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#044",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Guidance for specific topics > Configuration and Deployment",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Lock down config files.\n\nRemove all aspects of configuration that are not in use.\n\nDo not store secrets in source-controlled config files (web.config, appsettings.json). Keep secrets out of the configuration file entirely.\n\nModern .NET (Core / 6+ / 8+): use User Secrets for development and a managed secret store (Azure Key Vault, AWS Secrets Manager, HashiCorp Vault) accessed via Managed Identity / Workload Identity for production.\n\nLegacy .NET Framework (4.7.1+): use Configuration Builders (e.g. Microsoft.Configuration.ConfigurationBuilders.Azure, ...Environment) to inject secrets at runtime from a secret store or environment variables, so they never appear in web.config.\n\nOnly as a last resort — for legacy applications that cannot be modified — encrypt sensitive web.config sections using aspnet_regiis -pe (command line help). Note that this only protects the file at rest on the server; the application still loads the plaintext into memory.\n\nFor ClickOnce applications, the .NET Framework should be upgraded to use the latest version to ensure support of TLS 1.2 or later."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#045",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Guidance for specific topics > Data Access",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Use Parameterized SQL commands for all data access, without exception.\n\nDo not use SqlCommand with a string parameter made up of a concatenated SQL String.\n\nList allowable values coming from the user. Use enums, TryParse or lookup values to assure that the data coming from the user is as expected.\n\nEnums are still vulnerable to unexpected values because .NET only validates a successful cast to the underlying data type, integer by default. Enum.IsDefined can validate whether the input value is valid within the list of defined constants.\n\nApply the principle of least privilege when setting up the Database User in your database of choice. The database user should only be able to access items that make sense for the use case.\n\nUse of Entity Framework is a very effective SQL injection prevention mechanism. Remember that building your own ad hoc queries in Entity Framework is just as susceptible to SQLi as a plain SQL query.\n\nWhen using SQL Server, prefer integrated authentication over SQL authentication.\n\nUse Always Encrypted where possible for sensitive data (SQL Server 2016+ and Azure SQL)"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#046",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "ASP NET Web Forms Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "ASP.NET Web Forms is the original browser-based application development API for the .NET Framework, and is still the most common enterprise platform for web application development.\n\nAlways use HTTPS.\n\nEnable requireSSL on cookies and form elements and HttpOnly on cookies in the web.config.\n\nImplement customErrors.\n\nMake sure tracing is turned off.\n\nWhile ViewState isn't always appropriate for web development, using it can provide CSRF mitigation. To make the ViewState protect against CSRF attacks you need to set the ViewStateUserKey:\n\n```\nprotected override OnInit(EventArgs e) {\n    base.OnInit(e);\n    ViewStateUserKey = Session.SessionID;\n}\n```\n\nIf you don't use Viewstate, then look to the default main page of the ASP.NET Web Forms default template for a manual anti-CSRF token using a double-submit cookie."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#047",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "ASP NET Web Forms Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "```\nprivate const string AntiXsrfTokenKey = \"__AntiXsrfToken\";\nprivate const string AntiXsrfUserNameKey = \"__AntiXsrfUserName\";\nprivate string _antiXsrfTokenValue;\nprotected void Page_Init(object sender, EventArgs e)\n{\n    // The code below helps to protect against XSRF attacks\n    var requestCookie = Request.Cookies[AntiXsrfTokenKey];\n    Guid requestCookieGuidValue;\n    if (requestCookie != null && Guid.TryParse(requestCookie.Value, out requestCookieGuidValue))\n    {\n       // Use the Anti-XSRF token from the cookie\n       _antiXsrfTokenValue = requestCookie.Value;\n       Page.ViewStateUserKey = _antiXsrfTokenValue;\n    }\n    else\n    {\n       // Generate a new Anti-XSRF token and save to the cookie\n       _antiXsrfTokenValue = Guid.NewGuid().ToString(\"N\");\n       Page.ViewStateUserKey = _antiXsrfTokenValue;\n       var responseCookie = new HttpCookie(AntiXsrfTokenKey)\n       {\n          HttpOnly = true,\n          Value = _antiXsrfTokenValue\n       };\n       if (FormsAuthentication.RequireSSL && Request.IsSecureConnection)\n       {\n          responseCookie.Secure = true;\n       }\n       Response.Cookies.Set(responseCookie);\n    }\n    Page.PreLoad += master_Page_PreLoad;\n}\nprotected void master_Page_PreLoad(object sender, EventArgs e)\n{\n    if (!IsPostBack)\n    {\n       // Set Anti-XSRF token\n       ViewState[AntiXsrfTokenKey] = Page.ViewStateUserKey;\n       ViewState[AntiXsrfUserNameKey] = Context.User.Identity.Name ?? String.Empty;\n    }\n    else\n    {\n       // Validate the Anti-XSRF token\n       if ((string)ViewState[AntiXsrfTokenKey] != _antiXsrfTokenValue ||\n          (string)ViewState[AntiXsrfUserNameKey] != (Context.User.Identity.Name ?? String.Empty))\n       {\n          throw new InvalidOperationException(\"Validation of Anti-XSRF token failed.\");\n       }\n    }\n}\n```\n\nConsider HSTS in IIS. See here for the procedure.\n\nThis is a recommended web.config setup that handles HSTS among other things."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#048",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "ASP NET Web Forms Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "```\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n <configuration>\n   <system.web>\n     <httpRuntime enableVersionHeader=\"false\"/>\n   </system.web>\n   <system.webServer>\n     <security>\n       <requestFiltering removeServerHeader=\"true\" />\n     </security>\n     <staticContent>\n       <clientCache cacheControlCustom=\"public\"\n            cacheControlMode=\"UseMaxAge\"\n            cacheControlMaxAge=\"1.00:00:00\"\n            setEtag=\"true\" />\n     </staticContent>\n     <httpProtocol>\n       <customHeaders>\n         <add name=\"Content-Security-Policy\"\n            value=\"default-src 'none'; style-src 'self'; img-src 'self'; font-src 'self'\" />\n         <add name=\"X-Content-Type-Options\" value=\"NOSNIFF\" />\n         <add name=\"X-Frame-Options\" value=\"DENY\" />\n         <add name=\"X-Permitted-Cross-Domain-Policies\" value=\"master-only\"/>\n         <add name=\"X-XSS-Protection\" value=\"0\"/>\n         <remove name=\"X-Powered-By\"/>\n       </customHeaders>\n     </httpProtocol>\n     <rewrite>\n       <rules>\n         <rule name=\"Redirect to https\">\n           <match url=\"(.*)\"/>\n           <conditions>\n             <add input=\"{HTTPS}\" pattern=\"Off\"/>\n             <add input=\"{REQUEST_METHOD}\" pattern=\"^get$|^head$\" />\n           </conditions>\n           <action type=\"Redirect\" url=\"https://{HTTP_HOST}/{R:1}\" redirectType=\"Permanent\"/>\n         </rule>\n       </rules>\n       <outboundRules>\n         <rule name=\"Add HSTS Header\" enabled=\"true\">\n           <match serverVariable=\"RESPONSE_Strict_Transport_Security\" pattern=\".*\" />\n           <conditions>\n             <add input=\"{HTTPS}\" pattern=\"on\" ignoreCase=\"true\" />\n           </conditions>\n           <action type=\"Rewrite\" value=\"max-age=15768000\" />\n         </rule>\n       </outboundRules>\n     </rewrite>\n   </system.webServer>\n </configuration>\n```\n\nRemove the version header by adding the following line in Machine.config file:\n\n```\n<httpRuntime enableVersionHeader=\"false\" />\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#049",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "ASP NET Web Forms Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Also remove the Server header using the HttpContext Class in your code.\n\n```\nHttpContext.Current.Response.Headers.Remove(\"Server\");\n```"
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#050",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "ASP NET Web Forms Guidance > HTTP validation and encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Do not disable validateRequest in the web.config or the page setup. This value enables limited XSS protection in ASP.NET and should be left intact as it provides partial prevention of Cross Site Scripting. Complete request validation is recommended in addition to the built-in protections.\n\nThe 4.5 version of the .NET Frameworks includes the AntiXssEncoder library, which has a comprehensive input encoding library for the prevention of XSS. Use it.\n\nList allowable values anytime user input is accepted.\n\nValidate the format of URIs using Uri.IsWellFormedUriString."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#051",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "ASP NET Web Forms Guidance > Forms authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Use cookies for persistence when possible. Cookieless auth will default to UseDeviceProfile.\n\nDon't trust the URI of the request for persistence of the session or authorization. It can be easily faked.\n\nReduce the Forms Authentication timeout from the default of 20 minutes to the shortest period appropriate for your application. If slidingExpiration is used this timeout resets after each request, so active users won't be affected.\n\nIf HTTPS is not used, slidingExpiration should be disabled. Consider disabling slidingExpiration even with HTTPS.\n\nAlways implement proper access controls.\n\nCompare user provided username with User.Identity.Name.\n\nCheck roles against User.Identity.IsInRole.\n\nUse the ASP.NET Membership provider and role provider, but review the password storage. The default storage hashes the password with a single iteration of SHA-1 which is rather weak. The ASP.NET MVC4 template uses ASP.NET Identity instead of ASP.NET Membership, and ASP.NET Identity uses PBKDF2 by default which is better. Review the OWASP Password Storage Cheat Sheet for more information.\n\nExplicitly authorize resource requests.\n\nLeverage role based authorization using User.Identity.IsInRole."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#052",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "XAML Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Work within the constraints of Internet Zone security for your application.\n\nUse ClickOnce deployment. For enhanced permissions, use permission elevation at runtime or trusted application deployment at install time."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#053",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "Windows Forms Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Use partial trust when possible. Partially trusted Windows applications reduce the attack surface of an application. Manage a list of what permissions your app must use, and what it may use, and then make the request for those permissions declaratively at runtime.\n\nUse ClickOnce deployment. For enhanced permissions, use permission elevation at runtime or trusted application deployment at install time."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#054",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "WCF Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Use HTTPS for RESTful requests regardless of HTTP method, and choose methods according to their semantics. Keep sensitive values out of URLs, which can be exposed in logs and browser history even with HTTPS. POST can carry sensitive form data in the request body rather than the URL, but POST alone does not provide confidentiality or authorization.\n\nAvoid BasicHttpBinding. It has no default security configuration. Use WSHttpBinding instead.\n\nUse at least two security modes for your binding. Message security includes security provisions in the headers. Transport security means use of SSL. TransportWithMessageCredential combines the two.\n\nTest your WCF implementation with a fuzzer like ZAP."
+  },
+  {
+   "chunk_id": "DotNet_Security_Cheat_Sheet#055",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/DotNet_Security_Cheat_Sheet.html",
+   "text": "Microsoft: Secure coding guidelines for .NET\n\nMicrosoft: Introduction to Identity on ASP.NET Core"
+  }
+ ]
+}

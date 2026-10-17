@@ -1,0 +1,553 @@
+{
+ "doc": "Multifactor_Authentication_Cheat_Sheet",
+ "title": "Multifactor Authentication Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#001",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Multifactor Authentication (MFA) requires evidence from at least two distinct authentication factors: something you know, something you have, and something you are. Location and other risk signals can inform authentication decisions, but do not substitute for an authentication factor, as explained in NIST SP 800-63B-4.\n\nFactor\n\nExamples\n\nSomething You Know\n\nPasswords and PINs\n\nSomething You Have\n\nOTP Tokens, U2F Tokens, Certificates, Smart Cards, SMS and Phone Calls (restricted)\n\nSomething You Are\n\nFingerprints, Facial Recognition, Iris Scans, Behavioral Biometrics\n\nIt should be noted that requiring multiple instances of the same authentication factor (such as needing both a password and a PIN) does not constitute MFA and offers minimal additional security. The factors used should be independent of each other and should not be able to be compromised by the same attack. While the following sections discuss the disadvantage and weaknesses of various different types of MFA, in many cases these are only relevant against targeted attacks. Any MFA is better than no MFA."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#002",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Advantages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "The most common way that user accounts get compromised on applications is through weak, re-used or stolen passwords. Despite any technical security controls implemented on the application, users are liable to choose weak passwords, or to use the same password on different applications. As developers or system administrators, it should be assumed that users' passwords will be compromised at some point, and the system should be designed in order to defend against this.\n\nMFA is by far the best defense against the majority of password-related attacks, including brute-force, credential stuffing and password spraying, with analysis by Microsoft suggesting that it would have stopped 99.9% of account compromises."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#003",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Disadvantages",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "The biggest disadvantage of MFA is the increase in management complexity for both administrators and end users. Many less technical users may find it difficult to configure and use MFA. Additionally, there are a number of other common issues encountered:\n\nTypes of MFA that require users to have specific hardware can introduce significant costs and administrative overheads.\n\nUsers may become locked out of their accounts if they lose or are unable to use their other factors.\n\nMFA introduces additional complexity into the application.\n\nMany MFA solutions add external dependencies to systems, which can introduce security vulnerabilities or single points of failure.\n\nProcesses implemented to allow users to bypass or reset MFA may be exploitable by attackers.\n\nRequiring MFA may prevent some users from accessing the application."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#004",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Quick Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Exactly when and how MFA is implemented in an application will vary on a number of different factors, including the threat model of the application, the technical level of the users, and the level of administrative control over the users. These need to be considered on a per-application basis.\n\nHowever, the following recommendations are generally appropriate for most applications, and provide an initial starting point to consider.\n\nRequire some form of MFA for all users.\n\nProvide the option for users to enable MFA on their accounts using TOTP.\n\nRequire MFA for administrative or other high privileged users.\n\nImplement a secure procedure to allow users to reset their MFA.\n\nConsider MFA as a service."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#005",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "MFA is a critical security control, and is recommended for all applications. The following sections provide guidance on how to implement MFA, and the considerations that should be taken into account."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#006",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > Regulatory and Compliance Requirements",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Many industries and countries have regulations that require the use of MFA. This is particularly common in the finance and healthcare sectors, and is often required in order to comply with the General Data Protection Regulation (GDPR) in the European Union. It is important to consider these requirements when implementing MFA."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#007",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > When to Require MFA",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "The most important place to require MFA on an application is when the user logs in. However, depending on the functionality available, it may also be appropriate to require MFA for performing sensitive actions, such as:\n\nChanging passwords or security questions.\n\nChanging the email address associated with the account.\n\nDisabling MFA.\n\nElevating a user session to an administrative session.\n\nIf the application provides multiple ways for a user to authenticate these should all require MFA, or have other protections implemented. A common area that is missed is if the application provides a separate API that can be used to login, or has an associated mobile application."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#008",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > One-Time Password (OTP) Handling and Storage",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "OTPs are authentication secrets and should be handled with password-like hygiene. While their security traits differ from long-lived passwords, improper handling can still lead to user account compromise.\n\nAt a minimum, OTP implementations SHOULD:\n\nEnforce a short time-to-live (TTL)\n\nEnsure OTPs are single use\n\nApply strict attempt limits\n\nInvalidate the OTP on successful verification\n\nOTP implementations SHOULD NOT:\n\nLog OTP values\n\nStore OTPs in long-term plaintext form\n\nTo further reduce risk and limit exposure, it is RECOMMENDED to:\n\nGenerate OTPs using a cryptographically secure random number generator\n\nConsider 8-digit or longer codes where usability allows\n\nOn \"resend\", generate a new OTP and overwrite the old record"
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#009",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > One-Time Password (OTP) Handling and Storage > Hashing OTPs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Hashing OTPs is still recommended, but for different reasons than password hashing. OTPs typically have a very small keyspace (for example, ~1 million possibilities for a 6-digit code), which means a database attacker can brute-force any OTP hash quickly.\n\nAs a result, hashing OTPs does not provide strong offline attack resistance in the way password hashing does.\n\nHowever, hashing remains useful to:\n\nPrevent accidental disclosure via logs, metrics, or debugging tools\n\nReduce blast radius if the database is briefly exposed during the OTP’s validity window\n\nEnforce good secret-handling discipline and avoid plaintext storage by default\n\nThe goal is short-term exposure protection, not long-term cryptographic secrecy."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#010",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > Improving User Experience > Risk Based Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Having to frequently login with MFA creates an additional burden for users, and may cause them to disable MFA on the application. Risk based authentication can be used to reduce the frequency of MFA prompts, by only requiring MFA when the user is performing an action that is considered to be high risk. Some examples of this include:\n\nRequiring MFA when the user logs in from a new device or location.\n\nRequiring MFA when the user logs in from a location that is considered to be high risk.\n\nUsing corporate IP ranges or geolocation as risk signals when deciding whether to require additional authentication."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#011",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > Improving User Experience > Passkeys",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Passkeys can provide phishing-resistant MFA by combining possession of the credential private key with local PIN or biometric verification. When using passkeys as MFA, require user verification and validate the returned user-verification flag on the server; a touch confirming user presence alone is not a second factor. The credential key pair is created during registration; authentication uses the existing private key to sign a challenge. For registration, verification, and recovery guidance, see the Passkey Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#012",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > Failed Login Attempts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "When a user enters their password, but fails to authenticate using a second factor, this could mean one of two things:\n\nThe user has lost their second factor, or doesn't have it available (for example, they don't have their mobile phone, or have no signal).\n\nThe user's password has been compromised.\n\nThere are a number of steps that should be taken when this occurs:\n\nPrompt the user to try another form of MFA.\n\nAllow the user to attempt to reset their MFA.\n\nNotify the user of the failed login attempt, and encourage them to change their password if they don't recognize it.\n\nThe notification should include the time, browser and geographic location of the login attempt.\n\nThis should be displayed next time they login, and optionally emailed to them as well."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#013",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > Resetting MFA",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "One of the biggest challenges with implementing MFA is handling users who forget or lose their additional factors. There are many ways this could happen, such as:\n\nRe-installing a workstation without backing up digital certificates.\n\nWiping or losing a phone without backing up OTP codes.\n\nChanging mobile numbers.\n\nIn order to prevent users from being locked out of the application, there needs to be a mechanism for them to regain access to their account if they can't use their existing MFA; however it is also crucial that this doesn't provide an attacker with a way to bypass MFA and hijack their account.\n\nThere is no definitive \"best way\" to do this, and what is appropriate will vary hugely based on the security of the application, and also the level of control over the users. Solutions that work for a corporate application where all the staff know each other are unlikely to be feasible for a publicly available application with thousands of users all over the world. Every recovery method has its own advantages and disadvantages, and these need to be evaluated in the context of the application.\n\nSome suggestions of possible methods include:\n\nProviding the user with a number of single-use recovery codes when they first setup MFA.\n\nRequiring the user to setup multiple types of MFA (such as a digital certificate, OTP core and phone number for SMS), so that they are unlikely to lose access to all of them at once.\n\nMailing a one-use recovery code (or new hardware token) to the user's registered address.\n\nRequiring the user contact the support team and having a rigorous process in place to verify their identity.\n\nRequiring another trusted user to vouch for them."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#014",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > Changing MFA Factors",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Users may need to update their authentication factors, such as changing a phone number, migrating to a new authenticator app, or replacing a lost hardware token. Because attackers can exploit this process to take over accounts, it must be strictly secured.\n\nBest practices include:\n\nRequire reauthentication with an existing enrolled factor before allowing changes.\n\nDo not rely solely on the active session, as it may be hijacked.\n\nTreat factor replacement as a high-risk action and apply risk-based checks (e.g., new device, unusual location).\n\nNotify the user through out-of-band channels (such as email or push notification) whenever an MFA factor is changed.\n\nConsider applying delays or step-up verification for high-value accounts.\n\nThis ensures that even if a session is compromised, attackers cannot silently replace the user’s MFA factors and lock the legitimate user out."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#015",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Implementing MFA > Consider Using a Third Party Service",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "There are a number of third party services that provide MFA as a service. These can be a good option for applications that don't have the resources to implement MFA themselves, or for applications that require a high level of assurance in their MFA. However, it is important to consider the security of the third party service, and the implications of using it. For example, if the third party service is compromised, it could allow an attacker to bypass MFA on all of the applications that use it."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#016",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Know",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Knowledge-based, the most common type of authentication is based on something the users knows - typically a password. The biggest advantage of this factor is that it has very low requirements for both the developers and the end user, as it does not require any special hardware, or integration with other services."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#017",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Know > Passwords and PINs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Passwords and PINs are the most common form of authentication due to the simplicity of implementing them. The Authentication Cheat Sheet has guidance on how to implement a strong password policy, and the Password Storage Cheat Sheet has guidance on how to securely store passwords. Most multifactor authentication systems make use of a password, as well as at least one other factor."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#018",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Know > Passwords and PINs > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Simple and well understood.\n\nNative support in every authentication framework.\n\nEasy to implement."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#019",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Know > Passwords and PINs > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Users are prone to choosing weak passwords.\n\nPasswords are commonly re-used between systems.\n\nSusceptible to phishing."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#020",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Know > Security Questions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Security questions are no longer recognized as an acceptable authentication factor per NIST SP 800-63. Account recovery is just an alternate way to authenticate so it should be no weaker than regular authentication."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#021",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Know > Security Questions > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "None that are not also present in passwords."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#022",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Know > Security Questions > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "No longer recognized as an acceptable authentication factor.\n\nQuestions often have easily guessable answers.\n\nAnswers to questions can often be obtained from social media or other sources.\n\nQuestions must be carefully chosen so that users will remember answers years later.\n\nSusceptible to phishing."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#023",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Possession-based authentication is based on the user having a physical or digital item that is required to authenticate. This is the most common form of MFA, and is often used in conjunction with passwords. The most common types of possession-based authentication are hardware and software tokens, and digital certificates. If properly implemented then this can be significantly more difficult for a remote attacker to compromise; however it also creates an additional administrative burden on the user, as they must keep the authentication factor with them whenever they wish to use it."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#024",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > One-Time Password Tokens",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "One-Time Password (OTP) tokens are a form of possession-based authentication, where the user is required to submit a constantly changing numeric code in order to authenticate. The most common of which is Time-based One-Time Password (TOTP) tokens, which can be both hardware and software based."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#025",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > One-Time Password Tokens > Hardware OTP Tokens",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Hardware OTP Tokens generate a constantly changing numeric codes, which must be submitted when authenticating. Most well-known of these is the RSA SecureID, which generates a six digit number that changes every 60 seconds.\n\nPros\n\nAs the tokens are separate physical devices, they are almost impossible for an attacker to compromise remotely.\n\nTokens can be used without requiring the user to have a mobile phone or other device.\n\nCons\n\nDeploying physical tokens to users is expensive and complicated.\n\nIf a user loses their token it could take a significant amount of time to purchase and ship them a new one.\n\nSome implementations require a backend server, which can introduce new vulnerabilities as well as a single point of failure.\n\nStolen tokens can be used without a PIN or device unlock code.\n\nSusceptible to phishing (although short-lived)."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#026",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > One-Time Password Tokens > Software OTP Tokens",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "A cheaper and easier alternative to hardware tokens is using software to generate Time-based One-Time Password (TOTP) codes. This would typically involve the user installing a TOTP application on their mobile phone, and then scanning a QR code provided by the web application which provides the initial seed. The authenticator app generates a numeric code using a configured time step; RFC 6238 recommends a default of 30 seconds. The app and server must use the same time-step value.\n\nMost websites use standardized TOTP tokens, allowing the user to install any authenticator app that supports TOTP. However, a small number of applications use their own variants of this (such as Symantec), which requires the users to install a specific app in order to use the service. This should be avoided in favor of a standards-based approach.\n\nPros\n\nThe absence of physical tokens greatly reduces the cost and administrative overhead of implementing the system.\n\nWhen users lose access to their TOTP app, a new one can be configured without needing to ship a physical token to them.\n\nTOTP is widely used, and many users will already have at least one TOTP app installed.\n\nA screen lock reduces theft risk but does not guarantee protection if the phone is stolen while unlocked. Enable authenticator-app access protection where available; for example, Google Authenticator’s Privacy Screen requires device verification before app use.\n\nCons\n\nTOTP apps are usually installed on mobile devices, which are vulnerable to compromise.\n\nThe TOTP app may be installed on the same mobile device (or workstation) that is used to authenticate.\n\nUsers may store the backup seeds insecurely.\n\nNot all users have mobile devices to use with TOTP.\n\nIf the user's mobile device is lost, stolen or out of battery, they will be unable to authenticate.\n\nSusceptible to phishing (although short-lived)."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#027",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Universal Second Factor",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Hardware U2F tokens\n\nUniversal Second Factor (U2F) is a standard for USB/NFC hardware tokens that implement challenge-response based authentication, rather than requiring the user to manually enter the code. This would typically be done by the user pressing a button on the token, or tapping it against their NFC reader. The most common U2F token is the YubiKey."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#028",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Universal Second Factor > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "U2F tokens are resistant to phishing since the private key never leaves the token.\n\nUsers can simply press a button rather than typing in a code.\n\nAs the tokens are separate physical devices, they are almost impossible for an attacker to compromise remotely.\n\nU2F is natively supported by a number of major web browsers.\n\nU2F tokens can be used without requiring the user to have a mobile phone or other device."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#029",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Universal Second Factor > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "As with hardware OTP tokens, the use of physical tokens introduces significant costs and administrative overheads.\n\nStolen tokens can be used without a PIN or device unlock code.\n\nAs the tokens are usually connected to the workstation via USB, users are more likely to forget them."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#030",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Certificates",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Digital certificates are files that are stored on the user's device which are automatically provided alongside the user's password when authenticating. The most common type is X.509 certificates more commonly known as client certificates. Certificates are supported by all major web browsers, and once installed require no further interaction from the user. The certificates should be linked to an individual's user account in order to prevent users from trying to authenticate against other accounts."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#031",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Certificates > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "There is no need to purchase and manage hardware tokens.\n\nOnce installed, certificates are very simple for users.\n\nCertificates can be centrally managed and revoked.\n\nResistant to phishing."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#032",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Certificates > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Using digital certificates requires a backend Private Key Infrastructure (PKI).\n\nInstalling certificates can be difficult for users, particularly in a highly restricted environment.\n\nEnterprise proxy servers which perform SSL decryption will prevent the use of certificates.\n\nThe certificates are stored on the user's workstation, and as such can be stolen if their system is compromised."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#033",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Smart Cards",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Smartcards are credit-card size cards with a chip containing a digital certificate for the user, which is unlocked with a PIN. They are commonly used for operating system authentication, but are rarely used in web applications."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#034",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Smart Cards > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Stolen smartcards cannot be used without the PIN.\n\nSmartcards can be used across multiple applications and systems.\n\nResistant to phishing."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#035",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Smart Cards > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Managing and distributing smartcards has the same costs and overheads as hardware tokens.\n\nSmartcards are not natively supported by modern browsers, so require third party software.\n\nAlthough most business-class laptops have smartcard readers built-in, home systems often do not.\n\nThe use of smartcards requires backend PKIs."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#036",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > SMS Messages and Phone Calls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "[!WARNING] NIST SP 800-63B-4 designates SMS and PSTN-delivered codes as a restricted authenticator because of SS7 interception, SIM-swap, and number-porting attacks. Do not use SMS for high-value or PII-handling applications. Where it is the only available factor, document the risk acceptance, enforce per-account rate limits, monitor for SIM-swap signals, and plan migration to TOTP, push notifications, or WebAuthn/FIDO2.\n\nSMS messages or phone calls can be used to provide users with a single-use code that they must submit as an additional factor. Due to the risks posed by these methods, they should not be used to protect applications that hold Personally Identifiable Information (PII) or where there is financial risk. e.g. healthcare and banking. NIST SP 800-63B classifies these as restricted authenticators and discourages their use for applications containing PII."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#037",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > SMS Messages and Phone Calls > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Relatively simple to implement.\n\nRequires user to link their account to a mobile number."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#038",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > SMS Messages and Phone Calls > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Requires the user to have a mobile device or landline.\n\nRequire user to have signal or internet access to receive the call or message.\n\nCalls and SMS messages may cost money to send need to protect against attackers requesting a large number of messages to exhaust funds.\n\nSusceptible to SIM swapping attacks.\n\nSMS messages may be received on the same device the user is authenticating from.\n\nSusceptible to phishing.\n\nSMS may be previewed when the device is locked.\n\nSMS may be read by malicious or insecure applications."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#039",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Email",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Email verification requires that the user enters a code or clicks a link sent to their email address. There is some debate as to whether email constitutes a form of MFA, because if the user does not have MFA configured on their email account, it simply requires knowledge of the user's email password (which is often the same as their application password). However, it is included here for completeness."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#040",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Email > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Very easy to implement.\n\nNo requirements for separate hardware or a mobile device."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#041",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Have > Email > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Relies entirely on the security of the email account, which often lacks MFA.\n\nEmail passwords are commonly the same as application passwords.\n\nProvides no protection if the user's email is compromised first.\n\nEmail may be received by the same device the user is authenticating from.\n\nSusceptible to phishing."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#042",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Are",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Inherence-based authentication is based on the physical attributes of the user. This is less common for web applications as it requires the user to have specific hardware, and is often considered to be the most invasive in terms of privacy. However, it is commonly used for operating system authentication, and is also used in some mobile applications."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#043",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Are > Biometrics",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "The are a number of common types of biometrics that are used, including:\n\nFingerprint scans\n\nFacial recognition\n\nIris scans\n\nVoice recognition"
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#044",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Are > Biometrics > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Well-implemented biometrics are hard to spoof, and require a targeted attack.\n\nFast and convenient for users."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#045",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Are > Biometrics > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Manual enrollment is required for the user.\n\nCustom (sometimes expensive) hardware is often required to read biometrics.\n\nPrivacy concerns: Sensitive physical information must be stored about users.\n\nIf compromised, biometric data can be difficult to change.\n\nHardware may be vulnerable to additional attack vectors."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#046",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Location can inform access restrictions and risk-based authentication decisions. It is not an independent authentication factor: a password combined with a trusted IP address or location does not constitute MFA. NIST SP 800-63B-4 explicitly distinguishes these risk signals from authentication factors."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#047",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Source IP Address",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "The source IP address the user is connecting from can be used as a risk signal or access restriction, typically in an allow-list based approach. This could either be based on a static list (such as corporate office ranges) or a dynamic list (such as previous IP addresses the user has authenticated from)."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#048",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Source IP Address > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Very easy for users.\n\nRequires minimal configuration and management from administrative staff."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#049",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Source IP Address > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Doesn't provide any protection if the user's system is compromised.\n\nDoesn't provide any protection against rogue insiders.\n\nTrusted IP addresses must be carefully restricted (for example, if the open guest Wi-Fi uses the main corporate IP range)."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#050",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Geolocation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Rather than using the exact IP address of the user, the geographic location that the IP address is registered to can be used. This is less precise, but may be more feasible to implement in environments where IP addresses are not static. A common usage would be to require additional authentication factors when an authentication attempt is made from outside of the user's normal country."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#051",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Geolocation > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Doesn't provide any protection if the user's system is compromised.\n\nDoesn't provide any protection against rogue insiders.\n\nEasy for an attacker to bypass by obtaining IP addresses in the trusted country or location.\n\nPrivacy features such as Apple's iCloud Private Relay and VPNs can make this less accurate."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#052",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Geofencing",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Geofencing is a more precise version of geolocation, which allows the user to define a specific area in which they are allowed to authenticate. This is often used in mobile applications, where the user's location can be determined with a high degree of accuracy using geopositioning hardware like GPS."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#053",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Geofencing > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Very easy for users.\n\nProvides a high level of protection against remote attackers."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#054",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Somewhere You Are > Geofencing > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Doesn't provide any protection if the user's system is compromised.\n\nDoesn't provide any protection against rogue insiders.\n\nDoesn't provide any protection against attackers who are physically close to the trusted location."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#055",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Behavioral biometrics, such as keystroke patterns or gait, are a form of \"something you are,\" not a separate authentication factor. Under NIST's biometric requirements, biometric comparison must be combined with an authenticated physical authenticator. General activity signals, such as login times or navigation patterns, can inform risk decisions but do not by themselves constitute MFA."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#056",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Behavioral Profiling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Behavioral profiling is based on the way the user interacts with the application, such as the time of day they log in, the devices they use, and the way they navigate the application. This is rapidly becoming more common in web applications when combined with Risk Based Authentication and User and Entity Behavior Analytics (UEBA) systems."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#057",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Behavioral Profiling > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Doesn't require user interaction.\n\nCan be used to continuously authenticate the user.\n\nCombines well with other factors to increase the level of assurance in the user's identity."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#058",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Behavioral Profiling > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Early implementations of behavioral profiling were often inaccurate and caused a significant number of false positives.\n\nRequires large amounts of data and processing power to analyze the user's behavior.\n\nMay be difficult to implement in environments where the user's behavior is likely to change frequently."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#059",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Keystroke & Mouse Dynamics",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Keystroke and mouse dynamics are based on the way the user types and moves their mouse. For example, the time between key presses, the time between key presses and releases, and the speed and acceleration of the mouse. Largely theoretical, and not widely used in practice."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#060",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Keystroke & Mouse Dynamics > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Can be used without requiring any additional hardware.\n\nCan be used without requiring any additional interaction from the user.\n\nCan be used to continuously authenticate the user.\n\nCan be used to detect when the user is not the one using the system.\n\nCan be used to detect when the user is under duress.\n\nCan be used to detect when the user is not in a fit state to use the system."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#061",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Keystroke & Mouse Dynamics > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Unlikely to be accurate enough to be used as a standalone factor.\n\nMay be spoofed by AI or other advanced attacks."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#062",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Gait Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Gait analysis is based on the way the user walks using cameras and sensors. They are often used in physical security systems, but are not widely used in web applications. Mobile device applications may be able to use the accelerometer to detect the user's gait and use this as an additional factor, however this is still largely theoretical."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#063",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Gait Analysis > Pros",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Very difficult to spoof.\n\nMay be used without requiring any additional interaction from the user."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#064",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Something You Do > Gait Analysis > Cons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Requires specific hardware to implement.\n\nUse outside of physical security systems is not widely tested."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#065",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "Adaptive or Risk-Based Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Adaptive (or Risk-Based) Authentication adjusts authentication requirements dynamically based on the context of the login attempt. This technique helps improve user experience while strengthening security by applying additional verification steps only when risk is elevated.\n\nCommon signals used to determine risk include:\n\nGeolocation and IP reputation\n\nDevice fingerprinting\n\nTime of access (e.g., 3 AM login)\n\nBehavioral biometrics (e.g., typing speed or mouse movements)\n\nKnown compromised credentials\n\nIf risk is detected, the system may:\n\nPrompt for an additional factor (e.g., OTP)\n\nEnforce re-authentication\n\nDeny access and trigger alerting or account protection flows\n\nFor more details on when to trigger reauthentication after high-risk events—such as account recovery or suspicious activity—see the Reauthentication After Risk Events section in the Authentication Cheat Sheet\n\nThis method is widely used in modern authentication systems to balance usability and security. However, developers must ensure that risk signals cannot be spoofed and that fallback mechanisms are not weaker than the primary MFA methods.\n\nExample Use Case: A user logs in from a trusted device in a usual location — no additional prompt is needed. But if they log in from a new country using a Tor exit node, the system requires SMS verification or triggers an account lock until further verification."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#066",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Attackers increasingly target weaknesses in MFA deployments and authentication workflows rather than attempting to defeat MFA itself. The following sections describe common attack patterns and recommended mitigations based on guidance from NIST SP 800-63B, CISA's Implementing Phishing-Resistant MFA, the FIDO Alliance Specifications, and OAuth 2.0 Security Best Current Practice (RFC 9700)."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#067",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > General Mitigation: Primary Phishing-Resistant Control",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Prefer phishing-resistant authenticators (FIDO2/WebAuthn), which bind authentication to the legitimate origin and resist credential theft, MFA fatigue, and reverse-proxy phishing. See the Passkeys section for additional guidance."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#068",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > MFA Fatigue (Push Notification Bombing)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Attackers repeatedly send MFA push notifications, often combined with social engineering, hoping the user eventually approves one."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#069",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > MFA Fatigue (Push Notification Bombing) > Mitigations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Require challenge-response push authentication (for example, number matching) to prevent blind approval of authentication requests.\n\nRate-limit or cap push notifications to prevent repeated prompt abuse.\n\nMonitor for anomalous authentication activity, such as multiple push prompts in a short period or new-device token reuse."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#070",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > Real-Time Phishing Using Reverse Proxies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Attackers use reverse-proxy phishing frameworks (such as Evilginx, Modlishka, and Muraena) to present convincing copies of legitimate login pages. These frameworks relay authentication traffic between the user and the legitimate service, allowing attackers to capture credentials and session tokens in real-time."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#071",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > Real-Time Phishing Using Reverse Proxies > Mitigations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Monitor for anomalous authentication and session activity that may indicate credential or session compromise (for example, impossible travel, new ASN, or sudden MFA method changes).\n\nUse phishing-resistant authenticators (see Passkeys section), which bind authentication to the legitimate origin and are resistant to real-time phishing attacks."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#072",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > SIM Swap and Phone Number Takeover",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Attackers convince a telecommunications provider to transfer a victim's phone number, allowing interception of SMS or voice-based one-time passwords."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#073",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > SIM Swap and Phone Number Takeover > Mitigations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Encourage carrier account PINs or port-out protection where available to reduce unauthorized number transfers.\n\nMonitor for unexpected phone-number changes or SIM replacement events.\n\nPrefer phishing-resistant authenticators or TOTP instead of SMS/voice OTP.\n\nSee also: SMS Messages and Phone Calls."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#074",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > Device Binding Bypass",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Attackers attempt to bypass device-based authentication by extracting exportable cryptographic keys or replaying cloned device attributes when authenticators are not hardware-protected."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#075",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > Device Binding Bypass > Mitigations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Prefer hardware-backed, non-exportable cryptographic keys (for example, platform authenticators backed by TPM, Secure Enclave, or Android StrongBox).\n\nValidate authenticator attestation where required by organizational policy."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#076",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > MFA Downgrade Attacks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Attackers attempt to force authentication through legacy protocols or authentication flows that do not enforce the same MFA requirements as modern authentication methods. Weak fallback mechanisms or legacy authentication endpoints can allow users to authenticate with lower-assurance factors than intended."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#077",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "MFA Attack Patterns and Mitigations > MFA Downgrade Attacks > Mitigations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "Disable legacy authentication protocols and endpoints that cannot enforce MFA consistently.\n\nPrevent fallback from phishing-resistant authenticators to lower-assurance authentication methods unless required by a documented security policy.\n\nFollow OAuth 2.0 Security Best Current Practice (RFC 9700) to prevent OAuth protocol-level downgrade and mix-up attacks."
+  },
+  {
+   "chunk_id": "Multifactor_Authentication_Cheat_Sheet#078",
+   "doc": "Multifactor_Authentication_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Multifactor_Authentication_Cheat_Sheet.html",
+   "text": "NIST SP 800-63B-4: Authentication and Authenticator Management\n\nW3C Web Authentication Level 3\n\nRFC 6238: Time-Based One-Time Password Algorithm"
+  }
+ ]
+}

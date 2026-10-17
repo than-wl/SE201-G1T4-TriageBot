@@ -1,0 +1,117 @@
+{
+ "CWE-117": [
+  "Logging_Cheat_Sheet"
+ ],
+ "CWE-121": [
+  "Drone_Security_Cheat_Sheet"
+ ],
+ "CWE-125": [
+  "Drone_Security_Cheat_Sheet"
+ ],
+ "CWE-1321": [
+  "JavaScript_and_TypeScript_Security_Cheat_Sheet"
+ ],
+ "CWE-1333": [
+  "JavaScript_and_TypeScript_Security_Cheat_Sheet"
+ ],
+ "CWE-1336": [
+  "Server_Side_Template_Injection_Prevention_Cheat_Sheet"
+ ],
+ "CWE-1385": [
+  "WebSocket_Security_Cheat_Sheet"
+ ],
+ "CWE-20": [
+  "Input_Validation_Cheat_Sheet"
+ ],
+ "CWE-209": [
+  "Authorization_Cheat_Sheet"
+ ],
+ "CWE-22": [
+  "File_Upload_Cheat_Sheet",
+  "Injection_Prevention_Cheat_Sheet"
+ ],
+ "CWE-269": [
+  "Authorization_Regression_Testing_Cheat_Sheet"
+ ],
+ "CWE-272": [
+  "Authorization_Cheat_Sheet"
+ ],
+ "CWE-280": [
+  "Authorization_Cheat_Sheet"
+ ],
+ "CWE-306": [
+  "Drone_Security_Cheat_Sheet"
+ ],
+ "CWE-367": [
+  "Business_Logic_Security_Cheat_Sheet"
+ ],
+ "CWE-434": [
+  "File_Upload_Cheat_Sheet"
+ ],
+ "CWE-611": [
+  "XML_External_Entity_Prevention_Cheat_Sheet",
+  "XML_Security_Cheat_Sheet"
+ ],
+ "CWE-639": [
+  "Authorization_Cheat_Sheet",
+  "Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet"
+ ],
+ "CWE-643": [
+  "XPath_Injection_Prevention_Cheat_Sheet"
+ ],
+ "CWE-77": [
+  "OS_Command_Injection_Defense_Cheat_Sheet"
+ ],
+ "CWE-778": [
+  "Authorization_Cheat_Sheet"
+ ],
+ "CWE-779": [
+  "Authorization_Cheat_Sheet"
+ ],
+ "CWE-78": [
+  "Injection_Prevention_Cheat_Sheet",
+  "Java_Security_Cheat_Sheet",
+  "OS_Command_Injection_Defense_Cheat_Sheet"
+ ],
+ "CWE-79": [
+  "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+  "DOM_based_XSS_Prevention_Cheat_Sheet",
+  "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+  "XSS_Filter_Evasion_Cheat_Sheet"
+ ],
+ "CWE-840": [
+  "Business_Logic_Security_Cheat_Sheet"
+ ],
+ "CWE-841": [
+  "Business_Logic_Security_Cheat_Sheet"
+ ],
+ "CWE-89": [
+  "Injection_Prevention_Cheat_Sheet",
+  "Java_Security_Cheat_Sheet",
+  "Query_Parameterization_Cheat_Sheet",
+  "SQL_Injection_Prevention_Cheat_Sheet"
+ ],
+ "CWE-90": [
+  "Injection_Prevention_Cheat_Sheet",
+  "LDAP_Injection_Prevention_Cheat_Sheet"
+ ],
+ "CWE-915": [
+  "Mass_Assignment_Cheat_Sheet",
+  "REST_Assessment_Cheat_Sheet"
+ ],
+ "CWE-918": [
+  "Server_Side_Request_Forgery_Prevention_Cheat_Sheet"
+ ],
+ "CWE-93": [
+  "Java_Security_Cheat_Sheet"
+ ],
+ "CWE-94": [
+  "Injection_Prevention_Cheat_Sheet",
+  "JavaScript_and_TypeScript_Security_Cheat_Sheet",
+  "Java_Security_Cheat_Sheet"
+ ],
+ "CWE-95": [
+  "Injection_Prevention_Cheat_Sheet",
+  "Java_Security_Cheat_Sheet"
+ ]
+}

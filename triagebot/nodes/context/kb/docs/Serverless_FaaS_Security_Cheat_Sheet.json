@@ -1,0 +1,98 @@
+{
+ "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+ "title": "Serverless / FaaS Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#001",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Serverless computing (Functions as a Service — FaaS) platforms such as AWS Lambda, Azure Functions, and Google Cloud Functions simplify application development and scaling. However, the execution model (short-lived, event-driven functions running in managed environments) introduces unique security risks compared to traditional architectures.\n\nThis cheat sheet provides best practices to secure serverless applications and minimize attack surfaces."
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#002",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Key Risks",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Over-permissioned functions (broad IAM roles, * policies).\n\nUnvalidated event inputs (API Gateway, S3, Pub/Sub, IoT).\n\nCold start data leakage (persistent state, side-channel timing).\n\nFunction chaining abuse (compromised function invoking others).\n\nShared environment risks (multi-tenant leakage, /tmp reuse).\n\nHardcoded secrets in code or platform config.\n\nExcessive network access."
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#003",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 1. Principle of Least Privilege",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Assign minimal IAM permissions to each function.\n\nUse role-per-function (avoid shared high-privilege roles).\n\nScope database/API keys to the smallest set of actions needed.\n\nBad IAM Policy (too broad):\n\n```\n{\n  \"Effect\": \"Allow\",\n  \"Action\": \"*\",\n  \"Resource\": \"*\"\n}\n```\n\nGood IAM Policy (scoped):\n\n```\n{\n  \"Effect\": \"Allow\",\n  \"Action\": [\"dynamodb:GetItem\", \"dynamodb:PutItem\"],\n  \"Resource\": \"arn:aws:dynamodb:us-east-1:123456789012:table/Orders\"\n}\n```"
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#004",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 2. Environment Isolation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Disable default network access unless required (e.g. outbound internet access).\n\nPlace functions in private subnets with controlled egress.\n\nIsolate sensitive functions (e.g. payment, auth) from general-purpose ones.\n\nSeparate production vs. staging environments with strict boundaries.\n\nAWS Lambda VPC Config (restrictive):\n\n```\nVpcConfig:\n  SubnetIds:\n    - subnet-123456\n  SecurityGroupIds:\n    - sg-restrict-outbound\n```"
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#005",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 3. Secure Function Invocation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Enforce authentication and authorization on all triggers (API Gateway, Pub/Sub, S3, IoT).\n\nValidate function-to-function calls with signed tokens or workload identities.\n\nApply rate limiting and throttling to mitigate DoS and abuse.\n\nAPI Gateway Authorizer Example (JWT validation):\n\n```\n{\n  \"Type\": \"JWT\",\n  \"IdentitySource\": \"$request.header.Authorization\",\n  \"Issuer\": \"https://secure-idp.example.com/\",\n  \"Audience\": \"my-api-client\"\n}\n```"
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#006",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 4. Event Data Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Treat all event payloads as untrusted input.\n\nApply strong input validation & sanitization (length, type, format).\n\nProtect against common injection attacks (SQLi, XSS, JSON injection, deserialization).\n\nStrip unnecessary fields and metadata before processing.\n\nExample: Python input validation for Lambda\n\n```\nimport json\nimport re\n\ndef lambda_handler(event, context):\n    body = json.loads(event[\"body\"])\n    email = body.get(\"email\", \"\")\n\n    if not re.match(r\"[^@]+@[^@]+\\.[^@]+\", email):\n        return {\"statusCode\": 400, \"body\": \"Invalid email\"}\n\n    # process safely\n    return {\"statusCode\": 200, \"body\": \"OK\"}\n```"
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#007",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 5. Cold Start & Execution Context Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Do not assume function runtime context is clean between invocations.\n\nAvoid storing secrets or temporary sensitive data in global/static variables.\n\nProtect against side-channel leaks (timing differences, leftover files in /tmp).\n\nFor sensitive workloads, enforce single-use execution environments if the platform supports it.\n\nBad:\n\n```\n# Secret stays in global variable across invocations\nSECRET_KEY = \"hardcoded-secret\"\n```\n\nGood:\n\n```\nimport os\nfrom my_secrets_lib import get_secret\n\ndef lambda_handler(event, context):\n    secret = get_secret(\"db-password\")  # fetch fresh each time\n    ...\n```"
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#008",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 6. Secrets Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "See the Secrets Management Cheat Sheet for secret lifecycle controls.\n\nFetch secrets at runtime from a vault or caching extension — not from platform-level function configuration (e.g. Lambda Environment Variables).\n\nUse ephemeral credentials (STS, workload identity federation).\n\nRotate secrets automatically.\n\nAWS Lambda Secret Fetch (Python via Parameters and Secrets Extension):\n\nNote: Ensure that the AWS Lambda Parameters and Secrets Extension is added and enabled for your function (for example, as a Lambda layer). Otherwise, http://localhost:2773 will not be available and requests to it will fail."
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#009",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 6. Secrets Management",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "```\nimport os\nimport json\nimport urllib.request\nimport urllib.parse\n\ndef get_secret(secret_name):\n    \"\"\"\n    Retrieves a secret using the AWS Lambda Extension local endpoint.\n    This method is faster and more cost-effective due to local caching.\n    \"\"\"\n    # The extension provides a local HTTP endpoint on port 2773\n    encoded_name = urllib.parse.quote_plus(secret_name)\n\n    secrets_extension_endpoint = (\n        f\"http://localhost:2773/secretsmanager/get?secretId={encoded_name}\"\n    )\n\n    # Authenticate using the identity token provided by the Lambda environment.\n    # Fail fast if the token is missing to avoid confusing 4xx errors.\n    session_token = os.environ.get(\"AWS_SESSION_TOKEN\")\n    if not session_token:\n        raise RuntimeError(\n            \"Missing AWS_SESSION_TOKEN required for \"\n            \"Parameters and Secrets Extension authentication.\"\n        )\n\n    headers = {\n        \"X-Aws-Parameters-Secrets-Token\": session_token\n    }\n\n    request = urllib.request.Request(\n        secrets_extension_endpoint,\n        headers=headers,\n        method=\"GET\"\n    )\n\n    with urllib.request.urlopen(request, timeout=3) as response:\n        if response.status != 200:\n            raise Exception(\n                f\"Error retrieving secret: {response.read().decode('utf-8')}\"\n            )\n\n        response_json = json.loads(response.read())\n        secret_string = response_json[\"SecretString\"]\n\n        return json.loads(secret_string)\n```"
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#010",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 7. Monitoring & Logging",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Use centralized logging (CloudWatch, Azure Monitor, GCP Logging).\n\nMask secrets and PII.\n\nExample: Redacting fields\n\n```\nimport logging\n\ndef log_event(event):\n    safe_event = {k: (\"***\" if \"password\" in k else v) for k,v in event.items()}\n    logging.info(safe_event)\n```"
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#011",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Best Practices > 8. Supply Chain Security",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Scan dependencies (npm audit, pip-audit, safety).\n\nUse minimal deployment packages.\n\nSign deployment packages and verify signatures against an approved publisher before deployment. A checksum alone does not authenticate the publisher.\n\nFor AWS Lambda, use code signing configurations with allowed signing profiles and UntrustedArtifactOnDeployment set to Enforce; the default Warn setting allows deployments that fail expiry, publisher, or revocation checks. Layers added to functions with code signing enabled must also be signed by an allowed profile."
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#012",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "Do’s and Don’ts",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "Do:\n\nEnforce least privilege per function.\n\nValidate all event inputs.\n\nFetch secrets from vaults, not platform config.\n\nRestrict network egress.\n\nMonitor invocations and logs.\n\nDon’t:\n\nHardcode secrets in code or configs.\n\nAssume clean runtime between invocations.\n\nGive * IAM permissions.\n\nLeave sensitive data in /tmp or globals.\n\nTrust event sources blindly."
+  },
+  {
+   "chunk_id": "Serverless_FaaS_Security_Cheat_Sheet#013",
+   "doc": "Serverless_FaaS_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Serverless_FaaS_Security_Cheat_Sheet.html",
+   "text": "AWS Lambda: Best practices\n\nAzure Functions: Security concepts\n\nGoogle Cloud Run: Security"
+  }
+ ]
+}

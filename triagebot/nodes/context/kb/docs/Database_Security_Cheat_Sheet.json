@@ -1,0 +1,91 @@
+{
+ "doc": "Database_Security_Cheat_Sheet",
+ "title": "Database Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#001",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "This cheat sheet provides guidance for securely configuring SQL databases such as MySQL, PostgreSQL, MariaDB, and Microsoft SQL Server. It is designed primarily for application developers and system administrators responsible for managing or interacting with relational databases.\n\nFor application-layer injection defenses, see the SQL Injection Prevention Cheat Sheet. For guidance on non-relational systems (e.g., MongoDB, Redis, Cassandra, DynamoDB), refer to the NoSQL Security Cheat Sheet"
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#002",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Protecting the Backend Database",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "The application's backend database should be isolated from other servers and only connect with as few hosts as possible. This task will depend on the system and network architecture. Consider these suggestions:\n\nDisabling network (TCP) access and requiring all access is over a local socket file or named pipe.\n\nConfiguring the database to only bind on localhost.\n\nRestricting access to the network port to specific hosts with firewall rules.\n\nPlacing the database server on a dedicated internal network segment that is isolated from the application server.\n\nProtect any web-based management tools (e.g., phpMyAdmin, pgAdmin) with authentication, HTTPS, and network restrictions.\n\nWhen an application is running on an untrusted system (such as a thick-client), it should always connect to the backend through an API that can enforce appropriate access control and restrictions. Direct connections should never be made from a thick client to the backend database."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#003",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Protecting the Backend Database > Implementing Transport Layer Protection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "Most database default configurations start with unencrypted network connections, though some do encrypt the initial authentication (such as Microsoft SQL Server). Even if the initial authentication is encrypted, the rest of the traffic will be unencrypted and all kinds of sensitive information will be sent across the network in clear text. The following steps should be taken to prevent unencrypted traffic:\n\nConfigure the database to only allow encrypted connections.\n\nInstall a trusted digital certificate on the server.\n\nThe client application should connect using TLSv1.2+ with modern ciphers (e.g, AES-GCM or ChaCha20).\n\nThe client application should verify that the digital certificate is correct.\n\nThe Transport Layer Security Cheat Sheet contains further guidance on securely configuring TLS."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#004",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Configuring Secure Authentication",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "The database should always require authentication, including connections from the local server. Database accounts should be:\n\nProtected with strong and unique passwords.\n\nUsed by a single application or service.\n\nConfigured with the minimum permissions required as discussed in the permissions section below.\n\nAs with any system that has its own user accounts, the usual account management processes should be followed, including:\n\nRegular reviews of the accounts to ensure that they are still required.\n\nRegular reviews of permissions.\n\nRemoving user accounts when an application is decommissioned.\n\nChanging the passwords when staff leave, or there is reason to believe that they may have been compromised.\n\nFor Microsoft SQL Server, consider the use of Windows or Integrated-Authentication, which uses existing Windows accounts rather than SQL Server accounts. This also removes the requirement to store credentials in the application, as it will connect using the credentials of the Windows user it is running under. The Windows Native Authentication Plugins provides similar functionality for MySQL."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#005",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Configuring Secure Authentication > Storing Database Credentials Securely",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "Database credentials should never be stored in the application source code, especially if they are unencrypted. Instead, they should be stored in a configuration file that:\n\nIs outside of the web root.\n\nHas appropriate permissions so that it can only be read by the required user(s).\n\nIs not checked into source code repositories.\n\nWhere possible, these credentials should also be encrypted or otherwise protected using built-in functionality, such as the web.config encryption available in ASP.NET."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#006",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Creating Secure Permissions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "When developers are assigning permissions to database user accounts, they should employ the principle of least privilege (i.e, the accounts should only have the minimal permissions required for the application to function). This principle can be applied at a number of increasingly granular levels depending on the functionality available in the database. You can do the following in all environments:\n\nDo not use the built-in root, sa or SYS accounts.\n\nDo not grant the account administrative rights over the database instance.\n\nMake sure the account can only connect from allowed hosts. This would often be localhost or the address of the application server.\n\nThe account should only access the specific databases it needs. Development, UAT and Production environments should all use separate databases and accounts.\n\nOnly grant the required permissions on the databases. Most applications would only need SELECT, UPDATE and DELETE permissions. The account should not be the owner of the database as this can lead to privilege escalation vulnerabilities.\n\nAvoid using database links or linked servers. Where they are required, use an account that has been granted access to only the minimum databases, tables, and system privileges required.\n\nMost security-critical applications, apply permissions at more granular levels, including:\n\nTable-level permissions.\n\nColumn-level permissions.\n\nRow-level permissions\n\nBlocking access to the underlying tables, and requiring all access through restricted views."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#007",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Database Configuration and Hardening",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "The database server's underlying operating system should be hardened by basing it on a secure baseline such as the CIS Benchmarks or the Microsoft Security Baselines.\n\nThe database application should also be properly configured and hardened. The following principles should apply to any database application and platform:\n\nInstall any required security updates and patches.\n\nConfigure the database services to run under a low privileged user account.\n\nRemove any default accounts and databases.\n\nStore transaction logs on a separate disk to the main database files.\n\nConfigure a regular backup of the database. Ensure that the backups are protected with appropriate permissions, and ideally encrypted.\n\nThe following sections give some further recommendations for specific database software, in addition to the more general recommendations given above."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#008",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Database Configuration and Hardening > Hardening a Microsoft SQL Server",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "Disable xp_cmdshell, xp_dirtree and other stored procedures that are not required.\n\nDisable Common Language Runtime (CLR) execution.\n\nDisable the SQL Browser service.\n\nDisable Mixed Mode Authentication unless it is required.\n\nEnsure that the sample Northwind and AdventureWorks databases have been removed.\n\nSee Microsoft's articles on securing SQL Server."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#009",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Database Configuration and Hardening > Hardening a MySQL or a MariaDB Server",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "Run the mysql_secure_installation script to remove the default databases and accounts.\n\nDisable the FILE privilege for all users to prevent them reading or writing files.\n\nSee the Oracle MySQL and MariaDB hardening guides."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#010",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Database Configuration and Hardening > Hardening a PostgreSQL Server",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "See the PostgreSQL Server Setup and Operation documentation and the older Security documentation."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#011",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "Database Configuration and Hardening > MongoDB",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "See the NoSQL Security Cheat Sheet for general guidance on securing NoSQL databases.\n\nSee the MongoDB security checklist."
+  },
+  {
+   "chunk_id": "Database_Security_Cheat_Sheet#012",
+   "doc": "Database_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Database_Security_Cheat_Sheet.html",
+   "text": "Microsoft: Securing SQL Server\n\nPostgreSQL: Secure TCP/IP Connections with SSL"
+  }
+ ]
+}

@@ -1,0 +1,91 @@
+{
+ "doc": "Input_Validation_Cheat_Sheet",
+ "title": "Input Validation Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#001",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Input validation checks whether data meets an application's requirements before the application uses it. It reduces the risk of malformed data, invalid business operations, and excessive resource consumption. OWASP's Proactive Control C3 distinguishes validation from the additional defenses needed when using that data:\n\nUse parameterized queries for SQL and context-aware output encoding to prevent cross-site scripting (XSS).\n\nCheck authorization separately: a valid account identifier does not mean the caller may access that account."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#002",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Input Validation Strategies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Validate both syntax (the expected type and format) and semantics (whether the value makes sense for the operation). For example, a booking needs valid dates and an end date after its start date. CWE-20 describes these checks, including consistency between related fields.\n\nDefine rules for each field:\n\nInput\n\nRules to enforce\n\nFixed choices\n\nExact membership in the allowed set, including values submitted from drop-down menus\n\nNumbers and dates\n\nExpected type, accepted format, and minimum and maximum values\n\nStrings\n\nLength limits and the characters or structure required by the field\n\nObjects\n\nAllowed fields, required fields, and rules for missing or null values\n\nArrays\n\nMinimum and maximum item counts and validation of every item, including nested objects"
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#003",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Input Validation Strategies > Allowlist vs Denylist",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Define what the application accepts and reject values outside those rules. Do not try to recognize every malicious string. Blocking apostrophes, for example, rejects legitimate names without making a database query safe. For free-form comments, an allowlist can permit broad Unicode text while limiting its length; it need not restrict users to letters and digits."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#004",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Implementing Input Validation > Parse Safely, Then Validate",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Apply request size limits before buffering or parsing input, and configure parser limits such as maximum nesting depth. JSON explicitly supports implementation limits on size, depth, and numbers. A schema check after parsing cannot protect a parser that has already exhausted resources.\n\nUse a maintained parser for the expected format, handle parsing failures, and validate the resulting values before business processing or storage. Configure parsers for untrusted input; see XML External Entity Prevention and Deserialization. Converting text to an integer only establishes a type: it does not establish an acceptable quantity.\n\nDecode according to the protocol before checking field rules. Validate the representation that will actually be used, and avoid decoding it again downstream; CWE-20 explains how inconsistent decoding can invalidate earlier checks."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#005",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Implementing Input Validation > Validate Structured Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Use your framework's validators or a schema validator to enforce field rules. For JSON, explicitly configure required and additional properties; listing a property alone neither requires it nor rejects unknown fields. Apply schemas to nested objects and use item schemas and array length limits. Keep business checks, such as date ordering, alongside these structural checks.\n\nReject invalid requests with a clear error; do not continue with partially validated data. Bind only intended input fields to application objects; see Mass Assignment."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#006",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Implementing Input Validation > Validating Free-form Unicode Text",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Agree on a character encoding across components and reject malformed input. Preserve legitimate punctuation and scripts in names and comments. Where a field requires Unicode normalization for consistent comparison, define and apply the same policy before validation, storage, and comparison. Unicode Standard Annex #15 defines the normalization forms and warns that compatibility normalization can erase meaningful distinctions. Normalization is not sanitization and does not replace output encoding."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#007",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Implementing Input Validation > Regular Expressions (Regex)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Use regular expressions for simple, structured fields. Require a match of the entire value, using an API such as Python's fullmatch where available. Check the engine's character classes and newline behavior rather than assuming patterns behave identically across languages.\n\nBound input length before matching, avoid patterns with excessive backtracking, and use a non-backtracking engine or a match timeout where supported. Test valid, invalid, and near-matching values; Microsoft's regex guidance explains why near-matches can cause denial of service. Treat a timeout as validation failure."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#008",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Implementing Input Validation > Validating Rich User Content",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "When accepting user-authored HTML, use a maintained HTML sanitization library. Input validation and regular expressions cannot replace that control."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#009",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Implementing Input Validation > File Upload Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Treat the submitted filename and content type as untrusted metadata. Validate filenames after protocol decoding; an allowed extension alone does not establish safe content. Follow the File Upload Cheat Sheet for content checks, size limits, storage, and safe serving."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#010",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Implementing Input Validation > Email Address Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Use a maintained email validation library compatible with the addresses your mail system supports. Format validation does not prove mailbox access. Follow Email Validation and Verification for comparison policies, ownership verification, and email change workflows."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#011",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Common Pitfalls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Client-only checks: Validate on the server even when the browser checks the same fields. Client-side validation is bypassable; use it for immediate feedback.\n\nTrusting internal sources: Validate data from internal APIs, partner feeds, queues, and stored records when it crosses a trust boundary. An internal transport does not establish that a value meets the receiving component's rules (CWE-20).\n\nDenylisting or “cleaning” input: Apply field-specific acceptance rules. Removing suspicious characters can change meaning and still does not provide query parameterization or output encoding.\n\nStopping at parsing or outer fields: Test rejected ranges, missing fields, invalid nested items, and oversized arrays, not just malformed syntax.\n\nAssuming regex or Unicode normalization makes data safe: Check whole-value matching and resource limits; keep normalization consistent with the field's meaning.\n\nTrusting upload metadata: Use the file upload controls above; checking a filename is not checking the file's contents.\n\nLogging rejected input verbatim: Record the failure and relevant metadata without secrets or full request bodies. Escape any retained untrusted values for the log format to prevent log injection; see Logging: Event collection and Data to exclude."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#012",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "OWASP Top 10 Proactive Controls 2024: C3 — Validate all Input & Handle Exceptions\n\nCWE-20: Improper Input Validation\n\nUnicode Standard Annex #15: Unicode Normalization Forms"
+  }
+ ]
+}

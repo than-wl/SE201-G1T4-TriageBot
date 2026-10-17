@@ -1,0 +1,49 @@
+{
+ "doc": "HTTP_Strict_Transport_Security_Cheat_Sheet",
+ "title": "HTTP Strict Transport Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "HTTP_Strict_Transport_Security_Cheat_Sheet#001",
+   "doc": "HTTP_Strict_Transport_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html",
+   "text": "HTTP Strict Transport Security (also named HSTS) is an opt-in security enhancement that is specified by a web application through the use of a special response header. Once a supported browser receives this header that browser will prevent any communications from being sent over HTTP to the specified domain and will instead send all communications over HTTPS. It also prevents HTTPS click through prompts on browsers.\n\nThe specification has been released and published end of 2012 as RFC 6797 (HTTP Strict Transport Security (HSTS)) by the IETF."
+  },
+  {
+   "chunk_id": "HTTP_Strict_Transport_Security_Cheat_Sheet#002",
+   "doc": "HTTP_Strict_Transport_Security_Cheat_Sheet",
+   "section": "Threats",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html",
+   "text": "HSTS addresses the following threats:\n\nUser bookmarks or manually types http://example.com and is subject to a man-in-the-middle attacker\n\nHSTS automatically redirects HTTP requests to HTTPS for the target domain\n\nWeb application that is intended to be purely HTTPS inadvertently contains HTTP links or serves content over HTTP\n\nHSTS automatically redirects HTTP requests to HTTPS for the target domain\n\nA man-in-the-middle attacker attempts to intercept traffic from a victim user using an invalid certificate and hopes the user will accept the bad certificate\n\nHSTS does not allow a user to override the invalid certificate message"
+  },
+  {
+   "chunk_id": "HTTP_Strict_Transport_Security_Cheat_Sheet#003",
+   "doc": "HTTP_Strict_Transport_Security_Cheat_Sheet",
+   "section": "Examples",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html",
+   "text": "This example sets a long (2 years = 63072000 seconds) max-age for the issuing host. Without includeSubDomains, this policy does not extend to its subdomains; see the subdomain cookie risks below:\n\nStrict-Transport-Security: max-age=63072000\n\nThis example is useful if all present and future subdomains will be HTTPS. This is a more secure option but will block access to certain pages that can only be served over HTTP:\n\nStrict-Transport-Security: max-age=63072000; includeSubDomains\n\nThis example is useful if all present and future subdomains will be HTTPS. In this example we set a very short max-age in case of mistakes during initial rollout:\n\nStrict-Transport-Security: max-age=86400; includeSubDomains\n\nRecommended:\n\nIf the site owner would like their domain to be included in the HSTS preload list maintained by Chrome (and used by Firefox and Safari), then use the header below.\n\nSending the preload directive from your site can have PERMANENT CONSEQUENCES and prevent users from accessing your site and any of its subdomains if you find you need to switch back to HTTP. Please read the details at preload removal before sending the header with preload.\n\nStrict-Transport-Security: max-age=63072000; includeSubDomains; preload\n\nThe preload flag indicates the site owner's consent to have their domain preloaded. The site owner still needs to then go and submit the domain to the list."
+  },
+  {
+   "chunk_id": "HTTP_Strict_Transport_Security_Cheat_Sheet#004",
+   "doc": "HTTP_Strict_Transport_Security_Cheat_Sheet",
+   "section": "Problems",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html",
+   "text": "Site owners can use HSTS to identify users without cookies. This can lead to a significant privacy leak. Take a look here for more details.\n\nCookies can be manipulated from sub-domains, so omitting the includeSubDomains option permits a broad range of cookie-related attacks that HSTS would otherwise prevent by requiring a valid certificate for a subdomain. Ensuring the secure flag is set on all cookies will also prevent, some, but not all, of the same attacks."
+  },
+  {
+   "chunk_id": "HTTP_Strict_Transport_Security_Cheat_Sheet#005",
+   "doc": "HTTP_Strict_Transport_Security_Cheat_Sheet",
+   "section": "Browser Support",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html",
+   "text": "As of September 2019 HSTS is supported by all modern browsers, with the only notable exception being Opera Mini.\n\nFor TLS configuration, see the Transport Layer Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "HTTP_Strict_Transport_Security_Cheat_Sheet#006",
+   "doc": "HTTP_Strict_Transport_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/HTTP_Strict_Transport_Security_Cheat_Sheet.html",
+   "text": "Chromium Projects/HSTS\n\nRFC 6797: HTTP Strict Transport Security"
+  }
+ ]
+}

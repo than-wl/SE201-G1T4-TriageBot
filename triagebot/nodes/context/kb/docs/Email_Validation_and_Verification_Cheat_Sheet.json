@@ -1,0 +1,189 @@
+{
+ "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+ "title": "Email Validation and Verification in Identity Systems Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#001",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Email addresses are widely used as primary identifiers in authentication and account recovery workflows. Improper handling of email validation, normalization, and verification can lead to account takeover, user enumeration, and identity confusion.\n\nThis cheat sheet provides guidance on securely handling email addresses within identity systems. See the Authentication Cheat Sheet for broader identity controls."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#002",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Goals",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Safely treat email as an identifier\n\nPrevent account takeover via email-based flows\n\nReduce user enumeration risk\n\nDefine secure verification and change workflows"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#003",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Threat Model",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Attackers may attempt to:\n\nRegister equivalent or visually similar email addresses\n\nExploit inconsistent normalization logic\n\nAbuse password reset functionality\n\nEnumerate valid accounts\n\nTake over accounts through email change workflows"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#004",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Canonicalization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Applications must define a consistent normalization strategy before storing or comparing email addresses."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#005",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Canonicalization > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Normalize the domain portion to lowercase\n\nAvoid provider-specific transformations (e.g., Gmail dot removal) unless fully controlled\n\nStore both:\n\nOriginal input (for display and communication)\n\nCanonical form (for comparison according to your policy)\n\nDocument the comparison policy explicitly and apply it consistently across registration, login, password reset, account recovery, and account linking flows"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#006",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Format Validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Strict regex-based validation often rejects valid addresses or introduces inconsistencies."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#007",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Format Validation > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Use well-tested libraries instead of custom regex\n\nAccept a broad range of valid formats\n\nReject clearly malformed input only"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#008",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Unicode and IDN Considerations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Unicode introduces spoofing risks via visually similar characters."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#009",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Unicode and IDN Considerations > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Normalize Unicode input\n\nConvert internationalized domains to punycode for comparison\n\nBe aware of homoglyph attacks (e.g., Latin vs Cyrillic characters)\n\nBe especially cautious with internationalized local-parts, because normalization and comparison behavior may differ across systems"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#010",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Case Sensitivity",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Domain part: always case-insensitive\n\nLocal part: technically case-sensitive under SMTP, though many providers do not enforce this in practice"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#011",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Case Sensitivity > Recommendation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Preserve the original email address as entered by the user\n\nDefine an explicit comparison policy for the local part based on your identity architecture and interoperability requirements\n\nOnly fold or normalize the local part when the system fully owns that behavior and the decision will not create account-collision or mistaken-account risk"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#012",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Ownership Verification",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Email ownership must be verified before enabling account use."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#013",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Ownership Verification > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Use cryptographically secure, random tokens\n\nEnsure tokens are:\n\nSingle-use\n\nTime-limited\n\nDo not activate accounts before verification is completed"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#014",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Password Reset Flows",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Password reset is a high-risk operation. See the Forgot Password Cheat Sheet for recovery controls."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#015",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Password Reset Flows > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Use single-use, time-limited tokens\n\nDo not disclose whether an email exists in the system\n\nInvalidate tokens after use or expiration\n\nRate limit reset requests"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#016",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Change Workflows",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Changing an email address is equivalent to changing identity."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#017",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email Change Workflows > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Require re-authentication\n\nNotify the existing email address of the change\n\nRequire confirmation of the new email address\n\nConsider requiring confirmation from both addresses for high-risk systems"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#018",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Anti-Enumeration Controls",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Attackers should not be able to determine whether an email is registered."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#019",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Anti-Enumeration Controls > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Use consistent responses for login and reset flows\n\nAvoid timing discrepancies between valid and invalid cases\n\nImplement rate limiting and monitoring"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#020",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Temporary Email Abuse",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Disposable email services can be used to bypass controls."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#021",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Temporary Email Abuse > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Maintain a list of known disposable domains if appropriate\n\nPrefer risk-based controls over strict blocking\n\nMonitor for suspicious patterns of account creation"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#022",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email as an Authentication Factor",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Email should not be treated as a strong authentication factor."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#023",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Email as an Authentication Factor > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Treat email as a weak factor\n\nRequire multi-factor authentication (MFA) for sensitive operations\n\nDo not rely on email alone for account security"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#024",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Logging and Monitoring",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Monitoring email-related flows helps detect abuse."
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#025",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "Logging and Monitoring > Recommendations",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "Log verification attempts and failures\n\nMonitor password reset activity\n\nDetect abnormal patterns (e.g., high-frequency requests)\n\nAvoid logging full email addresses; mask or pseudonymize them where logging is necessary (e.g., j***@example.com)\n\nNever log verification, reset, or authentication tokens or full verification/reset URLs\n\nTreat email addresses and related identifiers in logs as personal or sensitive data and restrict access accordingly"
+  },
+  {
+   "chunk_id": "Email_Validation_and_Verification_Cheat_Sheet#026",
+   "doc": "Email_Validation_and_Verification_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Email_Validation_and_Verification_Cheat_Sheet.html",
+   "text": "RFC 5322: Internet Message Format\n\nRFC 5321: Simple Mail Transfer Protocol\n\nNIST SP 800-63B-4: Authentication and Authenticator Management"
+  }
+ ]
+}

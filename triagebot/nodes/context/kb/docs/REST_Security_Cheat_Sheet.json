@@ -1,0 +1,203 @@
+{
+ "doc": "REST_Security_Cheat_Sheet",
+ "title": "REST Security Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#001",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "REST (or REpresentational State Transfer) is an architectural style first described in Roy Fielding's Ph.D. dissertation on Architectural Styles and the Design of Network-based Software Architectures.\n\nIt evolved as Fielding wrote the HTTP/1.1 and URI specs and has been proven to be well-suited for developing distributed hypermedia applications. While REST is more widely applicable, it is most commonly used within the context of communicating with services via HTTP.\n\nThe key abstraction of information in REST is a resource. A REST API resource is identified by a URI, usually a HTTP URL. REST components use connectors to perform actions on a resource by using a representation to capture the current or intended state of the resource and transferring that representation.\n\nThe primary connector types are client and server, secondary connectors include cache, resolver and tunnel.\n\nREST APIs are stateless. Stateful APIs do not adhere to the REST architectural style. State in the REST acronym refers to the state of the resource which the API accesses, not the state of a session within which the API is called. While there may be good reasons for building a stateful API, it is important to realize that managing sessions is complex and difficult to do securely.\n\nStateful services are out of scope of this Cheat Sheet: Passing state from client to backend, while making the service technically stateless, is an anti-pattern that should also be avoided as it is prone to replay and impersonation attacks.\n\nIn order to implement flows with REST APIs, resources are typically created, read, updated and deleted. For example, an ecommerce site may offer methods to create an empty shopping cart, to add items to the cart and to check out the cart. Each of these REST calls is stateless and the endpoint should check whether the caller is authorized to perform the requested operation."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#002",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Another key feature of REST applications is the use of standard HTTP verbs and error codes in the pursuit or removing unnecessary variation among different services.\n\nAnother key feature of REST applications is the use of HATEOAS or Hypermedia As The Engine of Application State. This provides REST applications a self-documenting nature making it easier for developers to interact with a REST service without prior knowledge.\n\nFor FastAPI applications, also see the FastAPI Security Cheat Sheet for dependency-based access control, request and response models, and deployment settings."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#003",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "HTTPS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Secure REST services must only provide HTTPS endpoints. This protects authentication credentials in transit, for example passwords, API keys or JSON Web Tokens. It also allows clients to authenticate the service and guarantees integrity of the transmitted data.\n\nSee the Transport Layer Security Cheat Sheet for additional information.\n\nConsider the use of mutually authenticated client-side certificates to provide additional protection for highly privileged web services."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#004",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Access Control",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Non-public REST services must perform access control at each API endpoint. Web services in monolithic applications implement this by means of user authentication, authorization logic and session management. This has several drawbacks for modern architectures which compose multiple microservices following the RESTful style.\n\nin order to minimize latency and reduce coupling between services, the access control decision should be taken locally by REST endpoints\n\nuser authentication should be centralised in a Identity Provider (IdP), which issues access tokens\n\nFor guidance on preventing insecure direct object references (IDOR), see the Insecure Direct Object Reference Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#005",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "JWT",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "There seems to be a convergence towards using JSON Web Tokens (JWT) as the format for security tokens. JWTs are JSON data structures containing a set of claims that can be used for access control decisions. A cryptographic signature or message authentication code (MAC) can be used to protect the integrity of the JWT.\n\nEnsure JWTs are integrity protected by either a signature or a MAC. Do not allow the unsecured JWTs: {\"alg\":\"none\"}.\n\nSee here\n\nIn general, signatures should be preferred over MACs for integrity protection of JWTs.\n\nIf MACs are used for integrity protection, every service that is able to validate JWTs can also create new JWTs using the same key. This means that all services using the same key have to mutually trust each other. Another consequence of this is that a compromise of any service also compromises all other services sharing the same key. See here for additional information.\n\nThe relying party or token consumer validates a JWT by verifying its integrity and claims contained.\n\nA relying party must verify the integrity of the JWT based on its own configuration or hard-coded logic. It must not rely on the information of the JWT header to select the verification algorithm. See here and here\n\nFor JWTs used for API access control, require and validate iss, aud, and exp by default; these claims are mandatory for tokens conforming to RFC 9068, Section 2.2. Require and validate any additional claims that the token profile makes mandatory. Check:\n\niss or issuer - is this a trusted issuer? Is it the expected owner of the signing key?\n\naud or audience - is the relying party in the target audience for this JWT?\n\nexp or expiration time - is the current time before the end of the validity period of this token?\n\nnbf or not before time - if present, is the current time at or after the start of the token's validity period? This claim is optional in RFC 7519, Section 4.1.5; require it if the token profile requires it."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#006",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "JWT",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "As JWTs contain details of the authenticated entity (user etc.) a disconnect can occur between the JWT and the current state of the users session, for example, if the session is terminated earlier than the expiration time due to an explicit logout or an idle timeout. When an explicit session termination event occurs, a unique, server-issued identifier (the jti claim, optionally combined with aud) should be submitted to a denylist on the API which will invalidate that JWT for any requests until the expiration of the token. See the JSON_Web_Token_Cheat_Sheet for further details."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#007",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "API Keys",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Public REST services without access control run the risk of being farmed leading to excessive bills for bandwidth or compute cycles. API keys can be used to mitigate this risk. They are also often used by organization to monetize APIs; instead of blocking high-frequency calls, clients are given access in accordance to a purchased access plan.\n\nAPI keys can reduce the impact of denial-of-service attacks. However, when they are issued to third-party clients, they are relatively easy to compromise.\n\nRequire API keys for every request to the protected endpoint.\n\nReturn 429 Too Many Requests HTTP response code if requests are coming in too quickly.\n\nRevoke the API key if the client violates the usage agreement.\n\nDo not rely exclusively on API keys to protect sensitive, critical or high-value resources."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#008",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Restrict HTTP methods",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Apply an allowlist of permitted HTTP Methods e.g. GET, POST, PUT.\n\nReject all requests not matching the allowlist with HTTP response code 405 Method not allowed.\n\nMake sure the caller is authorized to use the incoming HTTP method on the resource collection, action, and record\n\nIn Java EE in particular, this can be difficult to implement properly. See Bypassing Web Authentication and Authorization with HTTP Verb Tampering for an explanation of this common misconfiguration."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#009",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Preventing Out-of-Order API Execution",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Modern REST APIs often implement business workflows through a sequence of endpoints (for example, create → validate → approve → finalize). If the backend does not explicitly validate workflow state transitions, attackers may invoke endpoints out of sequence to bypass intended controls."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#010",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Preventing Out-of-Order API Execution > Problem",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Out-of-order API execution occurs when an attacker:\n\nSkips required workflow steps by directly calling later-stage endpoints\n\nReplays or reuses tokens across workflow boundaries\n\nExploits assumptions that the frontend enforces correct sequencing\n\nBecause each endpoint may be individually authenticated and authorized, traditional access control checks often fail to detect these issues."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#011",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Preventing Out-of-Order API Execution > Example",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "A checkout workflow expects the following sequence:\n\n```\nPOST /checkout/create\nPOST /checkout/pay\nPOST /checkout/confirm\n```\n\nIf the backend does not validate workflow state transitions, an attacker could directly invoke:\n\n```\nPOST /checkout/confirm\n```\n\nwithout completing payment."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#012",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Preventing Out-of-Order API Execution > Prevention Guidance",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Enforce workflow state validation on the server side for every request\n\nModel workflows explicitly using finite states or state machines\n\nBind tokens or identifiers to specific workflow stages\n\nAvoid relying on frontend logic to enforce sequencing\n\nReject invalid or out-of-order transitions with clear error responses"
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#013",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Preventing Out-of-Order API Execution > Testing Checklist",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Can endpoints be invoked out of sequence?\n\nDoes each endpoint validate the current workflow state?\n\nAre tokens reusable across workflow steps?\n\nAre invalid state transitions consistently rejected?"
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#014",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Input validation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Do not trust input parameters/objects.\n\nValidate input: length / range / format and type.\n\nAchieve an implicit input validation by using strong types like numbers, booleans, dates, times or fixed data ranges in API parameters.\n\nConstrain string inputs with regexps.\n\nReject unexpected/illegal content.\n\nMake use of validation/sanitation libraries or frameworks in your specific language.\n\nDefine an appropriate request size limit and reject requests exceeding the limit with HTTP response status 413 Request Entity Too Large.\n\nConsider logging input validation failures. Assume that someone who is performing hundreds of failed input validations per second is up to no good.\n\nHave a look at input validation cheat sheet for comprehensive explanation.\n\nUse a secure parser for parsing the incoming messages. If you are using XML, make sure to use a parser that is not vulnerable to XXE and similar attacks."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#015",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Validate content types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "A REST request or response body should match the intended content type in the header. Otherwise this could cause misinterpretation at the consumer/producer side and lead to code injection/execution.\n\nDocument all supported content types in your API."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#016",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Validate content types > Validate request content types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "For requests with a body, require a supported Content-Type according to the endpoint contract and reject unsupported media types with 415 Unsupported Media Type. Do not require Content-Type solely for requests without a body. Reserve 406 Not Acceptable for response content negotiation.\n\nFor XML content types ensure appropriate XML parser hardening, see the XXE cheat sheet.\n\nAvoid accidentally exposing unintended content types by explicitly defining content types e.g. Jersey (Java) @consumes(\"application/json\"); @produces(\"application/json\"). This avoids XXE-attack vectors for example."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#017",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Validate content types > Send safe response content types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "It is common for REST services to allow multiple response types (e.g. application/xml or application/json, and the client specifies the preferred order of response types by the Accept header in the request.\n\nDo NOT simply copy the Accept header to the Content-type header of the response.\n\nSelect a supported response type that matches the client's Accept preferences, including media ranges and quality values. If none is acceptable and no default response will be supplied, return 406 Not Acceptable.\n\nServices including script code (e.g. JavaScript) in their responses must be especially careful to defend against header injection attack.\n\nEnsure sending intended content type headers in your response matching your body content e.g. application/json and not application/javascript."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#018",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Management endpoints",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Avoid exposing management endpoints via Internet.\n\nIf management endpoints must be accessible via the Internet, make sure that users must use a strong authentication mechanism, e.g. multi-factor.\n\nExpose management endpoints via different HTTP ports or hosts preferably on a different NIC and restricted subnet.\n\nRestrict access to these endpoints by firewall rules or use of access control lists."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#019",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Error handling",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Respond with generic error messages - avoid revealing details of the failure unnecessarily.\n\nDo not pass technical details (e.g. call stacks or other internal hints) to the client."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#020",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Audit logs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Write audit logs before and after security related events.\n\nConsider logging token validation errors in order to detect attacks.\n\nTake care of log injection attacks by sanitizing log data beforehand."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#021",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Security Headers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "There are a number of security related headers that can be returned in the HTTP responses to instruct browsers to act in specific ways. However, some of these headers are intended to be used with HTML responses, and as such may provide little or no security benefits on an API that does not return HTML. Note that if the API is only consumed by non-browser clients (e.g. mobile apps, server-to-server calls, command-line tools), most of these headers will have no effect since they are directives for browsers.\n\nThe following headers should be included in all API responses that may be consumed by browser clients:\n\nHeader\n\nRationale\n\nCache-Control: no-store\n\nInstructs compliant private and shared HTTP caches not to store the response or reuse it for another request (RFC 9111). This does not prevent storage by application code: the Cache API does not honor HTTP caching headers. Keep sensitive responses out of application-managed caches; see the offline application guidance.\n\nContent-Security-Policy: frame-ancestors 'none'\n\nHeader used to specify whether a response can be framed in a <frame>, <iframe>, <embed> or <object> element. For an API response, there is no requirement to be framed in any of those elements. Providing frame-ancestors 'none' prevents any domain from framing the response returned by the API call. This header protects against drag-and-drop style clickjacking attacks.\n\nContent-Type\n\nHeader to specify the content type of a response. This must be specified as per the type of content returned by an API call. If not specified or if specified incorrectly, a browser might attempt to guess the content type of the response. This can return in MIME sniffing attacks. One common content type value is application/json if the API response is JSON.\n\nStrict-Transport-Security"
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#022",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Security Headers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "For hosts covered by an active HSTS policy, instructs browsers to use HTTPS and terminate connections with TLS errors. Initial HTTP access remains exposed unless policy is already known, such as through preloading. HSTS does not protect against an attacker certificate that the client trusts; see the HSTS threat limitations.\n\nX-Content-Type-Options: nosniff\n\nHeader to instruct a browser to always use the MIME type that is declared in the Content-Type header rather than trying to determine the MIME type based on the file's content. This header with a nosniff value prevents browsers from performing MIME sniffing, and inappropriately interpreting responses as HTML.\n\nX-Frame-Options: DENY\n\nLegacy header superseded by Content-Security-Policy: frame-ancestors 'none' (see above). Still recommended for compatibility with older browsers that do not support CSP Level 2. Providing DENY prevents any domain from framing the response.\n\nThe headers below are only intended to provide additional security when responses are rendered as HTML. As such, if the API will never return HTML in responses, then these headers may not be necessary. However, if there is any uncertainty about the function of the headers, or the types of information that the API returns (or may return in future), then it is recommended to include them as part of a defense-in-depth approach.\n\nHeader\n\nExample\n\nRationale\n\nContent-Security-Policy\n\nContent-Security-Policy: default-src 'none'\n\nThe majority of CSP functionality only affects pages rendered as HTML.\n\nPermissions-Policy"
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#023",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Security Headers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Permissions-Policy: accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()\n\nThis header used to be named Feature-Policy. When browsers heed this header, it is used to control browser features via directives. The example disables features with an empty allowlist for a number of permitted directive names. When you apply this header, verify that the directives are up-to-date and fit your needs. Please have a look at this article for a detailed explanation on how to control browser features.\n\nReferrer-Policy\n\nReferrer-Policy: no-referrer\n\nNon-HTML responses should not trigger additional requests."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#024",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "CORS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "Cross-Origin Resource Sharing (CORS) is a W3C standard to flexibly specify what cross-domain requests are permitted. By delivering appropriate CORS Headers your REST API signals to the browser which domains, AKA origins, are allowed to make JavaScript calls to the REST service.\n\nDisable CORS headers if cross-domain calls are not supported/expected.\n\nBe as specific as possible and as general as necessary when setting the origins of cross-domain calls."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#025",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "Sensitive information in HTTP requests",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "RESTful web services should be careful to prevent leaking credentials. Passwords, security tokens, and API keys should not appear in the URL, as this can be captured in web server logs, which makes them intrinsically valuable.\n\nIn POST/PUT requests sensitive data should be transferred in the request body or request headers.\n\nIn GET requests sensitive data should be transferred in an HTTP Header.\n\nOK:\n\nhttps://example.com/resourceCollection/[ID]/action\n\nhttps://twitter.com/vanderaj/lists\n\nNOT OK:\n\nhttps://example.com/controller/123/action?apiKey=a53f435643de32 because the apiKey is in the URL."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#026",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "HTTP Return Code",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "HTTP defines status code. When designing REST API, don't just use 200 for success or 404 for error. Always use the semantically appropriate status code for the response.\n\nHere is a non-exhaustive selection of security related REST API status codes. Use it to ensure you return the correct code.\n\nCode\n\nMessage\n\nDescription\n\n200\n\nOK\n\nResponse to a successful REST API action. The HTTP method can be GET, POST, PUT, PATCH or DELETE.\n\n201\n\nCreated\n\nThe request has been fulfilled and resource created. A URI for the created resource is returned in the Location header.\n\n202\n\nAccepted\n\nThe request has been accepted for processing, but processing is not yet complete.\n\n301\n\nMoved Permanently\n\nPermanent redirection.\n\n304\n\nNot Modified\n\nCaching related response that returned when the client has the same copy of the resource as the server.\n\n307\n\nTemporary Redirect\n\nTemporary redirection of resource.\n\n400\n\nBad Request\n\nThe request is malformed, such as message body format error.\n\n401\n\nUnauthorized\n\nWrong or no authentication ID/password provided.\n\n403\n\nForbidden\n\nIt's used when the authentication succeeded but authenticated user doesn't have permission to the request resource.\n\n404\n\nNot Found\n\nWhen a non-existent resource is requested.\n\n405\n\nMethod Not Allowed\n\nThe error for an unexpected HTTP method. For example, the REST API is expecting HTTP GET, but HTTP PUT is used.\n\n406\n\nNot Acceptable\n\nNo supported response representation satisfies the client's content negotiation preferences and the server will not send a default representation.\n\n413\n\nPayload too large\n\nUse it to signal that the request size exceeded the given limit e.g. regarding file uploads.\n\n415\n\nUnsupported Media Type\n\nThe request content has a format that the target method does not support.\n\n429\n\nToo Many Requests\n\nThe error is used when there may be DOS attack detected or the request is rejected due to rate limiting.\n\n500\n\nInternal Server Error"
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#027",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "HTTP Return Code",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "An unexpected condition prevented the server from fulfilling the request. Be aware that the response should not reveal internal information that helps an attacker, e.g. detailed error messages or stack traces.\n\n501\n\nNot Implemented\n\nThe REST service does not implement the requested operation yet.\n\n503\n\nService Unavailable\n\nThe REST service is temporarily unable to process the request. Used to inform the client it should retry at a later time.\n\nAdditional information about HTTP return code usage in REST API can be found here and here."
+  },
+  {
+   "chunk_id": "REST_Security_Cheat_Sheet#028",
+   "doc": "REST_Security_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/REST_Security_Cheat_Sheet.html",
+   "text": "RFC 8725: JSON Web Token Best Current Practices\n\nRFC 9110: HTTP Semantics"
+  }
+ ]
+}

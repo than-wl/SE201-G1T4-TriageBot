@@ -1,0 +1,158 @@
+{
+ "chunks": [
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#001",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "This article is focused on providing clear, simple, actionable guidance for preventing the entire category of Injection flaws in your applications. Injection attacks, especially SQL Injection, are unfortunately very common.\n\nApplication accessibility is a very important factor in protection and prevention of injection flaws. Only the minority of all applications within a company/enterprise are developed in house, where as most applications are from external sources. Open source applications give at least the opportunity to fix problems, but closed source applications need a different approach to injection flaws.\n\nInjection flaws occur when an application sends untrusted data to an interpreter. Injection flaws are very prevalent, particularly in legacy code, often found in SQL queries, LDAP queries, XPath queries, OS commands, program arguments, etc. Injection flaws are easy to discover when examining code, but more difficult via testing. Scanners and fuzzers can help attackers find them.\n\nDepending on the accessibility different actions must be taken in order to fix them. It is always the best way to fix the problem in source code itself, or even redesign some parts of the applications. But if the source code is not available or it is simply uneconomical to fix legacy software only virtual patching makes sense."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#021",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Injection Prevention Rules > Rule #1 (Perform proper input validation)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "Perform proper input validation. Positive or allowlist input validation with appropriate canonicalization is also recommended, but is not a complete defense as many applications require special characters in their input."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#022",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Injection Prevention Rules > Rule #2 (Use a safe API)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "The preferred option is to use a safe API which avoids the use of the interpreter entirely or provides a parameterized interface. Be careful of APIs, such as stored procedures, that are parameterized, but can still introduce injection under the hood."
+  },
+  {
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#023",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Injection Prevention Rules > Rule #3 (Contextually escape user data)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html",
+   "text": "If a parameterized API is not available, you should carefully escape special characters using the specific escape syntax for that interpreter."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#001",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Input validation checks whether data meets an application's requirements before the application uses it. It reduces the risk of malformed data, invalid business operations, and excessive resource consumption. OWASP's Proactive Control C3 distinguishes validation from the additional defenses needed when using that data:\n\nUse parameterized queries for SQL and context-aware output encoding to prevent cross-site scripting (XSS).\n\nCheck authorization separately: a valid account identifier does not mean the caller may access that account."
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#002",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Input Validation Strategies",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Validate both syntax (the expected type and format) and semantics (whether the value makes sense for the operation). For example, a booking needs valid dates and an end date after its start date. CWE-20 describes these checks, including consistency between related fields.\n\nDefine rules for each field:\n\nInput\n\nRules to enforce\n\nFixed choices\n\nExact membership in the allowed set, including values submitted from drop-down menus\n\nNumbers and dates\n\nExpected type, accepted format, and minimum and maximum values\n\nStrings\n\nLength limits and the characters or structure required by the field\n\nObjects\n\nAllowed fields, required fields, and rules for missing or null values\n\nArrays\n\nMinimum and maximum item counts and validation of every item, including nested objects"
+  },
+  {
+   "chunk_id": "Input_Validation_Cheat_Sheet#003",
+   "doc": "Input_Validation_Cheat_Sheet",
+   "section": "Input Validation Strategies > Allowlist vs Denylist",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html",
+   "text": "Define what the application accepts and reject values outside those rules. Do not try to recognize every malicious string. Blocking apostrophes, for example, rejects legitimate names without making a database query safe. For free-form comments, an allowlist can permit broad Unicode text while limiting its length; it need not restrict users to letters and digits."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#001",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Secure Code Review is the process of manually examining source code to identify security vulnerabilities that automated tools often miss. It involves analyzing application logic, data flow, and implementation details to detect security flaws that require human expertise and contextual understanding.\n\nManual Code Review complements automated security testing tools (SAST/DAST) by focusing on areas where human analysis provides the most value, including business logic validation, complex security implementations, and context-specific vulnerabilities. While automated tools can assist by highlighting potential areas of concern, the core analysis relies on human judgment and domain expertise.\n\nSecurity-Focused Review differs from functional code review by specifically targeting security concerns such as input validation, authentication mechanisms, authorization controls, cryptographic implementations, and potential attack vectors."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#002",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Introduction > Review Types",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Baseline Reviews examine the entire codebase comprehensively. Use for:\n\nNew applications or major releases\n\nLegacy system onboarding\n\nCompliance requirements\n\nPost-incident analysis\n\nDiff-Based Reviews focus on code changes only. Use for:\n\nPull requests and commits\n\nDaily development workflow\n\nFeature completion\n\nContinuous security validation\n\nThis cheat sheet provides practical guidance for conducting effective manual security code reviews, with emphasis on both baseline and incremental review methodologies."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#003",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Methodology > Preparation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "For All Reviews:\n\nUnderstand application architecture and business requirements\n\nGather threat models and previous security findings\n\nIdentify critical assets and high-risk functions\n\nReview security requirements and documentation\n\nAdditional for Baseline Reviews:\n\nMap complete application boundaries and dependencies\n\nAnalyze overall security architecture\n\nReview security incident history\n\nAudit all third-party libraries\n\nAdditional for Diff-Based Reviews:\n\nIdentify modified files and affected components\n\nAssess impact on existing security controls\n\nUnderstand purpose of changes\n\nPrioritize high-risk modifications"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#004",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Methodology > Review Process",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Baseline Review Steps:\n\nArchitecture review for security anti-patterns\n\nEntry point analysis and input validation\n\nAuthentication and authorization verification\n\nData flow tracing\n\nBusiness logic analysis\n\nCryptographic implementation review\n\nError handling verification\n\nConfiguration and deployment review\n\nDiff-Based Review Steps:\n\nAnalyze impact on existing security controls\n\nIdentify new attack vectors\n\nVerify security at modified trust boundaries\n\nCheck new integrations\n\nEnsure no security regression\n\nApply relevant security patterns"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#005",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "For request forgery and redirect checks, also consult the CSRF Prevention, SSRF Prevention, and Unvalidated Redirects and Forwards cheat sheets."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#006",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Input Validation Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Check for missing server-side validation, improper sanitization, and weak input filtering. For more information, see Input Validation Cheat Sheet and Mass Assignment Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#007",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Injection Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "SQL Injection:\n\nLook for string concatenation in database queries and unsafe query construction. For more information, see SQL Injection Prevention Cheat Sheet.\n\nCross-Site Scripting (XSS):\n\nReview output encoding, DOM manipulation, and user input rendering. For more information, see Cross Site Scripting Prevention Cheat Sheet.\n\nPath Traversal:\n\nCheck for unsafe file path construction and directory traversal vulnerabilities. For more information, see File Upload Cheat Sheet.\n\nCommand Injection:\n\nIdentify direct command execution with user input and unsafe system calls. For more information, see OS Command Injection Defense Cheat Sheet.\n\nNoSQL Injection:\n\nExamine NoSQL query construction and parameter binding. For more information, see NoSQL Security Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#008",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Authentication & Session Management Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Review authentication mechanisms, session token generation, and user credential handling. For more information, refer to Authentication Cheat Sheet and Session Management Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#009",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Access Control Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Examine authorization checks, role-based access controls, and privilege escalation prevention. For more information, see Authorization Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#010",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Deserialization Vulnerabilities",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Insecure Deserialization:\n\nCheck for unsafe deserialization of untrusted data and object injection vulnerabilities. For more information, see Deserialization Cheat Sheet.\n\nXML External Entity (XXE):\n\nReview XML parsing configurations and external entity processing. For more information, see XML External Entity Prevention Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#011",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Common Vulnerability Patterns > Cryptographic Implementation Flaws",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Examine encryption algorithms, key management, and cryptographic implementations. For more information, refer to Cryptographic Storage Cheat Sheet."
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#012",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Code Pattern Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Focus on high-risk code patterns:\n\nInput processing and validation functions\n\nDatabase query construction and ORM usage\n\nFile operations and path handling\n\nAuthentication and session management logic\n\nAuthorization and access control checks\n\nCryptographic operations and key management\n\nError handling and logging mechanisms\n\nConfiguration loading and environment variables"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#013",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Data Flow Analysis",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Trace data through the application:\n\nIdentify Sources: User inputs, file uploads, API calls, database reads, environment variables\n\nFollow Processing: Validation, transformation, business logic, caching\n\nCheck Sinks: Database queries, file writes, output rendering, logging, external APIs\n\nValidate Boundaries: Input validation and output encoding at trust boundaries\n\nTrust Zones: Verify security controls at each trust boundary crossing\n\nData Classification: Ensure sensitive data receives appropriate protection"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#014",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Threat-Based Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Align review with common attack patterns:\n\nOWASP Top 10: Focus on prevalent web application risks\n\nSTRIDE Model: Spoofing, Tampering, Repudiation, Information Disclosure, DoS, Elevation\n\nAttack Trees: Map potential attack paths through the application\n\nAbuse Cases: Consider how features could be misused by attackers\n\nSecurity Controls: Verify defense-in-depth implementation"
+  },
+  {
+   "chunk_id": "Secure_Code_Review_Cheat_Sheet#015",
+   "doc": "Secure_Code_Review_Cheat_Sheet",
+   "section": "Review Techniques > Business Logic Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Secure_Code_Review_Cheat_Sheet.html",
+   "text": "Use the Abuse Case Cheat Sheet to identify misuse scenarios.\n\nAnalyze application workflows for:\n\nState management and transition validation\n\nRace conditions and concurrency issues\n\nTransaction integrity and rollback mechanisms\n\nResource limits and quota enforcement\n\nAuthorization at each workflow step\n\nWorkflow bypass opportunities"
+  }
+ ]
+}

@@ -1,0 +1,182 @@
+{
+ "doc": "Deserialization_Cheat_Sheet",
+ "title": "Deserialization Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#001",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "This article is focused on providing clear, actionable guidance for safely deserializing untrusted data in your applications."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#002",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "What is Deserialization",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Serialization is the process of turning some object into a data format that can be restored later. People often serialize objects in order to save them for storage, or to send as part of communications.\n\nDeserialization is the reverse of that process, taking data structured in some format, and rebuilding it into an object. Today, the most popular data format for serializing data is JSON. Before that, it was XML.\n\nHowever, many programming languages have native ways to serialize objects. These native formats usually offer more features than JSON or XML, including customization of the serialization process.\n\nUnfortunately, the features of these native deserialization mechanisms can sometimes be repurposed for malicious effect when operating on untrusted data. Attacks against deserializers have been found to allow denial-of-service, access control, or remote code execution (RCE) attacks."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#003",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "The following language-specific guidance attempts to enumerate safe methodologies for deserializing data that can't be trusted."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#004",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > PHP > Clear-box Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Check the use of unserialize() function and review how the external parameters are accepted. Use a safe, standard data interchange format such as JSON (via json_decode() and json_encode()) if you need to pass serialized data to the user."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#005",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Python > Opaque-box Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "If the traffic data contains the symbol dot . at the end, it's very likely that the data was sent in serialization. It will be only true if the data is not being encoded using Base64 or Hexadecimal schemas. If the data is being encoded, then it's best to check if the serialization is likely happening or not by looking at the starting characters of the parameter value. For example if data is Base64 encoded, then it will most likely start with gASV."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#006",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Python > Clear-box Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Review the following APIs for untrusted input:\n\nUses of pickle.load() or pickle.loads(). Unpickling can execute arbitrary code; never unpickle untrusted data. pickle.loads() expects bytes-like input, not a Python 3 string.\n\nUses of PyYAML's unsafe loaders, such as yaml.unsafe_load() or yaml.load() with Loader=yaml.Loader or Loader=yaml.UnsafeLoader. For untrusted YAML, use yaml.safe_load(), and do not register custom constructors that allow arbitrary object creation. Current PyYAML requires an explicit Loader argument for yaml.load().\n\nUses of jsonpickle.decode() with untrusted input."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#007",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "For historical research on Java deserialization and defensive allowlisting, see Java Deserialization Attacks — German OWASP Day 2016.\n\nThe following techniques can reduce risks when using Java's Serializable format.\n\nImplementation advice:\n\nConfigure serialization filters with an application-specific class allowlist and resource limits before reading objects.\n\nIf maintaining a resolveClass() override, account for its limitations below; class checks alone do not bound resource consumption."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#008",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Clear-box Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Be aware of the following Java API uses for potential serialization vulnerability.\n\n1. XMLdecoder with external user defined parameters\n\n2. XStream with fromXML method (xstream version <= v1.4.6 is vulnerable to the serialization issue)\n\n3. ObjectInputStream with readObject\n\n4. Uses of readObject, readObjectNoData, readResolve or readExternal\n\n5. ObjectInputStream.readUnshared\n\n6. Serializable"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#009",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Opaque-box Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "If the captured traffic data includes the following patterns, it may suggest that the data was sent in Java serialization streams:\n\nAC ED 00 05 in Hex\n\nrO0 in Base64\n\nContent-type header of an HTTP response set to application/x-java-serialized-object"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#010",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Prevent Data Leakage and Trusted Field Clobbering",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "If there are data members of an object that should never be controlled by end users during deserialization or exposed to users during serialization, they should be declared as the transient keyword (section Protecting Sensitive Information).\n\nFor a class that defined as Serializable, the sensitive information variable should be declared as private transient.\n\nFor example, the class myAccount, the variables 'profit' and 'margin' were declared as transient to prevent them from being serialized.\n\n```\npublic class myAccount implements Serializable\n{\n    private transient double profit; // declared transient\n\n    private transient double margin; // declared transient\n    ....\n```"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#011",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Prevent Deserialization of Domain Objects",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Some of your application objects may be forced to implement Serializable due to their hierarchy. To guarantee that your application objects can't be deserialized, a readObject() method should be declared (with a final modifier) which always throws an exception:\n\n```\nprivate final void readObject(ObjectInputStream in) throws java.io.IOException {\n    throw new java.io.IOException(\"Cannot be deserialized\");\n}\n```"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#012",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Harden Your Own java.io.ObjectInputStream",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "The java.io.ObjectInputStream class is used to deserialize objects. A custom class-resolution allowlist may be useful if:\n\nyou can change the code that does the deserialization;\n\nyou know what classes you expect to deserialize.\n\nThe general idea is to override ObjectInputStream.resolveClass() to restrict ordinary class resolution during deserialization.\n\nThis does not check every object: the serialization specification handles strings separately and resolves dynamic proxy class descriptors through resolveProxyClass().\n\nThe following example allows only Bicycle through resolveClass(). It is an illustrative class check, not a complete deserialization defense:\n\n```\npublic class LookAheadObjectInputStream extends ObjectInputStream {\n\n    public LookAheadObjectInputStream(InputStream inputStream) throws IOException {\n        super(inputStream);\n    }\n\n    /**\n    * Restrict ordinary class resolution to our expected Bicycle class\n    */\n    @Override\n    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {\n        if (!desc.getName().equals(Bicycle.class.getName())) {\n            throw new InvalidClassException(\"Unauthorized deserialization attempt\", desc.getName());\n        }\n        return super.resolveClass(desc);\n    }\n}\n```\n\nUse serialization filtering to combine a class allowlist with limits on graph depth, references, array lengths, and stream bytes. Also bound the serialized input size separately: filters are not called for concretely encoded strings or primitives. Filtering does not make arbitrary untrusted deserialization safe.\n\nMore complete implementations of this approach have been proposed by various community members:\n\nNibbleSec - a library that allows creating lists of classes that are allowed to be deserialized\n\nIBM - the seminal protection, written years before the most devastating exploitation scenarios were envisioned.\n\nApache Commons IO classes"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#013",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Harden All java.io.ObjectInputStream Usage with an Agent",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "As mentioned above, the java.io.ObjectInputStream class is used to deserialize objects. It's possible to harden its behavior by subclassing it. However, if you don't own the code or can't wait for a patch, using an agent to weave in hardening to java.io.ObjectInputStream is the best solution.\n\nGlobally changing ObjectInputStream is only safe for block-listing known malicious types, because it's not possible to know for all applications what the expected classes to be deserialized are. Fortunately, there are very few classes needed in the denylist to be safe from all the known attack vectors, today.\n\nIt's inevitable that more \"gadget\" classes will be discovered that can be abused. However, there is an incredible amount of vulnerable software exposed today, in need of a fix. In some cases, \"fixing\" the vulnerability may involve re-architecting messaging systems and breaking backwards compatibility as developers move towards not accepting serialized objects.\n\nTo enable these agents, simply add a new JVM parameter:\n\n```\n-javaagent:name-of-agent.jar\n```\n\nAgents taking this approach have been released by various community members:\n\nrO0 by Contrast Security\n\nA similar, but less scalable approach would be to manually patch and bootstrap your JVM's ObjectInputStream. Guidance on this approach is available here."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#014",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Other Deserialization Libraries and Formats",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "While the advice above is focused on Java's Serializable format, there are a number of other libraries that use other formats for deserialization. Many of these libraries may have similar security issues if not configured correctly. This section lists some of these libraries and recommended configuration options to avoid security issues when deserializing untrusted data:\n\nCan be used safely with default configuration:\n\nThe following libraries can be used safely with default configuration:\n\nfastjson2 (JSON) - can be used safely as long as the autotype option is not turned on\n\njackson-databind (JSON) - can be used safely as long as polymorphism is not used (see blog post)\n\nKryo v5.0.0+ (custom format) - can be used safely as long as class registration is not turned off (see documentation and this issue)\n\nYamlBeans v1.16+ (YAML) - can be used safely as long as the UnsafeYamlConfig class isn't used (see this commit)\n\nNOTE: because these versions are not available in Maven Central, a fork exists that can be used instead.\n\nXStream v1.4.17+ (JSON and XML) - can be used safely as long as the allowlist and other security controls are not relaxed (see documentation)\n\nRequires configuration before can be used safely:\n\nThe following libraries require configuration options to be set before they can be used safely:\n\nfastjson v1.2.68+ (JSON) - cannot be used safely unless the safemode option is turned on, which disables deserialization of any class (see documentation). Previous versions are not safe.\n\njson-io (JSON) - cannot be used safely since the use of @type property in JSON allows deserialization of any class. Can only be used safely in following situations:\n\nIn non-typed mode using the JsonReader.USE_MAPS setting which turns off generic object deserialization\n\nWith a custom deserializer controlling which classes get deserialized"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#015",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > Java > Other Deserialization Libraries and Formats",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Kryo < v5.0.0 (custom format) - cannot be used safely unless class registration is turned on, which disables deserialization of any class (see documentation and this issue)\n\nNOTE: other wrappers exist around Kryo such as Chill, which may also have class registration not required by default regardless of the underlying version of Kryo being used\n\nSnakeYAML (YAML) - cannot be used safely unless the org.yaml.snakeyaml.constructor.SafeConstructor class is used, which disables deserialization of any class (see docs)\n\nCannot be used safely:\n\nThe following libraries are either no longer maintained or cannot be used safely with untrusted input:\n\nCastor (XML) - appears to be abandoned with no commits since 2016\n\nfastjson < v1.2.68 (JSON) - these versions allows deserialization of any class (see documentation)\n\nXMLDecoder in the JDK (XML) - \"close to impossible to securely deserialize Java objects in this format from untrusted inputs\" (\"Red Hat Defensive Coding Guide\", end of section 2.6.5)\n\nXStream < v1.4.17 (JSON and XML) - these versions allows deserialization of any class (see documentation)\n\nYamlBeans < v1.16 (YAML) - these versions allows deserialization of any class (see this document)"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#016",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > .Net CSharp > Clear-box Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Search the source code for the following terms:\n\nTypeNameHandling\n\nJavaScriptTypeResolver\n\nLook for any serializers where the type is set by a user controlled variable."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#017",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > .Net CSharp > Opaque-box Review",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Search for the following base64 encoded content that starts with:\n\n```\nAAEAAAD/////\n```\n\nSearch for content with the following text:\n\nTypeObject\n\n$type:"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#018",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > .Net CSharp > General Precautions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Microsoft has stated that the BinaryFormatter type is dangerous and cannot be secured. As such, it should not be used. Full details are in the BinaryFormatter security guide.\n\nDon't allow the datastream to define the type of object that the stream will be deserialized to. You can prevent this by for example using the DataContractSerializer or XmlSerializer if at all possible.\n\nWhere JSON.Net is being used make sure the TypeNameHandling is only set to None.\n\n```\nTypeNameHandling = TypeNameHandling.None\n```\n\nIf JavaScriptSerializer is to be used then do not use it with a JavaScriptTypeResolver.\n\nIf you must deserialize data streams that define their own type, then restrict the types that are allowed to be deserialized. One should be aware that this is still risky as many native .Net types potentially dangerous in themselves. e.g.\n\n```\nSystem.IO.FileInfo\n```\n\nFileInfo objects that reference files actually on the server can when deserialized, change the properties of those files e.g. to read-only, creating a potential denial of service attack.\n\nEven if you have limited the types that can be deserialized remember that some types have properties that are risky. System.ComponentModel.DataAnnotations.ValidationException, for example has a property Value of type Object. if this type is the type allowed for deserialization then an attacker can set the Value property to any object type they choose.\n\nAttackers should be prevented from steering the type that will be instantiated. If this is possible then even DataContractSerializer or XmlSerializer can be subverted e.g.\n\n```\n// Action below is dangerous if the attacker can change the data in the database\nvar typename = GetTransactionTypeFromDatabase();\n\nvar serializer = new DataContractJsonSerializer(Type.GetType(typename));\n\nvar obj = serializer.ReadObject(ms);\n```\n\nExecution can occur within certain .Net types during deserialization. Creating a control such as the one shown below is ineffective."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#019",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > .Net CSharp > General Precautions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "```\nvar suspectObject = myBinaryFormatter.Deserialize(untrustedData);\n\n//Check below is too late! Execution may have already occurred.\nif (suspectObject is SomeDangerousObjectType)\n{\n    //generate warnings and dispose of suspectObject\n}\n```\n\nFor JSON.Net it is possible to create a safer form of allow-list control using a custom SerializationBinder.\n\nTry to keep up-to-date on known .Net insecure deserialization gadgets and pay special attention where such types can be created by your deserialization processes. A deserializer can only instantiate types that it knows about.\n\nTry to keep any code that might create potential gadgets separate from any code that has internet connectivity. As an example System.Windows.Data.ObjectDataProvider used in WPF applications is a known gadget that allows arbitrary method invocation. It would be risky to have this a reference to this assembly in a REST service project that deserializes untrusted data."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#020",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Guidance on Deserializing Objects Safely > .Net CSharp > Known .NET RCE Gadgets",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "System.Configuration.Install.AssemblyInstaller\n\nSystem.Activities.Presentation.WorkflowDesigner\n\nSystem.Windows.ResourceDictionary\n\nSystem.Windows.Data.ObjectDataProvider\n\nSystem.Windows.Forms.BindingSource\n\nMicrosoft.Exchange.Management.SystemManager.WinForms.ExchangeSettingsProvider\n\nSystem.Data.DataViewManager, System.Xml.XmlDocument/XmlDataDocument\n\nSystem.Management.Automation.PSObject"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#021",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Language-Agnostic Methods for Deserializing Safely > Using Alternative Data Formats",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "A great reduction of risk is achieved by avoiding native (de)serialization formats. By switching to a pure data format like JSON or XML, you lessen the chance of custom deserialization logic being repurposed towards malicious ends.\n\nMany applications rely on a data-transfer object pattern that involves creating a separate domain of objects for the explicit purpose data transfer. Of course, it's still possible that the application will make security mistakes after a pure data object is parsed."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#022",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Language-Agnostic Methods for Deserializing Safely > Only Deserialize Signed Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "If the application knows before deserialization which messages will need to be processed, they could sign them as part of the serialization process. The application could then to choose not to deserialize any message which didn't have an authenticated signature."
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#023",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Mitigation Tools/Libraries",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Java secure deserialization library\n\nSWAT - tool for creating allowlists\n\nNotSoSerial"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#024",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "Detection Tools",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Java deserialization cheat sheet aimed at pen testers\n\nA proof-of-concept tool for generating payloads that exploit unsafe Java object deserialization.\n\nJava De-serialization toolkits\n\nJava de-serialization tool\n\n.Net payload generator\n\nBurp Suite extension\n\nJava secure deserialization library\n\nSerianalyzer is a static bytecode analyzer for deserialization\n\nPayload generator\n\nAndroid Java Deserialization Vulnerability Tester\n\nBurp Suite Extension\n\nJavaSerialKiller\n\nJava Deserialization Scanner\n\nBurp-ysoserial\n\nSuperSerial\n\nSuperSerial-Active"
+  },
+  {
+   "chunk_id": "Deserialization_Cheat_Sheet#025",
+   "doc": "Deserialization_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html",
+   "text": "Oracle Java 17: Serialization Filtering\n\nMicrosoft: Deserialization Risks in Use of BinaryFormatter and Related Types\n\nPython: pickle Security Warning"
+  }
+ ]
+}

