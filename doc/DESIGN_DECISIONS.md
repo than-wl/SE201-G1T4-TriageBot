@@ -36,22 +36,37 @@ version, and prompt-injection surface through live web content is avoided.
 
 ## 3. Guidance retrieval: CWE-keyed local KB with keyword ranking
 
-**Decision.** The KB is a small local corpus of security documentation
-organised by CWE. Retrieval selects documents matching the alert's CWE,
-then ranks chunks within them using terms derived from the alert (rule id,
-source APIs, message). Keyword ranking is the current implementation, not a
-permanent placeholder: we evaluate whether its results are adequate in
-testing, and upgrade to embedding-based retrieval only if they are not.
+**Decision.** The KB is a committed, offline corpus of the OWASP Cheat
+Sheet Series, chunked by section and indexed by CWE. Retrieval works in
+two stages: a CWE gate selects the documents mapped to the alert's CWE
+(via a build-time map of curated category pins unioned with detected
+mentions, because cheat sheets rarely state their own CWE id in prose),
+then keyword ranking orders the candidate chunks — matched documents plus
+a small always-included set of CWE-agnostic chunks — using terms derived
+from the alert (rule id, message, source/sink APIs), and the top few
+chunks become the payload's guidance. An alert with no mappable CWE
+receives only the always-included chunks and is flagged
+`cwe_matched=false`, which the validator routes to human review.
 
-**Why.** The CWE field already exists in the normalised alert, so retrieval
-needs no additional coupling. Keyword ranking is deterministic and
-dependency-free, making results reproducible and the KB easy to extend with
-new documentation files rather than code changes.
+Keyword ranking is the deliberately simplified checkpoint mechanism
+inside an otherwise complete retrieval component; the architecture
+component itself (payload-node retrieval with a defined input, output,
+and committed KB) is built and connected, and the brief permits
+documented simplifications of component internals.
+
+**Why.** The CWE field already exists in the normalised alert, so
+retrieval needs no additional coupling to ingest. Keyword ranking is
+deterministic and dependency-free, making results reproducible and the
+KB easy to extend with new documentation files rather than code changes.
+The always-included set guarantees agents receive general review guidance
+even when the CWE gate misses.
 
 **Consequence.** Adding a vulnerability category later means adding files
-to `triagebot/nodes/context/kb/`. If evaluation shows ranked keyword
-results are inadequate, the team considers embedding-based retrieval over
-the same chunks; the KB format supports that swap.
+to `triagebot/nodes/context/kb/`. The expected upgrade for the final
+system is embedding-based retrieval (vector similarity search, i.e. RAG)
+over the same committed chunk store, motivated if evaluation shows the
+keyword ranker misses relevant guidance; the chunk JSON layout is the
+stable interface, so that upgrade replaces the ranker, not the KB.
 
 ## 4. Council: concurrent specialists, single join
 
