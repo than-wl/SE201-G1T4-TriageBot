@@ -71,6 +71,10 @@ This repository currently contains the project overview, team-owned planning mat
 | -------------------------------------- | -------------------------------------------------------------------------------- |
 | `CHECKPOINT_BRIEF.md`                | Current checkpoint goal, status, and action plan                                 |
 | `CHECKPOINT_TEAM_TASKS.md`           | Detailed checkpoint assignments and integration checklist                        |
+| `CHECKPOINT_DARREN.md`               | Darren's Semgrep integration and OWASP mapping instructions                      |
+| `CHECKPOINT_HONG_YI.md`              | Hong Yi's single-agent and council instructions                                  |
+| `CHECKPOINT_LISA.md`                 | Lisa's validation and human-review instructions                                  |
+| `CHECKPOINT_BRADLEY.md`              | Bradley's evaluation and checkpoint-report instructions                         |
 | `Context/README.md`                  | Index of shared context and local-only material                                   |
 | `verification/openrouter_smoke.py`   | Five-case OpenRouter smoke test and offline validator self-test                  |
 | `verification/feasibility_checks.py` | Limited retrieval, evidence-helper, and Analyst–Skeptic–Chair feasibility pass |

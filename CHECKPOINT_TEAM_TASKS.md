@@ -107,16 +107,17 @@ Repository access does not automatically grant OpenRouter access, and no API key
 
 The recommended arrangement is:
 
-1. The account owner creates a separate temporary API key for each active member.
-2. Give each key a small total spending limit, for example **US$0.25**, and an expiry shortly after the checkpoint.
-3. If account guardrails are available, allow only the development model.
-4. Send each key privately, never through GitHub, source code, issues, or chat logs that will be committed.
-5. Each member copies `.env.example` to `.env` and adds only their assigned key locally.
-6. Revoke all temporary keys after the checkpoint.
+1. Only members who need live model calls receive a key. For the current task split, Hong Yi may need a temporary development key; Darren, Lisa, and Bradley can complete their assigned work offline. The account owner may run the final paid batch personally.
+2. If a member needs a live call, the account owner creates a separate temporary API key for that member.
+3. Give each key a small total spending limit, for example **US$0.25**, and an expiry shortly after the checkpoint.
+4. If account guardrails are available, allow only the development model.
+5. Send any key privately, never through GitHub, source code, issues, or chat logs that will be committed.
+6. The recipient copies `.env.example` to `.env` and adds only their assigned key locally.
+7. Revoke all temporary keys after the checkpoint.
 
 Use `google/gemini-3.5-flash-lite` for cheap development calls after Hong Yi makes the model configurable. Use the proposal model, `google/gemini-3.8-flash`, for the recorded final comparison so the final results remain consistent with the proposal and earlier smoke test. Record the exact model used for every run.
 
-Separate keys are preferable to one shared key because they provide individual spend limits and can be revoked independently. If the account owner chooses one shared temporary key instead, it must still have a low hard spending limit and expiry, and it must never enter the repository.
+Separate keys are preferable to one shared key because they provide individual spend limits and can be revoked independently. If the account owner chooses one shared temporary key instead, it must still have a low hard spending limit and expiry, it should be used only by the person running live calls, and it must never enter the repository.
 
 No member should need paid calls to complete their basic implementation. All components must support offline tests with fixtures or recorded responses.
 
