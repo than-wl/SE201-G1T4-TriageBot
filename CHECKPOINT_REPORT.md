@@ -4,7 +4,7 @@
 **Members:** Darren, Hong Yi, Lisa, Bradley, Wei Lin
 **Checkpoint date:** 18 October 2026
 
-> **Draft status.** This draft was prepared on 17 October before the integrated run. Every item marked `[TBC: ...]` is waiting on a teammate's component or on the final recorded run, and must be filled in or removed before submission. Search the file for `[TBC` to find them all.
+> **Draft status.** This draft was prepared on 17 October and last updated on 18 October against `main` at commit `057e906`, before the integrated run. Every item marked `[TBC: ...]` is waiting on a teammate's component or on the final recorded run, and must be filled in or removed before submission. Search the file for `[TBC` to find them all.
 
 ## 1. Summary
 
@@ -54,7 +54,7 @@ Product code lives in `triagebot/`, one folder per pipeline node. Shared JSON co
 | --- | --- | --- | --- |
 | Shared contracts and package layout | Hong Yi | `triagebot/schemas.py`, `triagebot/` | Verified: merged to `main` |
 | Semgrep normalisation and answer-key mapping | Darren | `triagebot/nodes/ingest/` | `[TBC: Darren's branch, tests and status]` |
-| OWASP guidance retrieval (knowledge base) | Hong Yi | `triagebot/nodes/context/` | Partially verified: committed knowledge base of 137 OWASP Cheat Sheets (3,238 chunks), CWE gate plus keyword ranking `[TBC: confirm retrieval tests]` |
+| OWASP guidance retrieval | Hong Yi | `triagebot/nodes/context/` | Partially verified: merged to `main`. Committed knowledge base of 137 OWASP Cheat Sheets (3,238 chunks); a CWE gate selects the mapped cheat sheets, keyword ranking returns up to 6 chunks within a 4,000-character budget, and alerts with no mapped CWE get curated general chunks flagged `cwe_matched=false`. Checked manually on a CWE-89 alert (section 6.4); no automated tests in the repository yet `[TBC: confirm with Hong Yi]` |
 | Single agent and council orchestration | Hong Yi | `triagebot/nodes/review/` | `[TBC: Hong Yi's branch, tests and status]` |
 | Deterministic validator | Lisa | `triagebot/nodes/validate/validator.py` | Verified offline: 32 tests on `checkpoint/lisa-validation` `[TBC: merge status]` |
 | Evaluation harness | Bradley | `triagebot/nodes/score/evaluate.py` | Verified offline: 14 tests, plus a check against the validator's real output `[TBC: merge status]` |
@@ -176,7 +176,8 @@ These cases were deliberately selected and test names were visible to the model,
 | Deterministic validator | 32 | Pass | Rejects a fabricated quote, wrong file, out-of-range line, malformed JSON, missing case, duplicate case and unsupported verdict. Each falls back to `human_review` with reasons |
 | Evaluation harness | 14 | Pass | Exact counts on a hand-checked five-case dataset; `human_review` never counted as a removal; missing and invalid results handled safely; output byte-identical across runs |
 | `[TBC: Darren's ingest tests]` | | | |
-| `[TBC: Hong Yi's council and retrieval tests]` | | | |
+| Guidance retrieval (manual check, not an automated test) | 1 alert | Works | A CWE-89 SQL-injection alert matched four cheat sheets (Injection Prevention, Java Security, Query Parameterization, SQL Injection Prevention) and returned 2 chunks (3,866 characters). An alert with no CWE fell back to 6 general chunks flagged `cwe_matched=false` |
+| `[TBC: Hong Yi's council tests]` | | | |
 
 The validator and evaluator were also run together: sample model output passed through the validator and then into the evaluator, which scored a fabricated citation and a missing answer as human review with the validator's reasons attached.
 
@@ -200,7 +201,7 @@ The validator and evaluator were also run together: sample model output passed t
 - **One category, small sample.** Results for about 100 CWE-89 findings do not generalise to other vulnerability categories or to the full benchmark.
 - **Public benchmark.** OWASP Benchmark is public and test names are visible, so the model may recognise cases. Comments and hints are stripped from the LLM-facing copy, but mutation tests that would detect memorisation are deferred.
 - **Filename-based mapping.** The preliminary scanner baseline matched findings to cases by file name. `[TBC: state whether Darren's mapping also checks category and CWE.]`
-- **Keyword retrieval.** Guidance ranking is keyword based, so relevant guidance worded differently from the alert may be missed.
+- **Keyword retrieval.** Guidance ranking is keyword based, so relevant guidance worded differently from the alert may be missed. In the manual check on a CWE-89 alert, the 4,000-character budget left room for only 2 of the 6 allowed chunks, and neither came from the SQL Injection Prevention Cheat Sheet, the most directly relevant document. `[TBC: Hong Yi to confirm whether the budget or ranking will be adjusted before the final run.]`
 - **Cost and latency for configuration D.** The validator's output records do not carry latency or token usage. `[TBC: either carry these through from configuration C, or state that D's cost equals C's plus negligible validation time.]`
 - **Single run.** Model output can vary between runs, and we report one recorded run. `[TBC: temperature and any repeat runs.]`
 
@@ -242,7 +243,7 @@ The validator and evaluator were also run together: sample model output passed t
 Each member has reviewed the paragraph describing their own work. `[TBC: tick when confirmed]`
 
 - **Darren:** `[TBC]` Semgrep integration, alert normalisation and answer-key mapping. `[ ] confirmed`
-- **Hong Yi:** Package scaffold and shared contracts, design decision record, offline OWASP Cheat Sheet knowledge base (137 sheets, 3,238 chunks), `[TBC: council and single-agent orchestration]`. `[ ] confirmed`
+- **Hong Yi:** Package scaffold and shared contracts, design decision record, offline OWASP Cheat Sheet knowledge base (137 sheets, 3,238 chunks), CWE-gated keyword retrieval over that knowledge base, `[TBC: council and single-agent orchestration]`. `[ ] confirmed`
 - **Lisa:** Deterministic validator with citation, identifier and case-ID checks and a `human_review` fallback, with 32 offline tests. `[ ] confirmed`
 - **Bradley:** Evaluation harness that scores all configurations against the hidden answer key, with 14 offline tests; this checkpoint report. `[ ] confirmed`
 - **Wei Lin:** Repository setup, checkpoint planning documents, `[TBC: final integration, recorded run and submission]`. `[ ] confirmed`
