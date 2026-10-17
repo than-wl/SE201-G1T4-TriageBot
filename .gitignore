@@ -1,5 +1,4 @@
-# Private project context, source material, and generated evidence.
-/Context/
+# Generated evidence outside the shared Context folder.
 /tmp/
 
 # Local credentials and machine-specific files.

@@ -1,0 +1,10 @@
+# Generated evidence, temporary renders, downloaded tools, and third-party repos.
+/tmp/
+/tmp-leftover/
+
+# Restricted SMU course material remains available through eLearn, not GitHub.
+/SE201_2026T1_project_v1.02.pdf
+/SE201_Week*.pdf
+
+# Local Codex working notes are not canonical team documentation.
+/Codex Handoff.md

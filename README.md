@@ -65,17 +65,19 @@ The next checkpoint objective is to connect the complete demonstration path and 
 
 ## Repository status
 
-This repository currently contains the public project brief and the reproducibility checks used during the feasibility and checkpoint work.
+This repository currently contains the project overview, team-owned planning material, and reproducibility checks used during the feasibility and checkpoint work.
 
-| Path | Purpose |
-| --- | --- |
-| `CHECKPOINT_BRIEF.md` | Current checkpoint goal, status, and action plan |
-| `verification/openrouter_smoke.py` | Five-case OpenRouter smoke test and offline validator self-test |
+| Path                                   | Purpose                                                                          |
+| -------------------------------------- | -------------------------------------------------------------------------------- |
+| `CHECKPOINT_BRIEF.md`                | Current checkpoint goal, status, and action plan                                 |
+| `CHECKPOINT_TEAM_TASKS.md`           | Detailed checkpoint assignments and integration checklist                        |
+| `Context/README.md`                  | Index of shared context and local-only material                                   |
+| `verification/openrouter_smoke.py`   | Five-case OpenRouter smoke test and offline validator self-test                  |
 | `verification/feasibility_checks.py` | Limited retrieval, evidence-helper, and Analyst–Skeptic–Chair feasibility pass |
-| `verification/requirements.txt` | Python dependency for the verification scripts |
-| `.env.example` | Safe template for local configuration |
+| `verification/requirements.txt`      | Python dependency for the verification scripts                                   |
+| `.env.example`                       | Safe template for local configuration                                            |
 
-Private working material is kept in the local `Context/` folder. It contains project notes, source material, benchmark data, reports, and generated evidence, and is intentionally excluded from Git. The online verification scripts expect the relevant local benchmark and Semgrep artefacts to be present there.
+Project-owned proposal and feasibility documents are shared under `Context/`. Restricted SMU course material, the downloaded OWASP Benchmark repository, raw model responses, and generated evidence remain local through `Context/.gitignore`. The online verification scripts expect the relevant local benchmark and Semgrep artefacts under `Context/tmp/`.
 
 ## Quick start
 
@@ -135,7 +137,7 @@ This demonstrates integration feasibility, not final accuracy. The next checkpoi
 
 ## Safety and privacy
 
-- Do not commit API keys, `.env` files, private benchmark data, generated model responses, or local context documents.
+- Do not commit API keys, `.env` files, downloaded benchmark data, generated model responses, restricted course material, or files marked local-only in `Context/README.md`.
 - Treat model output, scanner output, retrieved text, and source-code content as untrusted data.
 - The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
 - Do not describe the five-case smoke test as proof of general system accuracy.
