@@ -1,33 +1,42 @@
 """TriageBot entry point: one engine, two front doors.
 
 Interactive menu (no arguments), from the repository root:
-    py -m triagebot
+    python -m triagebot
 
     1  Scanner baseline   How good is Semgrep alone? Scored against the OWASP answer key.
     2  Triage one alert   One finding through the whole pipeline, every stage shown.  (coming soon)
     3  Evaluate a sample  The checkpoint sample through each configuration, scored.  (coming soon)
     q  Quit
 
-Option 1 first asks whether to use the saved Semgrep scan or re-run
-Semgrep, and afterwards offers the technical details.
+The menu starts with the setup check (triagebot/check.py) and, if the
+OWASP Benchmark is missing, offers to clone it (only on an explicit "y").
+Option 1 re-runs the check and refuses while a required item is MISSING;
+it then asks whether to use the current scan or re-run Semgrep, and
+afterwards offers the technical details.
 
 Non-interactive subcommands (same functions as the menu options):
-    py -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details]
-    py -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
-    py -m triagebot evaluate [--sample PATH] [--mode single,council]
+    python -m triagebot check
+    python -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details]
+                                 [--export-svg PATH]
+    python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
+    python -m triagebot evaluate [--sample PATH] [--mode single,council]
 
 baseline: runs the ingest stage (triagebot.nodes.ingest.run.build), writes
 the same files to --out (default Context/tmp/checkpoint/), and shows the
 scanner-baseline screen: scan provenance, CWE-matched headline numbers, a
 table by vulnerability type, what this means for TriageBot (noise, recall
-ceiling, blind spots) and the checkpoint test set. --rescan re-runs Semgrep
-first (README Setup, "Semgrep scan"), keeping the previous file as
-semgrep-owasp.previous.json and falling back to it if the scan fails.
---details adds the file-matched comparison, CWE mismatch pairs, ingest
-counts and the files written. Paths default to triagebot/config.py.
+ceiling, blind spots) and the checkpoint test set. The scan is the local
+re-scan if present, else the committed recorded scan (config.effective_scan).
+--rescan re-runs Semgrep first, always into config.LOCAL_SCAN, keeping the
+previous local file as semgrep-owasp.previous.json and falling back to the
+current scan if it fails. --details adds the file-matched comparison, CWE
+mismatch pairs, ingest counts and the files written. --export-svg also
+saves the screen as an SVG (README screenshot).
 
 triage and evaluate are placeholders until triagebot/pipeline.py is
 wired; they print a notice and exit with code 2.
+
+check: prints the setup table; exit code 1 while a required item is MISSING.
 
 Exit codes: 0 success, 1 missing or unreadable input, 2 not yet available.
 
@@ -51,11 +60,13 @@ try:
     from rich.table import Table
     from rich.text import Text
 except ImportError:
-    sys.exit(r"TriageBot needs its Python environment. Run it with "
-             r".\.verification-venv\Scripts\python.exe -m triagebot, or activate the venv first "
-             r"(see README, Setup).")
+    if __name__ == "__main__" and sys.argv[1:2] == ["check"]:
+        from triagebot import check as _check
+        sys.exit(_check.print_plain())
+    sys.exit("TriageBot needs its Python environment. Activate .venv (the prompt shows \"(.venv)\") "
+             "and run: pip install -r requirements.txt   (see README, Quick start).")
 
-from triagebot import config
+from triagebot import check, config
 from triagebot.nodes.ingest import run
 
 console = Console(highlight=False)
@@ -73,8 +84,10 @@ REVIEW_MODES = ("single", "council")
 
 SEMGREP_RULESET = "p/java"
 ANSWER_KEY_NAME = "OWASP Benchmark v1.2 answer key"
-SETUP_SEMGREP = 'README section 4 (Setup), "Semgrep scan"'
-SETUP_BENCHMARK = 'README section 4 (Setup), "OWASP Benchmark"'
+INSTALL_SEMGREP = "pip install -r requirements-scan.txt"
+SETUP_HINT = "run python -m triagebot check for the fix"
+CLONE_PROMPT = "Clone the OWASP Benchmark now? (about 100 MB) \\[y/N]: "
+SVG_WIDTH = 110                # columns of the recorded screen
 
 CATEGORY_NAMES = {
     "cmdi": "Command injection",
@@ -122,10 +135,18 @@ def _local_time(moment: datetime) -> str:
     return moment.astimezone().strftime("%d %b %Y, %H:%M")
 
 
-def saved_scan_time(path) -> str | None:
-    """Local modification time of the saved Semgrep JSON, or None if absent."""
+def scan_time(path) -> str | None:
+    """When the scan ran (local time), or None if the file is absent.
+
+    The recorded scan's date is fixed in config; any other file uses its
+    modification time.
+    """
     path = Path(path)
-    return _local_time(datetime.fromtimestamp(path.stat().st_mtime)) if path.is_file() else None
+    if not path.is_file():
+        return None
+    recorded = config.recorded_scan_date(path)
+    return _local_time(datetime.fromisoformat(recorded) if recorded
+                       else datetime.fromtimestamp(path.stat().st_mtime))
 
 
 def _section(title):
@@ -136,10 +157,8 @@ def _section(title):
 # --- re-scan -------------------------------------------------------------
 
 def _semgrep_exe() -> Path | None:
-    """The venv's Semgrep (next to this Python), or None if not installed."""
-    name = "semgrep.exe" if os.name == "nt" else "semgrep"
-    exe = Path(sys.executable).with_name(name)
-    return exe if exe.is_file() else None
+    """Semgrep next to this Python, else on PATH; None if not installed."""
+    return check.semgrep_exe()
 
 
 def _scan_failed(detail, partial) -> bool:
@@ -150,31 +169,33 @@ def _scan_failed(detail, partial) -> bool:
     return False
 
 
-def rescan(semgrep_path) -> bool:
-    """Re-run Semgrep into semgrep_path; True on success.
+def rescan() -> bool:
+    """Re-run Semgrep into config.LOCAL_SCAN (git-ignored); True on success.
 
-    On any failure the saved file is left untouched and False is returned.
-    The previous file is copied to <stem>.previous.json before replacing.
+    Never touches the committed recorded scan. On any failure the local
+    file is left untouched and False is returned. A previous local file is
+    copied to <stem>.previous.json before replacing. Semgrep runs from the
+    benchmark root on "src/main/java", so its paths are relative like the
+    recorded scan's.
     """
-    semgrep_path = Path(semgrep_path)
+    semgrep_path = Path(config.LOCAL_SCAN)
     exe = _semgrep_exe()
     if exe is None:
-        console.print(f"[yellow]Semgrep is not installed in this environment[/] "
-                      f"(see {SETUP_SEMGREP}).")
+        console.print(f"[yellow]Semgrep is not installed.[/] Run: {INSTALL_SEMGREP}")
         return False
     if not config.BENCHMARK_ROOT or not (Path(config.BENCHMARK_ROOT) / "src/main/java").is_dir():
-        console.print(f"[yellow]Benchmark source not found[/] (see {SETUP_BENCHMARK}).")
+        console.print(f"[yellow]Benchmark source not found[/] ({SETUP_HINT}).")
         return False
 
-    source = Path(config.BENCHMARK_ROOT) / "src" / "main" / "java"
+    root = Path(config.BENCHMARK_ROOT)
     partial = semgrep_path.with_name(semgrep_path.name + ".partial")
     command = [str(exe), "scan", "--config", SEMGREP_RULESET, "--json",
-               "--output", str(partial), str(source)]
+               "--output", str(partial.resolve()), "src/main/java"]
     env = {**os.environ, "PYTHONUTF8": "1"}
     semgrep_path.parent.mkdir(parents=True, exist_ok=True)
     try:
-        with console.status(f"Scanning... (Semgrep {SEMGREP_RULESET} on {source})"):
-            completed = subprocess.run(command, env=env, capture_output=True, text=True,
+        with console.status(f"Scanning... (Semgrep {SEMGREP_RULESET} on {_short(root / 'src/main/java')})"):
+            completed = subprocess.run(command, cwd=root, env=env, capture_output=True, text=True,
                                        encoding="utf-8", errors="replace")
     except OSError as error:
         return _scan_failed(str(error), partial)
@@ -186,7 +207,8 @@ def rescan(semgrep_path) -> bool:
     if semgrep_path.is_file():
         shutil.copy2(semgrep_path, semgrep_path.with_name(f"{semgrep_path.stem}.previous.json"))
     partial.replace(semgrep_path)
-    console.print(f"[green]Scan complete[/] (exit code {completed.returncode}); saved to {semgrep_path}")
+    console.print(f"[green]Scan complete[/] (exit code {completed.returncode}); "
+                  f"saved to {_short(semgrep_path)}")
     return True
 
 
@@ -195,35 +217,41 @@ def rescan(semgrep_path) -> bool:
 def prepare_baseline(semgrep=None, answer_key=None, out=None, rescan_first=False) -> dict | None:
     """Optionally re-scan, then run ingest and write its files.
 
-    Returns {"outputs", "semgrep", "answer_key", "out"}; None (after printing
-    a friendly error) when an input is missing or unreadable.
+    semgrep: a scan file; default config.effective_scan() (local re-scan,
+    else the recorded scan). A successful re-scan replaces it with
+    config.LOCAL_SCAN. Returns {"outputs", "semgrep", "source",
+    "answer_key", "out"}; None (after printing a friendly error) when an
+    input is missing or unreadable.
     """
-    semgrep = Path(semgrep or config.SEMGREP_JSON)
+    semgrep = Path(semgrep or config.effective_scan()[0])
     answer_key = answer_key or config.ANSWER_KEY
     out = Path(out or config.CHECKPOINT_OUT)
 
-    if rescan_first and not rescan(semgrep):
-        if semgrep.is_file():
-            console.print(f"Using the saved scan from {saved_scan_time(semgrep)} instead.")
+    if rescan_first:
+        if rescan():
+            semgrep = Path(config.LOCAL_SCAN)
+        elif semgrep.is_file():
+            console.print(f"Using the {config.scan_source(semgrep)} from {scan_time(semgrep)} instead.")
     if not semgrep.is_file():
         _fail(f"Semgrep JSON not found: {semgrep}\n"
-              f"Run the scan in {SETUP_SEMGREP}, or pass --semgrep PATH.")
+              f"Restore the recorded scan ({SETUP_HINT}), or pass --semgrep PATH.")
         return None
     if not answer_key or not Path(answer_key).is_file():
         where = answer_key or "unknown (BENCHMARK_ROOT unset and Context/tmp/BenchmarkJava missing)"
         _fail(f"OWASP answer key not found: {where}\n"
-              f"Clone the benchmark as in {SETUP_BENCHMARK}, or pass --answer-key PATH.")
+              f"Clone the OWASP Benchmark ({SETUP_HINT}), or pass --answer-key PATH.")
         return None
     try:
         outputs = run.build(semgrep, answer_key)
         written = run.write_outputs(outputs, out)
     except json.JSONDecodeError as error:
-        _fail(f"{semgrep} is not valid JSON ({error}).\nRe-run the scan in {SETUP_SEMGREP}.")
+        _fail(f"{semgrep} is not valid JSON ({error}).\nRe-run the scan, or delete it to use the recorded scan.")
         return None
     except (OSError, ValueError, KeyError) as error:
         _fail(f"baseline failed: {error}")
         return None
-    return {"outputs": outputs, "semgrep": semgrep, "answer_key": Path(answer_key), "out": written}
+    return {"outputs": outputs, "semgrep": semgrep, "source": config.scan_source(semgrep),
+            "answer_key": Path(answer_key), "out": written}
 
 
 def _type_table(rows: dict) -> Table:
@@ -263,7 +291,8 @@ def show_baseline(ctx: dict) -> None:
     provenance.add_column(style="dim")
     provenance.add_column()
     provenance.add_row("Scan", f"Semgrep {rep['semgrep_version']}, ruleset {SEMGREP_RULESET}, "
-                               f"saved {scanned} (local time), {rep['alerts']:,} alerts")
+                               f"{ctx.get('source') or config.scan_source(ctx['semgrep'])} "
+                               f"from {scanned} (local time), {rep['alerts']:,} alerts")
     provenance.add_row("Scored against", f"{ANSWER_KEY_NAME}, {base['answer_key']['cases']:,} test cases")
     console.print(provenance)
 
@@ -367,15 +396,85 @@ def show_details(ctx: dict) -> None:
         console.print(f"  Written:       {_short(ctx['out'] / name)}")
 
 
-def baseline(semgrep=None, answer_key=None, out=None, rescan_first=False, details=False) -> int:
-    """`baseline` subcommand: prepare, show the screen, optionally the details."""
+def baseline(semgrep=None, answer_key=None, out=None, rescan_first=False, details=False,
+             export_svg=None) -> int:
+    """`baseline` subcommand: prepare, show the screen, optionally the details.
+
+    export_svg: also record the screen (fixed width, colour) and save it there.
+    """
+    global console
     ctx = prepare_baseline(semgrep, answer_key, out, rescan_first=rescan_first)
     if ctx is None:
         return 1
-    show_baseline(ctx)
-    if details:
-        show_details(ctx)
+    shown = console
+    if export_svg:
+        console = Console(record=True, width=SVG_WIDTH, force_terminal=True, color_system="truecolor",
+                          highlight=False, file=shown.file)
+    try:
+        show_baseline(ctx)
+        if details:
+            show_details(ctx)
+        if export_svg:
+            target = Path(export_svg)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            console.save_svg(str(target), title="TriageBot · Scanner baseline")
+    finally:
+        console = shown
+    if export_svg:
+        console.print(f"Saved the screen to {_short(export_svg)}")
     return 0
+
+
+# --- setup check ------------------------------------------------------------
+
+STATUS_STYLE = {check.OK: "green", check.MISSING: "bold red", check.WARNING: "yellow"}
+
+
+def show_check(checks) -> None:
+    table = Table(title="Setup check", title_justify="left", title_style="bold", box=box.SIMPLE_HEAD)
+    table.add_column("Check", no_wrap=True)
+    table.add_column("Status", no_wrap=True)
+    table.add_column("Detail")
+    for c in checks:
+        table.add_row(c.name, Text(c.status, style=STATUS_STYLE[c.status]), c.detail)
+    console.print(table)
+    fixes = [c for c in checks if c.status != check.OK and c.fix]
+    for c in fixes:
+        console.print(Text(f"To fix \"{c.name}\":", style="bold"))
+        for line in c.fix.splitlines():
+            console.print(f"  {line}", markup=False)
+    if fixes:
+        console.print()
+
+
+def setup_check() -> int:
+    """`check` subcommand: the table; exit code 1 while a required item is MISSING."""
+    checks = check.run_checks()
+    show_check(checks)
+    return 1 if check.blocking(checks) else 0
+
+
+def clone_benchmark(target=None) -> bool:
+    """git clone the benchmark and check out the pinned commit; True on success."""
+    target = Path(target or check.benchmark_dir())
+    try:
+        with console.status(f"Cloning the OWASP Benchmark into {_short(target)}..."):
+            for command in check.clone_commands(target):
+                done = subprocess.run(command, capture_output=True, text=True,
+                                      encoding="utf-8", errors="replace")
+                if done.returncode != 0:
+                    lines = (done.stderr or "").strip().splitlines()
+                    console.print(Text("Clone failed", style="yellow")
+                                  + Text(f": {lines[-1]}" if lines else f" (exit code {done.returncode})."))
+                    return False
+    except OSError as error:
+        console.print(f"[yellow]Could not run git[/] ({error}). Install Git from https://git-scm.com/ "
+                      "and try again.")
+        return False
+    config.BENCHMARK_ROOT = str(target)
+    config.ANSWER_KEY = target / check.ANSWER_KEY_NAME
+    console.print(f"[green]Cloned[/] the benchmark at commit {config.BENCHMARK_COMMIT[:12]} into {_short(target)}")
+    return True
 
 
 # --- options 2 and 3: placeholders (Wei Lin connects these to pipeline.py) --
@@ -425,9 +524,28 @@ def show_menu() -> None:
     console.print()
 
 
+def _menu_check(show_when_ready=True) -> bool:
+    """Run the setup check (offering to clone a missing benchmark); True if nothing blocks."""
+    checks = check.run_checks()
+    if show_when_ready or check.blocking(checks):
+        show_check(checks)
+    if check.benchmark_missing(checks) and _ask(CLONE_PROMPT) in ("y", "yes"):
+        if clone_benchmark():
+            checks = check.run_checks()
+            show_check(checks)
+    return not check.blocking(checks)
+
+
 def _menu_baseline(semgrep, answer_key, out) -> None:
-    saved = saved_scan_time(semgrep or config.SEMGREP_JSON)
-    use = f"use saved scan from {saved}" if saved else "use saved scan (none found)"
+    if not _menu_check(show_when_ready=False):
+        console.print("[yellow]Option 1 needs the items marked MISSING above.[/] "
+                      "Run the commands shown, then choose 1 again.")
+        _ask("Press Enter to return to the menu")
+        return
+    path = Path(semgrep or config.effective_scan()[0])
+    when = scan_time(path)
+    use = (f"use the {config.scan_source(path)} from {when}" if when
+           else "use the saved scan (none found)")
     choice = _ask(f"[bold]\\[Enter][/] {use}   [bold]r[/] = re-run Semgrep now "
                   "(takes a few minutes, needs internet): ")
     ctx = prepare_baseline(semgrep, answer_key, out, rescan_first=choice == "r")
@@ -455,8 +573,9 @@ def menu(semgrep=None, answer_key=None, out=None) -> int:
         "2": lambda: _menu_placeholder(triage_one),
         "3": lambda: _menu_placeholder(evaluate_sample),
     }
-    show_menu()
     try:
+        _menu_check()
+        show_menu()
         while True:
             choice = _ask(PROMPT)
             if choice in ("q", "quit", "exit"):
@@ -485,14 +604,19 @@ def parser() -> argparse.ArgumentParser:
                                 epilog="With no subcommand, opens the interactive menu.")
     sub = p.add_subparsers(dest="command")
 
+    sub.add_parser("check", help="is this machine ready? Python, rich, benchmark, scan, Semgrep")
+
     b = sub.add_parser("baseline", help="menu option 1: score Semgrep alone against the answer key")
-    b.add_argument("--semgrep", help=f"Semgrep JSON (default {config.SEMGREP_JSON})")
+    b.add_argument("--semgrep", help=f"Semgrep JSON (default: {_short(config.LOCAL_SCAN)} if present, "
+                                     f"else the recorded scan {_short(config.RECORDED_SCAN)})")
     b.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
     b.add_argument("--out", help=f"output directory (default {config.CHECKPOINT_OUT})")
     b.add_argument("--rescan", action="store_true",
-                   help="re-run Semgrep first (a few minutes, needs internet); falls back to the saved scan")
+                   help=f"re-run Semgrep first into {_short(config.LOCAL_SCAN)} (a few minutes, needs "
+                        f"internet and {INSTALL_SEMGREP}); falls back to the current scan")
     b.add_argument("--details", action="store_true",
                    help="also show matching comparison, CWE mismatch pairs, ingest counts and files written")
+    b.add_argument("--export-svg", metavar="PATH", help="also save the screen as an SVG image")
 
     t = sub.add_parser("triage", help="menu option 2: one alert through the pipeline (coming soon)")
     t.add_argument("--case", required=True, help="BenchmarkTestNNNNN")
@@ -506,8 +630,10 @@ def parser() -> argparse.ArgumentParser:
 
 def main(argv=None) -> int:
     args = parser().parse_args(argv)
+    if args.command == "check":
+        return setup_check()
     if args.command == "baseline":
-        return baseline(args.semgrep, args.answer_key, args.out, args.rescan, args.details)
+        return baseline(args.semgrep, args.answer_key, args.out, args.rescan, args.details, args.export_svg)
     if args.command == "triage":
         return triage_one(args.case, args.mode)
     if args.command == "evaluate":

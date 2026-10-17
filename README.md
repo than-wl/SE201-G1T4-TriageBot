@@ -1,183 +1,198 @@
 # SE201 G1T4 — TriageBot
 
-## 1. What TriageBot is
+TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
-TriageBot is a post-processing layer for alerts from a conventional static application security testing (SAST) scanner. It takes a Semgrep finding, gathers evidence from the source code and relevant OWASP security guidance, and uses an AI-assisted review to sort the alert into one of three outcomes: **likely a real vulnerability**, **likely a false positive**, or **needs human review** because the evidence is incomplete or uncertain. Every decision must cite the source code it relies on; a decision that cannot be justified is escalated to human review.
+**Status:** Checkpoint stage: scanner baseline working; AI triage pipeline being integrated.
 
-TriageBot does not replace Semgrep or any other scanner, and it does not look for new vulnerabilities. Its job is to reduce unnecessary alert review while keeping genuine findings. We evaluate it on the OWASP Benchmark Java dataset against simpler baselines (scanner only, single LLM agent), measuring genuine findings retained, false positives removed, genuine findings wrongly dismissed, human-review rate, latency and token cost.
+## 1. What TriageBot does
 
-## 2. How it works
+A static application security testing (SAST) scanner such as Semgrep flags code that *might* be vulnerable, and many of its alerts are false alarms that a developer must still read. TriageBot is a layer after the scanner: for each Semgrep alert it gathers evidence (the surrounding source code, helper facts and relevant OWASP guidance) and an AI review sorts the alert into **likely a real vulnerability**, **likely a false positive**, or **needs human review**.
+
+Every decision must quote the source code it relies on, and deterministic code checks those quotes; a decision that cannot be justified goes to human review. TriageBot does not replace the scanner and never adds new alerts: it can only filter, so the scanner's own recall is its ceiling.
+
+We measure it on the OWASP Benchmark Java test suite, whose answer key says which test cases are really vulnerable, and compare it with simpler baselines (scanner only, a single AI agent).
 
 ![TriageBot architecture](docs/architecture/TriageBot_Architecture_Diagram.png)
 
 The editable source of the diagram is [docs/architecture/TriageBot_Architecture_Diagram.drawio.svg](docs/architecture/TriageBot_Architecture_Diagram.drawio.svg).
 
-| Stage | What it does | Code location | Status |
-| --- | --- | --- | --- |
-| Ingest | Semgrep JSON to a normalised alert | `triagebot/nodes/ingest/` | Built |
-| Context payload | Source window, helper facts, retrieved guidance | `triagebot/nodes/context/` | Built |
-| Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Roles built; council orchestration pending |
-| Validate | Deterministic citation and format checks | `triagebot/nodes/validate/` | Built |
-| Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
-| Pipeline wiring and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Menu built; options 2-3 pending pipeline |
+## 2. Results so far
 
-Shared data shapes passed between stages live in `triagebot/schemas.py`. Runtime settings (model, budgets, paths) live in `triagebot/config.py`. Model callers, the live OpenRouter caller and the offline fixture caller, live in `triagebot/llm/`. The reasoning behind these choices is recorded in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
+The scanner baseline (Semgrep alone, before TriageBot), from the recorded scan, CWE-matched, over all 2,740 OWASP Benchmark v1.2 test cases:
 
-## 3. Repository layout
+| Measure | Value |
+| --- | --- |
+| Precision (flagged test cases that are real) | **65.5%** |
+| Recall (real vulnerabilities flagged) | **68.6%** |
+| F1 | **67.0%** |
+| False alarms to remove | 512 of 1,482 flagged test cases (34.5%) |
+| Recall ceiling for TriageBot | 68.6% |
+| Blind spots (nothing caught) | Weak randomness (0 of 218), Insecure cookie (0 of 36) |
 
-```text
-triagebot/       product code, one folder per pipeline stage under nodes/
-tests/           offline unit tests and fixtures (no network)
-verification/    feasibility-stage scripts, kept as historical evidence
-docs/            design decisions, architecture diagram, proposal, feasibility reports
-ai-log/          per-member AI use logs
-Context/         local-only workspace (see Context/README.md); only its README and .gitignore are tracked
-checkpoint/      temporary planning notes, removed before final submission
+![The scanner-baseline screen of python -m triagebot](docs/screenshots/baseline.svg)
+
+The AI configurations are evaluated on a 100-case SQL injection sample; see [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for the checkpoint status and results.
+
+## 3. Quick start
+
+Tested with Python 3.12.7 and Git 2.45 on Windows 11. Run every command from the repository root, in a terminal.
+
+**1. Prerequisites:** [Git](https://git-scm.com/downloads) and [Python 3.10 or newer](https://www.python.org/downloads/).
+
+**2. Clone this repository**
+
+```bash
+git clone https://github.com/than-wl/SE201-G1T4-TriageBot.git
+cd SE201-G1T4-TriageBot
 ```
 
-## 4. Setup
+**3. Create the environment, activate it, install**
 
-Commands use Windows PowerShell from the repository root. On macOS/Linux, use `python3 -m venv` and `.verification-venv/bin/python` in place of the Windows paths.
+| Windows (PowerShell) | macOS / Linux |
+| --- | --- |
+| `py -m venv .venv` | `python3 -m venv .venv` |
+| `.\.venv\Scripts\Activate.ps1` | `source .venv/bin/activate` |
+| `python -m pip install -r requirements.txt` | `python -m pip install -r requirements.txt` |
 
-### Python environment
+The prompt now starts with `(.venv)`. Activate it again in every new terminal. From here on, `python` means the venv's Python on every platform.
 
-```powershell
-py -m venv .verification-venv
-& '.\.verification-venv\Scripts\python.exe' -m pip install -r '.\verification\requirements.txt'
+**4. Run TriageBot**
+
+```bash
+python -m triagebot
 ```
 
-### OWASP Benchmark
+The menu starts with a setup check. If the OWASP Benchmark (about 100 MB) is missing it asks *"Clone the OWASP Benchmark now? [y/N]"*; answer `y`, or clone it yourself at the pinned commit:
 
-The benchmark is not copied into this repository. Clone it into the ignored local folder at the pinned commit used for all recorded evidence:
-
-```powershell
+```bash
 git clone https://github.com/OWASP-Benchmark/BenchmarkJava.git Context/tmp/BenchmarkJava
 git -C Context/tmp/BenchmarkJava checkout 8b67a88d73b2594570fc21150705283de884620b
 ```
 
-After `git checkout <commit>`, git prints a "detached HEAD" message: this is expected.
+Then choose `1` for the scanner baseline. No Semgrep install or scan is needed: the repository includes the recorded scan everyone scores ([data/semgrep/README.md](data/semgrep/README.md)).
 
-If the benchmark is somewhere other than `Context/tmp/BenchmarkJava`, point `BENCHMARK_ROOT` at it:
+## 4. Using TriageBot
 
-```powershell
-$env:BENCHMARK_ROOT = (Resolve-Path '.\Context\tmp\BenchmarkJava').Path
+`python -m triagebot` opens the menu:
+
+| Option | What it shows |
+| --- | --- |
+| 1 Scanner baseline | How good Semgrep is alone: the scan used (recorded or your re-scan), headline precision, recall and F1, a table by vulnerability type, what this means for TriageBot (false alarms to remove, recall ceiling, blind spots) and the checkpoint test set. `r` re-runs Semgrep first; `d` afterwards shows the technical details. |
+| 2 Triage one alert | Coming soon: one finding through the whole pipeline, every stage shown. |
+| 3 Evaluate a sample | Coming soon: the checkpoint sample through each configuration, scored. |
+
+The same actions as subcommands, for scripts:
+
+```bash
+python -m triagebot check
+python -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details] [--export-svg PATH]
+python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
+python -m triagebot evaluate [--sample PATH] [--mode single,council]
 ```
 
-`BENCHMARK_ROOT` is optional when the benchmark is cloned to `Context/tmp/BenchmarkJava`; set it only to use another location.
+- `check`: the setup check (Python version, rich, the Benchmark folder and its commit, the scan, Semgrep) with OK / MISSING / WARNING and the command that fixes each problem. Exit code 1 while something required is missing.
+- `baseline`: menu option 1. It also writes the ingest files to `Context/tmp/checkpoint/` (`alerts.json`, `selected_alerts.json`, `ingest_report.json`, `split.json`, `scanner_predictions.json`, `baseline.json`).
+  - `--rescan` re-runs Semgrep into `Context/tmp/semgrep-owasp.json` (needs `pip install -r requirements-scan.txt` and internet; a few minutes). That local re-scan is then used instead of the recorded scan until you delete it; the previous one is kept as `semgrep-owasp.previous.json`, and a failed scan falls back to the current one.
+  - `--details` adds the file-matched comparison, CWE mismatch pairs, ingest counts and files written.
+  - `--export-svg PATH` also saves the screen as an SVG image (how the screenshot above was made).
+- `triage` and `evaluate`: print "Not yet available" and exit with code 2 until `triagebot/pipeline.py` is wired.
 
-The benchmark's answer key is used only by the evaluation code after model calls are complete. It must never be sent to a model.
+## 5. How it works
 
-In VS Code, the Python extension may auto-type a venv activation command onto the line you are pasting; if a command fails with a parse error, run it again on its own line.
+| Stage | What it does | Code location | Status |
+| --- | --- | --- | --- |
+| Ingest | Semgrep JSON to normalised alerts; scanner baseline; dev/test split and sample | `triagebot/nodes/ingest/` | Built |
+| Context payload | Source window, helper facts, retrieved guidance | `triagebot/nodes/context/` | Built |
+| Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Roles built; council orchestration pending |
+| Validate | Deterministic citation and format checks | `triagebot/nodes/validate/` | Built |
+| Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
+| Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Menu, setup check and option 1 built; options 2-3 pending pipeline |
 
-### Semgrep scan
+The data shapes passed between stages are the shared contracts in `triagebot/schemas.py`. Runtime settings (model, budgets, paths, the pinned benchmark commit) live in `triagebot/config.py`, and the model callers (live OpenRouter and offline fixture) in `triagebot/llm/`. The reasoning behind these choices is in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
 
-```powershell
-& '.\.verification-venv\Scripts\python.exe' -m pip install semgrep==1.178.0
-$env:PYTHONUTF8 = "1"
-& '.\.verification-venv\Scripts\semgrep.exe' scan --config p/java --json `
-    --output 'Context\tmp\semgrep-owasp.json' 'Context\tmp\BenchmarkJava\src\main\java'
+## 6. Evaluation method
+
+- **Dataset:** OWASP Benchmark Java v1.2 (2,740 test cases) at commit `8b67a88`. Its answer key, `expectedresults-1.2.csv`, says whether each test case is really vulnerable and which weakness (CWE) it targets.
+- **CWE-matched scoring:** an alert counts for a test case only if it names the same weakness the case targets (or an accepted equivalent), not merely because it is in the same file.
+- **Fixed split:** a 50/50 development/test split, stratified by vulnerability type and label, with seed 201. Prompts are tuned on the development half only; the checkpoint sample (100 SQL injection cases, 50 real and 50 false alarms) is drawn from it.
+- **Configurations** on the same cases: A scanner only; B single agent; C Analyst / Skeptic / Chair council; D council plus the deterministic validator.
+- **Metrics:** precision, recall, F1, false alarms removed, real vulnerabilities wrongly dismissed, human-review rate, cost and latency.
+- **Isolation:** the answer key is read only by the evaluation code, after all model calls. It never reaches a prompt or the model.
+
+## 7. For developers
+
+Run the offline tests (no network, no API key, no credits):
+
+```bash
+python -m unittest discover -s tests -v
 ```
 
-The `p/java` ruleset is fetched from the Semgrep registry at run time, so ingest records the Semgrep version and scan date in `ingest_report.json` (our recorded run: 1.178.0, 1,909 findings, 0 errors).
+Ingest and scanner baseline as plain text (writes the same files as `baseline`):
 
-### OpenRouter key (live runs only)
-
-Offline tests and the evaluator need no key. For live model calls, copy the template and set your own key in the local `.env`:
-
-```powershell
-Copy-Item .env.example .env
-# Edit .env and set OPENROUTER_API_KEY locally.
+```bash
+python -m triagebot.nodes.ingest.run
 ```
 
-Never commit `.env` or paste a key into source files, issues or chat.
+Score saved results with the evaluator (offline; the scanner-only baseline is added automatically; paths are examples):
 
-## 5. Running
-
-### Offline tests
-
-No network requests and no OpenRouter credits:
-
-```powershell
-& '.\.verification-venv\Scripts\python.exe' -m unittest discover -s tests -v
+```bash
+python -m triagebot.nodes.score.evaluate --labels Context/tmp/BenchmarkJava/expectedresults-1.2.csv --cases Context/tmp/checkpoint/selected_alerts.json --config B-single-agent=Context/tmp/checkpoint/single_agent_results.json --config C-council=Context/tmp/checkpoint/council_results.json --config D-validated-council=Context/tmp/checkpoint/validated_council_results.json
 ```
 
-### Ingest and scanner baseline
+It prints a metrics table and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts count as invalid and as human review, and human review never counts as a removed false positive.
 
-Offline, no API key. Reads the Semgrep JSON and the answer key (defaults from `triagebot/config.py`; override with `--semgrep`, `--answer-key`, `--out`), prints the scanner-only metrics per category and the checkpoint sample size:
+**Re-scanning.** `pip install -r requirements-scan.txt` installs Semgrep 1.178.0, then `python -m triagebot baseline --rescan`. To update the committed recorded scan, follow [data/semgrep/README.md](data/semgrep/README.md).
 
-```powershell
-& '.\.verification-venv\Scripts\python.exe' -m triagebot.nodes.ingest.run
+**Live model calls.** Copy `.env.example` to `.env` and set your own `OPENROUTER_API_KEY` there. Never commit `.env` or paste a key into source files, issues or chat.
+
+**Feasibility scripts** in `verification/` are kept as historical evidence. The self-test is offline:
+
+```bash
+python verification/openrouter_smoke.py --self-test
 ```
 
-It writes to `Context/tmp/checkpoint/`:
+> **Paid calls.** `python verification/openrouter_smoke.py` (five calls) and `python verification/feasibility_checks.py` (three more) call OpenRouter and spend credits. Both need the `.env` key and the benchmark and a local scan under `Context/tmp/`. Check the budget and the account first. Recorded results: [docs/feasibility/](docs/feasibility/).
 
-- `alerts.json`: every normalised alert (LLM side, no answer-key data)
-- `selected_alerts.json`: the checkpoint sample, accepted by the evaluator's `--cases` (LLM side)
-- `ingest_report.json`: Semgrep version, scan date, dropped, duplicate and unmapped counts
-- `split.json`: dev/test split and sample composition (evaluation side)
-- `scanner_predictions.json`: per-case scanner predictions, "file" and "cwe" modes (evaluation side)
-- `baseline.json`: per-category metrics for both modes and the CWE mismatch report (evaluation side)
-
-### Score saved results
-
-The evaluator runs offline and needs no API key. It compares each configuration's saved verdicts with the OWASP answer key; the scanner-only baseline is added automatically. Paths are examples; generated inputs stay under the ignored `Context/tmp/`.
-
-```powershell
-& '.\.verification-venv\Scripts\python.exe' -m triagebot.nodes.score.evaluate `
-    --labels '.\Context\tmp\BenchmarkJava\expectedresults-1.2.csv' `
-    --cases '.\Context\tmp\checkpoint\selected_alerts.json' `
-    --config 'B-single-agent=.\Context\tmp\checkpoint\single_agent_results.json' `
-    --config 'C-council=.\Context\tmp\checkpoint\council_results.json' `
-    --config 'D-validated-council=.\Context\tmp\checkpoint\validated_council_results.json'
-```
-
-It prints a Markdown metrics table and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts are counted as invalid and as human review, and human review is never counted as a removed false positive.
-
-### Feasibility scripts
-
-These are the feasibility-stage scripts in `verification/`. The self-test is offline:
-
-```powershell
-& '.\.verification-venv\Scripts\python.exe' '.\verification\openrouter_smoke.py' --self-test
-```
-
-Expected result:
+**Repository layout**
 
 ```text
-Offline checks passed; fabricated quote, wrong file/line and malformed JSON rejected.
+triagebot/       product code, one folder per pipeline stage under nodes/
+tests/           offline unit tests and fixtures (no network)
+data/semgrep/    the recorded Semgrep scan (scanner output only, no answer-key data)
+docs/            design decisions, architecture diagram, screenshots, proposal, feasibility reports
+verification/    feasibility-stage scripts, kept as historical evidence
+ai-log/          per-member AI use logs
+Context/         local-only workspace (benchmark clone, re-scans, outputs); only its README and .gitignore are tracked
+checkpoint/      TEMPORARY planning notes, removed before final submission
 ```
 
-> **Paid calls.** The two commands below call OpenRouter and spend credits. The smoke test makes five paid calls and the council feasibility pass makes three more. Both need the `.env` key and the benchmark and Semgrep artefacts under `Context/tmp/`, and both save generated evidence there. Check the budget, the account and the local input files before running them.
+**Branches and commits.** Work on a branch (for example `checkpoint/<name>-<topic>` or `chore/<topic>`) and merge through a pull request. Every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer.
 
-```powershell
-& '.\.verification-venv\Scripts\python.exe' '.\verification\openrouter_smoke.py'
-& '.\.verification-venv\Scripts\python.exe' '.\verification\feasibility_checks.py'
-```
+## 8. Troubleshooting
 
-The recorded results are in [docs/feasibility/OPENROUTER_SMOKE_REPORT.md](docs/feasibility/OPENROUTER_SMOKE_REPORT.md) and [docs/feasibility/FEASIBILITY_CHECK_REPORT.md](docs/feasibility/FEASIBILITY_CHECK_REPORT.md).
+- **"No module named rich", or no `(.venv)` at the start of the prompt:** the environment is not active. Activate it (Quick start step 3) and, if needed, `python -m pip install -r requirements.txt`.
+- **PowerShell: "running scripts is disabled on this system":** allow scripts for this terminal only, then activate again:
 
-### Terminal menu
+  ```powershell
+  Set-ExecutionPolicy -Scope Process RemoteSigned
+  ```
 
-`python -m triagebot` with no arguments opens an interactive menu (terminal output uses `rich`, installed by the Setup `pip install` line). If it reports that TriageBot needs its Python environment, run it with `.\.verification-venv\Scripts\python.exe -m triagebot` or activate the venv first. Every option is also a non-interactive subcommand that calls the same function, for scripts:
+- **VS Code types the activation command onto the line you pasted** and the command fails with a parse error: run your command again on its own line.
+- **"You are in 'detached HEAD' state" after the benchmark checkout:** expected; it means the benchmark is at the pinned commit.
+- **Semgrep fails on Windows with `UnicodeEncodeError`:** TriageBot's re-scan sets this for you; when running Semgrep by hand, first run `$env:PYTHONUTF8 = "1"`.
+- **VS Code uses the wrong Python:** Command Palette, "Python: Select Interpreter", then choose the one in `.venv`.
 
-```powershell
-& '.\.verification-venv\Scripts\python.exe' -m triagebot
-& '.\.verification-venv\Scripts\python.exe' -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details]
-& '.\.verification-venv\Scripts\python.exe' -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
-& '.\.verification-venv\Scripts\python.exe' -m triagebot evaluate [--sample PATH] [--mode single,council]
-```
+## 9. Responsible AI and safety
 
-1. **Scanner baseline** (`baseline`), **working**, offline, no API key: how good is Semgrep alone, scored against the answer key. The screen states which scan it uses and what it is scored against, then gives the headline precision, recall and F1, a table by vulnerability type, what this means for TriageBot (false alarms to remove, the recall ceiling, blind spots) and the checkpoint test set; it also writes the ingest files to `Context/tmp/checkpoint/`. `--rescan` (or `r` at the menu prompt) re-runs the Semgrep scan from Setup first, keeping the old file as `semgrep-owasp.previous.json` and falling back to it if the scan fails; `--details` (or `d` after the screen) adds the file-matched comparison, CWE mismatch pairs, ingest counts and files written. A missing Semgrep JSON or answer key names the Setup step to run and exits with code 1.
-2. **Triage one alert** (`triage`), **planned**: one finding through the whole pipeline, with every stage shown.
-3. **Evaluate a sample** (`evaluate`), **planned**: the checkpoint sample through each configuration, scored.
+- Do not commit API keys, `.env` files, the downloaded benchmark, generated model responses, restricted course material, or anything under `Context/` other than its README and `.gitignore`.
+- The answer key is read only by the evaluation code and never enters a prompt.
+- Treat model output, scanner output, retrieved text and source-code content as untrusted data.
+- The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
+- Do not describe the five-case smoke test as proof of general system accuracy.
 
-Options 2 and 3 print "Not yet available" and exit with code 2 until `triagebot/pipeline.py` is wired.
+**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16.
 
-## 6. Current status
-
-The project is at the checkpoint stage. Feasibility is established: Semgrep has been run on the OWASP Benchmark, OpenRouter returned structured, cited results for five SQL injection cases, a limited Analyst–Skeptic–Chair pass ran on those cases, and the deterministic validator rejects malformed or unsupported citations. The ingest stage, context payload, review roles, validator and evaluator are built and tested offline; the end-to-end wiring, council orchestration and the roughly 100-finding evaluation are still to come. See [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for the detailed status.
-
-## 7. Team and roles
+## 10. Team and roles
 
 | Member | Responsibilities |
 | --- | --- |
@@ -186,15 +201,3 @@ The project is at the checkpoint stage. Feasibility is established: Semgrep has 
 | Lisa | Deterministic validator |
 | Bradley | Evaluation harness, checkpoint report |
 | Wei Lin | Repository setup, integration, submission |
-
-## 8. AI use disclosure
-
-Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16.
-
-## 9. Safety and privacy
-
-- Do not commit API keys, `.env` files, the downloaded benchmark, generated model responses, restricted course material, or anything under `Context/` other than its README and `.gitignore`.
-- The answer key is read only by the evaluation code and never enters a prompt.
-- Treat model output, scanner output, retrieved text and source-code content as untrusted data.
-- The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
-- Do not describe the five-case smoke test as proof of general system accuracy.

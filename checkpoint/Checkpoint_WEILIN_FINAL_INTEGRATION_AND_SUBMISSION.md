@@ -97,9 +97,9 @@ The final `main` branch must contain meaningful commits from Darren, Hong Yi, Li
 From the final integrated branch:
 
 ```powershell
-py -m venv .verification-venv
-& '.\\.verification-venv\\Scripts\\python.exe' -m pip install -r '.\\verification\\requirements.txt'
-& '.\\.verification-venv\\Scripts\\python.exe' '.\\verification\\openrouter_smoke.py' --self-test
+py -m venv .venv
+& '.\\.venv\\Scripts\\python.exe' -m pip install -r '.\\requirements.txt'
+& '.\\.venv\\Scripts\\python.exe' '.\\verification\\openrouter_smoke.py' --self-test
 ```
 
 The offline self-test must pass before any paid model call. It should reject fabricated quotes, wrong file/line citations, and malformed JSON.

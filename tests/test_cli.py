@@ -1,13 +1,17 @@
 """Offline tests for the terminal menu and subcommands (triagebot/__main__.py).
 
 Output is rendered through fixed-width, colourless rich consoles, and
-Semgrep is never run: re-scans use a mocked subprocess.
+Semgrep and git are never run: re-scans, clones and the commit check use a
+mocked subprocess. config.LOCAL_SCAN and config.RECORDED_SCAN point into a
+temporary directory, and the menu's setup check is mocked unless a test
+is about it.
 
 Run from the repo root: python -m unittest discover -s tests
 """
 from contextlib import redirect_stderr, redirect_stdout
 import io
 import json
+import os
 from pathlib import Path
 import re
 import shutil
@@ -16,12 +20,14 @@ import sys
 import tempfile
 import unittest
 from unittest import mock
+import xml.etree.ElementTree as ElementTree
 
 from rich.console import Console
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from triagebot import __main__ as cli  # noqa: E402
+from triagebot import check  # noqa: E402
 
 FIXTURES = ROOT / "tests/fixtures/ingest"
 SEMGREP = FIXTURES / "semgrep.json"
@@ -49,8 +55,10 @@ class TempDir(unittest.TestCase):
         self.addCleanup(tmp.cleanup)
         self.tmp = Path(tmp.name)
         self.out = self.tmp / "out"
-        self.semgrep = self.tmp / "semgrep-owasp.json"     # a copy, so re-scans may replace it
+        self.semgrep = self.tmp / "semgrep-owasp.json"     # the local re-scan, so re-scans may replace it
         shutil.copy2(SEMGREP, self.semgrep)
+        self.recorded = self.tmp / "data" / "recorded.json"
+        self.enterContext(mock.patch.multiple(cli.config, LOCAL_SCAN=self.semgrep, RECORDED_SCAN=self.recorded))
 
     def baseline_argv(self, *extra):
         return ["baseline", "--semgrep", str(self.semgrep), "--answer-key", str(ANSWER_KEY),
@@ -73,7 +81,19 @@ class TempDir(unittest.TestCase):
         return self.enterContext(mock.patch.object(cli.subprocess, "run", side_effect=run))
 
 
+def checks(**status):
+    """A setup-check result: every check OK unless overridden, e.g. checks(bench=check.MISSING)."""
+    names = {"python": "Python version", "rich": "rich installed", "bench": "OWASP Benchmark folder",
+             "scan": "Semgrep scan available", "semgrep": "Semgrep installed"}
+    return [check.Check(name, status.get(key, check.OK), "detail", "fix command", key != "semgrep")
+            for key, name in names.items()]
+
+
 class Menu(TempDir):
+    def setUp(self):
+        super().setUp()
+        self.enterContext(mock.patch.object(cli.check, "run_checks", return_value=checks()))
+
     def run_menu(self, *answers):
         with mock.patch("builtins.input", side_effect=list(answers)) as fake:
             code, printed, errors = capture(cli.menu, str(self.semgrep), str(ANSWER_KEY), str(self.out))
@@ -96,7 +116,8 @@ class Menu(TempDir):
     def test_option_1_uses_saved_scan(self):
         code, printed, prompts = self.run_menu("1", "", "", "q")
         self.assertEqual((code, prompts), (0, 4))
-        self.assertIn("use saved scan from", printed)
+        self.assertIn("use the local re-scan from", printed)
+        self.assertIn("Setup check", printed)
         self.assertIn("r = re-run Semgrep now (takes a few minutes, needs internet)", printed)
         self.assertIn("Semgrep raised alerts on 6 test cases", printed)
         self.assertIn("d = show technical details", printed)
@@ -117,7 +138,8 @@ class Menu(TempDir):
         self.assertEqual((code, prompts), (0, 4))
         command, env = run.call_args.args[0], run.call_args.kwargs["env"]
         self.assertEqual(command[1:5], ["scan", "--config", "p/java", "--json"])
-        self.assertTrue(command[-1].replace("\\", "/").endswith("BenchmarkJava/src/main/java"))
+        self.assertEqual(command[-1], "src/main/java")         # relative, like the recorded scan
+        self.assertTrue(str(run.call_args.kwargs["cwd"]).endswith("BenchmarkJava"))
         self.assertEqual(env["PYTHONUTF8"], "1")
         self.assertEqual((self.tmp / "semgrep-owasp.previous.json").read_bytes(), old)
         self.assertIn("Scan complete", printed)
@@ -169,8 +191,8 @@ class BaselineScreen(TempDir):
     def test_title_and_provenance(self):
         self.assertIn("TriageBot · Scanner baseline", self.printed)
         self.assertIn("How good is the security scanner on its own, before TriageBot?", self.printed)
-        self.assertIn("Semgrep 1.178.0, ruleset p/java, saved ", self.printed)
-        self.assertIn(cli.saved_scan_time(self.semgrep), self.printed)
+        self.assertIn("Semgrep 1.178.0, ruleset p/java, local re-scan from ", self.printed)
+        self.assertIn(cli.scan_time(self.semgrep), self.printed)
         self.assertIn("(local time), 9 alerts", self.printed)
         self.assertIn("OWASP Benchmark v1.2 answer key, 10 test cases", self.printed)
 
@@ -238,8 +260,8 @@ class Rescan(TempDir):
         self.assertEqual((code, errors), (0, ""))
         run.assert_not_called()
         self.assertIn("Semgrep is not installed", printed)
-        self.assertIn('"Semgrep scan"', printed)
-        self.assertIn("Using the saved scan from", printed)
+        self.assertIn("pip install -r requirements-scan.txt", printed)
+        self.assertIn("Using the local re-scan from", printed)
         self.assertIn("Semgrep raised alerts on 6 test cases", printed)
         self.assertEqual(self.semgrep.read_bytes(), old)
         self.assertNotIn("Traceback", printed + errors)
@@ -250,7 +272,7 @@ class Rescan(TempDir):
         code, printed, _ = capture(cli.main, self.baseline_argv("--rescan"))
         self.assertEqual(code, 0)
         self.assertIn("The Semgrep scan did not complete: network unreachable", printed)
-        self.assertIn("Using the saved scan from", printed)
+        self.assertIn("Using the local re-scan from", printed)
         self.assertEqual(self.semgrep.read_bytes(), old)
         self.assertFalse((self.tmp / "semgrep-owasp.previous.json").exists())
         self.assertEqual(sorted(p.name for p in self.tmp.glob("semgrep-owasp*")), ["semgrep-owasp.json"])
@@ -287,12 +309,12 @@ class MissingInputs(TempDir):
     def test_missing_semgrep_json(self):
         code, _, errors = self.run_baseline("--semgrep", str(self.tmp / "none.json"),
                                             "--answer-key", str(ANSWER_KEY))
-        self.assert_friendly(code, errors, "Semgrep JSON not found", '"Semgrep scan"')
+        self.assert_friendly(code, errors, "Semgrep JSON not found", "python -m triagebot check")
 
     def test_missing_answer_key(self):
         code, _, errors = self.run_baseline("--semgrep", str(SEMGREP),
                                             "--answer-key", str(self.tmp / "none.csv"))
-        self.assert_friendly(code, errors, "answer key not found", '"OWASP Benchmark"')
+        self.assert_friendly(code, errors, "answer key not found", "Clone the OWASP Benchmark")
 
     def test_answer_key_unknown(self):
         with mock.patch.object(cli.config, "ANSWER_KEY", None):
@@ -302,7 +324,7 @@ class MissingInputs(TempDir):
     def test_malformed_semgrep_json(self):
         self.semgrep.write_text("{not json", encoding="utf-8")
         code, _, errors = self.run_baseline("--semgrep", str(self.semgrep), "--answer-key", str(ANSWER_KEY))
-        self.assert_friendly(code, errors, "not valid JSON", '"Semgrep scan"')
+        self.assert_friendly(code, errors, "not valid JSON", "Re-run the scan")
 
 
 class MissingRich(unittest.TestCase):
@@ -313,8 +335,226 @@ class MissingRich(unittest.TestCase):
                               text=True, timeout=60)
         self.assertEqual(done.returncode, 1)
         self.assertIn("TriageBot needs its Python environment", done.stderr)
-        self.assertIn(r".\.verification-venv\Scripts\python.exe -m triagebot", done.stderr)
+        self.assertIn("Activate .venv", done.stderr)
+        self.assertIn("pip install -r requirements.txt", done.stderr)
         self.assertNotIn("Traceback", done.stderr)
+
+
+class ScanResolution(TempDir):
+    def test_local_rescan_preferred_over_recorded(self):
+        self.recorded.parent.mkdir(parents=True)
+        shutil.copy2(SEMGREP, self.recorded)
+        self.assertEqual(cli.config.effective_scan(), (self.semgrep, "local re-scan"))
+
+    def test_recorded_used_without_local_file(self):
+        self.semgrep.unlink()
+        self.assertEqual(cli.config.effective_scan(), (self.recorded, "recorded scan"))
+
+    def test_provenance_names_the_recorded_scan_and_its_fixed_date(self):
+        self.recorded.parent.mkdir(parents=True)
+        self.semgrep.replace(self.recorded)
+        code, printed, _ = capture(cli.main, ["baseline", "--answer-key", str(ANSWER_KEY), "--out", str(self.out)])
+        self.assertEqual(code, 0)
+        self.assertIn("ruleset p/java, recorded scan from ", printed)
+        self.assertIn(cli.scan_time(self.recorded), printed)
+        report = json.loads((self.out / "ingest_report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["scan_date"], cli.config.RECORDED_SCAN_DATE)    # not the checkout mtime
+
+    def test_provenance_names_the_local_rescan(self):
+        code, printed, _ = capture(cli.main, ["baseline", "--answer-key", str(ANSWER_KEY), "--out", str(self.out)])
+        self.assertEqual(code, 0)
+        self.assertIn("ruleset p/java, local re-scan from ", printed)
+
+
+class RescanTarget(TempDir):
+    def test_rescan_writes_only_the_local_scan(self):
+        self.recorded.parent.mkdir(parents=True)
+        shutil.copy2(SEMGREP, self.recorded)
+        self.semgrep.unlink()
+        recorded = self.recorded.read_bytes()
+        run = self.fake_semgrep()
+        code, printed, _ = capture(cli.main, ["baseline", "--semgrep", str(self.recorded), "--answer-key",
+                                              str(ANSWER_KEY), "--out", str(self.out), "--rescan"])
+        self.assertEqual(code, 0)
+        command = run.call_args.args[0]
+        self.assertEqual(Path(command[command.index("--output") + 1]), self.semgrep.resolve().with_name(
+            "semgrep-owasp.json.partial"))
+        self.assertEqual(self.recorded.read_bytes(), recorded)
+        self.assertEqual(json.loads(self.semgrep.read_text(encoding="utf-8"))["version"], "9.9.9")
+        self.assertIn("local re-scan", printed)
+
+    def semgrep_exe_with(self, layout):
+        """semgrep_exe() for a fake Python in a folder with no venv-like name."""
+        python = self.tmp / f"any-python-folder-{layout}" / "python.exe"
+        name = "semgrep.exe" if os.name == "nt" else "semgrep"
+        target = {"beside": python.with_name(name),
+                  "subdir": python.parent / ("Scripts" if os.name == "nt" else "bin") / name}.get(layout)
+        if target:
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text("", encoding="utf-8")
+        with mock.patch.object(check.sys, "executable", str(python)), \
+                mock.patch.object(check.shutil, "which", return_value=None):
+            return check.semgrep_exe(), target
+
+    def test_semgrep_found_next_to_python(self):
+        for layout in ("beside", "subdir"):
+            with self.subTest(layout=layout):
+                found, target = self.semgrep_exe_with(layout)
+                self.assertEqual(found, target)
+
+    def test_semgrep_found_on_path_or_not_at_all(self):
+        self.assertEqual(self.semgrep_exe_with(None)[0], None)
+        with mock.patch.object(check.sys, "executable", str(self.tmp / "python.exe")), \
+                mock.patch.object(check.shutil, "which", return_value="/usr/bin/semgrep"):
+            self.assertEqual(check.semgrep_exe(), Path("/usr/bin/semgrep"))
+
+
+class SetupChecks(TempDir):
+    def bench(self, testcode=True, key=True):
+        root = self.tmp / "BenchmarkJava"
+        if testcode:
+            (root / check.TESTCODE).mkdir(parents=True, exist_ok=True)
+        if key:
+            root.mkdir(exist_ok=True)
+            (root / check.ANSWER_KEY_NAME).write_text("# test name\n", encoding="utf-8")
+        return root
+
+    def git(self, head="", returncode=0):
+        return mock.Mock(return_value=subprocess.CompletedProcess([], returncode, head + "\n", ""))
+
+    def test_python_version(self):
+        self.assertEqual(check.check_python((3, 10, 0)).status, check.OK)
+        old = check.check_python((3, 9, 18))
+        self.assertEqual((old.status, old.required), (check.MISSING, True))
+        self.assertIn("python.org", old.fix)
+
+    def test_rich(self):
+        self.assertEqual(check.check_rich(lambda name: object()).status, check.OK)
+        missing = check.check_rich(lambda name: None)
+        self.assertEqual(missing.status, check.MISSING)
+        self.assertIn("pip install -r requirements.txt", missing.fix)
+
+    def test_benchmark_folder(self):
+        self.assertEqual(check.check_benchmark(self.bench()).status, check.OK)
+
+    def test_benchmark_folder_missing_shows_clone_and_checkout(self):
+        missing = check.check_benchmark(self.tmp / "nowhere")
+        self.assertEqual(missing.status, check.MISSING)
+        self.assertIn(f"git clone {cli.config.BENCHMARK_URL}", missing.fix)
+        self.assertIn(f"checkout {cli.config.BENCHMARK_COMMIT}", missing.fix)
+
+    def test_benchmark_folder_without_answer_key(self):
+        missing = check.check_benchmark(self.bench(key=False))
+        self.assertEqual(missing.status, check.MISSING)
+        self.assertIn(check.ANSWER_KEY_NAME, missing.detail)
+
+    def test_commit_check(self):
+        root = self.bench()
+        same = check.check_commit(root, run=self.git(cli.config.BENCHMARK_COMMIT))
+        self.assertEqual(same.status, check.OK)
+        other = check.check_commit(root, run=self.git("0" * 40))
+        self.assertEqual((other.status, other.required), (check.WARNING, False))
+        self.assertIn(f"checkout {cli.config.BENCHMARK_COMMIT}", other.fix)
+
+    def test_commit_check_skipped_without_git(self):
+        self.assertIsNone(check.check_commit(self.bench(), run=mock.Mock(side_effect=FileNotFoundError)))
+        self.assertIsNone(check.check_commit(self.tmp, run=self.git(returncode=128)))   # not a git checkout
+        with mock.patch.multiple(cli.config, BENCHMARK_ROOT=str(self.bench())):
+            names = [c.name for c in check.run_checks(run=mock.Mock(side_effect=FileNotFoundError))]
+        self.assertNotIn("Benchmark at pinned commit", names)
+        self.assertIn("OWASP Benchmark folder", names)
+
+    def test_scan(self):
+        self.assertIn("local re-scan", check.check_scan().detail)
+        self.semgrep.unlink()
+        self.assertEqual(check.check_scan().status, check.MISSING)
+        self.recorded.parent.mkdir(parents=True)
+        shutil.copy2(SEMGREP, self.recorded)
+        self.assertIn("recorded scan", check.check_scan().detail)
+
+    def test_semgrep_is_only_a_warning(self):
+        warning = check.check_semgrep(lambda: None)
+        self.assertEqual((warning.status, warning.required), (check.WARNING, False))
+        self.assertIn("needed for re-scans", warning.detail)
+        self.assertIn("pip install -r requirements-scan.txt", warning.fix)
+        self.assertEqual(check.check_semgrep(lambda: self.tmp / "semgrep.exe").status, check.OK)
+        self.assertEqual(check.blocking([warning]), [])
+
+    def test_subcommand_prints_words_and_fixes(self):
+        with mock.patch.object(cli.check, "run_checks", return_value=checks(bench=check.MISSING,
+                                                                             semgrep=check.WARNING)):
+            code, printed, _ = capture(cli.main, ["check"])
+        self.assertEqual(code, 1)
+        for word in ("Setup check", "OK", "MISSING", "WARNING", 'To fix "OWASP Benchmark folder":',
+                     "fix command"):
+            self.assertIn(word, printed)
+        with mock.patch.object(cli.check, "run_checks", return_value=checks(semgrep=check.WARNING)):
+            self.assertEqual(capture(cli.main, ["check"])[0], 0)
+
+    def test_plain_report_without_rich(self):
+        out = io.StringIO()
+        self.assertEqual(check.print_plain(checks(rich=check.MISSING), out=out), 1)
+        self.assertIn("MISSING  rich installed", out.getvalue())
+
+
+class MenuSetup(TempDir):
+    def run_menu(self, results, *answers):
+        with mock.patch.object(cli.check, "run_checks", side_effect=results) as checked, \
+                mock.patch.object(cli.subprocess, "run",
+                                  return_value=subprocess.CompletedProcess([], 0, "", "")) as run, \
+                mock.patch("builtins.input", side_effect=list(answers)):
+            code, printed, _ = capture(cli.menu, str(self.semgrep), str(ANSWER_KEY), str(self.out))
+        return code, printed, run, checked
+
+    def test_no_clone_offer_when_benchmark_present(self):
+        code, printed, run, _ = self.run_menu([checks()], "q")
+        self.assertEqual(code, 0)
+        self.assertNotIn("Clone the OWASP Benchmark now?", printed)
+        run.assert_not_called()
+
+    def test_clone_offer_declined_does_nothing(self):
+        for answer in ("", "n"):
+            with self.subTest(answer=answer):
+                code, printed, run, _ = self.run_menu([checks(bench=check.MISSING)], answer, "q")
+                self.assertEqual(code, 0)
+                self.assertIn("Clone the OWASP Benchmark now? (about 100 MB) [y/N]", printed)
+                run.assert_not_called()
+
+    def test_clone_offer_accepted_clones_and_checks_out(self):
+        target = self.tmp / "BenchmarkJava"
+        with mock.patch.multiple(cli.config, BENCHMARK_ROOT=None, BENCHMARK_CLONE_DIR=target,
+                                 ANSWER_KEY=None):
+            code, printed, run, checked = self.run_menu([checks(bench=check.MISSING), checks()], "y", "q")
+            self.assertEqual(cli.config.BENCHMARK_ROOT, str(target))
+        self.assertEqual(code, 0)
+        commands = [c.args[0] for c in run.call_args_list]
+        self.assertEqual(commands, [["git", "clone", cli.config.BENCHMARK_URL, str(target)],
+                                    ["git", "-C", str(target), "checkout", cli.config.BENCHMARK_COMMIT]])
+        self.assertEqual(checked.call_count, 2)                # re-checked after the clone
+        self.assertIn("Cloned", printed)
+
+    def test_option_1_refuses_while_required_check_missing(self):
+        with mock.patch.object(cli, "prepare_baseline") as prepare:
+            code, printed, _, _ = self.run_menu([checks(), checks(scan=check.MISSING)], "1", "", "q")
+        self.assertEqual(code, 0)
+        prepare.assert_not_called()
+        self.assertIn("Option 1 needs the items marked MISSING above", printed)
+
+    def test_option_1_runs_when_only_warnings(self):
+        code, printed, _, _ = self.run_menu([checks(), checks(semgrep=check.WARNING)], "1", "", "", "q")
+        self.assertEqual(code, 0)
+        self.assertIn("Semgrep raised alerts on 6 test cases", printed)
+
+
+class ExportSvg(TempDir):
+    def test_export_svg_writes_valid_svg(self):
+        target = self.tmp / "shots" / "baseline.svg"
+        code, printed, _ = capture(cli.main, self.baseline_argv("--export-svg", str(target)))
+        self.assertEqual(code, 0)
+        root = ElementTree.parse(target).getroot()
+        self.assertEqual(root.tag, "{http://www.w3.org/2000/svg}svg")
+        self.assertIn("Scanner", target.read_text(encoding="utf-8"))
+        self.assertIn("Saved the screen to", printed)
 
 
 class Placeholders(unittest.TestCase):

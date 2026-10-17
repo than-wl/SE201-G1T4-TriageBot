@@ -6,5 +6,6 @@
 .env.*
 !.env.example
 .sunnify-context-engine-id
+.venv/
 .verification-venv/
 __pycache__/

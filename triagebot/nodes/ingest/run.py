@@ -1,7 +1,10 @@
 """Ingest + scanner baseline command (engine for menu option 1).
 
 Usage, from the repository root:
-    py -m triagebot.nodes.ingest.run [--semgrep PATH] [--answer-key PATH] [--out DIR]
+    python -m triagebot.nodes.ingest.run [--semgrep PATH] [--answer-key PATH] [--out DIR]
+
+--semgrep defaults to the local re-scan if present, else the recorded scan
+(triagebot/config.py, effective_scan()).
 
 Writes to --out:
   LLM side (NormalisedAlert fields only, no answer-key data):
@@ -51,6 +54,7 @@ def build(semgrep_path, answer_key_path, seed=config.SPLIT_SEED,
           sample_size=config.SAMPLE_SIZE) -> dict:
     """Run ingest, mapping, split and sample; return {filename: JSON-ready data}."""
     data, scan_date = load_semgrep(semgrep_path)
+    scan_date = config.recorded_scan_date(semgrep_path) or scan_date   # mtime of a checkout means nothing
     alerts, report = normalise(data, scan_date)
     key = load_answer_key(answer_key_path)
 
@@ -130,7 +134,7 @@ def summary(outputs: dict) -> str:
     sample = outputs["split.json"]["sample"]
     key = base["answer_key"]
     parts = [
-        f"Ingest: Semgrep {rep['semgrep_version']}, scan date {rep['scan_date']} (file mtime)",
+        f"Ingest: Semgrep {rep['semgrep_version']}, scan date {rep['scan_date']}",
         f"  findings: {rep['total_findings']} total, {rep['test_file_findings']} in test files, "
         f"{rep['helper_file_findings_dropped']['count']} helper-file dropped, "
         f"{rep['unmapped_paths']['count']} unmapped",
@@ -156,7 +160,8 @@ def summary(outputs: dict) -> str:
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Normalise Semgrep output and score the scanner baseline.")
-    parser.add_argument("--semgrep", default=str(config.SEMGREP_JSON), help="Semgrep JSON output")
+    parser.add_argument("--semgrep", default=str(config.effective_scan()[0]),
+                        help="Semgrep JSON output (default: local re-scan, else the recorded scan)")
     parser.add_argument("--answer-key", default=str(config.ANSWER_KEY) if config.ANSWER_KEY else None,
                         help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
     parser.add_argument("--out", default=str(config.CHECKPOINT_OUT), help="output directory")

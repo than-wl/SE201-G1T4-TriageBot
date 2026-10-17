@@ -140,3 +140,41 @@ mock Semgrep.
 - Changed the baseline screen from a raw Markdown dump to a presentable rich layout; technical comparisons moved behind --details.
 - Kept the saved scan as the default (fast and offline for demos) and added an optional live re-scan with a backup of the previous result.
 - Pinned rich to the version Semgrep already installs, and added a friendly message if the environment isn't active.
+
+## 2026-10-18 — Quick start: recorded scan, setup check, README restructure
+
+- **Tool (model):** Claude Code (claude-opus-5-5); spec from Claude (Cowork)
+- **Files:** data/semgrep/semgrep-owasp-p-java-1.178.0.json, data/semgrep/README.md,
+  triagebot/nodes/ingest/record_scan.py, triagebot/check.py, triagebot/config.py,
+  triagebot/__main__.py, triagebot/nodes/ingest/run.py, requirements.txt (moved from
+  verification/), requirements-scan.txt, .gitignore, README.md,
+  docs/screenshots/baseline.svg, tests/test_cli.py, tests/test_record_scan.py,
+  checkpoint/Checkpoint_WEILIN_FINAL_INTEGRATION_AND_SUBMISSION.md (path fixes only),
+  ai-log/darren.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Make TriageBot easy to set up and understand for a first-time reader (our instructor).
+Commit a recorded Semgrep scan (paths made relative by a small one-off normaliser, so
+it holds nothing machine-specific) and use it unless a local re-scan exists, with the
+baseline screen saying which one is in use; re-scans always write to the git-ignored
+local file. Standardise the environment on `.venv` with `requirements.txt` at the root
+and `requirements-scan.txt` for Semgrep. Add a `python -m triagebot check` setup check
+(also run by the menu) that shows OK / MISSING / WARNING with the command to fix each
+problem, offers to clone a missing OWASP Benchmark only on an explicit "y", and stops
+option 1 while something required is missing. Add `--export-svg` to save the baseline
+screen, and restructure the README around a quick start, results, usage, evaluation
+method, developer notes and troubleshooting. Offline tests mock git and Semgrep.
+
+### How I checked it
+
+- Noticed the first recorded scan had 1,908 findings instead of the original 1,909, and had it traced: a taint-analysis timeout in a later re-scan suppressed one LDAP finding (BenchmarkTest00530).
+- Re-recorded the original 1,909-finding scan; confirmed the baseline matches the earlier numbers exactly (970 TP / 512 FP / 445 FN / 813 TN).
+- Confirmed the recorded scan contains no user names or absolute paths, and that only path strings were changed.
+- Ran `python -m triagebot check` and `python -m triagebot baseline` on my machine; ran the full suite (165 tests pass).
+
+### What I kept or changed
+
+- Kept the recorded scan, setup check, environment changes and README structure as generated.
+- Changed the recorded scan from the later re-scan back to the original run, and documented the run-to-run variation in data/semgrep/README.md.
