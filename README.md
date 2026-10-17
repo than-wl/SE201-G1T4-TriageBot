@@ -69,13 +69,13 @@ This repository currently contains the project overview, team-owned planning mat
 
 | Path                                   | Purpose                                                                          |
 | -------------------------------------- | -------------------------------------------------------------------------------- |
-| `CHECKPOINT_BRIEF.md`                | Current checkpoint goal, status, and action plan                                 |
-| `CHECKPOINT_TEAM_TASKS.md`           | Detailed checkpoint assignments and integration checklist                        |
-| `CHECKPOINT_DARREN.md`               | Darren's Semgrep integration and OWASP mapping instructions                      |
-| `CHECKPOINT_HONG_YI.md`              | Hong Yi's single-agent and council instructions                                  |
-| `CHECKPOINT_LISA.md`                 | Lisa's validation and human-review instructions                                  |
-| `CHECKPOINT_BRADLEY.md`              | Bradley's evaluation and checkpoint-report instructions                         |
-| `Checkpoint_WEILIN_FINAL_INTEGRATION_AND_SUBMISSION.md` | Wei Lin's final integration and submission checklist                   |
+| `checkpoint/CHECKPOINT_BRIEF.md`     | Current checkpoint goal, status, and action plan                                 |
+| `checkpoint/CHECKPOINT_TEAM_TASKS.md` | Detailed checkpoint assignments and integration checklist                       |
+| `checkpoint/CHECKPOINT_DARREN.md`    | Darren's Semgrep integration and OWASP mapping instructions                      |
+| `checkpoint/CHECKPOINT_HONG_YI.md`   | Hong Yi's single-agent and council instructions                                  |
+| `checkpoint/CHECKPOINT_LISA.md`      | Lisa's validation and human-review instructions                                  |
+| `checkpoint/CHECKPOINT_BRADLEY.md`   | Bradley's evaluation and checkpoint-report instructions                          |
+| `checkpoint/Checkpoint_WEILIN_FINAL_INTEGRATION_AND_SUBMISSION.md` | Wei Lin's final integration and submission checklist |
 | `Context/README.md`                  | Index of shared context and local-only material                                   |
 | `verification/openrouter_smoke.py`   | Five-case OpenRouter smoke test and offline validator self-test                  |
 | `verification/feasibility_checks.py` | Limited retrieval, evidence-helper, and Analyst–Skeptic–Chair feasibility pass |
@@ -149,4 +149,4 @@ This demonstrates integration feasibility, not final accuracy. The next checkpoi
 
 ## Project context
 
-The main planning document is [CHECKPOINT_BRIEF.md](CHECKPOINT_BRIEF.md). It records the checkpoint requirements, what is currently verified, what remains incomplete, and the questions the team should agree on before implementation continues.
+The main planning document is [CHECKPOINT_BRIEF.md](checkpoint/CHECKPOINT_BRIEF.md). It records the checkpoint requirements, what is currently verified, what remains incomplete, and the questions the team should agree on before implementation continues.
