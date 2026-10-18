@@ -4,7 +4,7 @@
 **Members:** Darren, Hong Yi, Lisa, Bradley, Wei Lin
 **Checkpoint date:** 18 October 2026
 
-> **Draft status.** Updated on 18 October on `checkpoint/wei-lin-integration`. The connected pipeline, 177 offline tests and recorded 100-case run are complete. Member confirmation boxes and Lisa's AI-use declaration still require human review before submission.
+> **Draft status.** Updated on 18 October on `checkpoint/wei-lin-integration`. The connected pipeline, 177 offline tests and recorded 100-case run are complete. Member confirmation boxes still require each member's own review before submission.
 
 ## 1. Summary
 
@@ -257,7 +257,7 @@ The validator and evaluator were also run together: sample model output passed t
 | Main pipeline connected, stubs documented                             | **Met**                       | Sections 3 and 4; 177 offline tests                                                                                           |                                                    |
 | One category end to end with retrieval and council                    | **Met**                       | `python -m triagebot triage --case BenchmarkTest00008 --mode council`; validated live result                                 |                                                    |
 | About 100 findings, single agent versus council, metrics and failures | **Met**                       | Sections 6.2 and 7.1; saved 100-case configurations and `evaluation.json`                                                     |                                                    |
-| Repository with setup, all-member contributions, AI-use log           | Partially met | README, commit history, `ai-log/`; every member has at least one commit; CI covers Windows, macOS and Linux | Lisa must confirm whether AI was used and add a log if applicable; all members must confirm their contribution paragraph |
+| Repository with setup, all-member contributions, AI-use log           | **Met** | README, commit history, `ai-log/` (one log per member, including `ai-log/lisa.md`); every member has at least one commit; CI covers Windows, macOS and Linux | |
 
 ## 9. Changes since the proposal
 
@@ -299,4 +299,4 @@ Each member must review the paragraph describing their own work; unchecked boxes
 
 ## 12. AI use declaration
 
-Claude Code assisted Darren, Hong Yi and Bradley with code, tests and documentation. OpenAI Codex assisted Wei Lin with final pipeline integration, tests, documentation and the recorded run. Commits containing AI-assisted work carry an `Assisted-by:` trailer, and significant retained work is recorded under `ai-log/`. Generated code was reviewed and exercised through the offline suite; the evaluation harness was additionally checked by planting deliberate bugs to confirm its tests catch them. Within the product, TriageBot itself calls `google/gemini-3.8-flash` (and used `google/gemini-3.5-flash-lite` during development) through OpenRouter; those calls are part of the system under evaluation, not assistance in writing it. Lisa must confirm whether she used AI and add a log if applicable before submission.
+Claude Code assisted Darren, Hong Yi, Lisa and Bradley with code, tests and documentation. OpenAI Codex assisted Wei Lin with final pipeline integration, tests, documentation and the recorded run. Commits containing AI-assisted work carry an `Assisted-by:` trailer, and significant retained work is recorded under `ai-log/`. Generated code was reviewed and exercised through the offline suite; the evaluation harness was additionally checked by planting deliberate bugs to confirm its tests catch them. Within the product, TriageBot itself calls `google/gemini-3.8-flash` (and used `google/gemini-3.5-flash-lite` during development) through OpenRouter; those calls are part of the system under evaluation, not assistance in writing it. Lisa's validator and tests were written with Claude Code (Sonnet 5.5); her earlier commit `e7cea32` predates the `Assisted-by:` trailer rule, which `ai-log/lisa.md` discloses.
