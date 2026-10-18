@@ -293,7 +293,7 @@ Each member must review the paragraph describing their own work; unchecked boxes
 
 - **Darren:** Ingest stage: normalising Semgrep findings into the shared alert contract, CWE-matched mapping to the answer key, the full-benchmark scanner baseline with precision, recall and F1, the shared metrics module, and the stratified dev/test split and checkpoint sample (48 tests). Also the terminal menu and setup check, the recorded-scan setup, and the README Quick start with CI on three operating systems. `[ ] confirmed`
 - **Hong Yi:** Package scaffold and shared contracts, design decision record, offline OWASP Cheat Sheet knowledge base (137 sheets, 3,238 chunks), CWE-gated keyword retrieval, single-agent review and Analyst/Skeptic/Chair roles. `[ ] confirmed`
-- **Lisa:** Deterministic validator with citation, identifier and case-ID checks and a `human_review` fallback, with 41 offline tests. `[ ] confirmed`
+- **Lisa:** Deterministic validator with citation, identifier and case-ID checks and a `human_review` fallback, with 41 offline tests and documentation. `[ ] confirmed`
 - **Bradley:** Evaluation harness that scores all configurations against the hidden answer key, with 14 offline tests; this checkpoint report. `[ ] confirmed`
 - **Wei Lin:** Repository setup, checkpoint planning documents, central pipeline and CLI integration, recorded run and submission review. `[ ] confirmed`
 
