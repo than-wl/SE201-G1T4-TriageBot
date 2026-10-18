@@ -4,8 +4,8 @@ Interactive menu (no arguments), from the repository root:
     python -m triagebot
 
     1  Scanner baseline   How good is Semgrep alone? Scored against the OWASP answer key.
-    2  Triage one alert   One finding through the whole pipeline, every stage shown.  (coming soon)
-    3  Evaluate a sample  The checkpoint sample through each configuration, scored.  (coming soon)
+    2  Triage one alert   One finding through the whole pipeline, every stage shown.
+    3  Evaluate a sample  The checkpoint sample through each configuration, scored.
     q  Quit
 
 The menu starts with the setup check (triagebot/check.py) and, if the
@@ -33,13 +33,13 @@ current scan if it fails. --details adds the file-matched comparison, CWE
 mismatch pairs, ingest counts and the files written. --export-svg also
 saves the screen as an SVG (README screenshot).
 
-triage and evaluate are placeholders until triagebot/pipeline.py is
-wired; they print a notice and exit with code 2.
+triage and evaluate run the connected review pipeline. They require an
+OpenRouter API key and therefore make paid model calls.
 
 check: prints the setup table; exit code 1 while a required item is MISSING
 (0 with --no-fail, for CI, where the Benchmark is never cloned).
 
-Exit codes: 0 success, 1 missing or unreadable input, 2 not yet available.
+Exit codes: 0 success, 1 missing or unreadable input.
 
 All output goes through rich; tests swap `console` and `err_console` for
 fixed-width, colourless consoles.
@@ -76,8 +76,9 @@ except ImportError:
              f"the prompt then shows \"(.venv)\") and run: pip install -r requirements.txt   "
              f"(see README, Quick start).")
 
-from triagebot import check, config
+from triagebot import check, config, pipeline
 from triagebot.nodes.ingest import run
+from triagebot.nodes.score import evaluate as scoring
 
 console = Console(highlight=False)
 err_console = Console(stderr=True, highlight=False)
@@ -85,11 +86,10 @@ err_console = Console(stderr=True, highlight=False)
 BANNER = "TriageBot: evidence-grounded triage of SAST alerts (SE201 G1T4)"
 OPTIONS = (
     ("1", "Scanner baseline", "How good is Semgrep alone? Scored against the OWASP answer key.", True),
-    ("2", "Triage one alert", "One finding through the whole pipeline, every stage shown.", False),
-    ("3", "Evaluate a sample", "The checkpoint sample through each configuration, scored.", False),
+    ("2", "Triage one alert", "One finding through the whole pipeline, every stage shown.", True),
+    ("3", "Evaluate a sample", "The checkpoint sample through each configuration, scored.", True),
 )
 PROMPT = "Choose 1, 2, 3 or q: "
-NOT_YET = "Not yet available: the end-to-end pipeline (triagebot/pipeline.py) is being wired."
 REVIEW_MODES = ("single", "council")
 
 SEMGREP_RULESET = "p/java"
@@ -490,18 +490,60 @@ def clone_benchmark(target=None) -> bool:
     return True
 
 
-# --- options 2 and 3: placeholders (Wei Lin connects these to pipeline.py) --
+# --- options 2 and 3: connected review pipeline -----------------------------
 
-def triage_one(case=None, mode="single") -> int:
-    """PLACEHOLDER. Menu option 2 / `triage`: one alert through the pipeline."""
-    console.print(NOT_YET)
-    return 2
+def _sample_alerts(path):
+    data = json.loads(Path(path).read_text(encoding="utf-8"))
+    alerts = data.get("alerts") if isinstance(data, dict) else data
+    if not isinstance(alerts, list) or not all(isinstance(alert, dict) for alert in alerts):
+        raise ValueError(f"{path}: expected a list of normalised alerts")
+    return alerts
 
 
-def evaluate_sample(sample=None, modes=REVIEW_MODES) -> int:
-    """PLACEHOLDER. Menu option 3 / `evaluate`: the sample through each configuration."""
-    console.print(NOT_YET)
-    return 2
+def triage_one(case=None, mode="single", sample=None, out=None) -> int:
+    """Menu option 2 / `triage`: one saved alert through the pipeline."""
+    sample = Path(sample or config.CHECKPOINT_OUT / "selected_alerts.json")
+    out = Path(out or config.CHECKPOINT_OUT)
+    try:
+        alerts = _sample_alerts(sample)
+        matches = [alert for alert in alerts if alert.get("case_id") == case]
+        if not matches:
+            return _fail(f"{case} is not in {_short(sample)}; run the baseline or choose a sampled case")
+        result = pipeline.triage(matches[0], mode)
+        out.mkdir(parents=True, exist_ok=True)
+        target = out / f"triage-{case}-{mode}.json"
+        target.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+        return _fail(str(error))
+    final = result["validated"]
+    console.print(f"[bold]{case}[/] via {mode}: [bold]{final['verdict']}[/] "
+                  f"(validation {'passed' if final['validated'] else 'sent to human review'})")
+    console.print(f"Saved: {_short(target)}")
+    return 0
+
+
+def evaluate_sample(sample=None, modes=REVIEW_MODES, out=None, answer_key=None) -> int:
+    """Menu option 3 / `evaluate`: run and score the checkpoint sample."""
+    sample = Path(sample or config.CHECKPOINT_OUT / "selected_alerts.json")
+    out = Path(out or config.CHECKPOINT_OUT)
+    answer_key = Path(answer_key or config.ANSWER_KEY or "")
+    if not answer_key.is_file():
+        return _fail(f"answer key not found: {answer_key}")
+    try:
+        alerts = _sample_alerts(sample)
+        configurations = pipeline.run_sample(alerts, tuple(modes), out)
+        configs = {name: (data["results"], data.get("model"))
+                   for name, data in configurations.items()}
+        report = scoring.evaluate(
+            [alert["case_id"] for alert in alerts], scoring.load_labels(answer_key), configs)
+        out.mkdir(parents=True, exist_ok=True)
+        target = out / "evaluation.json"
+        target.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    except (OSError, ValueError, KeyError, json.JSONDecodeError) as error:
+        return _fail(str(error))
+    console.print(scoring.markdown_table(report), markup=False)
+    console.print(f"\nReport: {_short(target)}")
+    return 0
 
 
 # --- front door 1: interactive menu ----------------------------------------
@@ -510,9 +552,10 @@ class _Quit(Exception):
     """End of input at any prompt."""
 
 
-def _ask(prompt) -> str:
+def _ask(prompt, lower=True) -> str:
     try:
-        return console.input(prompt).strip().lower()
+        answer = console.input(prompt).strip()
+        return answer.lower() if lower else answer
     except (EOFError, KeyboardInterrupt):
         console.print()
         raise _Quit from None
@@ -577,18 +620,38 @@ def _menu_baseline(semgrep, answer_key, out) -> None:
         _ask("Press Enter to return to the menu")
 
 
-def _menu_placeholder(action) -> None:
-    action()
+def _menu_triage(out) -> None:
+    if not _menu_check(show_when_ready=False):
+        console.print("[yellow]Triage needs the items marked MISSING above.[/]")
+        _ask("Press Enter to return to the menu")
+        return
+    case = _ask("Case ID (for example BenchmarkTest00001): ", lower=False)
+    choice = _ask("[bold]s[/] = single agent   [bold]c[/] = council   [bold]\\[Enter][/] = single: ")
+    mode = "council" if choice in ("c", "council") else "single"
+    triage_one(case, mode, None, out)
+    console.print()
+    _ask("Press Enter to return to the menu")
+
+
+def _menu_evaluate(answer_key, out) -> None:
+    if not _menu_check(show_when_ready=False):
+        console.print("[yellow]Evaluation needs the items marked MISSING above.[/]")
+        _ask("Press Enter to return to the menu")
+        return
+    console.print("[yellow]This paid run uses up to 4 model calls per finding "
+                  "(1 single-agent + 3 council calls).[/]")
+    if _ask("Continue? \\[y/N]: ") in ("y", "yes"):
+        evaluate_sample(None, REVIEW_MODES, out, answer_key)
     console.print()
     _ask("Press Enter to return to the menu")
 
 
 def menu(semgrep=None, answer_key=None, out=None) -> int:
-    """Loop until q (or end of input). Arguments are passed to option 1."""
+    """Loop until q (or end of input)."""
     actions = {
         "1": lambda: _menu_baseline(semgrep, answer_key, out),
-        "2": lambda: _menu_placeholder(triage_one),
-        "3": lambda: _menu_placeholder(evaluate_sample),
+        "2": lambda: _menu_triage(out),
+        "3": lambda: _menu_evaluate(answer_key, out),
     }
     try:
         _menu_check()
@@ -637,13 +700,17 @@ def parser() -> argparse.ArgumentParser:
                    help="also show matching comparison, CWE mismatch pairs, ingest counts and files written")
     b.add_argument("--export-svg", metavar="PATH", help="also save the screen as an SVG image")
 
-    t = sub.add_parser("triage", help="menu option 2: one alert through the pipeline (coming soon)")
+    t = sub.add_parser("triage", help="menu option 2: one alert through the pipeline")
     t.add_argument("--case", required=True, help="BenchmarkTestNNNNN")
     t.add_argument("--mode", choices=REVIEW_MODES, default="single")
+    t.add_argument("--sample", help="selected_alerts.json (default: under the checkpoint output folder)")
+    t.add_argument("--out", help=f"output directory (default {config.CHECKPOINT_OUT})")
 
-    e = sub.add_parser("evaluate", help="menu option 3: evaluate the checkpoint sample (coming soon)")
+    e = sub.add_parser("evaluate", help="menu option 3: evaluate the checkpoint sample")
     e.add_argument("--sample", help="selected_alerts.json (default: under --out of baseline)")
     e.add_argument("--mode", type=_modes, default=REVIEW_MODES, help="comma-separated: single,council")
+    e.add_argument("--out", help=f"output directory (default {config.CHECKPOINT_OUT})")
+    e.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
     return p
 
 
@@ -654,9 +721,9 @@ def main(argv=None) -> int:
     if args.command == "baseline":
         return baseline(args.semgrep, args.answer_key, args.out, args.rescan, args.details, args.export_svg)
     if args.command == "triage":
-        return triage_one(args.case, args.mode)
+        return triage_one(args.case, args.mode, args.sample, args.out)
     if args.command == "evaluate":
-        return evaluate_sample(args.sample, args.mode)
+        return evaluate_sample(args.sample, args.mode, args.out, args.answer_key)
     return menu()
 
 

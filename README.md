@@ -4,7 +4,7 @@
 
 TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
-**Status:** Checkpoint stage: scanner baseline working; AI triage pipeline being integrated.
+**Status:** Checkpoint implementation and recorded 100-case evaluation complete; final team sign-off and submission remain.
 
 ## 1. What TriageBot does
 
@@ -33,7 +33,7 @@ The scanner baseline (Semgrep alone, before TriageBot), from the recorded scan, 
 
 ![The scanner-baseline screen of python -m triagebot](docs/screenshots/baseline.svg)
 
-The AI configurations are evaluated on a 100-case SQL injection sample; see [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for the checkpoint status and results.
+On the balanced 100-case SQL-injection checkpoint sample, the council removed 35 of 50 false positives, wrongly dismissed none of the 50 genuine findings, and sent 32 cases to human review. These are preliminary one-category results; see [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for definitions, precision/recall/F1, costs, failures and limitations.
 
 ## 3. Quick start
 
@@ -80,8 +80,8 @@ Then choose `1` for the scanner baseline. No Semgrep scan is needed: the reposit
 | Option | What it shows |
 | --- | --- |
 | 1 Scanner baseline | How good Semgrep is alone: the scan used (recorded or your re-scan), headline precision, recall and F1, a table by vulnerability type, what this means for TriageBot (false alarms to remove, recall ceiling, blind spots) and the checkpoint test set. `r` re-runs Semgrep first; `d` afterwards shows the technical details. |
-| 2 Triage one alert | Coming soon: one finding through the whole pipeline, every stage shown. |
-| 3 Evaluate a sample | Coming soon: the checkpoint sample through each configuration, scored. |
+| 2 Triage one alert | Runs one sampled Semgrep finding through either the single agent or the Analyst / Skeptic / Chair council, then validates and saves the result. This makes paid OpenRouter calls. |
+| 3 Evaluate a sample | Runs the checkpoint sample through the single-agent and council configurations, validates the council output, and scores the saved results. It asks for confirmation before making paid calls. |
 
 The same actions as subcommands, for scripts:
 
@@ -97,7 +97,8 @@ python -m triagebot evaluate [--sample PATH] [--mode single,council]
   - `--rescan` re-runs Semgrep into `Context/tmp/semgrep-owasp.json` (needs Semgrep from `requirements.txt` and internet; a few minutes). That local re-scan is then used instead of the recorded scan until you delete it; the previous one is kept as `semgrep-owasp.previous.json`, and a failed scan falls back to the current one.
   - `--details` adds the file-matched comparison, CWE mismatch pairs, ingest counts and files written.
   - `--export-svg PATH` also saves the screen as an SVG image (how the screenshot above was made).
-- `triage` and `evaluate`: print "Not yet available" and exit with code 2 until `triagebot/pipeline.py` is wired.
+- `triage`: runs one case from `selected_alerts.json` through `single` or `council` mode and saves `triage-<case>-<mode>.json`.
+- `evaluate`: runs every selected case through the requested modes, writes `B-single-agent.json`, `C-council.json`, `D-validated-council.json`, and scores them into `evaluation.json`. The answer key is loaded only after the model calls finish.
 
 ## 5. How it works
 
@@ -105,10 +106,10 @@ python -m triagebot evaluate [--sample PATH] [--mode single,council]
 | --- | --- | --- | --- |
 | Ingest | Semgrep JSON to normalised alerts; scanner baseline; dev/test split and sample | `triagebot/nodes/ingest/` | Built |
 | Context payload | Source window, helper facts, retrieved guidance | `triagebot/nodes/context/` | Built |
-| Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Roles built; council orchestration pending |
+| Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Built and connected |
 | Validate | Deterministic citation and format checks | `triagebot/nodes/validate/` | Built |
 | Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
-| Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Menu, setup check and option 1 built; options 2-3 pending pipeline |
+| Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Built; all three menu options and matching subcommands are connected |
 
 The data shapes passed between stages are the shared contracts in `triagebot/schemas.py`. Runtime settings (model, budgets, paths, the pinned benchmark commit) live in `triagebot/config.py`, and the model callers (live OpenRouter and offline fixture) in `triagebot/llm/`. The reasoning behind these choices is in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
 
@@ -140,7 +141,7 @@ python -m triagebot.nodes.ingest.run
 Score saved results with the evaluator (offline; the scanner-only baseline is added automatically; paths are examples):
 
 ```bash
-python -m triagebot.nodes.score.evaluate --labels Context/tmp/BenchmarkJava/expectedresults-1.2.csv --cases Context/tmp/checkpoint/selected_alerts.json --config B-single-agent=Context/tmp/checkpoint/single_agent_results.json --config C-council=Context/tmp/checkpoint/council_results.json --config D-validated-council=Context/tmp/checkpoint/validated_council_results.json
+python -m triagebot.nodes.score.evaluate --labels Context/tmp/BenchmarkJava/expectedresults-1.2.csv --cases Context/tmp/checkpoint/selected_alerts.json --config B-single-agent=Context/tmp/checkpoint/B-single-agent.json --config C-council=Context/tmp/checkpoint/C-council.json --config D-validated-council=Context/tmp/checkpoint/D-validated-council.json
 ```
 
 It prints a metrics table and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts count as invalid and as human review, and human review never counts as a removed false positive.

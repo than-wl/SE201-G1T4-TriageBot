@@ -114,7 +114,7 @@ class Menu(TempDir):
             self.assertIn(title, printed)
             self.assertIn(description, printed)
         self.assertIn("Quit", printed)
-        self.assertEqual(printed.count("(coming soon)"), 2)
+        self.assertNotIn("(coming soon)", printed)
         self.assertNotIn("not yet available", printed)
 
     def test_quit_and_end_of_input(self):
@@ -168,20 +168,25 @@ class Menu(TempDir):
         self.assertIn("Scan complete", printed)
         self.assertIn("Semgrep 9.9.9", printed)                # the screen uses the new scan
 
-    def test_options_2_and_3_wait_for_enter(self):
-        for choice in ("2", "3"):
-            with self.subTest(choice=choice):
-                code, printed, prompts = self.run_menu(choice, "", "q")
-                self.assertEqual((code, prompts), (0, 3))
-                self.assertIn(cli.NOT_YET, printed)
-                self.assertIn("Press Enter to return to the menu", printed)
-        self.assertFalse(self.out.exists())
+    def test_option_2_asks_for_case_and_mode_then_runs(self):
+        with mock.patch.object(cli, "triage_one", return_value=0) as triage:
+            code, printed, _ = self.run_menu("2", "BenchmarkTest00001", "c", "", "q")
+        self.assertEqual(code, 0)
+        triage.assert_called_once_with("BenchmarkTest00001", "council", None, str(self.out))
+        self.assertIn("Press Enter to return to the menu", printed)
+
+    def test_option_3_requires_confirmation_before_paid_run(self):
+        with mock.patch.object(cli, "evaluate_sample", return_value=0) as evaluate:
+            code, printed, _ = self.run_menu("3", "y", "", "q")
+        self.assertEqual(code, 0)
+        evaluate.assert_called_once_with(None, cli.REVIEW_MODES, str(self.out), str(ANSWER_KEY))
+        self.assertIn("up to 4 model calls per finding", printed)
 
     def test_invalid_input_reprompts(self):
         code, printed, prompts = self.run_menu("x", "", "4", "q")
         self.assertEqual((code, prompts), (0, 4))
         self.assertIn("Unknown option 'x'", printed)
-        self.assertNotIn(cli.NOT_YET, printed)
+        self.assertNotIn("not yet available", printed.lower())
 
     def test_menu_and_subcommand_call_the_same_functions(self):
         ctx = object()
@@ -660,19 +665,62 @@ class ExportSvg(TempDir):
         self.assertIn("Saved the screen to", printed)
 
 
-class Placeholders(unittest.TestCase):
-    def test_triage_subcommand(self):
-        code, printed, _ = capture(cli.main, ["triage", "--case", "BenchmarkTest00001", "--mode", "council"])
-        self.assertEqual((code, printed.strip()), (2, cli.NOT_YET))
+class PipelineCommands(TempDir):
+    def setUp(self):
+        super().setUp()
+        self.sample = self.tmp / "selected_alerts.json"
+        self.alert = {
+            "case_id": "BenchmarkTest00001", "file": "src/main/java/Test.java",
+            "rule_id": "fixture", "cwe": "CWE-89", "start_line": 1,
+            "end_line": 1, "message": "fixture",
+        }
+        self.sample.write_text(json.dumps({"alerts": [self.alert]}), encoding="utf-8")
 
-    def test_evaluate_subcommand(self):
-        code, printed, _ = capture(cli.main, ["evaluate", "--mode", "single,council"])
-        self.assertEqual((code, printed.strip()), (2, cli.NOT_YET))
+    def test_triage_subcommand_runs_pipeline_and_saves_demo(self):
+        run = {"case_id": "BenchmarkTest00001", "mode": "council",
+               "review": {"verdict": "true_positive"},
+               "validated": {"verdict": "true_positive", "validated": True}}
+        with mock.patch.object(cli.pipeline, "triage", return_value=run) as triage:
+            code, printed, errors = capture(
+                cli.main, ["triage", "--case", "BenchmarkTest00001", "--mode", "council",
+                           "--sample", str(self.sample), "--out", str(self.out)])
+        self.assertEqual((code, errors), (0, ""))
+        triage.assert_called_once_with(self.alert, "council")
+        saved = self.out / "triage-BenchmarkTest00001-council.json"
+        self.assertEqual(json.loads(saved.read_text(encoding="utf-8")), run)
+        self.assertIn("true_positive", printed)
+        self.assertIn(str(saved), printed)
+
+    def test_evaluate_subcommand_runs_sample_then_scores_saved_results(self):
+        configs = {
+            "B-single-agent": {"model": "fixture", "results": [
+                {"case_id": "BenchmarkTest00001", "verdict": "true_positive"}]},
+        }
+        with mock.patch.multiple(cli.config, ANSWER_KEY=ANSWER_KEY), \
+                mock.patch.object(cli.pipeline, "run_sample", return_value=configs) as run_sample:
+            code, printed, errors = capture(
+                cli.main, ["evaluate", "--sample", str(self.sample), "--mode", "single",
+                           "--out", str(self.out)])
+        self.assertEqual((code, errors), (0, ""))
+        run_sample.assert_called_once_with([self.alert], ("single",), self.out)
+        report = json.loads((self.out / "evaluation.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["sample_size"], 1)
+        self.assertIn("B-single-agent", printed)
 
     def test_evaluate_rejects_unknown_mode(self):
         with self.assertRaises(SystemExit) as raised:
             capture(cli.main, ["evaluate", "--mode", "single,bogus"])
         self.assertEqual(raised.exception.code, 2)
+
+    def test_evaluate_checks_answer_key_before_paid_calls(self):
+        missing = self.tmp / "missing-answer-key.csv"
+        with mock.patch.object(cli.pipeline, "run_sample") as run_sample:
+            code, _, errors = capture(
+                cli.main, ["evaluate", "--sample", str(self.sample),
+                           "--answer-key", str(missing), "--out", str(self.out)])
+        self.assertEqual(code, 1)
+        self.assertIn("answer key not found", errors.lower())
+        run_sample.assert_not_called()
 
 
 if __name__ == "__main__":
