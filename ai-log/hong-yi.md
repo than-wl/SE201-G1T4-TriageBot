@@ -154,3 +154,35 @@ false_positive with grounded citations.
 Kept the caller and the no-retry failure path (observed working live).
 Changed: `REVIEW_MAX_TOKENS` 700 → 900 after the run showed one call
 truncating at the cap (analyst spent 676 of 700 tokens).
+
+## 2026-10-18 — Source window widened from ±25 to ±100 lines
+
+- **Tool (model):** Claude Code (mimo-v2.6-flash)
+- **Files:** triagebot/config.py
+- **Outcome:** Changed
+
+### What I asked for
+
+After the recorded 100-case run reported a 32% human-review rate,
+choose and apply a wider `SOURCE_WINDOW_LINES` (100 rather than 85:
+round, and quotable as "±100 lines"), then re-run the recorded
+evaluation to measure the effect.
+
+### How I checked it
+
+`git blame` traced the ±25 default to my own payload commit (e6b2852),
+and the run's report attributes most escalations to helper methods cut
+off mid-slice (e.g. BenchmarkTest01004, BenchmarkTest01883). Rebuilt the
+same 100-case sample (seed 201) and re-triaged BenchmarkTest01004
+through the council: analyst, skeptic and chair all returned
+`true_positive` with validation passing — the whole file now fits the
+window. The full 100-case re-run was started, then stopped by choice
+before any results were written, so the effect on the human-review rate
+is not yet measured.
+
+### What I kept or changed
+
+Changed only the constant (25 → 100, with the reason in the comment);
+kept the slice-then-extract-facts design. The recorded checkpoint
+numbers were produced at ±25 and stand unchanged; a full re-run to
+quantify the effect is deferred.

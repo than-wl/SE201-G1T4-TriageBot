@@ -26,7 +26,9 @@ def _benchmark_root(environ=os.environ, repo_root=_REPO_ROOT):
 
 # Local benchmark checkout (not committed); None -> payload build raises.
 BENCHMARK_ROOT = _benchmark_root()
-SOURCE_WINDOW_LINES = 25       # alert lines +/- this many lines of context
+SOURCE_WINDOW_LINES = 100      # alert lines +/- this many lines of context
+                               # (25 cut helper methods off mid-body in the
+                               # recorded run; 100 keeps whole methods)
 
 BENCHMARK_URL = "https://github.com/OWASP-Benchmark/BenchmarkJava.git"
 BENCHMARK_COMMIT = "8b67a88d73b2594570fc21150705283de884620b"   # pinned for all recorded evidence
