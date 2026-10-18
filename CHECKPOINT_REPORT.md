@@ -257,7 +257,7 @@ The validator and evaluator were also run together: sample model output passed t
 | Main pipeline connected, stubs documented                             | **Met**                       | Sections 3 and 4; 177 offline tests                                                                                           |                                                    |
 | One category end to end with retrieval and council                    | **Met**                       | `python -m triagebot triage --case BenchmarkTest00008 --mode council`; validated live result                                 |                                                    |
 | About 100 findings, single agent versus council, metrics and failures | **Met**                       | Sections 6.2 and 7.1; saved 100-case configurations and `evaluation.json`                                                     |                                                    |
-| Repository with setup, all-member contributions, AI-use log           | **Met** | README, commit history, `ai-log/` (one log per member, including `ai-log/lisa.md`); every member has at least one commit; CI covers Windows, macOS and Linux | |
+| Repository with setup, all-member contributions, AI-use log           | **Met** | README, commit history, `ai-log/` (all members logged); every member has at least one commit; CI covers Windows, macOS and Linux | |
 
 ## 9. Changes since the proposal
 
