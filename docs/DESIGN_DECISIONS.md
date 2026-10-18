@@ -311,3 +311,23 @@ alerts the same in both halves.
 counts and full assignment. Changing the seed or fraction would
 invalidate the separation between tuning and final results, so it needs
 a team decision recorded here.
+
+## 19. Source window widened from ±25 to ±100 lines
+
+**Decision.** The context payload slices comment-stripped source around
+each alert at `config.SOURCE_WINDOW_LINES`. After the recorded
+checkpoint run, the window was raised from 25 to 100 lines (on
+`checkpoint/hong-yi-source-window`).
+
+**Why.** In the recorded run, most human-review escalations traced to
+helper methods cut off mid-body by the ±25 slice: the Chair could not
+see the branch connecting user input to the sink (BenchmarkTest01004,
+BenchmarkTest01883). The same slice also bounds `extract_facts`, so the
+fact hints were starved together with the code. 100 lines keeps whole
+helper methods for typical Benchmark test files; the extra input is one
+source window per call, still small against the model budget.
+
+**Consequence.** The recorded checkpoint numbers (produced at ±25)
+stand unchanged; any comparison run must fix one window and state
+which. The slice is still a hard bound — files wider than the window
+remain truncated, so a full re-run must re-check for any such cases.
