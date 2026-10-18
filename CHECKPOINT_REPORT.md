@@ -5,7 +5,7 @@
 **Members:** Darren, Hong Yi, Lisa, Bradley, Wei Lin
 **Checkpoint date:** 18 October 2026
 
-> **Draft status.** Updated on 18 October on `checkpoint/wei-lin-integration`. The connected pipeline, 177 offline tests and recorded 100-case run are complete. Each member has confirmed their contribution paragraph (section 11).
+> **Status.** Final checkpoint submission, 18 October 2026. The connected pipeline, 177 offline tests and recorded 100-case run are complete. Each member has confirmed their contribution paragraph (section 11).
 
 ## 1. Summary
 
@@ -190,7 +190,7 @@ The proposal's filename-based numbers were slightly inflated. The difference sit
 
 The scanner-only column is fixed by definition: every flagged finding is kept, so all genuine findings are retained and no false positives are removed. Configuration D carries C's latency and cost because validation is local and makes no additional model call.
 
-For a conventional binary view of the filtering pipeline, treating `human_review` as **kept** rather than removed, precision / recall / F1 were 50.0% / 100.0% / 66.7% for scanner only, 74.6% / 94.0% / 83.2% for the single agent, and 76.9% / 100.0% / 87.0% for both council configurations. Thus the council outperformed the single agent on the same cases: it removed one additional false positive, avoided all three unsafe dismissals, and sent one fewer case to review. The council met the proposal's 95% safe-retention and 25% removal targets on this sample, while keeping human review below 50%. However, only 66% of genuine findings were automatically confirmed; 34% still required a developer. Most escalations arose because the source window cut off a helper method or because a model response was not parseable JSON (5 council cases). Validation rejected 6 council outputs—5 missing citations after unparseable model answers and 1 mismatched guidance reference—but all six were already `human_review`, so it improved evidence labelling without changing the outcome counts.
+For a conventional binary view of the filtering pipeline, treating `human_review` as **kept** rather than removed, precision / recall / F1 were 50.0% / 100.0% / 66.7% for scanner only, 74.6% / 94.0% / 83.2% for the single agent, and 76.9% / 100.0% / 87.0% for both council configurations. Thus the council outperformed the single agent on the same cases: it removed one additional false positive, avoided all three unsafe dismissals, and sent one fewer case to review. The council met the proposal's 95% safe-retention and 25% removal targets on this sample, while keeping human review below 50%. However, only 66% of genuine findings were automatically confirmed; 34% still required a developer. Escalations we inspected arose because the source window cut off a helper method, or because a model response was not parseable JSON (5 council cases). Validation rejected 6 council outputs—5 missing citations after unparseable model answers and 1 mismatched guidance reference—but all six were already `human_review`, so it improved evidence labelling without changing the outcome counts.
 
 This is an initial checkpoint sample of one category. It is not a general accuracy estimate.
 
