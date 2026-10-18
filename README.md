@@ -197,7 +197,7 @@ checkpoint/      TEMPORARY planning notes, removed before final submission
 - The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
 - Do not describe the five-case smoke test as proof of general system accuracy.
 
-**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16.
+**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16. Logs to date: `ai-log/bradley.md`, `darren.md`, `hong-yi.md`, `lisa.md` and `wei-lin.md`.
 
 ## 10. Team and roles
 
