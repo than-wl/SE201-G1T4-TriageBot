@@ -1,6 +1,7 @@
 # TriageBot Checkpoint Report
 
 **Team:** SE201 G1T4
+**Repository:** https://github.com/than-wl/SE201-G1T4-TriageBot
 **Members:** Darren, Hong Yi, Lisa, Bradley, Wei Lin
 **Checkpoint date:** 18 October 2026
 
