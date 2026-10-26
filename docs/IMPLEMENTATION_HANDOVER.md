@@ -8,16 +8,18 @@ implement Phase 2 and audit again using this same document. Update the status an
 verification sections in place, not a second handover.
 
 **Today's intended scope: Phase 1 AND Phase 2 only. Phase 3 is another day.**
-**Current delivery implements Phase 1 ONLY. Stop for audit before Phase 2.**
+**Current delivery implements Phase 2 on the pushed Phase 1 branch. Stop for Phase 2 audit; Phase 3 remains deferred.**
 
 | Phase | Scope | Current status | PR checkpoint |
 | --- | --- | --- | --- |
 | 1 | Council-only LangGraph + explicit graph state | Implemented on branch `phase1/langgraph-council`; audit complete, PR review pending | PR 1: review before Phase 2 |
-| 2 | Persistent, file-backed SQLite checkpoints + recovery | Planned; NOT implemented | PR 2: separate from PR 1 |
+| 2 | Persistent, file-backed SQLite checkpoints + recovery | Implemented locally; independent audit pending | PR 2: separate from PR 1 |
 | 3 | HITL pause/resume + Markdown review handoff | Deferred; NOT today's scope | Later work |
 
-The change set is committed locally on `phase1/langgraph-council` so it can be
-reviewed. It has not been pushed or opened as a PR.
+Phase 2 base: pushed branch `phase1/langgraph-council`, commit
+`6ec079a1ad4d507acc1ea92565855af9ba4b77fb` (not main). The user explicitly
+requested Phase 2 after pushing Phase 1. Phase 2 is a local review ZIP; this
+session did not push, merge, open a PR, or claim independent approval.
 
 ## Agreed architectural boundaries
 
@@ -171,7 +173,31 @@ review bundle as verification evidence, not an extra runtime dependency.
 
 Suggested PR 1 title: `refactor: migrate council orchestration to LangGraph`
 
-## Phase 2 — planned implementation, NOT present yet
+## Phase 2 — implementation delivered locally; audit pending
+
+### Implementation record (same handover, updated in place)
+
+- Opt-in `triagebot/checkpoints.py` manages file-backed SQLite sessions, UUIDs,
+  provenance, no-client status inspection, explicit recovery acknowledgment and
+  one-executor-per-DB OS locking. CLI: council-start/status/resume.
+- Graph state saves numeric node durations and provenance, never live timers,
+  clients, credentials or database connections. Runtime is reconstructed on resume.
+- Existing triage/evaluation remain ephemeral; the single baseline is unchanged.
+  Public result JSON is preserved. Durable latency uses the documented active
+  critical path; committed usage is not proof of all crash-time provider charges.
+- Updated requirements/ignore rules, graph/state/config/helpers/caller model
+  resolution, CLI, graph regression assertions and real SQLite/subprocess tests.
+- 220 offline tests passed on Linux/Python 3.13 (191 pushed-baseline tests + 29 new
+  checkpoint tests). Tests use actual SQLite, process exit/restart, a hard Chair
+  crash, successful parallel pending writes, validation-only recovery, incompatible
+  resumes, completed-session idempotence, locking, private permissions and CLI.
+- No paid calls, rescans, accuracy evaluation, tools, vector retrieval, HITL or
+  review.md handoff. Cross-platform CI and independent audit are pending.
+- The pre-existing cwe_matched=False enforcement gap remains a separate safety
+  issue; it was not silently fixed in this infrastructure change.
+
+The detailed Phase 2 scope/design obligations below remain the audit specification,
+not authorization to proceed to Phase 3. Operational usage is in README.md.
 
 ### Scope
 
@@ -273,9 +299,9 @@ and real SQLite, not only mocks. Stop after review and wait for the user's decis
 
 ## Audit ledger (update in this same file)
 
-- Phase 1 implementation: delivered locally; independent audit PENDING.
-- Phase 1 findings/resolution: PENDING.
-- User authorization to start Phase 2 after audit: PENDING.
-- Phase 2 implementation/evidence: NOT STARTED.
-- Phase 2 findings/resolution: NOT STARTED.
+- Phase 1 implementation: found pushed at 6ec079a on phase1/langgraph-council; branch documents a completed local audit.
+- Phase 1 findings/resolution: retained from the pushed branch; no new independent approval asserted.
+- User authorization to start Phase 2: received in the current implementation chat.
+- Phase 2 implementation/evidence: local review ZIP delivered; 220 offline tests passed.
+- Phase 2 findings/resolution: independent audit PENDING; stop here.
 - Phase 3: DEFERRED, outside today's scope.

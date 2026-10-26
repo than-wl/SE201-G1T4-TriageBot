@@ -127,12 +127,13 @@ class CouncilGraphTest(unittest.TestCase):
         for update in updates:
             for name, delta in update.items():
                 if name in ("analyst", "skeptic"):
-                    self.assertEqual(set(delta), {f"{name}_report"})
+                    self.assertEqual(set(delta), {f"{name}_report", f"{name}_elapsed_seconds"})
                 state.update(delta)
         json.dumps(state)
         self.assertEqual(set(state), {
             "alert", "payload", "analyst_report", "skeptic_report",
-            "review", "role_reports", "validated",
+            "review", "role_reports", "validated", "analyst_elapsed_seconds",
+            "skeptic_elapsed_seconds", "chair_elapsed_seconds",
         })
 
     def test_phase1_graph_has_no_checkpointer_or_human_interrupts(self):

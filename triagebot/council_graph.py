@@ -1,4 +1,4 @@
-"""Council-only LangGraph orchestration (Phase 1: no persistence or HITL).
+"""Council-only LangGraph orchestration; persistence is opt-in, HITL deferred.
 
 The graph fans out to independent specialists and explicitly joins BOTH
 before Chair. Dependencies live in per-invocation runtime context; the
@@ -27,37 +27,47 @@ from triagebot.state import CouncilState
 class CouncilContext:
     """Run-scoped dependencies; never part of serialized CouncilState.
 
-    The monotonic timer preserves Phase 1's pre-validation latency metric.
-    Phase 2 must define timing for cross-process recovery; this marker
-    cannot be restored from a checkpoint or reused across processes.
+    Ephemeral runs retain the original monotonic wall-clock metric. Durable
+    runs use saved active node durations instead; no process-local timer is
+    required after recovery. Dependencies are reconstructed by the caller.
     """
 
     caller_factory: Callable[[], Any]
     kb: Any
     benchmark_root: Any
     review_started: float | None = None
+    persistent: bool = False
+    expected_source_sha256: str | None = None
 
 
 def _build_context(state: CouncilState, runtime: Runtime[CouncilContext]):
     ctx = runtime.context
+    if ctx.expected_source_sha256 is not None:
+        validation_case({"alert": state["alert"], "guidance": {"chunks": []}},
+                        ctx.benchmark_root, ctx.expected_source_sha256)
     payload = build_payload(state["alert"], ctx.kb, ctx.benchmark_root)
     ctx.review_started = time.perf_counter()
     return {"payload": payload}
 
 
 def _analyst(state: CouncilState, runtime: Runtime[CouncilContext]):
+    started = time.perf_counter()
     caller = runtime.context.caller_factory()
     report = analyst.review(state["payload"], caller)
-    return {"analyst_report": with_call_metadata(report, caller)}
+    return {"analyst_report": with_call_metadata(report, caller),
+            "analyst_elapsed_seconds": time.perf_counter() - started}
 
 
 def _skeptic(state: CouncilState, runtime: Runtime[CouncilContext]):
+    started = time.perf_counter()
     caller = runtime.context.caller_factory()
     report = skeptic.review(state["payload"], caller)
-    return {"skeptic_report": with_call_metadata(report, caller)}
+    return {"skeptic_report": with_call_metadata(report, caller),
+            "skeptic_elapsed_seconds": time.perf_counter() - started}
 
 
 def _chair(state: CouncilState, runtime: Runtime[CouncilContext]):
+    started = time.perf_counter()
     caller = runtime.context.caller_factory()
     report = chair.review(
         state["payload"], state["analyst_report"], state["skeptic_report"], caller
@@ -66,18 +76,24 @@ def _chair(state: CouncilState, runtime: Runtime[CouncilContext]):
     review["usage"] = summed_usage(
         [state["analyst_report"], state["skeptic_report"], review]
     )
-    return {"review": review}
+    return {"review": review, "chair_elapsed_seconds": time.perf_counter() - started}
 
 
 def _validate(state: CouncilState, runtime: Runtime[CouncilContext]):
     ctx = runtime.context
-    if ctx.review_started is None:
+    if not ctx.persistent and ctx.review_started is None:
         raise RuntimeError("Council review timer was not initialized")
     # Copy rather than mutate the value produced by the Chair node.
     review = dict(state["review"])
-    review["latency_seconds"] = round(time.perf_counter() - ctx.review_started, 3)
+    if ctx.persistent:
+        # Critical path of completed model nodes, excluding offline/recovery wait.
+        elapsed = max(state["analyst_elapsed_seconds"], state["skeptic_elapsed_seconds"])
+        elapsed += state["chair_elapsed_seconds"]
+    else:
+        elapsed = time.perf_counter() - ctx.review_started
+    review["latency_seconds"] = round(elapsed, 3)
     cases = {
-        state["alert"]["case_id"]: validation_case(state["payload"], ctx.benchmark_root)
+        state["alert"]["case_id"]: validation_case(state["payload"], ctx.benchmark_root, ctx.expected_source_sha256)
     }
     validated = validate_results(review, cases)["results"][0]
     return {
@@ -87,8 +103,8 @@ def _validate(state: CouncilState, runtime: Runtime[CouncilContext]):
     }
 
 
-def build_council_graph():
-    """Compile an ephemeral graph; SQLite/thread IDs are explicitly Phase 2."""
+def build_council_graph(checkpointer=None, *, interrupt_after=None):
+    """Compile with optional persistence. Static test stops are NOT human HITL."""
     graph = StateGraph(CouncilState, context_schema=CouncilContext)
     graph.add_node("build_context", _build_context)
     graph.add_node("analyst", _analyst)
@@ -102,7 +118,7 @@ def build_council_graph():
     graph.add_edge(["analyst", "skeptic"], "chair")
     graph.add_edge("chair", "validate")
     graph.add_edge("validate", END)
-    return graph.compile()
+    return graph.compile(checkpointer=checkpointer, interrupt_after=interrupt_after)
 
 
 def run_council(alert, caller_factory=OpenRouterCaller, kb=None, benchmark_root=None):
@@ -113,8 +129,13 @@ def run_council(alert, caller_factory=OpenRouterCaller, kb=None, benchmark_root=
         benchmark_root=benchmark_root or config.BENCHMARK_ROOT,
     )
     state = build_council_graph().invoke({"alert": alert}, context=context)
+    return council_result(state)
+
+
+def council_result(state):
+    """Project graph internals onto the existing public triage contract."""
     return {
-        "case_id": alert["case_id"],
+        "case_id": state["alert"]["case_id"],
         "mode": "council",
         "payload": state["payload"],
         "role_reports": state["role_reports"],

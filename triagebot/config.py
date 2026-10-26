@@ -81,3 +81,7 @@ SAMPLE_CWE = "CWE-89"
 REVIEW_MAX_TOKENS = 900        # short JSON answer; headroom over the 700
                                # that the live run showed truncating chatty replies
 REVIEW_TEMPERATURE = 0.0       # recorded runs must be reproducible
+
+# --- durable council execution (opt-in; not the historical course checkpoint) ---
+COUNCIL_DB = _REPO_ROOT / ".triagebot" / "checkpoints.sqlite"
+COUNCIL_CHECKPOINT_SCHEMA = 1

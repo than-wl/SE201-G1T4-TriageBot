@@ -187,7 +187,7 @@ kept the slice-then-extract-facts design. The recorded checkpoint
 numbers were produced at ±25 and stand unchanged; a full re-run to
 quantify the effect is deferred.
 
-## 2026-10-26 — Phase 1: council migrated to LangGraph
+## 2026-10-26 — Council migrated to LangGraph
 
 - **Tool (model):** DeepSeek (v4.1 flash)
 - **Files:** triagebot/council_graph.py, triagebot/state.py,
@@ -198,14 +198,15 @@ quantify the effect is deferred.
 
 ### What I asked for
 
-Implement Phase 1 of the handover: move only the Analyst/Skeptic/Chair
-council onto LangGraph, with an explicit `CouncilState` TypedDict and a
-runtime context object holding the caller factory, KB, benchmark root and
-monotonic timer outside the state. Graph shape
-`START → build_context → {analyst, skeptic} → chair → validate → END`,
-with one explicit join and the public `triage()` / `run_sample()` contracts
-and recorded results left untouched. The single-agent baseline stays plain
-Python; no persistence, HITL, retries, tools or retrieval changes.
+Move only the Analyst/Skeptic/Chair council onto LangGraph: keep the graph
+state in an explicit `CouncilState` TypedDict, and hold the caller factory,
+knowledge base, benchmark root and monotonic timer in a runtime context
+object outside the state. The graph should run
+`START → build_context → {analyst, skeptic} → chair → validate → END`
+with one explicit join, while the public `triage()` / `run_sample()`
+contracts and the recorded results stay untouched. The single-agent
+baseline stays plain Python; no persistence, human-in-the-loop pause,
+retries, tools or retrieval changes.
 
 ### How I checked it
 
@@ -232,5 +233,62 @@ replaces it. Cleanup while reviewing: the doc-only `triagebot/llm/base.py`
 caller-contract text is now the package docstring, and decision 12's claim
 that the package top level holds only `schemas.py` and `config.py` was
 corrected after the new orchestration modules moved in. No merge, no PR, and
-no metrics re-run are claimed here — the Phase 2 and Phase 3 items in the
-handover remain unimplemented.
+no metrics re-run are claimed here; checkpointing and human review were not
+part of this change.
+
+
+## 2026-10-26 — SQLite checkpoints for council sessions
+
+- **Tool (model):** DeepSeek (v4.1 flash)
+- **Files:** triagebot/checkpoints.py, triagebot/council_graph.py,
+  triagebot/state.py, triagebot/execution.py, triagebot/__main__.py,
+  triagebot/config.py, triagebot/llm/openrouter.py, tests/test_checkpoints.py,
+  tests/checkpoint_worker.py, tests/test_council_graph.py, requirements.txt,
+  .gitignore, README.md, docs/DESIGN_DECISIONS.md,
+  docs/IMPLEMENTATION_HANDOVER.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Add opt-in, file-backed SQLite sessions for the council only, on top of the
+existing LangGraph council: a unique UUID per run, `council-start` /
+`council-status` / `council-resume`, provenance checks before an unfinished
+run is continued, one executor per database, and completed runs readable
+without new model calls. Existing `triage` / `evaluate`, the interactive menu
+and the single-agent baseline must stay ephemeral and unchanged; no
+human-in-the-loop pause, no tools and no automatic retries.
+
+### How I checked it
+
+Audited the delivered review ZIP against its stated base,
+`6ec079a1ad4d507acc1ea92565855af9ba4b77fb`: all 16 file hashes matched the
+manifest and the patch applied cleanly to that commit. Installed the full
+requirements and ran the suite on Windows/Python 3.12 with real LangGraph
+1.2.17, SQLite adapter 3.1.2 and `langgraph-checkpoint` 4.3.0: 220 tests pass,
+with only the POSIX file-permission test skipped on Windows. Re-ran the suite
+in this repository after copying the files in.
+
+The first full runs were intermittent: one recovery test failed in about two of
+every three runs. The cause was the subprocess fixture writing its call log
+through a fresh `O_APPEND` descriptor per call, which on Windows can lose a
+line when the Analyst and Skeptic write at the same time. A standalone probe
+reproduced the lost lines in ten of ten rounds; putting a process-wide lock
+around that one write made those tests pass in ten consecutive runs, and the
+full suite has passed twice in this repository since the fix. The
+implementation's tests cover cross-process create/inspect/recover, a hard
+process death in Chair, a failed parallel sibling without repeating the
+successful one, validation-only recovery, source/KB/model/config/version
+drift, executor locking, private DB creation and the CLI guards. No OpenRouter
+calls, paid evaluation, rescan, answer-key access or new accuracy claims were
+made.
+
+### What I kept or changed
+
+Kept the existing triage/evaluate pipeline, the public result contract, the
+single-agent baseline and the existing graph shape. Changed: the fixture
+call log is now written under a lock (test-only). The bundle's evidence run was
+on Linux/Python 3.13, which is outside the CI matrix (3.10/3.12); this entry
+records the Windows/Python 3.12 run repeated here. Exactly-once billing is
+still not guaranteed: reported usage covers committed reports only, not every
+possibly billed attempt. No push, merge, PR or independent approval is
+claimed; the human-review pause remains future work.
