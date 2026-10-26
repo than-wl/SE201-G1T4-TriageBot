@@ -4,7 +4,7 @@
 
 TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
-**Status:** Checkpoint implementation and recorded 100-case evaluation complete. Phase 1 council-only LangGraph migration is implemented and audited locally, awaiting PR review; it does not add persistent checkpoints or HITL. Historical checkpoint results below have not been rerun with the migrated council.
+**Status:** The recorded course-checkpoint evaluation remains historical. Phase 1 council-only LangGraph is on `phase1/langgraph-council`. Phase 2 opt-in SQLite sessions are implemented locally for independent audit; no Phase 2 push/PR or HITL is claimed. Historical metrics have not been rerun.
 
 ## 1. What TriageBot does
 
@@ -119,11 +119,93 @@ and live timing handles remain in per-invocation runtime context. The single-age
 comparison baseline remains plain Python. `triagebot/execution.py` contains shared,
 framework-neutral metadata and validation-context helpers.
 
-There is no checkpointer, SQLite database, thread/resume CLI, or human interrupt in
-Phase 1. See [the reusable implementation/audit handover](docs/IMPLEMENTATION_HANDOVER.md)
-for Phase 1 acceptance and the planned Phase 2/3 boundaries.
+Phase 1 itself introduced no persistence. Phase 2 adds the opt-in durable commands
+below; existing `triage`, `evaluate`, the interactive menu and single-agent baseline
+remain ephemeral/unchanged. There is still no HITL interrupt or human-review report.
+The [existing reusable handover](docs/IMPLEMENTATION_HANDOVER.md) is updated in place,
+not replaced by another handover.
 
 The data shapes passed between stages are the shared contracts in `triagebot/schemas.py`. Runtime settings (model, budgets, paths, the pinned benchmark commit) live in `triagebot/config.py`, and the model callers (live OpenRouter and offline fixture) in `triagebot/llm/`. The reasoning behind these choices is in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
+
+### Opt-in durable council sessions (Phase 2)
+
+Install the updated requirements. The default local database is
+`.triagebot/checkpoints.sqlite`; use `--db PATH` for a different file (not
+`:memory:`). No cloud service/account is needed. Existing commands do not create
+this database automatically. The SQLite adapter may bring `sqlite-vec` as a
+transitive package; no embedding index, extension-based retrieval or RAG change
+is configured/used here.
+
+Start a **new paid council run**, with the same model selected by
+`OPENROUTER_MODEL` and key as normal. Its unique thread ID is persisted and printed
+BEFORE model execution. Starting the same case again creates a separate run.
+
+```bash
+python -m triagebot council-start --case BenchmarkTest00008
+# Optional: --sample PATH --db PATH --out DIR --benchmark-root PATH
+```
+
+Inspect it without a key, source checkout or model call:
+
+```bash
+python -m triagebot council-status --thread-id YOUR-UUID
+```
+
+Continue the **same** unfinished run, after checking the status and acknowledging
+possible replay/duplicate billing:
+
+```bash
+python -m triagebot council-resume --thread-id YOUR-UUID --allow-replay
+# Optional: --db PATH --out DIR --benchmark-root PATH
+```
+
+`--allow-replay` is mandatory for ANY incomplete recovery, including a session
+created but not yet executed. Completed runs return their stored result without
+this flag or new model calls. Both start and resume write the ordinary triage JSON
+contract to `council-<thread-id>.json` under `--out` (default the existing output
+directory). Status prints metadata/next nodes, not source evidence. Save the thread
+ID: this version has no run-list command. `pending` means saved graph work remains
+(including an active or failed execution), not that a human-review pause exists.
+
+**Recovery guarantees and limits**
+
+- Sync LangGraph checkpoint writes and real file-backed SQLite support recovery
+  across process restarts. Already checkpointed/pending successful work is reused
+  where the engine supports it; no automatic retry policy is added.
+- An API response and a checkpoint are NOT one transaction. A crash in between can
+  replay a call. Reported token/cost totals cover committed role reports only,
+  NOT all possibly billed/uncommitted attempts. Reconcile uncertain charges with
+  the provider before treating them as final accounting. There is no automatic
+  budget/total-spend enforcement or exactly-once guarantee.
+- A nonblocking OS file lock allows ONE executor per database at a time; specialist
+  nodes still run in parallel. Process death releases the lock automatically;
+  never delete/replace a lock file while a process holds it. Status can be read
+  while another process is active. This is a local CLI design, not a multi-user
+  service or network-filesystem/distributed-lock solution.
+- Resume requires the same source-file bytes, model setting, corpus, relevant
+  settings, product-code fingerprint, package versions and Python minor version.
+  Runtime dependencies/keys are reconstructed, not saved. If these changed, use
+  a new run; checkpoint migration across versions is not implemented. Completed
+  results remain retrievable without reconstructing the runtime.
+- Source identity is also rechecked before validation so old citations are not
+  silently checked against changed code. Do not edit source/KB/config during runs.
+- Durable `latency_seconds` is the saved ACTIVE model-node critical path:
+  `max(Analyst elapsed, Skeptic elapsed) + Chair elapsed`, excluding offline time,
+  checkpoint scheduling/I/O and validation. Ephemeral runs retain their original
+  wall-clock metric. The status labels this timing method; do not mix the two
+  definitions in latency comparisons without explicitly accounting for it.
+
+**Privacy and cleanup:** this DB includes source excerpts, guidance, model reports,
+checkpoint history and graph errors. It is not encrypted. Use only a trusted local
+DB, not an untrusted downloaded checkpoint. Credentials and benchmark answer-key
+files are not persisted by this workflow; source/model content can still be
+sensitive. No tracing backend is enabled here; inherited tracing environment
+settings remain the operator's responsibility. New DBs are private by default on
+POSIX, but Windows ACLs must be managed by the operator. Default storage and common
+SQLite sidecars are git-ignored; protect any custom location as well. With all
+executors stopped, delete the dedicated DB and associated WAL/SHM/journal/lock
+files to discard its history. Never share them in the review ZIP. A future
+retrieval/vector DB should be a different file.
 
 ## 6. Evaluation method
 

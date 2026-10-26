@@ -338,3 +338,41 @@ source window per call, still small against the model budget.
 stand unchanged; any comparison run must fix one window and state
 which. The slice is still a hard bound — files wider than the window
 remain truncated, so a full re-run must re-check for any such cases.
+
+
+## 20. Opt-in SQLite checkpoints for council sessions (Phase 2)
+
+**Decision (implemented locally; independent audit pending).** Add dedicated
+`council-start`, `council-status` and `council-resume` commands backed by
+`langgraph-checkpoint-sqlite==3.1.2`. Keep ordinary triage/evaluation and the
+single-agent baseline unchanged. Store each run under a fresh UUID in a local
+file-backed database; do not deploy DynamoDB or another hosted service.
+
+**Why.** Recover council state across process restarts and prepare the foundation
+for later HITL without implementing human pauses or a review document now.
+
+**Consequences.**
+
+- Checkpointer connections are scoped/closed, with supported cross-thread SQLite
+  access for graph writes. One OS-level executor lock per DB prevents simultaneous
+  continuations from charging for the same session; no distributed-service claim.
+- Store a provenance manifest and compare source, corpus, model, settings, product
+  code, package versions and Python minor before executing unfinished sessions.
+  Runtime objects/keys remain outside state; fresh KB caches are loaded per run.
+  Unknown fields (including answer-key labels) are rejected in persisted alerts.
+- Resume uses input=None for the SAME thread. Completed runs are read without
+  execution; incomplete recovery needs explicit --allow-replay. No automatic
+  retry is added; crash-time billing is inherently uncertain and cost metadata
+  only covers committed reports, not every possible provider charge.
+- Persist per-role active durations, not a monotonic timestamp from another
+  process. Durable latency is max(specialist durations)+Chair duration. Original
+  ephemeral latency remains unchanged; disclose the metric difference.
+- Recheck original source identity before validation; no source-to-sink analysis,
+  no new verdict policy/CWE gate, no agent tools, and no human resolution are added.
+- The database is sensitive local history, git-ignored and unencrypted. Trust the
+  local DB; no external tracing is enabled. Avoid source/config/corpus changes
+  while a run is active. Version migrations and production service hardening are
+  future work, not part of this local prototype.
+
+See README.md for operational commands and the EXISTING implementation handover
+for the Phase 2 audit checkpoint. Recorded course-checkpoint scores stay unchanged.

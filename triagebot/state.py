@@ -2,7 +2,8 @@
 
 Each parallel specialist writes its own key (no shared-list reducer).
 Callers, credentials, KB objects, paths and live timing handles belong in
-runtime context, not this state. Persisted checkpointing is Phase 2.
+runtime context, not this state. Persistent runs also retain provenance and
+active node durations; no monotonic timestamps are serialized.
 """
 
 from typing import TypedDict
@@ -20,3 +21,7 @@ class CouncilState(TypedDict, total=False):
     review: dict
     role_reports: list[dict]
     validated: dict
+    analyst_elapsed_seconds: float
+    skeptic_elapsed_seconds: float
+    chair_elapsed_seconds: float
+    run_provenance: dict

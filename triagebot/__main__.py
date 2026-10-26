@@ -546,6 +546,63 @@ def evaluate_sample(sample=None, modes=REVIEW_MODES, out=None, answer_key=None) 
     return 0
 
 
+# --- opt-in durable council sessions (Phase 2; no human-review workflow) ------
+
+def _save_council_result(thread_id, result, out):
+    out = Path(out or config.CHECKPOINT_OUT)
+    out.mkdir(parents=True, exist_ok=True)
+    target = out / f"council-{thread_id}.json"
+    target.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    console.print(f"Saved: {_short(target)}", markup=False)
+
+
+def council_start(case, sample=None, db=None, out=None, benchmark_root=None):
+    """Explicitly start a NEW paid council session and print its ID first."""
+    from triagebot.checkpoints import create_council_run, resume_council_run
+    import sqlite3
+    try:
+        alerts = _sample_alerts(Path(sample or config.CHECKPOINT_OUT / "selected_alerts.json"))
+        matches = [alert for alert in alerts if alert.get("case_id") == case]
+        if not matches:
+            return _fail(f"{case} is not in the selected sample")
+        thread_id = create_council_run(matches[0], db, benchmark_root=benchmark_root)
+        console.print(f"Council thread: {thread_id}", markup=False)
+        console.file.flush()
+        result = resume_council_run(thread_id, db, allow_replay=True,
+                                    benchmark_root=benchmark_root)
+        _save_council_result(thread_id, result, out)
+    except (OSError, ValueError, KeyError, RuntimeError, sqlite3.Error) as error:
+        return _fail(str(error))
+    return 0
+
+
+def council_status(thread_id, db=None):
+    """Inspect saved metadata without creating a model client or executing nodes."""
+    from triagebot.checkpoints import inspect_council_run
+    import sqlite3
+    try:
+        status = inspect_council_run(thread_id, db)
+        # Source evidence remains local in SQLite, not dumped by the status command.
+        status.pop("result", None)
+        console.print(json.dumps(status, indent=2, sort_keys=True), markup=False)
+    except (OSError, ValueError, KeyError, RuntimeError, sqlite3.Error) as error:
+        return _fail(str(error))
+    return 0
+
+
+def council_resume(thread_id, db=None, out=None, benchmark_root=None, allow_replay=False):
+    """Resume SAME thread; acknowledge possible duplicate charges after a crash."""
+    from triagebot.checkpoints import resume_council_run
+    import sqlite3
+    try:
+        result = resume_council_run(thread_id, db, allow_replay=allow_replay,
+                                    benchmark_root=benchmark_root)
+        _save_council_result(thread_id, result, out)
+    except (OSError, ValueError, KeyError, RuntimeError, sqlite3.Error) as error:
+        return _fail(str(error))
+    return 0
+
+
 # --- front door 1: interactive menu ----------------------------------------
 
 class _Quit(Exception):
@@ -711,6 +768,24 @@ def parser() -> argparse.ArgumentParser:
     e.add_argument("--mode", type=_modes, default=REVIEW_MODES, help="comma-separated: single,council")
     e.add_argument("--out", help=f"output directory (default {config.CHECKPOINT_OUT})")
     e.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
+    cs = sub.add_parser("council-start", help="NEW paid council run with local SQLite checkpoints")
+    cs.add_argument("--case", required=True, help="case from selected_alerts.json")
+    cs.add_argument("--sample", help="normalised selected-alerts file")
+    cs.add_argument("--db", help="local SQLite file (default .triagebot/checkpoints.sqlite)")
+    cs.add_argument("--out", help="directory for the completed public result JSON")
+    cs.add_argument("--benchmark-root", help="source checkout (default BENCHMARK_ROOT)")
+
+    ci = sub.add_parser("council-status", help="inspect a saved council thread; no model calls")
+    ci.add_argument("--thread-id", required=True, help="UUID printed when the run was created")
+    ci.add_argument("--db", help="local SQLite file")
+
+    cr = sub.add_parser("council-resume", help="resume a saved thread; may repeat uncommitted paid calls")
+    cr.add_argument("--thread-id", required=True, help="UUID printed when the run was created")
+    cr.add_argument("--db", help="local SQLite file")
+    cr.add_argument("--out", help="directory for the completed public result JSON")
+    cr.add_argument("--benchmark-root", help="source checkout (default BENCHMARK_ROOT)")
+    cr.add_argument("--allow-replay", action="store_true",
+                    help="acknowledge possible duplicate model charges for an incomplete run")
     return p
 
 
@@ -724,6 +799,12 @@ def main(argv=None) -> int:
         return triage_one(args.case, args.mode, args.sample, args.out)
     if args.command == "evaluate":
         return evaluate_sample(args.sample, args.mode, args.out, args.answer_key)
+    if args.command == "council-start":
+        return council_start(args.case, args.sample, args.db, args.out, args.benchmark_root)
+    if args.command == "council-status":
+        return council_status(args.thread_id, args.db)
+    if args.command == "council-resume":
+        return council_resume(args.thread_id, args.db, args.out, args.benchmark_root, args.allow_replay)
     return menu()
 
 

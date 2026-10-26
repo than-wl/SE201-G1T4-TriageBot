@@ -1,5 +1,6 @@
 """Framework-neutral execution helpers shared by both review strategies."""
 
+import hashlib
 from pathlib import Path
 
 
@@ -12,11 +13,18 @@ def with_call_metadata(report, caller):
     return enriched
 
 
-def validation_case(payload, benchmark_root):
+def validation_case(payload, benchmark_root, expected_source_sha256=None):
     path = Path(benchmark_root) / payload["alert"]["file"]
+    if expected_source_sha256 is None:
+        source = path.read_text(encoding="utf-8", errors="replace")
+    else:
+        raw = path.read_bytes()
+        if hashlib.sha256(raw).hexdigest() != expected_source_sha256:
+            raise ValueError("Source changed since this council run was created")
+        source = raw.decode("utf-8", errors="replace").replace("\r\n", "\n").replace("\r", "\n")
     return {
         "file": payload["alert"]["file"],
-        "source": path.read_text(encoding="utf-8", errors="replace"),
+        "source": source,
         "guidance_chunks": payload["guidance"]["chunks"],
     }
 
