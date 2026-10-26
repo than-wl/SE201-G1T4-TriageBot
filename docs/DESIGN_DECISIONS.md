@@ -5,21 +5,28 @@ reasoning behind the checkpoint architecture. Each entry states the
 decision, the alternative considered, and what the choice implies.
 Status: living document, updated as the team decides.
 
-## 1. Orchestration: plain Python for the checkpoint
+## 1. Orchestration: council-only LangGraph after the checkpoint
 
-**Decision.** The checkpoint pipeline is plain Python: stages are ordinary
-functions wired by `triagebot/pipeline.py`. We adopt LangGraph only if
-functionality is required that plain Python cannot provide cleanly
-(branching, retries, or stateful loops).
+**Historical checkpoint decision.** Plain Python functions and a two-way
+`ThreadPoolExecutor` fan-out were sufficient for the recorded checkpoint.
+That checkpoint implementation and its measured results remain historical evidence.
 
-**Why.** The current topology is a straight sequence with one two-way
-parallel stage, which `concurrent.futures` covers directly. Adding a
-framework would introduce a dependency and setup cost for every member
-without changing capability at this stage.
+**Current Phase 1 decision (audited locally; PR review pending).** Migrate only the
+Analyst/Skeptic/Chair council to LangGraph, with explicit state in `state.py`
+and the graph in `council_graph.py`. Keep the single-agent baseline as plain
+Python and preserve the public `triage()` / `run_sample()` contracts.
 
-**Consequence.** Nodes carry no framework dependency, so a later switch to
-LangGraph would be contained in `pipeline.py` alone. The team re-evaluates
-if the pipeline grows real conditional flows.
+**Why.** Establish explicit state and node boundaries for the agreed next
+phase: durable SQLite checkpoints, followed later by a real human-review
+handoff. This refactor is infrastructure work, not evidence of higher accuracy.
+Parallel specialist independence and the single Chair join are unchanged.
+
+**Consequence.** State contains JSON-compatible evidence and reports; callers,
+KB objects, credentials and monotonic timing live outside it. LangGraph nodes
+wrap existing review functions. No retry policy, persistence, HITL, tools,
+retrieval change, or new safety gate is introduced in Phase 1. Phase 2 must
+explicitly design cross-process timing and runtime-context reconstruction.
+See `IMPLEMENTATION_HANDOVER.md` for the phased audit gates.
 
 ## 2. Guidance is fetched at payload-build time, not by the agents
 
@@ -191,10 +198,10 @@ requires no role changes (decision 10).
 contract, and the evidence-block renderer — lives in
 `triagebot/nodes/review/prompts.py`, not at the package top level.
 
-**Why.** The only consumers of prompt text are the four review roles;
-`triagebot/`'s top level stays limited to the contracts every module
-depends on (`schemas.py`, `config.py`), so a reader can see the
-dependency structure at a glance.
+**Why.** The only consumers of prompt text are the four review roles, so
+prompt text stays inside the review node and is not one of the shared
+contracts at `triagebot/`'s top level (`schemas.py`, `config.py`), which a
+reader can scan to see the dependency structure at a glance.
 
 **Consequence.** Prompt edits are reviewed inside the review node's
 pull requests, and prompt-text review (a future evaluation activity)

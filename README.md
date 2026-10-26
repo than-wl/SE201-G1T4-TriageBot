@@ -4,7 +4,7 @@
 
 TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
-**Status:** Checkpoint implementation and recorded 100-case evaluation complete; final team sign-off and submission remain.
+**Status:** Checkpoint implementation and recorded 100-case evaluation complete. Phase 1 council-only LangGraph migration is implemented and audited locally, awaiting PR review; it does not add persistent checkpoints or HITL. Historical checkpoint results below have not been rerun with the migrated council.
 
 ## 1. What TriageBot does
 
@@ -111,6 +111,18 @@ python -m triagebot evaluate [--sample PATH] [--mode single,council]
 | Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
 | Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Built; all three menu options and matching subcommands are connected |
 
+**Current council orchestration (Phase 1):** `triagebot/council_graph.py` runs
+`build_context → [Analyst || Skeptic] → Chair → validate` using LangGraph.
+The explicit waiting edge joins both specialist reports before Chair runs once.
+`triagebot/state.py` defines JSON-compatible council state; callers, KB objects,
+and live timing handles remain in per-invocation runtime context. The single-agent
+comparison baseline remains plain Python. `triagebot/execution.py` contains shared,
+framework-neutral metadata and validation-context helpers.
+
+There is no checkpointer, SQLite database, thread/resume CLI, or human interrupt in
+Phase 1. See [the reusable implementation/audit handover](docs/IMPLEMENTATION_HANDOVER.md)
+for Phase 1 acceptance and the planned Phase 2/3 boundaries.
+
 The data shapes passed between stages are the shared contracts in `triagebot/schemas.py`. Runtime settings (model, budgets, paths, the pinned benchmark commit) live in `triagebot/config.py`, and the model callers (live OpenRouter and offline fixture) in `triagebot/llm/`. The reasoning behind these choices is in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
 
 ## 6. Evaluation method
@@ -197,7 +209,7 @@ checkpoint/      TEMPORARY planning notes, removed before final submission
 - The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
 - Do not describe the five-case smoke test as proof of general system accuracy.
 
-**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16.
+**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16. Logs to date: `ai-log/bradley.md`, `darren.md`, `hong-yi.md`, `lisa.md` and `wei-lin.md`.
 
 ## 10. Team and roles
 

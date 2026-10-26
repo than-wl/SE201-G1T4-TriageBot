@@ -1,3 +1,4 @@
 python-dotenv>=1.0,<2
 rich==15.0.0
 semgrep==1.178.0
+langgraph==1.2.17

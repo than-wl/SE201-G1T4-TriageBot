@@ -186,3 +186,51 @@ Changed only the constant (25 → 100, with the reason in the comment);
 kept the slice-then-extract-facts design. The recorded checkpoint
 numbers were produced at ±25 and stand unchanged; a full re-run to
 quantify the effect is deferred.
+
+## 2026-10-26 — Phase 1: council migrated to LangGraph
+
+- **Tool (model):** DeepSeek (v4.1 flash)
+- **Files:** triagebot/council_graph.py, triagebot/state.py,
+  triagebot/execution.py, triagebot/pipeline.py, tests/test_council_graph.py,
+  requirements.txt, README.md, docs/DESIGN_DECISIONS.md,
+  docs/IMPLEMENTATION_HANDOVER.md, triagebot/llm/__init__.py
+- **Outcome:** Changed
+
+### What I asked for
+
+Implement Phase 1 of the handover: move only the Analyst/Skeptic/Chair
+council onto LangGraph, with an explicit `CouncilState` TypedDict and a
+runtime context object holding the caller factory, KB, benchmark root and
+monotonic timer outside the state. Graph shape
+`START → build_context → {analyst, skeptic} → chair → validate → END`,
+with one explicit join and the public `triage()` / `run_sample()` contracts
+and recorded results left untouched. The single-agent baseline stays plain
+Python; no persistence, HITL, retries, tools or retrieval changes.
+
+### How I checked it
+
+Audited the implementation as a separate reviewable bundle before
+integrating it into this branch: the changed-tree diff was exactly the ten
+declared files and every file hash matched the manifest; the full suite
+(191 tests) passed against real `langgraph==1.2.17` on Windows/Python 3.12;
+a parity probe run on both the pre-migration and migrated trees produced
+byte-identical output for twelve scenario × mode cases plus `run_sample`
+(latency excluded); an unexpected Python exception in one specialist
+propagates identically before and after; nothing reads or writes a
+checkpointer and there are no interrupt points. Re-ran the suite in this
+repository after copying the files in.
+
+### What I kept or changed
+
+Kept the graph structure, the state/context split, and the unchanged
+public contracts; the single-agent path still has no LangGraph dependency
+at call time. Changed: the bundle's standalone draft disclosure
+(`ai-log/phase1-langgraph.md`, which named an assistant without a model
+identifier and had no owning member) was not copied; this per-member entry
+replaces it. Cleanup while reviewing: the doc-only `triagebot/llm/base.py`
+(no symbols, imported nowhere) became `triagebot/llm/__init__.py`, so its
+caller-contract text is now the package docstring, and decision 12's claim
+that the package top level holds only `schemas.py` and `config.py` was
+corrected after the new orchestration modules moved in. No merge, no PR, and
+no metrics re-run are claimed here — the Phase 2 and Phase 3 items in the
+handover remain unimplemented.
