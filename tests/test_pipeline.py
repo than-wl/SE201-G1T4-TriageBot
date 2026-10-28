@@ -73,6 +73,25 @@ class PipelineTest(unittest.TestCase):
         self.assertTrue(run["validated"]["validated"])
         self.assertEqual(run["validated"]["usage"]["cost"], 0.001)
 
+    def test_payload_includes_a_helper_far_beyond_the_alert(self):
+        source = self.root / ALERT["file"]
+        lines = ["class Demo {"] + [f"int filler{i} = {i};" for i in range(2, 60)]
+        lines += ["String helperValue = request.getParameter(\"x\");", "}"]
+        source.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        response = {
+            "verdict": "human_review", "explanation": "More analysis needed.",
+            "citations": [{"file": ALERT["file"], "line": 2, "quote": "int filler2"}],
+            "guidance": [],
+        }
+
+        run = pipeline.triage(
+            ALERT, mode="single", caller_factory=lambda: CannedCaller(response),
+            kb=EmptyKnowledgeBase(), benchmark_root=self.root)
+
+        self.assertIn(
+            '60: String helperValue = request.getParameter("x");',
+            run["payload"]["source"]["lines"])
+
     def test_council_runs_both_specialists_then_chair_and_sums_usage(self):
         response = {
             "verdict": "false_positive",

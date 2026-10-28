@@ -52,11 +52,12 @@ def stratum_counts(answer_key: dict[str, AnswerKeyEntry], split: dict[str, str])
 
 
 def select_sample(alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKeyEntry],
-                  split: dict[str, str], cwe: str, size: int, seed: int
+                  split: dict[str, str], cwe: str, size: int, seed: int,
+                  partition: str = "dev"
                   ) -> tuple[list[NormalisedAlert], dict]:
     """Return (sample alerts sorted by case_id, composition summary).
 
-    Eligible: dev cases whose benchmark CWE is `cwe` and that have at
+    Eligible: cases in `partition` whose benchmark CWE is `cwe` and that have at
     least one CWE-matching alert. One alert per case: the matching alert
     with the lowest start_line, then rule_id. Cases are drawn with
     random.Random(seed) as evenly as possible between vulnerable and safe;
@@ -67,7 +68,7 @@ def select_sample(alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKey
     for alert in alerts:
         case_id = alert["case_id"]
         entry = answer_key.get(case_id)
-        if (entry is None or split.get(case_id) != "dev" or entry["cwe"] != cwe
+        if (entry is None or split.get(case_id) != partition or entry["cwe"] != cwe
                 or not cwe_matches(alert["cwe"], entry["cwe"])):
             continue
         current = best.get(case_id)
@@ -85,9 +86,27 @@ def select_sample(alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKey
     chosen = sorted(rng.sample(vulnerable, n_vulnerable) + rng.sample(safe, n_safe))
     sample = [{field: best[c][field] for field in _ALERT_FIELDS} for c in chosen]
     summary = {
-        "cwe": cwe, "seed": seed, "requested": size, "selected": len(sample),
+        "cwe": cwe, "partition": partition, "seed": seed,
+        "requested": size, "selected": len(sample),
         "shortfall": max(0, size - len(sample)),
         "eligible_vulnerable": len(vulnerable), "eligible_safe": len(safe),
         "selected_vulnerable": n_vulnerable, "selected_safe": n_safe,
     }
     return sample, summary
+
+
+def select_categories(
+        alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKeyEntry],
+        split: dict[str, str], sizes: dict[str, int], seed: int,
+        partition: str = "dev"
+        ) -> tuple[list[NormalisedAlert], dict[str, dict]]:
+    """Select reproducible, label-free samples for several CWE categories."""
+    combined = []
+    summaries = {}
+    for cwe in sorted(sizes):
+        sample, summary = select_sample(
+            alerts, answer_key, split, cwe, sizes[cwe], seed,
+            partition=partition)
+        combined.extend(sample)
+        summaries[cwe] = summary
+    return sorted(combined, key=lambda item: item["case_id"]), summaries

@@ -147,6 +147,13 @@ def score(name, cases, labels, results, model=None):
     total = len(cases)
     genuine = sum(labels[case_id] for case_id in cases)
     human = counts["genuine_human_review"] + counts["fp_human_review"]
+    true_positive = counts["genuine_retained"] + counts["genuine_human_review"]
+    false_positive = counts["fp_retained"] + counts["fp_human_review"]
+    false_negative = counts["genuine_dismissed"]
+    precision = rate(true_positive, true_positive + false_positive)
+    recall = rate(true_positive, true_positive + false_negative)
+    f1 = (round(2 * precision * recall / (precision + recall), 4)
+          if precision is not None and recall is not None and precision + recall else None)
     scored = [by_case[case_id] for case_id in cases if case_id in by_case]
     return {
         "configuration": name, "model": model,
@@ -156,6 +163,7 @@ def score(name, cases, labels, results, model=None):
         "genuine_retained_rate": rate(counts["genuine_retained"], genuine),
         "genuine_dismissed_rate": rate(counts["genuine_dismissed"], genuine),
         "fp_removed_rate": rate(counts["fp_removed"], total - genuine),
+        "precision": precision, "recall": recall, "f1": f1,
         "human_review_rate": rate(human, total),
         "invalid_output_rate": rate(invalid, total),
         "malformed_results": malformed,
@@ -194,6 +202,9 @@ def markdown_table(report):
         ("False positives sent to human review", "fp_human_review", str),
         ("Genuine retained rate", "genuine_retained_rate", percent),
         ("False-positive removal rate", "fp_removed_rate", percent),
+        ("Precision (human review retained)", "precision", percent),
+        ("Recall (human review retained)", "recall", percent),
+        ("F1 (human review retained)", "f1", percent),
         ("Human-review rate", "human_review_rate", percent),
         ("Invalid-output rate", "invalid_output_rate", percent),
         ("Missing results", "missing_results", str),

@@ -1,5 +1,41 @@
 # AI Use Log: Wei Lin
 
+## 2026-10-28 | Frozen final evaluation and high-band evidence
+
+- **Tool (model):** OpenAI Codex (GPT-5); recorded product calls to
+  `google/gemini-3.8-flash` through OpenRouter
+- **Files:** `FINAL_PROJECT_PLAN.md`, `FINAL_RESULTS.md`,
+  `RESPONSIBLE_AI_RISK_ASSESSMENT.md`, `triagebot/config.py`,
+  `triagebot/llm/openrouter.py`, ingest/scoring modules, verification scripts,
+  tests, and `README.md`
+- **Outcome:** Changed
+
+### What I asked for
+
+Complete final-project checkpoints 1-5 against the highest rubric band: lock a
+held-out multi-category experiment, fix known reliability issues test-first,
+measure the Semgrep recall bottleneck, run and analyse the final evaluation,
+and document responsible-AI risks and limitations.
+
+### How I checked it
+
+Recorded the rubric gate before final calls and froze a deterministic 120-case
+test sample with no answer-key labels in model inputs. Added red/green tests for
+held-out category selection, distant helper context, strict OpenRouter JSON,
+and precision/recall/F1. Ran the complete offline suite, a live development
+smoke test, Semgrep `p/java` versus `p/java` plus `p/security-audit`, the four
+held-out configurations, five mutation pairs, and five repeat cases. Verified
+equal case coverage, per-CWE metrics, costs, latency, invalid outputs, ignored
+raw artifacts, and source-supported failure examples.
+
+### What I kept or changed
+
+Kept the existing pipeline and evaluator seams. Added strict provider-supported
+JSON output, a wider bounded source window, reusable held-out sampling and
+per-CWE reporting. Reported the negative mutation result (0/5 required flips)
+and category weaknesses rather than tuning after seeing test output. The final
+single-plus-council run cost US$1.918870; validation reused council output.
+
 ## 2026-10-18 | Final checkpoint integration and recorded run
 
 - **Tool (model):** OpenAI Codex (GPT-5); live product calls to `google/gemini-3.8-flash` through OpenRouter

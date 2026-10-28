@@ -4,7 +4,8 @@
 
 TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
-**Status:** Checkpoint implementation and recorded 100-case evaluation complete; final team sign-off and submission remain.
+**Status:** Final-project evaluation gates 1-5 are complete; presentation,
+team review, repository cleanup and submission packaging remain.
 
 ## 1. What TriageBot does
 
@@ -18,7 +19,7 @@ We measure it on the OWASP Benchmark Java test suite, whose answer key says whic
 
 The editable source of the diagram is [docs/architecture/TriageBot_Architecture_Diagram.drawio.svg](docs/architecture/TriageBot_Architecture_Diagram.drawio.svg).
 
-## 2. Results so far
+## 2. Evaluation results
 
 The scanner baseline (Semgrep alone, before TriageBot), from the recorded scan, CWE-matched, over all 2,740 OWASP Benchmark v1.2 test cases:
 
@@ -34,6 +35,16 @@ The scanner baseline (Semgrep alone, before TriageBot), from the recorded scan, 
 ![The scanner-baseline screen of python -m triagebot](docs/screenshots/baseline.svg)
 
 On the balanced 100-case SQL-injection checkpoint sample, the council removed 35 of 50 false positives, wrongly dismissed none of the 50 genuine findings, and sent 32 cases to human review. These are preliminary one-category results; see [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for definitions, precision/recall/F1, costs, failures and limitations.
+
+The frozen final test used 120 unseen cases balanced across five CWE categories.
+The raw council achieved 89.1% precision, 95.0% recall, and 91.9% F1; it
+removed 53 of 60 false positives but wrongly dismissed 3 of 60 genuine
+findings. Deterministic validation reduced genuine dismissals to 2, while
+increasing human review from 9 to 26 cases. A five-pair mutation check scored
+0/5 required verdict flips, so these benchmark results are promising evidence,
+not production readiness. See [FINAL_RESULTS.md](FINAL_RESULTS.md) for the full
+scanner comparison, per-category metrics, costs, failure analysis and threats
+to validity.
 
 ## 3. Quick start
 
@@ -146,6 +157,26 @@ python -m triagebot.nodes.score.evaluate --labels Context/tmp/BenchmarkJava/expe
 
 It prints a metrics table and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts count as invalid and as human review, and human review never counts as a removed false positive.
 
+**Frozen final evaluation.** The highest-band gate and fixed protocol are in
+[FINAL_PROJECT_PLAN.md](FINAL_PROJECT_PLAN.md); results and limitations are in
+[FINAL_RESULTS.md](FINAL_RESULTS.md). Generate the held-out five-category
+sample without making model calls:
+
+```bash
+python -m triagebot.nodes.ingest.final_sample
+```
+
+After a recorded paid run, create the overall and per-CWE report from its saved
+outputs:
+
+```bash
+python -m triagebot.nodes.score.final_report --labels Context/tmp/BenchmarkJava/expectedresults-1.2.csv --cases Context/tmp/final/selected_alerts.json --config B-single-agent=Context/tmp/final/results/B-single-agent.json --config C-council=Context/tmp/final/results/C-council.json --config D-validated-council=Context/tmp/final/results/D-validated-council.json --out Context/tmp/final/final_evaluation.json
+```
+
+Runtime scans, samples, and model responses remain under ignored
+`Context/tmp/`; the repository retains reproducible code, hashes, aggregate
+results, and failure analysis without publishing API keys or raw paid outputs.
+
 **Re-scanning.** `requirements.txt` installs Semgrep 1.178.0; run `python -m triagebot baseline --rescan`. To update the committed recorded scan, follow [data/semgrep/README.md](data/semgrep/README.md).
 
 **Live model calls.** Copy `.env.example` to `.env` and set your own `OPENROUTER_API_KEY` there. Never commit `.env` or paste a key into source files, issues or chat.
@@ -190,6 +221,9 @@ checkpoint/      TEMPORARY planning notes, removed before final submission
 - **VS Code uses the wrong Python:** Command Palette, "Python: Select Interpreter", then choose the one in `.venv`.
 
 ## 9. Responsible AI and safety
+
+The full risk register, mitigations, residual risks, and human-oversight rule
+are in [RESPONSIBLE_AI_RISK_ASSESSMENT.md](RESPONSIBLE_AI_RISK_ASSESSMENT.md).
 
 - Do not commit API keys, `.env` files, the downloaded benchmark, generated model responses, restricted course material, or anything under `Context/` other than its README and `.gitignore`.
 - The answer key is read only by the evaluation code and never enters a prompt.

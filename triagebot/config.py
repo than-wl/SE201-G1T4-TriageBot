@@ -26,7 +26,7 @@ def _benchmark_root(environ=os.environ, repo_root=_REPO_ROOT):
 
 # Local benchmark checkout (not committed); None -> payload build raises.
 BENCHMARK_ROOT = _benchmark_root()
-SOURCE_WINDOW_LINES = 25       # alert lines +/- this many lines of context
+SOURCE_WINDOW_LINES = 60       # reaches benchmark helpers while keeping prompts bounded
 
 BENCHMARK_URL = "https://github.com/OWASP-Benchmark/BenchmarkJava.git"
 BENCHMARK_COMMIT = "8b67a88d73b2594570fc21150705283de884620b"   # pinned for all recorded evidence
@@ -74,6 +74,15 @@ SPLIT_SEED = 201
 TEST_FRACTION = 0.5            # share of each (category, label) stratum held out
 SAMPLE_SIZE = 100              # checkpoint sample, drawn from the dev split
 SAMPLE_CWE = "CWE-89"
+FINAL_OUT = _REPO_ROOT / "Context" / "tmp" / "final"
+FINAL_PARTITION = "test"
+FINAL_SAMPLE_SIZES = {
+    "CWE-22": 24,
+    "CWE-78": 24,
+    "CWE-79": 24,
+    "CWE-89": 24,
+    "CWE-90": 24,
+}
 
 # --- review (model-call) limits ------------------------------------------
 REVIEW_MAX_TOKENS = 900        # short JSON answer; headroom over the 700
