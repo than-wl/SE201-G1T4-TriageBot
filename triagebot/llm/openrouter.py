@@ -23,6 +23,19 @@ _REPORT_SCHEMA = {
     "properties": {
         "verdict": {"type": "string", "enum": [
             "true_positive", "false_positive", "human_review"]},
+        "analysis": {
+            "type": "object",
+            "properties": {
+                "source": {"type": "string"}, "sink": {"type": "string"},
+                "reaches_sink": {"type": "string", "enum": ["yes", "no", "uncertain"]},
+                "protection": {"type": "string"},
+                "protection_effective": {
+                    "type": "string", "enum": ["yes", "no", "uncertain"]},
+            },
+            "required": ["source", "sink", "reaches_sink", "protection",
+                         "protection_effective"],
+            "additionalProperties": False,
+        },
         "explanation": {"type": "string"},
         "citations": {"type": "array", "items": {
             "type": "object",
@@ -43,7 +56,7 @@ _REPORT_SCHEMA = {
             "additionalProperties": False,
         }},
     },
-    "required": ["verdict", "explanation", "citations", "guidance"],
+    "required": ["verdict", "analysis", "explanation", "citations", "guidance"],
     "additionalProperties": False,
 }
 

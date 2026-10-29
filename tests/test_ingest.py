@@ -328,6 +328,16 @@ class Sample(unittest.TestCase):
         self.assertEqual([item["case_id"] for item in sample], ["T1"])
         self.assertEqual(summary["partition"], "test")
 
+    def test_can_exclude_cases_used_by_an_earlier_evaluation(self):
+        sample, summary = split_mod.select_sample(
+            self.alerts, self.key, self.split, "CWE-89", 10, 201,
+            exclude_case_ids={"V1", "V2", "S1"})
+
+        self.assertNotIn("V1", {item["case_id"] for item in sample})
+        self.assertNotIn("V2", {item["case_id"] for item in sample})
+        self.assertNotIn("S1", {item["case_id"] for item in sample})
+        self.assertEqual(summary["excluded_prior_cases"], 3)
+
     def test_multiple_categories_are_combined_without_labels(self):
         tagged = [dict(item, vulnerable=True) for item in self.alerts]
         tagged.append(dict(alert("X1", cwe="CWE-79"), vulnerable=True))

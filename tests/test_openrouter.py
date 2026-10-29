@@ -34,7 +34,7 @@ class StructuredOutput(unittest.TestCase):
         self.assertTrue(response_format["json_schema"]["strict"])
         self.assertEqual(
             set(response_format["json_schema"]["schema"]["required"]),
-            {"verdict", "explanation", "citations", "guidance"})
+            {"verdict", "analysis", "explanation", "citations", "guidance"})
 
 
 if __name__ == "__main__":

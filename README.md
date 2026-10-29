@@ -116,9 +116,9 @@ python -m triagebot evaluate [--sample PATH] [--mode single,council]
 | Stage | What it does | Code location | Status |
 | --- | --- | --- | --- |
 | Ingest | Semgrep JSON to normalised alerts; scanner baseline; dev/test split and sample | `triagebot/nodes/ingest/` | Built |
-| Context payload | Source window, helper facts, retrieved guidance | `triagebot/nodes/context/` | Built |
-| Review | Single agent, or Analyst / Skeptic / Chair council | `triagebot/nodes/review/` | Built and connected |
-| Validate | Deterministic citation and format checks | `triagebot/nodes/validate/` | Built |
+| Context payload | Source window, directly called methods, bounded related-file graph, helper facts and guidance | `triagebot/nodes/context/` | Built |
+| Review | Single agent, or Analyst / Skeptic / Chair council; structured reasoning, consistency guard and CWE checklists | `triagebot/nodes/review/` | Built and connected |
+| Validate | Exact multi-file citations plus safe normalization of known guidance metadata | `triagebot/nodes/validate/` | Built |
 | Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
 | Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Built; all three menu options and matching subcommands are connected |
 
@@ -132,6 +132,7 @@ The data shapes passed between stages are the shared contracts in `triagebot/sch
 - **Configurations** on the same cases: A scanner only; B single agent; C Analyst / Skeptic / Chair council; D council plus the deterministic validator.
 - **Metrics:** precision, recall, F1, false alarms removed, real vulnerabilities wrongly dismissed, human-review rate, cost and latency.
 - **Isolation:** the answer key is read only by the evaluation code, after all model calls. It never reaches a prompt or the model.
+- **Fresh comparison:** the improvement comparison excludes all 120 cases used by the completed final evaluation; its frozen model-side sample contains no labels.
 
 ## 7. For developers
 
@@ -159,11 +160,19 @@ It prints a metrics table and writes the full report, including every failure ca
 
 **Frozen final evaluation.** The highest-band gate and fixed protocol are in
 [FINAL_PROJECT_PLAN.md](FINAL_PROJECT_PLAN.md); results and limitations are in
-[FINAL_RESULTS.md](FINAL_RESULTS.md). Generate the held-out five-category
+[FINAL_RESULTS.md](FINAL_RESULTS.md), and the incremental before/after evidence
+is in [IMPROVEMENT_EXPERIMENT_LOG.md](IMPROVEMENT_EXPERIMENT_LOG.md). Generate the held-out five-category
 sample without making model calls:
 
 ```bash
 python -m triagebot.nodes.ingest.final_sample
+```
+
+Freeze the unused 66-case comparison sample (excluding the completed 120
+cases) without making model calls:
+
+```bash
+python verification/prepare_comparison_sample.py
 ```
 
 After a recorded paid run, create the overall and per-CWE report from its saved

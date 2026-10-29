@@ -15,6 +15,7 @@ from triagebot.llm.openrouter import OpenRouterCaller
 from triagebot.nodes.context.payload import build_payload
 from triagebot.nodes.context.retrieval import KnowledgeBase
 from triagebot.nodes.review.council import analyst, chair, skeptic
+from triagebot.nodes.review.consistency import problem as consistency_problem
 from triagebot.nodes.review.single_agent import baseline
 from triagebot.nodes.validate.validator import validate_results
 
@@ -30,9 +31,16 @@ def _with_call_metadata(report, caller):
 
 def _validation_case(payload, benchmark_root):
     path = Path(benchmark_root) / payload["alert"]["file"]
+    source_files = {payload["alert"]["file"]: path.read_text(
+        encoding="utf-8", errors="replace")}
+    for related in payload["source"].get("related", []):
+        related_path = Path(benchmark_root) / related["file"]
+        source_files[related["file"]] = related_path.read_text(
+            encoding="utf-8", errors="replace")
     return {
         "file": payload["alert"]["file"],
-        "source": path.read_text(encoding="utf-8", errors="replace"),
+        "source": source_files[payload["alert"]["file"]],
+        "source_files": source_files,
         "guidance_chunks": payload["guidance"]["chunks"],
     }
 
@@ -44,6 +52,19 @@ def _summed_usage(reports):
             if isinstance(value, (int, float)) and not isinstance(value, bool):
                 usage[key] = usage.get(key, 0) + value
     return usage
+
+
+def _repair_inconsistent(payload, review, role_reports, caller_factory, repair):
+    issue = consistency_problem(review)
+    if not issue:
+        return review
+    caller = caller_factory()
+    repaired = _with_call_metadata(repair(payload, review, issue, caller), caller)
+    role_reports.append(repaired)
+    if consistency_problem(repaired):
+        repaired = dict(repaired, verdict="human_review")
+        role_reports[-1] = repaired
+    return repaired
 
 
 def triage(alert, mode="single", caller_factory=OpenRouterCaller, kb=None,
@@ -59,6 +80,8 @@ def triage(alert, mode="single", caller_factory=OpenRouterCaller, kb=None,
         caller = caller_factory()
         review = _with_call_metadata(baseline.review(payload, caller), caller)
         role_reports = [review]
+        review = _repair_inconsistent(
+            payload, review, role_reports, caller_factory, baseline.repair)
     else:
         analyst_caller, skeptic_caller = caller_factory(), caller_factory()
         with ThreadPoolExecutor(max_workers=2) as pool:
@@ -69,9 +92,13 @@ def triage(alert, mode="single", caller_factory=OpenRouterCaller, kb=None,
         chair_caller = caller_factory()
         chair_report = _with_call_metadata(
             chair.review(payload, analyst_report, skeptic_report, chair_caller), chair_caller)
-        review = dict(chair_report)
-        review["usage"] = _summed_usage([analyst_report, skeptic_report, chair_report])
-        role_reports = [analyst_report, skeptic_report, review]
+        role_reports = [analyst_report, skeptic_report, chair_report]
+        review = _repair_inconsistent(
+            payload, chair_report, role_reports, caller_factory, chair.repair)
+
+    review = dict(review)
+    review["usage"] = _summed_usage(role_reports)
+    role_reports[-1] = review
 
     review["latency_seconds"] = round(time.perf_counter() - started, 3)
     cases = {alert["case_id"]: _validation_case(payload, root)}

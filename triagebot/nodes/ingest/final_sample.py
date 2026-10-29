@@ -15,16 +15,18 @@ from triagebot.nodes.ingest.run import assert_llm_safe
 from triagebot.nodes.ingest.split import assign_split, select_categories
 
 
-def build(semgrep_path, answer_key_path) -> dict[str, dict]:
+def build(semgrep_path, answer_key_path, exclude_case_ids=(), sample_sizes=None) -> dict[str, dict]:
     raw, scan_date = load_semgrep(semgrep_path)
     alerts, report = normalise(raw, config.recorded_scan_date(semgrep_path) or scan_date)
     key = load_answer_key(answer_key_path)
     assignment = assign_split(key, config.SPLIT_SEED, config.TEST_FRACTION)
+    sizes = sample_sizes or config.FINAL_SAMPLE_SIZES
     sample, composition = select_categories(
-        alerts, key, assignment, config.FINAL_SAMPLE_SIZES,
-        config.SPLIT_SEED, partition=config.FINAL_PARTITION)
+        alerts, key, assignment, sizes,
+        config.SPLIT_SEED, partition=config.FINAL_PARTITION,
+        exclude_case_ids=exclude_case_ids)
     assert_llm_safe(sample)
-    if len(sample) != sum(config.FINAL_SAMPLE_SIZES.values()):
+    if len(sample) != sum(sizes.values()):
         raise ValueError(f"final sample is short: selected {len(sample)}")
     selection = {
         "status": "frozen",
@@ -32,8 +34,9 @@ def build(semgrep_path, answer_key_path) -> dict[str, dict]:
         "split_seed": config.SPLIT_SEED,
         "test_fraction": config.TEST_FRACTION,
         "sample_seed": config.SPLIT_SEED,
-        "categories": config.FINAL_SAMPLE_SIZES,
+        "categories": sizes,
         "selected": len(sample),
+        "excluded_prior_cases": len(set(exclude_case_ids)),
         "rule": "one CWE-matching Semgrep alert per case, balanced by label on the evaluation side",
     }
     return {

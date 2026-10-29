@@ -53,7 +53,7 @@ def stratum_counts(answer_key: dict[str, AnswerKeyEntry], split: dict[str, str])
 
 def select_sample(alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKeyEntry],
                   split: dict[str, str], cwe: str, size: int, seed: int,
-                  partition: str = "dev"
+                  partition: str = "dev", exclude_case_ids=()
                   ) -> tuple[list[NormalisedAlert], dict]:
     """Return (sample alerts sorted by case_id, composition summary).
 
@@ -64,11 +64,12 @@ def select_sample(alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKey
     if fewer than `size` qualify, all are returned and the shortfall is
     reported. The summary uses answer-key labels and is evaluation-side.
     """
+    excluded = set(exclude_case_ids)
     best: dict[str, NormalisedAlert] = {}
     for alert in alerts:
         case_id = alert["case_id"]
         entry = answer_key.get(case_id)
-        if (entry is None or split.get(case_id) != partition or entry["cwe"] != cwe
+        if (case_id in excluded or entry is None or split.get(case_id) != partition or entry["cwe"] != cwe
                 or not cwe_matches(alert["cwe"], entry["cwe"])):
             continue
         current = best.get(case_id)
@@ -89,6 +90,7 @@ def select_sample(alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKey
         "cwe": cwe, "partition": partition, "seed": seed,
         "requested": size, "selected": len(sample),
         "shortfall": max(0, size - len(sample)),
+        "excluded_prior_cases": len(excluded),
         "eligible_vulnerable": len(vulnerable), "eligible_safe": len(safe),
         "selected_vulnerable": n_vulnerable, "selected_safe": n_safe,
     }
@@ -98,7 +100,7 @@ def select_sample(alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKey
 def select_categories(
         alerts: list[NormalisedAlert], answer_key: dict[str, AnswerKeyEntry],
         split: dict[str, str], sizes: dict[str, int], seed: int,
-        partition: str = "dev"
+        partition: str = "dev", exclude_case_ids=()
         ) -> tuple[list[NormalisedAlert], dict[str, dict]]:
     """Select reproducible, label-free samples for several CWE categories."""
     combined = []
@@ -106,7 +108,7 @@ def select_categories(
     for cwe in sorted(sizes):
         sample, summary = select_sample(
             alerts, answer_key, split, cwe, sizes[cwe], seed,
-            partition=partition)
+            partition=partition, exclude_case_ids=exclude_case_ids)
         combined.extend(sample)
         summaries[cwe] = summary
     return sorted(combined, key=lambda item: item["case_id"]), summaries
