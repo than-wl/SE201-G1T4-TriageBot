@@ -21,6 +21,7 @@ def assemble(role: str, case_id: str, result: dict) -> dict:
         "explanation": result.get("explanation", ""),
         "citations": _as_list(result.get("citations")),
         "guidance": _as_list(result.get("guidance")),
+        "analysis": result.get("analysis") if isinstance(result.get("analysis"), dict) else {},
     }
 
 
@@ -33,6 +34,7 @@ def failure(role: str, case_id: str, error: str) -> dict:
         "explanation": f"Model call failed; no verdict can be trusted: {error}",
         "citations": [],
         "guidance": [],
+        "analysis": {},
     }
 
 

@@ -20,12 +20,30 @@ _FACT_LABELS = {
     "guards_or_constants": "Guards, allowlists, constants",
 }
 
+_CWE_CHECKLISTS = {
+    "CWE-78": """Command-injection checklist:
+- Distinguish untrusted data in the command string versus an argument or environment array.
+- Determine whether a shell interprets the value or an executable receives it directly.
+- Verify constants, branch conditions and allowlists on the executed path.""",
+    "CWE-90": """LDAP-injection checklist:
+- Trace the exact value into LDAP filter construction and DirContext.search.
+- Distinguish LDAP escaping from encoding, decoding or generic string transformation.
+- Verify map, collection and helper-method flows before deciding that input is neutralised.""",
+}
+
 REPORT_CONTRACT = """\
 Return ONLY a single JSON object — no markdown fences, no commentary —
 with exactly these keys:
 
 {
   "verdict": "true_positive" or "false_positive" or "human_review",
+  "analysis": {
+    "source": "where untrusted input originates",
+    "sink": "the dangerous operation",
+    "reaches_sink": "yes" or "no" or "uncertain",
+    "protection": "guard, sanitiser or constant branch, or none",
+    "protection_effective": "yes" or "no" or "uncertain"
+  },
   "explanation": "short evidence-based explanation",
   "citations": [{"file": "...", "line": 0, "quote": "..."}],
   "guidance": [{"chunk_id": "...", "doc": "...", "section": "...", "url": "..."}]
@@ -34,10 +52,14 @@ with exactly these keys:
 Rules:
 - verdict: one of the three values; choose human_review whenever the
   evidence is insufficient or uncertain.
+- analysis: complete every field from the supplied evidence. The verdict must
+  agree with it: reaches_sink=yes and protection_effective=no means
+  true_positive; reaches_sink=no or protection_effective=yes means
+  false_positive; uncertain evidence means human_review.
 - explanation: 1-3 sentences, grounded in the cited evidence.
-- citations: source-code evidence only, taken from the numbered source
-  lines in the evidence block; at least one; "file" is the alert's file
-  path exactly as shown in the evidence; "quote" must be an exact,
+- citations: source-code evidence only, taken from the numbered primary or
+  related source lines in the evidence block; at least one; "file" is the
+  corresponding file path exactly as shown; "quote" must be an exact,
   contiguous substring of that line's text (excluding the "NN: "
   prefix). Never fabricate.
 - guidance: only chunks listed in the evidence block, copied exactly
@@ -80,6 +102,13 @@ either specialist, split their conclusions, or escalate to
 human_review — decide on the evidence, and cite what you actually
 checked."""
 
+REPAIR_BODY = """\
+You are correcting one internally inconsistent security review. Recheck the
+structured analysis against the source evidence, then return a complete report
+whose verdict agrees with that analysis. Do not change a field merely to make
+the JSON consistent; correct the security reasoning itself. If the evidence
+cannot resolve the conflict, return human_review."""
+
 SINGLE_BODY = """\
 You are the sole reviewer of a security scanner alert.
 Perform the full analysis in one pass: first build the case that the
@@ -93,7 +122,14 @@ human_review when it is insufficient or uncertain."""
 ANALYST_SYSTEM = ANALYST_BODY + "\n\n" + REPORT_CONTRACT
 SKEPTIC_SYSTEM = SKEPTIC_BODY + "\n\n" + REPORT_CONTRACT
 CHAIR_SYSTEM = CHAIR_BODY + "\n\n" + REPORT_CONTRACT
+REPAIR_SYSTEM = REPAIR_BODY + "\n\n" + REPORT_CONTRACT
 SINGLE_SYSTEM = SINGLE_BODY + "\n\n" + REPORT_CONTRACT
+
+
+def for_cwe(system: str, payload: ContextPayload) -> str:
+    """Add a short trusted checklist for vulnerability types that need one."""
+    checklist = _CWE_CHECKLISTS.get(payload["alert"].get("cwe"))
+    return system if checklist is None else system + "\n\n" + checklist
 
 
 def to_prompt_block(payload: ContextPayload) -> str:
@@ -114,9 +150,11 @@ def to_prompt_block(payload: ContextPayload) -> str:
         "",
         "--- Source code (comments removed; prefixed \"NN: \") ---",
         *payload["source"]["lines"],
-        "",
-        "--- Extracted facts (hints to verify against the code) ---",
     ]
+    for related in payload["source"].get("related", []):
+        lines += ["", f"--- Related source: {related['file']} "
+                  f"({related['relationship']}) ---", *related["lines"]]
+    lines += ["", "--- Extracted facts (hints to verify against the code) ---"]
     for key, label in _FACT_LABELS.items():
         values = payload["facts"].get(key, [])
         lines.append(f"{label}:")

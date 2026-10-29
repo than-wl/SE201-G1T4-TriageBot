@@ -25,9 +25,16 @@ class NormalisedAlert(TypedDict):
     message: str          # scanner message
 
 
+class RelatedSource(TypedDict):
+    file: str
+    relationship: str
+    lines: list[str]
+
+
 class SourceContext(TypedDict):
     file: str
     lines: list[str]      # comment-stripped, numbered: "42: stmt.executeQuery(q);"
+    related: list[RelatedSource]
 
 
 class HelperFacts(TypedDict):
@@ -70,6 +77,14 @@ class GuidanceRef(TypedDict):
     url: str              # canonical source URL
 
 
+class SecurityAnalysis(TypedDict):
+    source: str
+    sink: str
+    reaches_sink: Literal["yes", "no", "uncertain"]
+    protection: str
+    protection_effective: Literal["yes", "no", "uncertain"]
+
+
 class AgentReport(TypedDict):
     role: str             # "single" | "analyst" | "skeptic" | "chair"
     case_id: str
@@ -77,6 +92,7 @@ class AgentReport(TypedDict):
     explanation: str
     citations: list[Citation]
     guidance: list[GuidanceRef]   # cheat-sheet chunks actually relied on
+    analysis: SecurityAnalysis
 
 
 class TriageResult(TypedDict):

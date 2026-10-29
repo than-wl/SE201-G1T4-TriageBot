@@ -8,12 +8,12 @@ neither sees the other's report (blinded until the Chair joins).
 
 from triagebot import config
 from triagebot.nodes.review.report import assemble, failure
-from triagebot.nodes.review.prompts import SKEPTIC_SYSTEM, to_prompt_block
+from triagebot.nodes.review.prompts import SKEPTIC_SYSTEM, for_cwe, to_prompt_block
 
 
 def review(payload, caller):
     request = {
-        "system": SKEPTIC_SYSTEM,
+        "system": for_cwe(SKEPTIC_SYSTEM, payload),
         "user": to_prompt_block(payload),
         "max_tokens": config.REVIEW_MAX_TOKENS,
         "temperature": config.REVIEW_TEMPERATURE,

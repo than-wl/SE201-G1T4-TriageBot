@@ -16,9 +16,10 @@ required; role, guidance, latency_seconds, usage and model are optional
 key is rejected.
 
 Guidance rule (design decision 15): guidance is a list of
-{chunk_id, doc, section, url}; every ref must name a supplied chunk and copy
-its doc, section and url exactly. Refs without supplied chunks cannot be
-verified and are rejected; an empty or missing guidance list is valid.
+{chunk_id, doc, section, url}. Every ref must name a supplied chunk. For a
+known chunk, doc, section and url are normalised from the retrieved evidence;
+unknown chunks cannot be verified and are rejected. An empty or missing list
+is valid.
 
 Validated records carry guidance through (else []), and always carry
 latency_seconds, usage, model and role when present, since the call's cost was
@@ -30,7 +31,7 @@ import re
 VERDICTS = ("true_positive", "false_positive", "human_review")
 RESULT_KEYS = {"case_id", "verdict", "explanation", "citations"}
 BODY_KEYS = RESULT_KEYS - {"case_id"}
-OPTIONAL_KEYS = {"role", "guidance", "latency_seconds", "usage", "model"}
+OPTIONAL_KEYS = {"role", "guidance", "analysis", "latency_seconds", "usage", "model"}
 CARRIED_KEYS = ("latency_seconds", "usage", "model", "role")  # kept on pass and fail
 CITATION_KEYS = {"file", "line", "quote"}
 GUIDANCE_KEYS = {"chunk_id", "doc", "section", "url"}
@@ -72,7 +73,37 @@ def _guidance_errors(guidance, guidance_chunks):
     return errors
 
 
-def check_body(value, file, source, require_case_id=False, guidance_chunks=None):
+def _normalise_guidance(value, guidance_chunks):
+    """Return a copied result with authoritative metadata for known chunk IDs."""
+    copied = dict(value)
+    guidance = value.get("guidance")
+    if not isinstance(guidance, list) or guidance_chunks is None:
+        return copied, []
+    normalised, repairs = [], []
+    for number, ref in enumerate(guidance, 1):
+        if not isinstance(ref, dict) or set(ref) != GUIDANCE_KEYS:
+            normalised.append(ref)
+            continue
+        chunk = next((c for c in guidance_chunks if c.get("chunk_id") == ref["chunk_id"]), None)
+        if chunk is None:
+            normalised.append(dict(ref))
+            continue
+        repaired = dict(ref)
+        changed = []
+        for key in ("doc", "section", "url"):
+            if repaired[key] != chunk.get(key):
+                repaired[key] = chunk.get(key)
+                changed.append(key)
+        if changed:
+            repairs.append(
+                f"Guidance {number}: normalised {', '.join(changed)} from retrieved chunk")
+        normalised.append(repaired)
+    copied["guidance"] = normalised
+    return copied, repairs
+
+
+def check_body(value, file, source, require_case_id=False, guidance_chunks=None,
+               source_files=None):
     """Validate verdict, explanation, citations and guidance of one result; return a list of error strings."""
     expected = RESULT_KEYS if require_case_id else BODY_KEYS
     if not isinstance(value, dict) or not expected <= set(value):
@@ -92,20 +123,23 @@ def check_body(value, file, source, require_case_id=False, guidance_chunks=None)
     citations = value["citations"]
     if not isinstance(citations, list) or not citations:
         return errors + ["Missing citations"]
-    lines = source.splitlines()
+    sources = dict(source_files or {})
+    sources.setdefault(file, source)
     for number, c in enumerate(citations, 1):
         if not isinstance(c, dict) or set(c) != CITATION_KEYS:
             errors.append(f"Citation {number}: invalid shape")
-        elif c["file"] != file:
+        elif c["file"] not in sources:
             errors.append(f"Citation {number}: wrong file")
-        elif type(c["line"]) is not int or not 1 <= c["line"] <= len(lines):
-            errors.append(f"Citation {number}: line out of range")
-        elif not isinstance(c["quote"], str) or not c["quote"].strip():
-            errors.append(f"Citation {number}: empty quote")
-        elif c["quote"] not in lines[c["line"] - 1]:
-            errors.append(f"Citation {number}: quote is not an exact substring of line {c['line']}")
+        else:
+            lines = sources[c["file"]].splitlines()
+            if type(c["line"]) is not int or not 1 <= c["line"] <= len(lines):
+                errors.append(f"Citation {number}: line out of range")
+            elif not isinstance(c["quote"], str) or not c["quote"].strip():
+                errors.append(f"Citation {number}: empty quote")
+            elif c["quote"] not in lines[c["line"] - 1]:
+                errors.append(f"Citation {number}: quote is not an exact substring of line {c['line']}")
     if isinstance(explanation, str) and explanation.strip():
-        errors.extend(_identifier_errors(explanation, source))
+        errors.extend(_identifier_errors(explanation, "\n".join(sources.values())))
     return errors
 
 
@@ -122,7 +156,7 @@ def _items(parsed, only_case):
     return [], "Unrecognised top-level shape (expected a list, {'cases': [...]} or one result object)"
 
 
-def _record(case_id, original, errors, value=None):
+def _record(case_id, original, errors, value=None, repairs=None):
     ok = not errors
     record = {
         "case_id": case_id,
@@ -133,6 +167,7 @@ def _record(case_id, original, errors, value=None):
         "citations": value["citations"] if ok else [],
         "guidance": value.get("guidance", []) if ok else [],
         "validation_errors": errors,
+        "validation_repairs": list(repairs or []),
     }
     for key in CARRIED_KEYS:  # the call's cost was spent whether or not validation passed
         if value is not None and key in value:
@@ -189,7 +224,9 @@ def validate_results(raw, cases):
             item = found[0]
             original = item["verdict"] if item.get("verdict") in VERDICTS else None
             case = cases[case_id]
+            item, repairs = _normalise_guidance(item, case.get("guidance_chunks"))
             errors = check_body(item, case["file"], case["source"], require_case_id=True,
-                                guidance_chunks=case.get("guidance_chunks"))
-            results.append(_record(case_id, original, errors, item))
+                                guidance_chunks=case.get("guidance_chunks"),
+                                source_files=case.get("source_files"))
+            results.append(_record(case_id, original, errors, item, repairs))
     return {"results": results, "batch_errors": batch_errors, "unknown_case_ids": unknown}

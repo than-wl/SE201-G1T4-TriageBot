@@ -13,6 +13,7 @@ Three steps, one per function:
 from pathlib import Path
 
 from triagebot import config
+from triagebot.nodes.context.source_context import build_source_context
 from triagebot.schemas import ContextPayload, HelperFacts, NormalisedAlert
 
 # --- comment stripping ---------------------------------------------------
@@ -135,13 +136,12 @@ def build_payload(alert: NormalisedAlert, kb, benchmark_root=None) -> ContextPay
         raise FileNotFoundError(f"benchmark source missing: {path}") from exc
 
     clean = strip_comments(text).splitlines()
-    start = max(1, alert["start_line"] - config.SOURCE_WINDOW_LINES)
-    end = min(len(clean), alert["end_line"] + config.SOURCE_WINDOW_LINES)
-    window = [f"{n}: {clean[n - 1]}" for n in range(start, end + 1)]
+    source = build_source_context(root, alert, clean)
+    window = source["lines"]
 
     facts = extract_facts(window)
     guidance = kb.retrieve(
         alert, extra_terms=facts["source_apis"] + facts["sink_apis"]
     )
-    return {"alert": alert, "source": {"file": alert["file"], "lines": window},
+    return {"alert": alert, "source": source,
             "facts": facts, "guidance": guidance}
