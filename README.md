@@ -4,7 +4,7 @@
 
 TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
-**Status:** The recorded course-checkpoint evaluation remains historical. Phase 1 council-only LangGraph is on `phase1/langgraph-council`. Phase 2 opt-in SQLite sessions are implemented locally for independent audit; no Phase 2 push/PR or HITL is claimed. Historical metrics have not been rerun.
+**Status:** The recorded course-checkpoint evaluation remains historical. The council runs on LangGraph (Phase 1), with opt-in SQLite checkpoint sessions (Phase 2, reviewed in PR #13) and an optional semantic guidance retrieval mode that is off by default (design decision 21). No human-in-the-loop pause is claimed. Historical metrics have not been rerun.
 
 ## 1. What TriageBot does
 

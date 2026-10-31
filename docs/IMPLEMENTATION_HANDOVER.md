@@ -8,18 +8,18 @@ implement Phase 2 and audit again using this same document. Update the status an
 verification sections in place, not a second handover.
 
 **Today's intended scope: Phase 1 AND Phase 2 only. Phase 3 is another day.**
-**Current delivery implements Phase 2 on the pushed Phase 1 branch. Stop for Phase 2 audit; Phase 3 remains deferred.**
+**Phase 1 and Phase 2 are implemented and audited; Phase 3 remains deferred.**
 
 | Phase | Scope | Current status | PR checkpoint |
 | --- | --- | --- | --- |
-| 1 | Council-only LangGraph + explicit graph state | Implemented on branch `phase1/langgraph-council`; audit complete, PR review pending | PR 1: review before Phase 2 |
-| 2 | Persistent, file-backed SQLite checkpoints + recovery | Implemented locally; independent audit pending | PR 2: separate from PR 1 |
+| 1 | Council-only LangGraph + explicit graph state | Implemented; audit complete; brought to `main` by the pull request that merges this branch | Merged with Phase 2 and the optional semantic retrieval |
+| 2 | Persistent, file-backed SQLite checkpoints + recovery | Implemented; reviewed in PR #13 (merged into the Phase 1 branch) | PR #13, then `main` with Phase 1 |
 | 3 | HITL pause/resume + Markdown review handoff | Deferred; NOT today's scope | Later work |
 
 Phase 2 base: pushed branch `phase1/langgraph-council`, commit
-`6ec079a1ad4d507acc1ea92565855af9ba4b77fb` (not main). The user explicitly
-requested Phase 2 after pushing Phase 1. Phase 2 is a local review ZIP; this
-session did not push, merge, open a PR, or claim independent approval.
+`6ec079a1ad4d507acc1ea92565855af9ba4b77fb` (not main). Phase 2 was delivered as a
+review ZIP, audited, and merged into the Phase 1 branch as PR #13; the combined
+branch reaches `main` through the pull request that carries this change.
 
 ## Agreed architectural boundaries
 
@@ -302,6 +302,6 @@ and real SQLite, not only mocks. Stop after review and wait for the user's decis
 - Phase 1 implementation: found pushed at 6ec079a on phase1/langgraph-council; branch documents a completed local audit.
 - Phase 1 findings/resolution: retained from the pushed branch; no new independent approval asserted.
 - User authorization to start Phase 2: received in the current implementation chat.
-- Phase 2 implementation/evidence: local review ZIP delivered; 220 offline tests passed.
-- Phase 2 findings/resolution: independent audit PENDING; stop here.
+- Phase 2 implementation/evidence: review ZIP delivered; 220 offline tests passed.
+- Phase 2 findings/resolution: audited; the Windows test-fixture race was fixed and PR #13 merged.
 - Phase 3: DEFERRED, outside today's scope.

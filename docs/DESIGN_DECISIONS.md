@@ -11,7 +11,7 @@ Status: living document, updated as the team decides.
 `ThreadPoolExecutor` fan-out were sufficient for the recorded checkpoint.
 That checkpoint implementation and its measured results remain historical evidence.
 
-**Current Phase 1 decision (audited locally; PR review pending).** Migrate only the
+**Current Phase 1 decision (audited locally; reaches main with Phase 2).** Migrate only the
 Analyst/Skeptic/Chair council to LangGraph, with explicit state in `state.py`
 and the graph in `council_graph.py`. Keep the single-agent baseline as plain
 Python and preserve the public `triage()` / `run_sample()` contracts.
@@ -342,7 +342,7 @@ remain truncated, so a full re-run must re-check for any such cases.
 
 ## 20. Opt-in SQLite checkpoints for council sessions (Phase 2)
 
-**Decision (implemented locally; independent audit pending).** Add dedicated
+**Decision (implemented; audited and reviewed in PR #13).** Add dedicated
 `council-start`, `council-status` and `council-resume` commands backed by
 `langgraph-checkpoint-sqlite==3.1.2`. Keep ordinary triage/evaluation and the
 single-agent baseline unchanged. Store each run under a fresh UUID in a local
