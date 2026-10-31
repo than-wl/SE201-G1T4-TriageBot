@@ -46,7 +46,7 @@ class GuidanceChunk(TypedDict):
 
 class Guidance(TypedDict):
     source: str           # provenance, e.g. "OWASP Cheat Sheet Series"
-    cwe_matched: bool     # False -> common/ only; forces human_review downstream
+    cwe_matched: bool     # False -> no grounded guidance; the validator routes the case to human_review
     chunks: list[GuidanceChunk]
 
 

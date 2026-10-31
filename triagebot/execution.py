@@ -26,6 +26,8 @@ def validation_case(payload, benchmark_root, expected_source_sha256=None):
         "file": payload["alert"]["file"],
         "source": source,
         "guidance_chunks": payload["guidance"]["chunks"],
+        # False means no grounded guidance: the validator routes the case to human review.
+        "guidance_matched": payload.get("guidance", {}).get("cwe_matched"),
     }
 
 

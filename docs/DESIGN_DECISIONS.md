@@ -376,3 +376,80 @@ for later HITL without implementing human pauses or a review document now.
 
 See README.md for operational commands and the EXISTING implementation handover
 for the Phase 2 audit checkpoint. Recorded course-checkpoint scores stay unchanged.
+
+
+## 21. Semantic guidance retrieval from the official CWE text (optional mode)
+
+**Decision (implemented; default still "map").** `RETRIEVAL_MODE` in `config.py`
+selects the ranker. "map" keeps the curated CWE-to-sheet gate. "semantic" takes the
+scanner's CWE, looks up its record in the official MITRE CWE catalogue (pinned by
+SHA-256, fetched once into the git-ignored `Context/tmp/cwe/`), embeds the record's
+name and description with the local `bge-small-en-v1.5` model (fastembed, ONNX, no
+server), and ranks every cheat-sheet chunk by cosine similarity. The chunks and their
+vectors live in one SQLite file, `Context/tmp/kb_vectors.sqlite` (a BLOB per vector).
+`sync()` embeds only chunks that are new or changed, so adding a document later is
+chunk-and-sync. Search is exact numpy cosine; an index can be added later without a
+data migration.
+
+**Why.** The hand-written map covered 33 CWEs, and its links were our judgement.
+The scan's 1,909 findings fall into only 9 CWEs, and 475 of them (CWE-326, 328, 501)
+are outside the map. The MITRE text is authoritative and the lookup is deterministic.
+
+**Grounding rule (applies to both modes).** A case is grounded only when the CWE is
+present, known to the catalogue and not deprecated, and at least one chunk clears
+`SEMANTIC_MIN_SCORE` (map mode: the CWE is in the map). An ungrounded case is never
+given an automatic verdict: the validator sets `human_review` with a validation error,
+whatever the model said. Before this change the validator did not read `cwe_matched`,
+although the schema and decision 3 described it as doing so; that gap is now closed.
+
+**Measurement (dev split only, CWE-89, 100 alerts, the fixed primary-sheet proxy).**
+Map: 0/100 alerts with a primary SQL sheet in the guidance. MITRE text as the query:
+100/100, with a primary-sheet share of 0.50. MITRE text plus the alert message: 0/100,
+the same pull toward the general injection sheet that hybrid BM25 showed. The
+threshold is not set. Every alert of one CWE shares one query, so its top score is
+identical across those alerts, and the scores of correct and wrong sheets overlap
+(CWE-326's wrong top sheet scores 0.741, CWE-328's correct sheet 0.735). Reading the
+top six for each of the 9 scan CWEs found the right sheet for CWE-79, 328 and 643,
+the right sheet only fourth for CWE-326, and no path-traversal sheet in the KB for
+CWE-22. Semantic retrieval cannot supply guidance the knowledge base does not contain.
+
+**Graded relevance study (all 9 scan CWEs).** The proxy above rests on a document-name
+guess, and the map was itself generated without verification. So the candidates (the
+union of the top dense and top BM25 results for each CWE, 130 chunks) were graded by
+reading their text: 2 = guidance about this weakness, 1 = adjacent, 0 = not relevant.
+The grades are one reader's judgement and have not been independently reviewed; they are
+in `verification/relevance_labels.json`, and `verification/relevance_eval.py` reproduces
+the table. Precision@2 / @6 (grade 2 only), macro over the 9 CWEs:
+
+| Method | P@2 | P@6 |
+| --- | ---: | ---: |
+| Dense, MITRE text as the query | 0.61 | 0.54 |
+| BM25 | 0.33 | 0.37 |
+| Dense + BM25, equal weight | 0.61 | 0.46 |
+| Dense + BM25, 0.7 / 0.3 | 0.56 | 0.57 |
+| Reranker MiniLM-L-6 (cross-encoder) | 0.33 | 0.44 |
+| Reranker bge-reranker-base | 0.44 | 0.43 |
+
+The curated map scores P@2 0.58 on the 6 CWEs it covers, against 0.67 for dense on the
+same 6, and 0.39 against 0.61 over all 9, because it has no entry for CWE-326, 328 and
+501. On this evidence dense is at least as good as the map where both answer and the only
+one that answers elsewhere; adding BM25 or an off-the-shelf reranker does not help.
+CWE-79 and CWE-501 score 0 for every method: for CWE-501 the KB holds no code-level
+guidance, and for CWE-79 the relevant chunks are present but ranked low. Nine CWEs and one
+reader make this a direction, not a verdict.
+
+**Consequences.**
+- The default remains "map"; switching to "semantic" is one config line and needs
+  the team's review of the measurement above. The test half of the split is untouched.
+- Map mode now routes CWE-326, 328 and 501 to human review (475 of 1,909 findings),
+  where the previous code sent them to the model. This is the rule as specified, and it
+  will change any aggregate that counts human-review cases.
+- Ungrounded cases still spend model calls before the validator overrides them. Skipping
+  those calls is a possible saving, not implemented.
+- The catalogue is not committed (its licence terms are not yet checked). The SQLite
+  store is derived from the committed KB and is git-ignored; it is not part of the
+  Phase 2 KB fingerprint, which hashes the JSON source files.
+- The committed KB repeats 22 chunks verbatim. The semantic store keeps one row per
+  chunk_id; the map path still reads the raw JSON, so its results do not change. The
+  duplicates should be removed at source by the KB builder, which is a data change to
+  review separately.

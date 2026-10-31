@@ -12,6 +12,24 @@ KB_DIR = Path(__file__).resolve().parent / "nodes" / "context" / "kb"
 RETRIEVAL_TOP_K = 6            # guidance chunks returned per payload
 GUIDANCE_MAX_CHARS = 4000      # ~1000-token guidance budget per payload
 
+# "map": the curated CWE -> cheat-sheet gate (the default until the dev-split
+#        measurement is reviewed). "semantic": embed the MITRE text for the
+#        alert's CWE and rank every cheat-sheet chunk by cosine similarity.
+RETRIEVAL_MODE = "map"
+SEMANTIC_MIN_SCORE = 0.0       # cosine threshold; a placeholder until chosen on the dev split
+SEMANTIC_QUERY_MAX_CHARS = 1000  # cap on the CWE text used as the query
+EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"   # local ONNX model via fastembed; no server
+EMBEDDING_QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
+
+# Official MITRE CWE catalogue, fetched once by `python -m triagebot.nodes.context.cwe_catalogue`.
+# The pinned hash makes a changed or truncated download fail loudly; bump it with the URL.
+CWE_CATALOGUE_URL = "https://cwe.mitre.org/data/xml/cwec_latest.xml.zip"
+CWE_CATALOGUE_SHA256 = "bcda44c9abf61ff977f50c3c6649eea5a97a7b0626b0396c2c3ec4bfb973a3dc"  # CWE 5.0
+_LOCAL_TMP = Path(__file__).resolve().parents[1] / "Context" / "tmp"   # git-ignored
+CWE_CATALOGUE_DIR = _LOCAL_TMP / "cwe"
+CWE_CATALOGUE_XML = CWE_CATALOGUE_DIR / "cwec_v5.0.xml"
+KB_VECTOR_DB = _LOCAL_TMP / "kb_vectors.sqlite"   # derived from the KB; chunks added or changed are re-embedded
+
 # --- source context -----------------------------------------------------
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 

@@ -292,3 +292,136 @@ records the Windows/Python 3.12 run repeated here. Exactly-once billing is
 still not guaranteed: reported usage covers committed reports only, not every
 possibly billed attempt. No push, merge, PR or independent approval is
 claimed; the human-review pause remains future work.
+
+## 2026-10-31 — Semantic retrieval over the cheat sheets, keyed by the CWE text
+
+- **Tool (model):** Claude Sonnet 5.5 (claude-sonnet-5-5)
+- **Files:** triagebot/config.py, triagebot/nodes/context/cwe_catalogue.py,
+  triagebot/nodes/context/embeddings.py, triagebot/nodes/context/retrieval.py,
+  triagebot/execution.py, triagebot/nodes/validate/validator.py,
+  triagebot/schemas.py, requirements.txt, tests/test_semantic_retrieval.py,
+  verification/semantic_measurement.py, docs/DESIGN_DECISIONS.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Replace the hand-written CWE-to-cheat-sheet map as the only way to find guidance.
+The scanner's CWE should be looked up in the official MITRE CWE catalogue, the
+record's text embedded with a local model, and the cheat-sheet chunks ranked by
+similarity to it. Any case without grounded guidance (no CWE, an unknown CWE, or
+similarity below a threshold) should go to human review. The thresholds belong in
+the config file so they can be tuned. The map should remain the default until the
+dev-split comparison has been reviewed.
+
+### How I checked it
+
+The full offline suite passes on Windows/Python 3.12: 230 tests, of which 10 are
+new and use a fake embedder, a fixture catalogue and a fixture knowledge base. I
+installed the official MITRE catalogue (CWE 5.0) through the install step, which
+checks it against a pinned SHA-256. It has 984 records, and the 28 deprecated ones
+are left out of lookups.
+
+On the dev split only (100 CWE-89 alerts, with the same fixed primary-sheet proxy
+as before, and no answer-key labels), the current map gave 0/100 alerts with a
+primary SQL sheet in the guidance, the MITRE text as the query gave 100/100 with a
+primary-sheet share of 0.50, and the MITRE text plus the alert message gave 0/100.
+The threshold could not be set from these results: the top score depends only on
+the CWE, and the scores for correct and wrong sheets overlap. I read the top six
+sheets for each of the nine CWEs in the scan. The right sheet appeared for CWE-79,
+CWE-328 and CWE-643. For CWE-326 it ranked only fourth. The knowledge base has no
+path-traversal sheet for CWE-22.
+
+I found that the validator never read the gate flag, although the schema and the
+design record both said it did. The gate flag is now enforced: an ungrounded case
+gets human_review with a validation error, whatever the model said.
+
+### What I kept or changed
+
+The default remains the curated map, so no existing result changes until the team
+reviews the comparison. The threshold stays at a placeholder value of 0.0. In map
+mode, 475 of the 1,909 scan findings (all of CWE-326, CWE-328 and CWE-501) now go to
+human review, where the earlier code sent them to the model. That change is the rule
+as specified, but it will affect any figure that counts human-review cases. The
+catalogue is downloaded into the git-ignored Context folder and is not committed,
+because its licence terms have not been checked. fastembed is added to the
+requirements, so the CI matrix will install it, which has not been verified yet. The
+held-out test half of the split was not used. No pull request has been raised.
+
+## 2026-10-31 — Knowledge-base vectors moved into a SQLite store
+
+- **Tool (model):** Claude Haiku 5.5 (claude-haiku-5-5)
+- **Files:** triagebot/nodes/context/vector_store.py, triagebot/nodes/context/embeddings.py,
+  triagebot/nodes/context/retrieval.py, triagebot/config.py, verification/semantic_measurement.py,
+  tests/test_vector_store.py, tests/test_semantic_retrieval.py, docs/DESIGN_DECISIONS.md, README.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Store the knowledge-base chunks and their embeddings in a SQLite file, rather than the
+temporary NumPy cache I had written. Adding a new document later should only need chunking
+and an insert, with no change to the storage design. The search itself stays exact.
+
+### How I checked it
+
+The full offline suite passes on Windows/Python 3.12: 239 tests, including new tests for
+incremental sync (unchanged chunks are not re-embedded, changed and new chunks are, removed
+chunks are deleted, and a model change re-embeds everything) and round-trip fidelity of the
+stored vectors. On the real knowledge base, the first sync embedded 3,238 chunks in about
+four and a half minutes, and a second sync embedded nothing.
+
+The check also found that the committed knowledge base repeats 22 chunks verbatim (the same
+text and ID within one document). The semantic store refuses a chunk ID that appears with
+different content, and drops verbatim repeats. The map path reads the raw JSON, so its
+results are unchanged. The duplicates should be removed at source, which is a data change to
+review separately.
+
+### What I kept or changed
+
+Kept the exact-search design and the map as the default. Changed: the cache file became a
+SQLite store, and the measurement script now uses it. I did not change the committed JSON.
+No pull request has been raised.
+
+## 2026-10-31 — Graded relevance study, evaluation script and branch recovery
+
+- **Tool (model):** Claude Haiku 5.5 (claude-haiku-5-5) graded the candidate chunks and ran the
+  first comparisons; Claude Sonnet 5.5 (claude-sonnet-5-5) wrote the evaluation script, inspected
+  the teammate's open pull request and the branch history, restored the Phase 1 branch and
+  prepared the commit
+- **Files:** verification/relevance_labels.json, verification/relevance_eval.py,
+  verification/retrieval_comparison.py, docs/DESIGN_DECISIONS.md
+- **Outcome:** Changed
+
+### What I asked for
+
+Check the retrieval choice against the real cheat-sheet text, not against the map (which was
+generated with AI help and never verified) or a guess based on document names. Read the
+candidates, judge their relevance, and re-evaluate dense retrieval, BM25 hybrids and rerankers,
+including a fair comparison with the map. Then look at a teammate's open pull request and work
+out how the two lines of work can be merged.
+
+### How I checked it
+
+The assistant read and graded 130 candidate chunks for the nine CWEs in the scan (2 = about this
+weakness, 1 = adjacent, 0 = not relevant). These grades are one reader's judgement and have not
+been independently reviewed. `verification/relevance_eval.py` rebuilds the candidate pools from
+the labels file and reproduces the table in design decision 21: dense retrieval scores precision@2
+of 0.61, BM25 0.33, equal-weight fusion 0.61, and two off-the-shelf rerankers 0.33 and 0.44. The
+curated map scores 0.58 on the six CWEs it covers (dense 0.67 on the same six) and 0.39 over all
+nine, because it has no entry for three of them. One figure moved between the first ad hoc run and
+the committed script: equal-weight fusion at precision@6 went from 0.44 to 0.46, because the first
+run counted the 22 duplicated chunks.
+
+For the teammate's pull request, I merged it into a throwaway copy of our branch. Four files
+conflict, and four of its tests fail if the `pipeline.py` conflict is resolved by keeping the
+LangGraph side, because its consistency-repair step is then silently dropped from council mode.
+The copy was deleted and the pull request was not touched. I also found that the remote Phase 1
+and Phase 2 branches had been deleted, so I pushed the local Phase 1 branch (which already holds
+Phase 2) back to GitHub.
+
+### What I kept or changed
+
+Dense retrieval stays the candidate; neither BM25 nor a reranker is added. The default mode is
+still the curated map, the threshold is still a placeholder, and the committed knowledge-base
+JSON is unchanged. Left for the team: an independent review of the grades, the disagreement over
+the source window (60 or 100 lines), and the merge order with the open pull request. No pull
+request has been raised.

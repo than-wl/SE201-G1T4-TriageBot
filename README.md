@@ -302,3 +302,20 @@ checkpoint/      TEMPORARY planning notes, removed before final submission
 | Lisa | Deterministic validator |
 | Bradley | Evaluation harness, checkpoint report |
 | Wei Lin | Repository setup, integration, submission |
+
+## Optional semantic guidance retrieval
+
+The default guidance ranker is the curated CWE-to-cheat-sheet map. A second mode,
+`RETRIEVAL_MODE = "semantic"` in `triagebot/config.py`, ranks cheat-sheet chunks
+against the official MITRE text of the scanner's CWE. It is opt-in until the team has
+reviewed the dev-split comparison (design decision 21).
+
+```bash
+pip install -r requirements.txt                              # includes fastembed
+python -m triagebot.nodes.context.cwe_catalogue              # once: MITRE CWE catalogue, SHA-256 checked
+```
+
+The catalogue is written under the git-ignored `Context/tmp/cwe/`, and the knowledge-base
+vector store is a SQLite file at `Context/tmp/kb_vectors.sqlite`. The first semantic run
+embeds the whole knowledge base (a few minutes on CPU); later runs embed only what changed. Alerts with no CWE, an unknown or deprecated CWE, or no chunk above
+`SEMANTIC_MIN_SCORE` are sent to human review in either mode.
