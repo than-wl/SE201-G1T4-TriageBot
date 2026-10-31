@@ -35,6 +35,7 @@ CARRIED_KEYS = ("latency_seconds", "usage", "model", "role")  # kept on pass and
 CITATION_KEYS = {"file", "line", "quote"}
 GUIDANCE_KEYS = {"chunk_id", "doc", "section", "url"}
 FALLBACK_EXPLANATION = "Validation failed; human review required."
+UNGROUNDED_ERROR = "No CWE-matched guidance for this alert; routed to human review"
 
 # Only dotted identifiers (optionally ending in "()") in backticks are checked; SQL or prose is skipped.
 _BACKTICKED = re.compile(r"`([^`\n]+)`")
@@ -191,5 +192,8 @@ def validate_results(raw, cases):
             case = cases[case_id]
             errors = check_body(item, case["file"], case["source"], require_case_id=True,
                                 guidance_chunks=case.get("guidance_chunks"))
+            if case.get("guidance_matched") is False:
+                # Ungrounded alerts never get an automatic verdict, whatever the model said.
+                errors.append(UNGROUNDED_ERROR)
             results.append(_record(case_id, original, errors, item))
     return {"results": results, "batch_errors": batch_errors, "unknown_case_ids": unknown}
