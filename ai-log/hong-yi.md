@@ -425,3 +425,41 @@ still the curated map, the threshold is still a placeholder, and the committed k
 JSON is unchanged. Left for the team: an independent review of the grades, the disagreement over
 the source window (60 or 100 lines), and the merge order with the open pull request. No pull
 request has been raised.
+
+## 2026-10-31 — Port of PR #14 onto the LangGraph council
+
+- **Tool (model):** Claude Sonnet 5.5 (claude-sonnet-5-5)
+- **Files:** triagebot/council_graph.py, triagebot/execution.py, triagebot/pipeline.py,
+  triagebot/state.py, triagebot/checkpoints.py, triagebot/config.py,
+  triagebot/nodes/validate/validator.py, tests/checkpoint_worker.py,
+  tests/test_checkpoints.py, tests/test_council_graph.py, README.md,
+  docs/DESIGN_DECISIONS.md, docs/IMPLEMENTATION_HANDOVER.md
+- **Outcome:** Changed
+
+### What I asked for
+
+A teammate's open pull request (better source context, a consistency-repair step, tighter
+validation) was built on the pipeline before the council moved to LangGraph. Branch from
+it, bring in `main`, resolve the conflicts, and make the council path keep everything the
+pull request added, without dropping any of it and without changing the teammate's own branch.
+
+### How I checked it
+
+A trial merge had shown that keeping the LangGraph side of the conflict silently drops the
+repair step from council mode, with four of the teammate's tests failing. After the port
+all 253 offline tests pass on Windows/Python 3.12: the teammate's repair, escalation and
+related-helper tests (now running through the graph), the existing council and checkpoint
+tests, and one new test that kills the process during the repair call and checks that
+recovery repeats the repair but not the specialists or the Chair.
+
+### What I kept or changed
+
+Kept the teammate's logic as it was and moved it, rather than rewriting it: the repair
+helper now lives in `execution.py` and is called by the single-agent path and by a new
+`repair` node. Changed: the graph is `chair -> repair -> validate`; the durable latency
+adds the repair time; the checkpoint schema is now 2; the resume guard also covers the
+related-source limits and the retrieval settings. The source window stays at the
+teammate's 60 lines for now, because his comparison was measured with it; this is provisional
+and recorded in design decision 22. Two limitations remain: durable runs fingerprint only the
+alert's own file, and the teammate's reported numbers were produced before the graph and are
+not claimed for it until the comparison is re-run. No paid model calls were made.

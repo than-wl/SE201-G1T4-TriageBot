@@ -10,7 +10,9 @@ from pathlib import Path
 import time
 
 from triagebot import config
-from triagebot.execution import validation_case, with_call_metadata
+from triagebot.execution import (
+    repair_if_inconsistent, summed_usage, validation_case, with_call_metadata,
+)
 from triagebot.llm.openrouter import OpenRouterCaller
 from triagebot.nodes.context.payload import build_payload
 from triagebot.nodes.context.retrieval import KnowledgeBase
@@ -35,6 +37,11 @@ def triage(alert, mode="single", caller_factory=OpenRouterCaller, kb=None,
     caller = caller_factory()
     review = with_call_metadata(baseline.review(payload, caller), caller)
     role_reports = [review]
+    review = repair_if_inconsistent(
+        payload, review, role_reports, caller_factory, baseline.repair)
+    review = dict(review)
+    review["usage"] = summed_usage(role_reports)
+    role_reports[-1] = review
 
     review["latency_seconds"] = round(time.perf_counter() - started, 3)
     cases = {alert["case_id"]: validation_case(payload, root)}

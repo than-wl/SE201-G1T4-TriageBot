@@ -9,6 +9,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from triagebot.nodes.score import evaluate  # noqa: E402
+from triagebot.nodes.score import final_report  # noqa: E402
 
 FIXTURES = ROOT / "tests/fixtures/evaluation"
 
@@ -47,6 +48,14 @@ class HandWrittenDataset(unittest.TestCase):
     def test_human_review_is_not_counted_as_a_removed_false_positive(self):
         self.assertEqual(self.council["fp_removed"], 1)
         self.assertEqual(self.council["fp_removed_rate"], round(1 / 3, 4))
+
+    def test_precision_recall_and_f1_treat_human_review_as_retained(self):
+        self.assertEqual(self.council["precision"], round(1 / 3, 4))
+        self.assertEqual(self.council["recall"], 0.5)
+        self.assertEqual(self.council["f1"], 0.4)
+        table = evaluate.markdown_table({"configurations": [self.council]})
+        self.assertIn("Precision (human review retained)", table)
+        self.assertIn("F1 (human review retained)", table)
 
     def test_failures_list_every_wrong_or_invalid_case(self):
         failures = {f["case_id"]: f["outcome"] for f in self.council["failures"]}
@@ -134,6 +143,24 @@ class UnsafeInputs(unittest.TestCase):
                             "BenchmarkTest00002,sqli,false,89\n", encoding="utf-8")
             self.assertEqual(evaluate.load_labels(path),
                              {"BenchmarkTest00001": True, "BenchmarkTest00002": False})
+
+
+class FinalReport(unittest.TestCase):
+    def test_reports_each_cwe_separately(self):
+        key = {
+            "Case1": {"category": "sqli", "cwe": "CWE-89", "vulnerable": True},
+            "Case2": {"category": "xss", "cwe": "CWE-79", "vulnerable": False},
+        }
+        configs = {"B": ([
+            {"case_id": "Case1", "verdict": "true_positive"},
+            {"case_id": "Case2", "verdict": "false_positive"},
+        ], "fixture")}
+
+        report = final_report.build(sorted(key), key, configs)
+
+        self.assertEqual(set(report["by_cwe"]), {"CWE-79", "CWE-89"})
+        self.assertEqual(report["overall"]["sample_size"], 2)
+        self.assertEqual(report["by_cwe"]["CWE-79"]["sample_size"], 1)
 
 
 if __name__ == "__main__":

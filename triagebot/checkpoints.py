@@ -164,7 +164,9 @@ def _provenance(alert, kb, benchmark_root, model):
         "model": model, "code_sha256": _sha(_json(code).encode()),
         "kb_sha256": _sha(_json(corpus).encode()),
         "config": {name: getattr(config, name) for name in (
-            "SOURCE_WINDOW_LINES", "GUIDANCE_MAX_CHARS", "RETRIEVAL_TOP_K",
+            "SOURCE_WINDOW_LINES", "SOURCE_RELATED_MAX_FILES", "SOURCE_RELATED_MAX_LINES",
+            "SOURCE_RELATED_MAX_LINES_PER_FILE", "GUIDANCE_MAX_CHARS", "RETRIEVAL_TOP_K",
+            "RETRIEVAL_MODE", "SEMANTIC_MIN_SCORE", "EMBEDDING_MODEL",
             "REVIEW_MAX_TOKENS", "REVIEW_TEMPERATURE", "BENCHMARK_COMMIT")},
         "versions": {name: version(name) for name in (
             "langgraph", "langgraph-checkpoint", "langgraph-checkpoint-sqlite",

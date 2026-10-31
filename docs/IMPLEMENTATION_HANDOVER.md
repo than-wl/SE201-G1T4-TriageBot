@@ -75,7 +75,10 @@ https://docs.langchain.com/oss/python/langgraph/use-graph-api
 
 ### Graph/state details
 
-`START -> build_context -> {analyst, skeptic} -> chair -> validate -> END`
+`START -> build_context -> {analyst, skeptic} -> chair -> repair -> validate -> END`
+
+(`repair` was added when PR #14's consistency check was ported: it makes one extra
+model call only when the Chair's verdict contradicts its own structured analysis.)
 
 The join is `add_edge(["analyst", "skeptic"], "chair")`, not two separately
 triggered Chair edges. Each specialist writes a distinct state key; neither

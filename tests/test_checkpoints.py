@@ -269,6 +269,20 @@ class CheckpointTest(unittest.TestCase):
         self.assertEqual(result["review"]["usage"]["prompt_tokens"], 30)
         self.assertEqual(inspect_council_run(tid, self.db)["status"], "completed")
 
+    def test_hard_crash_in_repair_recovers_without_repeating_the_chair(self):
+        tid = self.worker("create").stdout.strip()
+        self.worker("crash-repair", tid, expected=73)   # the Chair contradicted its own analysis
+        self.assertEqual(inspect_council_run(tid, self.db)["next_nodes"], ["repair"])
+        result = json.loads(self.worker("recover", tid).stdout)
+        counts = Counter(self.log.read_text().splitlines())
+        self.assertEqual(counts, {"analyst": 1, "skeptic": 1, "chair": 1, "repair": 2})
+        self.assertEqual(result["review"]["verdict"], "true_positive")
+        # Analyst, Skeptic, the Chair's own report, and the repaired report.
+        self.assertEqual([r["role"] for r in result["role_reports"]],
+                         ["analyst", "skeptic", "chair", "chair"])
+        self.assertEqual(result["review"]["usage"]["prompt_tokens"], 40)
+        self.assertTrue(result["validated"]["validated"])
+
     def test_successful_parallel_pending_write_is_not_replayed(self):
         tid = self.worker("create").stdout.strip()
         self.worker("fail-skeptic", tid, expected=74)
@@ -279,13 +293,13 @@ class CheckpointTest(unittest.TestCase):
 
     def test_resume_at_validation_needs_no_timer_or_new_model_calls(self):
         tid = self.worker("create").stdout.strip()
-        self.worker("stop-after-chair", tid)
+        self.worker("stop-before-validate", tid)
         self.assertEqual(inspect_council_run(tid, self.db)["next_nodes"], ["validate"])
         before = self.log.read_text()
         with _database(self.db) as (_, saver):
             values = saver.get_tuple({"configurable": {"thread_id": tid}}).checkpoint["channel_values"]
             expected = round(max(values["analyst_elapsed_seconds"], values["skeptic_elapsed_seconds"])
-                             + values["chair_elapsed_seconds"], 3)
+                             + values["chair_elapsed_seconds"] + values["repair_elapsed_seconds"], 3)
         result = json.loads(self.worker("recover", tid).stdout)
         self.assertEqual(result["review"]["latency_seconds"], expected)
         self.assertEqual(self.log.read_text(), before)

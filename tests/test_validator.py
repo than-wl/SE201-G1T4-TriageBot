@@ -73,7 +73,7 @@ class AcceptedTests(unittest.TestCase):
         self.assertEqual([r["case_id"] for r in outcome["results"]], list(CASES))
         self.assertEqual(set(outcome["results"][0]), {
             "case_id", "verdict", "original_verdict", "validated", "explanation", "citations", "guidance",
-            "validation_errors"})
+            "validation_errors", "validation_repairs"})
 
 
 class RejectedTests(unittest.TestCase):
@@ -266,18 +266,26 @@ class ReviewReportTests(unittest.TestCase):
         self.assertTrue(record["validated"], record["validation_errors"])
         self.assertEqual(record["guidance"], [ref()])
 
-    def test_mismatched_guidance_ref_fails(self):
-        cases = {"chunk_id": ref(chunk_id="SQL_Injection_Prevention_Cheat_Sheet#999"),
-                 "doc": ref(doc="XSS_Prevention_Cheat_Sheet"), "section": ref(section="Other"),
-                 "url": ref(url="https://example.com/")}
-        for field, bad in cases.items():
+    def test_unknown_guidance_chunk_fails(self):
+        record = self.record(
+            assembled([ref(chunk_id="SQL_Injection_Prevention_Cheat_Sheet#999")]),
+            with_chunks())
+        self.assertFalse(record["validated"])
+        self.assertEqual(record["verdict"], "human_review")
+        self.assertEqual(record["guidance"], [])
+        self.assertTrue(any(e.startswith("Guidance 1:") for e in record["validation_errors"]),
+                        record["validation_errors"])
+
+    def test_known_guidance_metadata_is_normalised_from_retrieved_chunk(self):
+        cases = {"doc": ref(doc="XSS_Prevention_Cheat_Sheet"),
+                 "section": ref(section="Other"), "url": ref(url="https://example.com/")}
+        for field, repairable in cases.items():
             with self.subTest(field=field):
-                record = self.record(assembled([bad]), with_chunks())
-                self.assertFalse(record["validated"])
-                self.assertEqual(record["verdict"], "human_review")
-                self.assertEqual(record["guidance"], [])
-                self.assertTrue(any(e.startswith("Guidance 1:") for e in record["validation_errors"]),
-                                record["validation_errors"])
+                record = self.record(assembled([repairable]), with_chunks())
+                self.assertTrue(record["validated"], record["validation_errors"])
+                self.assertEqual(record["guidance"], [ref()])
+                self.assertEqual(record["validation_repairs"],
+                                 [f"Guidance 1: normalised {field} from retrieved chunk"])
 
     def test_malformed_guidance_fails(self):
         for guidance in ("x", [{"chunk_id": CHUNK["chunk_id"]}], [dict(ref(), text="extra")]):

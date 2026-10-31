@@ -44,9 +44,14 @@ def _benchmark_root(environ=os.environ, repo_root=_REPO_ROOT):
 
 # Local benchmark checkout (not committed); None -> payload build raises.
 BENCHMARK_ROOT = _benchmark_root()
-SOURCE_WINDOW_LINES = 100      # alert lines +/- this many lines of context
-                               # (25 cut helper methods off mid-body in the
-                               # recorded run; 100 keeps whole methods)
+SOURCE_WINDOW_LINES = 60       # reaches benchmark helpers while keeping prompts bounded
+                               # (decision 19 widened this to 100 on main; PR #14's
+                               # 66-case experiment was measured at 60 together with the
+                               # related-file context below, so 60 is kept until the team
+                               # compares the two on the same cases)
+SOURCE_RELATED_MAX_FILES = 4   # bounded direct/transitive project helper context
+SOURCE_RELATED_MAX_LINES = 120
+SOURCE_RELATED_MAX_LINES_PER_FILE = 60
 
 BENCHMARK_URL = "https://github.com/OWASP-Benchmark/BenchmarkJava.git"
 BENCHMARK_COMMIT = "8b67a88d73b2594570fc21150705283de884620b"   # pinned for all recorded evidence
@@ -94,6 +99,22 @@ SPLIT_SEED = 201
 TEST_FRACTION = 0.5            # share of each (category, label) stratum held out
 SAMPLE_SIZE = 100              # checkpoint sample, drawn from the dev split
 SAMPLE_CWE = "CWE-89"
+FINAL_OUT = _REPO_ROOT / "Context" / "tmp" / "final"
+FINAL_PARTITION = "test"
+FINAL_SAMPLE_SIZES = {
+    "CWE-22": 24,
+    "CWE-78": 24,
+    "CWE-79": 24,
+    "CWE-89": 24,
+    "CWE-90": 24,
+}
+COMPARISON_SAMPLE_SIZES = {
+    "CWE-22": 16,
+    "CWE-78": 16,
+    "CWE-79": 16,
+    "CWE-89": 16,
+    "CWE-90": 2,  # only one unused safe and vulnerable test case remain
+}
 
 # --- review (model-call) limits ------------------------------------------
 REVIEW_MAX_TOKENS = 900        # short JSON answer; headroom over the 700
@@ -102,4 +123,4 @@ REVIEW_TEMPERATURE = 0.0       # recorded runs must be reproducible
 
 # --- durable council execution (opt-in; not the historical course checkpoint) ---
 COUNCIL_DB = _REPO_ROOT / ".triagebot" / "checkpoints.sqlite"
-COUNCIL_CHECKPOINT_SCHEMA = 1
+COUNCIL_CHECKPOINT_SCHEMA = 2   # 2: adds the repair node's state; schema-1 runs cannot resume

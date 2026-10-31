@@ -18,6 +18,47 @@ from urllib.request import Request, urlopen
 
 _API = "https://openrouter.ai/api/v1/chat/completions"
 _DEFAULT_MODEL = "google/gemini-3.8-flash"   # proposal model (decision 6)
+_REPORT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "verdict": {"type": "string", "enum": [
+            "true_positive", "false_positive", "human_review"]},
+        "analysis": {
+            "type": "object",
+            "properties": {
+                "source": {"type": "string"}, "sink": {"type": "string"},
+                "reaches_sink": {"type": "string", "enum": ["yes", "no", "uncertain"]},
+                "protection": {"type": "string"},
+                "protection_effective": {
+                    "type": "string", "enum": ["yes", "no", "uncertain"]},
+            },
+            "required": ["source", "sink", "reaches_sink", "protection",
+                         "protection_effective"],
+            "additionalProperties": False,
+        },
+        "explanation": {"type": "string"},
+        "citations": {"type": "array", "items": {
+            "type": "object",
+            "properties": {
+                "file": {"type": "string"}, "line": {"type": "integer"},
+                "quote": {"type": "string"},
+            },
+            "required": ["file", "line", "quote"],
+            "additionalProperties": False,
+        }},
+        "guidance": {"type": "array", "items": {
+            "type": "object",
+            "properties": {
+                "chunk_id": {"type": "string"}, "doc": {"type": "string"},
+                "section": {"type": "string"}, "url": {"type": "string"},
+            },
+            "required": ["chunk_id", "doc", "section", "url"],
+            "additionalProperties": False,
+        }},
+    },
+    "required": ["verdict", "analysis", "explanation", "citations", "guidance"],
+    "additionalProperties": False,
+}
 
 
 def configured_model():
@@ -42,6 +83,9 @@ class OpenRouterCaller:
             "temperature": request.get("temperature", 0.0),
             # minimal, hidden reasoning: keeps recorded runs cheap and clean
             "reasoning": {"effort": "minimal", "exclude": True},
+            "provider": {"require_parameters": True},
+            "response_format": {"type": "json_schema", "json_schema": {
+                "name": "triage", "strict": True, "schema": _REPORT_SCHEMA}},
             "messages": [
                 {"role": "system", "content": request["system"]},
                 {"role": "user", "content": request["user"]},

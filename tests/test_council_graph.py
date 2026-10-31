@@ -122,7 +122,7 @@ class CouncilGraphTest(unittest.TestCase):
         names = [next(iter(update)) for update in updates]
         self.assertEqual(names[0], "build_context")
         self.assertEqual(set(names[1:3]), {"analyst", "skeptic"})
-        self.assertEqual(names[3:], ["chair", "validate"])
+        self.assertEqual(names[3:], ["chair", "repair", "validate"])
         state = {"alert": deepcopy(ALERT)}
         for update in updates:
             for name, delta in update.items():
@@ -133,7 +133,7 @@ class CouncilGraphTest(unittest.TestCase):
         self.assertEqual(set(state), {
             "alert", "payload", "analyst_report", "skeptic_report",
             "review", "role_reports", "validated", "analyst_elapsed_seconds",
-            "skeptic_elapsed_seconds", "chair_elapsed_seconds",
+            "skeptic_elapsed_seconds", "chair_elapsed_seconds", "repair_elapsed_seconds",
         })
 
     def test_phase1_graph_has_no_checkpointer_or_human_interrupts(self):

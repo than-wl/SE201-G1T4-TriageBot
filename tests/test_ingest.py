@@ -321,6 +321,35 @@ class Sample(unittest.TestCase):
         self.assertEqual({a["case_id"] for a in sample}, {f"V{i}" for i in range(1, 6)} | {"S1", "S2", "S3"})
         self.assertEqual((summary["eligible_vulnerable"], summary["eligible_safe"]), (5, 3))
 
+    def test_can_select_held_out_partition(self):
+        sample, summary = split_mod.select_sample(
+            self.alerts, self.key, self.split, "CWE-89", 10, 201, partition="test")
+
+        self.assertEqual([item["case_id"] for item in sample], ["T1"])
+        self.assertEqual(summary["partition"], "test")
+
+    def test_can_exclude_cases_used_by_an_earlier_evaluation(self):
+        sample, summary = split_mod.select_sample(
+            self.alerts, self.key, self.split, "CWE-89", 10, 201,
+            exclude_case_ids={"V1", "V2", "S1"})
+
+        self.assertNotIn("V1", {item["case_id"] for item in sample})
+        self.assertNotIn("V2", {item["case_id"] for item in sample})
+        self.assertNotIn("S1", {item["case_id"] for item in sample})
+        self.assertEqual(summary["excluded_prior_cases"], 3)
+
+    def test_multiple_categories_are_combined_without_labels(self):
+        tagged = [dict(item, vulnerable=True) for item in self.alerts]
+        tagged.append(dict(alert("X1", cwe="CWE-79"), vulnerable=True))
+        sample, summaries = split_mod.select_categories(
+            tagged, self.key, self.split,
+            {"CWE-89": 4, "CWE-79": 1}, 201, partition="dev")
+
+        self.assertEqual(len(sample), 5)
+        self.assertEqual(set(summaries), {"CWE-89", "CWE-79"})
+        self.assertEqual(len({item["case_id"] for item in sample}), 5)
+        self.assertTrue(all(set(item) == ALERT_FIELDS for item in sample))
+
     def test_one_alert_per_case_with_tie_break(self):
         sample, _ = self.select(100)
         self.assertEqual(len(sample), len({a["case_id"] for a in sample}))

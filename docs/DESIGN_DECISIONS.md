@@ -453,3 +453,35 @@ reader make this a direction, not a verdict.
   chunk_id; the map path still reads the raw JSON, so its results do not change. The
   duplicates should be removed at source by the KB builder, which is a data change to
   review separately.
+
+
+## 22. Reconciling PR #14 (evaluation improvements) with the LangGraph council
+
+**Decision.** PR #14 was built on the pipeline before the council moved to LangGraph.
+Merging it onto `main` as is would have kept its source-context and validation changes
+but silently dropped its consistency-repair step from council mode, because the graph
+never called it. The repair step is therefore a graph node of its own
+(`chair -> repair -> validate`), and the shared logic lives in `triagebot/execution.py`
+so the plain-Python single-agent path and the graph run the same code.
+
+- **One repair call at most.** If the Chair's verdict contradicts its structured
+  analysis, one repair call is made; a repair that is still inconsistent becomes
+  `human_review`. No automatic retry beyond that. With a consistent verdict the node
+  makes no model call.
+- **Its own node,** so a crash after the Chair does not repeat the paid Chair call
+  (Phase 2). The durable latency adds the repair duration:
+  `max(analyst, skeptic) + chair + repair`. The checkpoint schema version is now 2, and
+  the provenance guard also covers the related-source limits and the retrieval settings.
+- **Validation context.** `validation_case` carries the quoted related files as
+  `source_files`, so a citation into a helper is checked against that helper's text.
+- **Source window.** This branch keeps PR #14's 60 lines together with its related-file
+  context, because its 66-case comparison was measured that way. Decision 19's 100 lines
+  had only a smoke test behind it. The two have not been compared on the same cases,
+  so this is provisional and one config line.
+
+**Limitations.**
+- Durable runs fingerprint only the alert's own source file. The related files chosen
+  during `build_context` are not fingerprinted, so a change to a helper between
+  creation and resume is not caught.
+- PR #14's reported numbers were produced before the graph. They are not claimed for the
+  graph path until the comparison is re-run there.

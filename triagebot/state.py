@@ -24,4 +24,5 @@ class CouncilState(TypedDict, total=False):
     analyst_elapsed_seconds: float
     skeptic_elapsed_seconds: float
     chair_elapsed_seconds: float
+    repair_elapsed_seconds: float
     run_provenance: dict
