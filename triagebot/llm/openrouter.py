@@ -61,9 +61,14 @@ _REPORT_SCHEMA = {
 }
 
 
+def configured_model():
+    """Resolve model identity without constructing a client or reading a key."""
+    return os.environ.get("OPENROUTER_MODEL") or _DEFAULT_MODEL
+
+
 class OpenRouterCaller:
     def __init__(self, model: str | None = None, timeout: int = 90):
-        self.model = model or os.environ.get("OPENROUTER_MODEL") or _DEFAULT_MODEL
+        self.model = model or configured_model()
         self.timeout = timeout
         self.last_call: dict | None = None   # usage/latency of the latest call
         key = _api_key()
