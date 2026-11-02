@@ -405,6 +405,52 @@ establish generalisation to new data.
 oversight, evaluate on genuinely new data next, and address transient missing-
 citation/API failures separately rather than weakening validation.
 
+### 2026-11-02 - Experiment 7: fresh 120-case generalisation test
+
+**Change:** no further implementation change. Freeze and evaluate the latest
+resource-aware LangGraph council at commit `ef6dd7c` on new cases.
+
+**Hypothesis:** the zero unsafe dismissals seen on the 66-case regression set
+will generalise to a larger unseen sample without answer-key access during
+model calls.
+
+**Cases used:** 120 previously unused OWASP Benchmark test-partition cases: 60
+genuine findings and 60 false positives. CWE-22, CWE-78, CWE-79 and CWE-89
+contributed 24 cases each; the previously untested CWE-501 and CWE-643
+categories contributed 12 each. A post-selection audit found zero overlap with
+287 cases previously selected or sent to a model. The frozen label-free sample
+SHA-256 is `d06d33baada754380d2f5891c8381024fe2f01c4fd984f09b41543bccd2959db`.
+
+| Result | Raw council | Validated council |
+| --- | ---: | ---: |
+| Precision | **93.75%** | 85.71% |
+| Recall | **100.00%** | **100.00%** |
+| F1 | **96.77%** | 92.31% |
+| Genuine wrongly dismissed | **0 of 60** | **0 of 60** |
+| False positives removed | **56 of 60** | 50 of 60 |
+| Human review | **2 of 120** | 14 of 120 |
+
+**After:** the safety result generalised: no genuine vulnerability was wrongly
+dismissed. Validation escalated all 12 CWE-501 cases because no CWE-matched
+guidance exists, plus two cases with missing citations. This reduced automatic
+false-positive removal but prevented unsupported decisions from passing.
+
+**Cost and latency:** Gemini 3.8 Flash at temperature 0 cost $1.922363. Mean
+latency was 24.676 seconds and maximum latency was 113.577 seconds.
+
+**Improved? Mixed but strong.** The latest council achieved 96.77% F1 and zero
+unsafe dismissals on genuinely new data, supporting the redesign. The validated
+pipeline exposed a real coverage gap for CWE-501 and reached 92.31% F1 with
+11.67% human review.
+
+**Decision:** preserve this first run without selective retries or tuning. Keep
+the resource-aware fix. Treat CWE-501 guidance coverage and missing-citation
+reliability as follow-up work, measured against a separate development set.
+
+**Unexpected finding:** broadening the test to new vulnerability categories
+revealed that deterministic validation can become the bottleneck even when the
+raw council performs well.
+
 Add one entry after every experiment:
 
 ```text
@@ -459,3 +505,7 @@ Keep short evidence-backed points here as they appear.
     rose from 95.4% to 98.5% and unsafe dismissals fell from two to zero, at a
     21.8% prompt-token increase. This repeated set is regression evidence, not
     a new unbiased test.
+11. **The safety improvement generalised, while broader coverage found the next
+    bottleneck.** On 120 fresh cases, the council achieved 96.77% F1 with zero
+    unsafe dismissals. Validation safely escalated all 12 CWE-501 cases because
+    that category has no matched guidance, showing why new categories matter.

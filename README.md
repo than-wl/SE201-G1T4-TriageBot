@@ -52,6 +52,15 @@ not production readiness. See [FINAL_RESULTS.md](FINAL_RESULTS.md) for the full
 scanner comparison, per-category metrics, costs, failure analysis and threats
 to validity.
 
+After the resource-aware command-injection fix, a second frozen evaluation used
+120 different cases across six CWE categories, with zero overlap with prior
+model-tested cases. The latest raw council achieved **93.8% precision, 100.0%
+recall and 96.8% F1**, removing 56 of 60 false positives and wrongly dismissing
+none of the 60 genuine findings. Deterministic validation also dismissed none,
+but sent 14 cases to human review—12 because the newly tested CWE-501 category
+has no matched guidance. This is the strongest current generalisation evidence,
+not a production-safety guarantee.
+
 ## 3. Quick start
 
 Tested with Python 3.12.7 and Git 2.45 on Windows 11. Run every command from the repository root, in a terminal.

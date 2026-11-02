@@ -103,6 +103,31 @@ human review fell from 3 cases to 2. This cost about **US$0.14 more**, took abou
 cases informed the fix, this is regression evidence rather than a new unseen
 evaluation.
 
+## Did the latest version work on new cases?
+
+Yes. We froze another **120 previously unused cases** after the fix: 60 genuine
+vulnerabilities and 60 false alarms across six CWE categories. They had zero
+overlap with the 287 cases previously selected or sent to a model. The answer
+key was used to balance the sample, but was withheld until all model calls had
+finished.
+
+| Latest version | Precision | Recall | F1 | False alarms removed | Real vulnerabilities wrongly removed | Sent to a human |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| AI council | **93.8%** | **100.0%** | **96.8%** | **56 of 60** | **0 of 60** | 2 of 120 |
+| Validated council | 85.7% | **100.0%** | 92.3% | 50 of 60 | **0 of 60** | 14 of 120 |
+
+This fresh test supports the safety improvement: neither configuration
+wrongly removed a genuine vulnerability. The raw council was more useful
+overall. Validation safely escalated every CWE-501 case because the knowledge
+base has no CWE-501 guidance, and escalated two other cases with missing
+citations. This explains 14 human reviews and the lower validated precision/F1;
+it is a guidance-coverage limitation, not evidence that unsafe results were
+accepted.
+
+The run cost **US$1.922363**, averaged **24.676 seconds per case**, and had a
+maximum latency of **113.577 seconds**. It is one frozen benchmark run, so it
+supports generalisation but does not prove production performance.
+
 ## Final conclusion
 
 TriageBot is promising as a **decision-support tool**. It can remove many
@@ -110,9 +135,9 @@ Semgrep false alarms and reduce the amount of manual review.
 
 However, it is **not ready to automatically suppress security warnings**. A
 human must still review its evidence before closing a finding. The next
-technical priorities are evaluation on genuinely new data and reliable handling
-of occasional API or missing-citation failures without weakening validation.
+technical priorities are adding guidance for uncovered CWE categories and
+reliable handling of occasional missing-citation failures without weakening
+validation.
 
-These results come from a synthetic Java benchmark and five vulnerability
-types. They should not be treated as proof of performance on real production
-projects.
+These results come from a synthetic Java benchmark. They should not be treated
+as proof of performance on real production projects.
