@@ -18,18 +18,19 @@ eLearn.
 - [x] Responsible-AI risk assessment and human-oversight boundary
 - [x] Consolidated AI-use disclosure plus all five individual member logs
 - [x] Automated tests and cross-platform CI configuration
+- [x] Final source merged into `main` and pushed to GitHub
 - [x] Secret-free package rules: no `.env`, API key, local benchmark checkout,
   raw paid outputs, virtual environment, cache, or local SQLite state
+- [x] Submission ZIP rebuilt from the merged `main` commit
 
 ## Still required before upload
 
 - [ ] Create and add the final presentation slides
 - [ ] Ensure all five members can explain their work and answer questions
 - [ ] Rehearse a presentation of at most 15 minutes, followed by 5 minutes Q&A
+- [ ] Ask the team to perform a final peer review of the merged `main` branch
 - [ ] Open the generated ZIP on a clean machine and follow its quick start
 - [ ] Confirm the GitHub repository/branch referenced in the package is accessible
-- [ ] Merge only after teammate review, then rebuild the package from the final
-  reviewed commit
 - [ ] Upload the final ZIP to eLearn before the deadline
 
 ## Highest-band review
