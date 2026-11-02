@@ -463,3 +463,13 @@ teammate's 60 lines for now, because his comparison was measured with it; this i
 and recorded in design decision 22. Two limitations remain: durable runs fingerprint only the
 alert's own file, and the teammate's reported numbers were produced before the graph and are
 not claimed for it until the comparison is re-run. No paid model calls were made.
+
+## 2026-11-02 | Git-history coverage check
+
+This log covers Hong Yi's authored work from the package scaffold and design
+decisions through shared contracts, the local knowledge base, retrieval and
+context payload, live review roles, the wider source window, LangGraph council,
+optional SQLite sessions, semantic guidance retrieval, and the PR #14 port.
+Git history shows no later Hong Yi-authored project commits requiring another
+AI-use entry. This is a completeness check, not a new claim that every
+documentation or merge edit used AI.

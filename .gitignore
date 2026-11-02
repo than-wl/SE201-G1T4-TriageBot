@@ -1,5 +1,6 @@
 # Generated evidence outside the shared Context folder.
 /tmp/
+/dist/
 
 # Local credentials and machine-specific files.
 .env

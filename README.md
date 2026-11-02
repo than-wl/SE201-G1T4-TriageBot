@@ -4,8 +4,8 @@
 
 TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
 
-**Status:** Final-project evaluation gates 1-5 are complete; presentation,
-team review, repository cleanup and submission packaging remain. The council runs
+**Status:** Final-project evaluation and repository finalisation are complete;
+team review and the presentation deck remain. The council runs
 on LangGraph (Phase 1), with opt-in SQLite checkpoint sessions (Phase 2) and an
 optional semantic guidance retrieval mode that is off by default (design decision
 21). No human-in-the-loop pause is claimed. The recorded comparison in
@@ -21,9 +21,9 @@ Every decision must quote the source code it relies on, and deterministic code c
 
 We measure it on the OWASP Benchmark Java test suite, whose answer key says which test cases are really vulnerable, and compare it with simpler baselines (scanner only, a single AI agent).
 
-![TriageBot architecture](docs/architecture/TriageBot_Architecture_Diagram.png)
-
-The editable source of the diagram is [docs/architecture/TriageBot_Architecture_Diagram.drawio.svg](docs/architecture/TriageBot_Architecture_Diagram.drawio.svg).
+[View the latest TriageBot architecture diagram](docs/architecture/README.md).
+Its editable Mermaid source is
+[docs/architecture/TriageBot_Architecture_Diagram.mmd](docs/architecture/TriageBot_Architecture_Diagram.mmd).
 
 ## 2. Evaluation results
 
@@ -317,7 +317,6 @@ docs/            design decisions, architecture diagram, screenshots, proposal, 
 verification/    feasibility-stage scripts, kept as historical evidence
 ai-log/          per-member AI use logs
 Context/         local-only workspace (benchmark clone, re-scans, outputs); only its README and .gitignore are tracked
-checkpoint/      TEMPORARY planning notes, removed before final submission
 ```
 
 **Branches and commits.** Work on a branch (for example `checkpoint/<name>-<topic>` or `chore/<topic>`) and merge through a pull request. Every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer.
@@ -349,7 +348,7 @@ are in [RESPONSIBLE_AI_RISK_ASSESSMENT.md](RESPONSIBLE_AI_RISK_ASSESSMENT.md).
 - The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
 - Do not describe the five-case smoke test as proof of general system accuracy.
 
-**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer. See [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16. Logs to date: `ai-log/bradley.md`, `darren.md`, `hong-yi.md`, `lisa.md` and `wei-lin.md`.
+**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work should carry an `Assisted-by: <tool> (<model>)` trailer. See the consolidated [AI use disclosure](AI_USE_DISCLOSURE.md), the individual logs, and [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16. Known historical trailer omissions are disclosed in the logs rather than hidden by rewriting shared Git history.
 
 ## 10. Team and roles
 

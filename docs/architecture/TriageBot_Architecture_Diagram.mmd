@@ -1,0 +1,61 @@
+flowchart LR
+    SRC["Java source\nOWASP Benchmark v1.2"] --> SG["Semgrep CE\nrecorded or fresh scan"]
+    SG --> NORM["Alert normaliser\none record per finding"]
+
+    subgraph EVIDENCE["Bounded evidence pack"]
+      direction TB
+      WINDOW["Alert source window"]
+      RELATED["Referenced Java helpers and\nlocal shell or batch resources"]
+      GUIDE["CWE guidance retrieval\nkeyword or optional semantic SQLite index"]
+    end
+
+    NORM --> WINDOW
+    NORM --> RELATED
+    NORM --> GUIDE
+
+    subgraph COUNCIL["LangGraph multi-agent council"]
+      direction TB
+      A["Analyst\nargues the likely verdict"]
+      S["Skeptic\nchallenges weak evidence"]
+      C["Chair\ncombines both reviews"]
+      R["Consistency repair\nresolves verdict/evidence conflicts"]
+      V["Deterministic validator\nchecks schema and exact citations"]
+      A --> C
+      S --> C
+      C --> R --> V
+    end
+
+    EVIDENCE --> A
+    EVIDENCE --> S
+    OR["OpenRouter\ngoogle/gemini-3.8-flash\ntemperature 0"] --> A
+    OR --> S
+    OR --> C
+    OR --> R
+
+    V --> TP["true_positive"]
+    V --> FP["false_positive"]
+    V --> HR["human_review\nsafe fallback"]
+
+    DB[("Optional SQLite checkpoints\nresume interrupted council sessions")]
+    COUNCIL -. state .-> DB
+
+    subgraph EVAL["Evaluation only - labels never enter model prompts"]
+      KEY["OWASP answer key"]
+      SPLIT["Frozen held-out sample\n60 genuine + 60 safe across 6 CWEs"]
+      SCORE["Precision, recall, F1,\nper-CWE failures, cost and latency"]
+      KEY --> SPLIT --> SCORE
+    end
+
+    SG -. scanner findings .-> SCORE
+    V -. validated verdicts .-> SCORE
+
+    classDef source fill:#e8f1ff,stroke:#3973b7,color:#172b4d;
+    classDef process fill:#eef8f2,stroke:#3b8b5a,color:#173d27;
+    classDef ai fill:#fff3df,stroke:#d78321,color:#51310b;
+    classDef safety fill:#f4ecff,stroke:#7d55b3,color:#33204c;
+    classDef outcome fill:#f7f7f7,stroke:#666,color:#222;
+    class SRC,SG,NORM source;
+    class WINDOW,RELATED,GUIDE process;
+    class A,S,C,R,OR ai;
+    class V,DB,KEY,SPLIT,SCORE safety;
+    class TP,FP,HR outcome;

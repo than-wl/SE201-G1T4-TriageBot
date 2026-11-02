@@ -45,3 +45,11 @@ Commit `e7cea32` ("validation: reject unsupported triage evidence") contains
 this AI-assisted work but was committed without the `Assisted-by:` trailer
 required by decision 16. It was already merged (PR #2), so history was not
 rewritten; this entry is the disclosure, and later commits carry the trailer.
+
+## 2026-11-02 | Git-history coverage check
+
+This log covers Lisa's deterministic schema/citation validator, its offline
+tests and later documentation work recording the team's AI logs and confirmed
+contribution statements. Git history shows no later Lisa-authored project
+commits requiring another AI-use entry. This is a completeness check, not a new
+claim that every documentation edit used AI.

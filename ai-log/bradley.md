@@ -53,3 +53,11 @@ result number is invented; every missing figure is marked [TBC].
 Kept as the working draft. Placeholders will be filled from teammates'
 components and the final run, and each member will confirm their own
 contribution paragraph before submission.
+
+## 2026-11-02 | Git-history coverage check
+
+This log covers Bradley's authored project work through the scoring harness,
+its planted-bug and clean-human-review tests, and the checkpoint report draft
+and retrieval-limit update. Git history shows no later Bradley-authored project
+commits requiring another AI-use entry. This is a completeness check, not a new
+claim that every documentation edit used AI.

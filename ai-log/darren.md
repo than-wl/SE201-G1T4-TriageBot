@@ -195,3 +195,14 @@ status badge in the README.
 
 - Kept the recorded scan, setup check, environment changes and README structure as generated.
 - Changed the recorded scan from the later re-scan back to the original run, and documented the run-to-run variation in data/semgrep/README.md.
+
+## 2026-11-02 | Git-history coverage check
+
+This log covers Darren's authored work on repository documentation, ingest and
+answer-key mapping, the Semgrep baseline, validator report compatibility, the
+terminal interface, setup checks, recorded scan, cross-platform CI, and final
+checkpoint-report edits. Git history shows no later Darren-authored project
+commits requiring another AI-use entry. This is a completeness check, not a new
+claim that every documentation edit used AI. The checkpoint task guides and old
+Draw.io/PNG diagram paths named in the historical entries above were superseded
+and removed during final repository cleanup; Git history preserves them.
