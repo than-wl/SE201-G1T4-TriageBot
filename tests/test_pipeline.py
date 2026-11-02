@@ -179,6 +179,66 @@ class PipelineTest(unittest.TestCase):
         self.assertTrue(run["validated"]["validated"],
                         run["validated"]["validation_errors"])
 
+    def test_payload_follows_infrastructure_helper_into_resource_script(self):
+        alert = dict(ALERT, cwe="CWE-78", start_line=7, end_line=7)
+        source = self.root / ALERT["file"]
+        source.write_text(
+            "class Demo {\n"
+            "String input = request.getHeader(\"X-Test\");\n"
+            "String cmd = helpers.CommandUtils.getCommand();\n"
+            "String[] args = {cmd};\n"
+            "String[] argsEnv = {\"FOO=\" + input};\n"
+            "Runtime r = Runtime.getRuntime();\n"
+            "Process p = r.exec(args, argsEnv);\n"
+            "}\n",
+            encoding="utf-8")
+
+        helper_file = "src/main/java/helpers/CommandUtils.java"
+        helper = self.root / helper_file
+        helper.parent.mkdir(parents=True, exist_ok=True)
+        filler = "\n".join(f"int filler{i} = {i};" for i in range(70))
+        helper.write_text(
+            "package helpers;\npublic class CommandUtils {\n" + filler + "\n"
+            "public static String getCommand() {\n"
+            "String ignored = \"../outside.sh\";\n"
+            "return getFileFromClasspath(\"scripts/runner.sh\");\n"
+            "}\n}\n",
+            encoding="utf-8")
+
+        script_file = "src/main/resources/scripts/runner.sh"
+        script = self.root / script_file
+        script.parent.mkdir(parents=True, exist_ok=True)
+        script.write_text("#!/bin/sh\neval \"$FOO\"\n", encoding="utf-8")
+        outside = self.root / "src/main/outside.sh"
+        outside.write_text("echo must-not-be-retrieved\n", encoding="utf-8")
+
+        response = {
+            "verdict": "true_positive",
+            "explanation": "Untrusted `input` reaches the script evaluation through FOO.",
+            "citations": [
+                {"file": ALERT["file"], "line": 2, "quote": "request.getHeader"},
+                {"file": script_file, "line": 2, "quote": "eval \"$FOO\""},
+            ],
+            "guidance": [],
+        }
+        caller = CannedCaller(response)
+
+        run = pipeline.triage(
+            alert, mode="single", caller_factory=lambda: caller,
+            kb=EmptyKnowledgeBase(), benchmark_root=self.root)
+
+        related = {item["file"]: item for item in run["payload"]["source"]["related"]}
+        self.assertIn(helper_file, related)
+        self.assertIn(script_file, related)
+        self.assertNotIn("src/main/outside.sh", related)
+        self.assertTrue(any("getCommand()" in line for line in related[helper_file]["lines"]))
+        self.assertIn('2: eval "$FOO"', related[script_file]["lines"])
+        self.assertTrue(any("r.exec(" in line for line in run["payload"]["facts"]["sink_apis"]))
+        self.assertIn("child process or script consumes environment values", caller.request["system"])
+        self.assertIn("attacker-controlled envp element can supply its own name=value",
+                      caller.request["system"])
+        self.assertTrue(run["validated"]["validated"], run["validated"]["validation_errors"])
+
     def test_council_runs_both_specialists_then_chair_and_sums_usage(self):
         response = {
             "verdict": "false_positive",

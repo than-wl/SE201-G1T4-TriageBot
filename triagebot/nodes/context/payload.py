@@ -82,7 +82,7 @@ _SOURCE_PATTERNS = (
 )
 _SINK_PATTERNS = (
     "executeQuery", "executeUpdate", "executeBatch", "prepareStatement",
-    "createStatement", "Runtime.exec", "ProcessBuilder", "eval(",
+    "createStatement", "Runtime.exec", ".exec(", "ProcessBuilder", "eval(",
     "innerHTML",
 )
 _CONCAT_PATTERNS = (

@@ -94,6 +94,15 @@ The improved run cost about **US$0.13 more** and took about **three seconds
 longer per case**. Two command-injection cases were still wrongly dismissed,
 so the improvement is meaningful but does not make automatic suppression safe.
 
+We later fixed that specific weakness by following referenced Java helpers into
+local shell and batch resources. On the same 66-case **regression set**, the
+merged system improved from **95.4% to 98.5% F1**, and real vulnerabilities
+wrongly removed fell from **2 to 0**. False-alarm removal stayed at 32 of 33 and
+human review fell from 3 cases to 2. This cost about **US$0.14 more**, took about
+2.9 seconds longer per case, and used 21.8% more prompt tokens. Because these
+cases informed the fix, this is regression evidence rather than a new unseen
+evaluation.
+
 ## Final conclusion
 
 TriageBot is promising as a **decision-support tool**. It can remove many
@@ -101,9 +110,8 @@ Semgrep false alarms and reduce the amount of manual review.
 
 However, it is **not ready to automatically suppress security warnings**. A
 human must still review its evidence before closing a finding. The next
-technical priority is indirect command-injection context: the two remaining
-misses passed attacker-controlled environment variables to scripts that were
-outside the retrieved Java source graph.
+technical priorities are evaluation on genuinely new data and reliable handling
+of occasional API or missing-citation failures without weakening validation.
 
 These results come from a synthetic Java benchmark and five vulnerability
 types. They should not be treated as proof of performance on real production

@@ -9,8 +9,9 @@ team review, repository cleanup and submission packaging remain. The council run
 on LangGraph (Phase 1), with opt-in SQLite checkpoint sessions (Phase 2) and an
 optional semantic guidance retrieval mode that is off by default (design decision
 21). No human-in-the-loop pause is claimed. The recorded comparison in
-`IMPROVEMENT_EXPERIMENT_LOG.md` was run on the pipeline before the council moved to
-LangGraph; a rerun on the graph path is still to do.
+`IMPROVEMENT_EXPERIMENT_LOG.md` now includes the merged LangGraph path and the
+resource-aware CWE-78 fix. Its latest same-set run is regression evidence, not a
+new unseen evaluation.
 
 ## 1. What TriageBot does
 
@@ -231,7 +232,7 @@ retrieval/vector DB should be a different file.
 - **Configurations** on the same cases: A scanner only; B single agent; C Analyst / Skeptic / Chair council; D council plus the deterministic validator.
 - **Metrics:** precision, recall, F1, false alarms removed, real vulnerabilities wrongly dismissed, human-review rate, cost and latency.
 - **Isolation:** the answer key is read only by the evaluation code, after all model calls. It never reaches a prompt or the model.
-- **Fresh comparison:** the improvement comparison excludes all 120 cases used by the completed final evaluation; its frozen model-side sample contains no labels.
+- **Original fresh comparison:** the 66-case improvement comparison excluded all 120 cases used by the completed final evaluation; its frozen model-side sample contains no labels. Later same-set runs are labelled as regression evidence because those cases informed the CWE-78 fix.
 
 ## 7. For developers
 

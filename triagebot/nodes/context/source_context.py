@@ -8,9 +8,11 @@ from triagebot import config
 
 _CALL = re.compile(r"\b([A-Za-z_$][\w$]*)\s*\(")
 _FQ_CLASS = re.compile(r"\b((?:[a-z_][\w$]*\.)+([A-Z][\w$]*))\s*\.")
+_FQ_MEMBER = re.compile(
+    r"\b((?:[a-z_][\w$]*\.)+([A-Z][\w$]*))\s*\.\s*([A-Za-z_$][\w$]*)\s*\(")
 _CLASS_NAME = re.compile(r"\b([A-Z][\w$]*)\b")
+_RESOURCE_LITERAL = re.compile(r'["\']([^"\'\r\n]+\.(?:sh|bat|cmd|ps1))["\']', re.IGNORECASE)
 _NOT_METHODS = {"if", "for", "while", "switch", "catch", "new", "return", "throw"}
-_INFRASTRUCTURE_SUFFIXES = ("Helper", "Util", "Utils")
 
 
 def _brace_delta(line):
@@ -67,14 +69,20 @@ def _java_path(root, qualified_name):
     return root / "src" / "main" / "java" / Path(*qualified_name.split(".")).with_suffix(".java")
 
 
-def _is_context_candidate(qualified_name):
-    return not qualified_name.rsplit(".", 1)[-1].endswith(_INFRASTRUCTURE_SUFFIXES)
-
-
 def _clean_lines(path):
     from triagebot.nodes.context.payload import strip_comments
 
     return strip_comments(path.read_text(encoding="utf-8", errors="replace")).splitlines()
+
+
+def _class_references(text, relationship):
+    references = {}
+    for qualified_name, _, member in _FQ_MEMBER.findall(text):
+        references.setdefault(qualified_name, set()).add(member)
+    for qualified_name, _ in _FQ_CLASS.findall(text):
+        references.setdefault(qualified_name, set())
+    return [(name, relationship, tuple(sorted(members)))
+            for name, members in references.items()]
 
 
 def build_source_context(root, alert, clean_lines):
@@ -90,18 +98,21 @@ def build_source_context(root, alert, clean_lines):
 
     primary_file = alert["file"]
     full_text = "\n".join(clean_lines)
-    queue = [(name, "direct class reference") for name, _ in _FQ_CLASS.findall(full_text)
-             if _is_context_candidate(name)]
+    queue = _class_references(full_text, "direct class reference")
     related, seen = [], {str((root / primary_file).resolve())}
     line_budget = config.SOURCE_RELATED_MAX_LINES
     while queue and len(related) < config.SOURCE_RELATED_MAX_FILES and line_budget > 0:
-        qualified_name, relationship = queue.pop(0)
+        qualified_name, relationship, members = queue.pop(0)
         path = _java_path(root, qualified_name).resolve()
         if str(path) in seen or not path.is_relative_to(root) or not path.is_file():
             continue
         seen.add(str(path))
         lines = _clean_lines(path)
-        numbers = [number for number, line in enumerate(lines, 1) if line.strip()]
+        spans = _method_spans(lines)
+        numbers = sorted({number for member in members if member in spans
+                          for number in range(spans[member][0], spans[member][1] + 1)})
+        if not numbers:
+            numbers = [number for number, line in enumerate(lines, 1) if line.strip()]
         numbers = numbers[:min(line_budget, config.SOURCE_RELATED_MAX_LINES_PER_FILE)]
         line_budget -= len(numbers)
         relative = path.relative_to(root).as_posix()
@@ -109,14 +120,36 @@ def build_source_context(root, alert, clean_lines):
                         "lines": _numbered(lines, numbers)})
 
         text = "\n".join(lines)
-        discovered = [(name, f"referenced by {relative}")
-                      for name, _ in _FQ_CLASS.findall(text) if _is_context_candidate(name)]
+        resource_root = (root / "src" / "main" / "resources").resolve()
+        for resource_name in _RESOURCE_LITERAL.findall(text):
+            if len(related) >= config.SOURCE_RELATED_MAX_FILES or line_budget <= 0:
+                break
+            resource = (resource_root / resource_name.lstrip("/\\")).resolve()
+            if (str(resource) in seen or not resource.is_relative_to(resource_root)
+                    or not resource.is_file()):
+                continue
+            seen.add(str(resource))
+            resource_lines = resource.read_text(
+                encoding="utf-8", errors="replace").splitlines()
+            resource_numbers = [number for number, line in enumerate(resource_lines, 1)
+                                if line.strip()]
+            resource_numbers = resource_numbers[:min(
+                line_budget, config.SOURCE_RELATED_MAX_LINES_PER_FILE)]
+            line_budget -= len(resource_numbers)
+            resource_relative = resource.relative_to(root).as_posix()
+            related.append({
+                "file": resource_relative,
+                "relationship": f"resource referenced by {relative}",
+                "lines": _numbered(resource_lines, resource_numbers),
+            })
+
+        discovered = _class_references(text, f"referenced by {relative}")
         for class_name in _CLASS_NAME.findall(text):
             sibling = path.with_name(class_name + ".java")
             if sibling.is_file():
                 package_root = root / "src" / "main" / "java"
                 qualified = ".".join(sibling.relative_to(package_root).with_suffix("").parts)
-                discovered.append((qualified, f"referenced by {relative}"))
+                discovered.append((qualified, f"referenced by {relative}", ()))
         queue[0:0] = discovered
 
     return {"file": primary_file, "lines": _numbered(clean_lines, selected),

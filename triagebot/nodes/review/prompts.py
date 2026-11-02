@@ -24,6 +24,8 @@ _CWE_CHECKLISTS = {
     "CWE-78": """Command-injection checklist:
 - Distinguish untrusted data in the command string versus an argument or environment array.
 - Determine whether a shell interprets the value or an executable receives it directly.
+- Trace how the child process or script consumes environment values; if unavailable, choose human review.
+- An attacker-controlled envp element can supply its own name=value; do not assume a fixed variable name.
 - Verify constants, branch conditions and allowlists on the executed path.""",
     "CWE-90": """LDAP-injection checklist:
 - Trace the exact value into LDAP filter construction and DirContext.search.

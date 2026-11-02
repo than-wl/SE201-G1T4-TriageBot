@@ -355,6 +355,56 @@ to human review. Model capability and provider reliability materially affect
 the pipeline. The old runner's uncaught truncated-response crash also exposed
 an operational reliability weakness absent from the completed improved run.
 
+### 2026-11-02 - Experiment 6: resource-aware command-injection context
+
+**Change:** after PR #14 and the LangGraph council were merged, allow directly
+referenced infrastructure classes such as `Utils`, select the referenced helper
+methods instead of the first lines of the file, follow bounded local shell/batch
+resource references, recognise aliased `.exec(...)` sinks, and require CWE-78
+reviewers to trace attacker-controlled `envp` entries into the child process.
+
+**Hypothesis:** supplying the previously missing helper and script evidence will
+remove the two unsafe command-injection dismissals without reducing false-positive
+removal elsewhere.
+
+**Cases used:** the same frozen 66-case comparison set and Gemini 3.8 Flash at
+temperature 0.0. This set has now informed the diagnosis and is a regression set,
+not a fresh unbiased test. Answer-key labels were still withheld from model calls.
+
+| Validated result | Merged `main` | Resource-aware fix | Change |
+| --- | ---: | ---: | ---: |
+| Precision | 96.9% | **97.1%** | +0.2 points |
+| Recall | 93.9% | **100.0%** | +6.1 points |
+| F1 | 95.4% | **98.5%** | +3.1 points |
+| Genuine wrongly dismissed | 2 | **0** | -2 |
+| False positives removed | 32 of 33 | 32 of 33 | no change |
+| Human review | 3 of 66 | **2 of 66** | -1 |
+| Mean latency | 21.877 s | 24.801 s | +2.924 s |
+| Reported cost | $0.934348 | $1.074134 | +$0.139786 |
+| Prompt tokens | 674,217 | 821,008 | +146,791 |
+
+**Before:** the merged graph still dismissed `BenchmarkTest01066` and
+`BenchmarkTest01192` because it did not show the council the `Utils` helper or
+the scripts that execute `FOO`. Two unrelated transient model failures also
+became human-review cases in that run.
+
+**After:** both command-injection cases were validated true positives and cited
+`insecureCmd.sh` line 4 (`eval $FOO`). No genuine vulnerability was dismissed.
+One genuine and one false-positive case were escalated because their model
+answers lacked citations.
+
+**Cost and latency:** safety improved at a cost of about $0.14, 2.9 seconds per
+case, and 21.8% more prompt tokens. One request produced a 273.652-second maximum
+latency, so mean latency hides a long-tail reliability issue.
+
+**Improved? Yes, as regression evidence.** The exact known safety failures were
+removed and overall regression metrics improved, but the repeated set cannot
+establish generalisation to new data.
+
+**Decision:** keep the bounded retrieval and checklist fix. Preserve human
+oversight, evaluate on genuinely new data next, and address transient missing-
+citation/API failures separately rather than weakening validation.
+
 Add one entry after every experiment:
 
 ```text
@@ -403,3 +453,9 @@ Keep short evidence-backed points here as they appear.
    Flash Lite cost only $0.11, but malformed and rate-limited answers sent
    80.3% of cases to humans; Gemini 3.8 Flash produced usable structured output
    and reduced that rate to 1.5% in the improved pipeline.
+10. **Tracing beyond Java fixed a safety failure.** Following a referenced
+    `Utils` method into its shell/batch resources changed both known CWE-78
+    misses into validated true positives. On the 66-case regression set, F1
+    rose from 95.4% to 98.5% and unsafe dismissals fell from two to zero, at a
+    21.8% prompt-token increase. This repeated set is regression evidence, not
+    a new unbiased test.
