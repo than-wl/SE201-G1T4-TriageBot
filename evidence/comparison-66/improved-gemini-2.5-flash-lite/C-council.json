@@ -1,0 +1,1435 @@
+{
+  "model": "google/gemini-2.5-flash-lite",
+  "results": [
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00026",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 1.654,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00040",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 1.207,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00047",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 1.302,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00077",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.507,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1759,
+        "cost": 0.0013651000000000002,
+        "prompt_tokens": 6615,
+        "total_tokens": 8374
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00199",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.306,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2637,
+        "cost": 0.0018062,
+        "prompt_tokens": 7514,
+        "total_tokens": 10151
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "java.io.FileOutputStream constructor",
+        "source": "HTTP request headers"
+      },
+      "case_id": "BenchmarkTest00222",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 54,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 86,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 88,
+          "quote": "fos = new java.io.FileOutputStream(fileName);"
+        }
+      ],
+      "explanation": "The application takes an HTTP header name as input, which is assigned to the 'bar' variable after a switch statement. This 'bar' variable is then concatenated with a base directory to form a file path, which is used to instantiate a FileOutputStream. No sanitization or validation is applied to the header name, allowing for directory traversal.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.581,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2508,
+        "cost": 0.0018919000000000002,
+        "prompt_tokens": 8887,
+        "total_tokens": 11395
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().write(bar)",
+        "source": "request.getHeaders(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest00290",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"Referer\")"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 51,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\")"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 57,
+          "quote": "response.getWriter().write(bar)"
+        }
+      ],
+      "explanation": "User-controlled input from the 'Referer' header is decoded and then directly written to the response writer. This bypasses any potential output encoding or sanitization, creating a path for Cross-Site Scripting (XSS) vulnerabilities.",
+      "guidance": [
+        {
+          "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+          "doc": "Introduction",
+          "section": "DOM Based XSS",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.159,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2577,
+        "cost": 0.0019508,
+        "prompt_tokens": 9200,
+        "total_tokens": 11777
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00302",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.599,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2613,
+        "cost": 0.0020312,
+        "prompt_tokens": 9860,
+        "total_tokens": 12473
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00310",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.751,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2641,
+        "cost": 0.00193154,
+        "prompt_tokens": 9583,
+        "total_tokens": 12224
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.FileInputStream(new java.io.File(fileName))",
+        "source": "request.getParameterMap()"
+      },
+      "case_id": "BenchmarkTest00454",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00454.java",
+          "line": 54,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00454.java",
+          "line": 55,
+          "quote": "else bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00454.java",
+          "line": 61,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00454.java",
+          "line": 62,
+          "quote": "fis = new java.io.FileInputStream(new java.io.File(fileName));"
+        }
+      ],
+      "explanation": "Although user input is read and concatenated into a file path, a constant branch condition ensures that the user-controlled input is never used. The 'bar' variable, which is part of the file path, is always assigned the constant string 'This_should_always_happen' due to the evaluation of the condition on line 54.",
+      "guidance": [],
+      "latency_seconds": 7.089,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2593,
+        "cost": 0.0019822,
+        "prompt_tokens": 9450,
+        "total_tokens": 12043
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "Runtime.exec()",
+        "source": "HTTPServletRequest"
+      },
+      "case_id": "BenchmarkTest00907",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00907.java",
+          "line": 45,
+          "quote": "String param = scr.getTheValue(\"BenchmarkTest00907\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00907.java",
+          "line": 52,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00907.java",
+          "line": 75,
+          "quote": "Process p = r.exec(args);"
+        }
+      ],
+      "explanation": "Although user input is read from the HttpServletRequest, it is assigned to the 'bar' variable only if a specific condition is met. This condition, (7 * 18) + 106 > 200, always evaluates to true, meaning 'bar' is always assigned the constant string \"This_should_always_happen\" and never the user-supplied parameter. Therefore, untrusted input does not reach the sink.",
+      "guidance": [],
+      "latency_seconds": 6.95,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2517,
+        "cost": 0.00193634,
+        "prompt_tokens": 10109,
+        "total_tokens": 12626
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "java.io.FileOutputStream constructor",
+        "source": "Cookie value from request"
+      },
+      "case_id": "BenchmarkTest00953",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00953.java",
+          "line": 60,
+          "quote": "param = java.net.URLDecoder.decode(theCookie.getValue(), \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00953.java",
+          "line": 68,
+          "quote": "String fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00953.java",
+          "line": 80,
+          "quote": "new java.io.FileOutputStream(new java.io.FileInputStream(fileName).getFD());"
+        }
+      ],
+      "explanation": "User-controlled input from a cookie is decoded and used to construct a file path. This path is then used to initialize a FileOutputStream, allowing an attacker to traverse directories and potentially write to arbitrary files.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.535,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2541,
+        "cost": 0.0019850000000000002,
+        "prompt_tokens": 9686,
+        "total_tokens": 12227
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00956",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.622,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2642,
+        "cost": 0.0019782000000000003,
+        "prompt_tokens": 9214,
+        "total_tokens": 11856
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01028",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.502,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2646,
+        "cost": 0.0019881,
+        "prompt_tokens": 9297,
+        "total_tokens": 11943
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01033",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.828,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2642,
+        "cost": 0.0021464,
+        "prompt_tokens": 10896,
+        "total_tokens": 13538
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01051",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.182,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2642,
+        "cost": 0.0019757999999999998,
+        "prompt_tokens": 9190,
+        "total_tokens": 11832
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01057",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.698,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2644,
+        "cost": 0.0020012,
+        "prompt_tokens": 9436,
+        "total_tokens": 12080
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "r.exec(cmd + bar)",
+        "source": "request.getHeader(\"BenchmarkTest01064\")"
+      },
+      "case_id": "BenchmarkTest01064",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01064\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 49,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 62,
+          "quote": "Process p = r.exec(cmd + bar);"
+        }
+      ],
+      "explanation": "Untrusted input is read from an HTTP header, decoded, and then concatenated into a command string passed to Runtime.exec(). No sanitization or validation is applied to the input before it is used in the command, making it vulnerable to command injection.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS Command Injection Defense Cheat Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.06,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2596,
+        "cost": 0.0020022599999999996,
+        "prompt_tokens": 10481,
+        "total_tokens": 13077
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01066",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.651,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2642,
+        "cost": 0.0020453,
+        "prompt_tokens": 9885,
+        "total_tokens": 12527
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01088",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 4.254,
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1759,
+        "cost": 0.0011775,
+        "prompt_tokens": 4739,
+        "total_tokens": 6498
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01179",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 1.094,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01182",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 1.1,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01192",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 0.901,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01212",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 3.327,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 883,
+        "cost": 0.0006132,
+        "prompt_tokens": 2600,
+        "total_tokens": 3483
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01235",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.577,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2591,
+        "cost": 0.001991,
+        "prompt_tokens": 9546,
+        "total_tokens": 12137
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "connection.prepareStatement",
+        "source": "HttpServletRequest.getParameter(\"BenchmarkTest01304\")"
+      },
+      "case_id": "BenchmarkTest01304",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01304\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 48,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME=? and PASSWORD='\" + bar + \"'\""
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 54,
+          "quote": "connection.prepareStatement("
+        }
+      ],
+      "explanation": "User-controlled input from the \"BenchmarkTest01304\" parameter is processed by the `doSomething` method and assigned to the `bar` variable. This `bar` variable is then directly concatenated into a SQL query string. The resulting SQL string is passed to `connection.prepareStatement`, creating a SQL injection vulnerability because the input is not parameterized or sanitized.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection Prevention Cheat Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.382,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2590,
+        "cost": 0.0019959,
+        "prompt_tokens": 9599,
+        "total_tokens": 12189
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01344",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.248,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2640,
+        "cost": 0.0020127,
+        "prompt_tokens": 9567,
+        "total_tokens": 12207
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01404",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 8.662,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2646,
+        "cost": 0.0022721,
+        "prompt_tokens": 12137,
+        "total_tokens": 14783
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01443",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.072,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2619,
+        "cost": 0.00200957,
+        "prompt_tokens": 10436,
+        "total_tokens": 13055
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01472",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.487,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2647,
+        "cost": 0.0023347999999999997,
+        "prompt_tokens": 12760,
+        "total_tokens": 15407
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01495",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.806,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2602,
+        "cost": 0.0020543000000000002,
+        "prompt_tokens": 10135,
+        "total_tokens": 12737
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01517",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.804,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2639,
+        "cost": 0.002061,
+        "prompt_tokens": 10054,
+        "total_tokens": 12693
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01583",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.697,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2628,
+        "cost": 0.0020319,
+        "prompt_tokens": 9807,
+        "total_tokens": 12435
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01610",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.803,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2642,
+        "cost": 0.0020528,
+        "prompt_tokens": 9960,
+        "total_tokens": 12602
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01621",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.702,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2581,
+        "cost": 0.0018363,
+        "prompt_tokens": 8039,
+        "total_tokens": 10620
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01628",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.455,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2644,
+        "cost": 0.0019754,
+        "prompt_tokens": 9178,
+        "total_tokens": 11822
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01664",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.606,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2639,
+        "cost": 0.0020784,
+        "prompt_tokens": 10228,
+        "total_tokens": 12867
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "URL decoding, list manipulation, command string concatenation",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "Runtime.exec",
+        "source": "HTTPServletRequest cookie value"
+      },
+      "case_id": "BenchmarkTest01865",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01865.java",
+          "line": 60,
+          "quote": "param = java.net.URLDecoder.decode(theCookie.getValue(), \"UTF-8\")"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01865.java",
+          "line": 100,
+          "quote": "bar = valuesList.get(1)"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01865.java",
+          "line": 78,
+          "quote": "Process p = r.exec(cmd + bar, argsEnv)"
+        }
+      ],
+      "explanation": "User-controlled input from an HTTP cookie is decoded and then processed by the `doSomething` method. The value returned by `doSomething` is concatenated with a command string and passed to `Runtime.exec`. The decoding and list manipulation do not sanitize the input against command injection, and the command string itself is not guaranteed to be safe.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS Command Injection Defense Cheat Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.58,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2626,
+        "cost": 0.0018974499999999997,
+        "prompt_tokens": 10959,
+        "total_tokens": 13585
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01902",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.16,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2606,
+        "cost": 0.0020958,
+        "prompt_tokens": 10534,
+        "total_tokens": 13140
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().printf(bar, obj)",
+        "source": "request.getHeader(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest01922",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"Referer\")"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 49,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\")"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 55,
+          "quote": "response.getWriter().printf(bar, obj)"
+        }
+      ],
+      "explanation": "User-controlled input from the 'Referer' header is retrieved, decoded, and then passed to a printf statement that writes directly to the response. This bypasses any view rendering or HTML escaping mechanisms, creating a vulnerability to Cross-Site Scripting (XSS).",
+      "guidance": [
+        {
+          "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+          "doc": "Introduction",
+          "section": "DOM Based XSS",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.251,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2564,
+        "cost": 0.0019798000000000003,
+        "prompt_tokens": 9542,
+        "total_tokens": 12106
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01941",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.481,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2641,
+        "cost": 0.00219678,
+        "prompt_tokens": 13085,
+        "total_tokens": 15726
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01965",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.0,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2638,
+        "cost": 0.0018332,
+        "prompt_tokens": 7780,
+        "total_tokens": 10418
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02030",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 8.201,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2638,
+        "cost": 0.0022963000000000003,
+        "prompt_tokens": 12411,
+        "total_tokens": 15049
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02048",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.724,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2645,
+        "cost": 0.002306,
+        "prompt_tokens": 12480,
+        "total_tokens": 15125
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02069",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.225,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2648,
+        "cost": 0.00199038,
+        "prompt_tokens": 10147,
+        "total_tokens": 12795
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02089",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.425,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2638,
+        "cost": 0.0019724,
+        "prompt_tokens": 9172,
+        "total_tokens": 11810
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02111",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.375,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2646,
+        "cost": 0.0019164000000000002,
+        "prompt_tokens": 8580,
+        "total_tokens": 11226
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02235",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.826,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2636,
+        "cost": 0.0019657999999999998,
+        "prompt_tokens": 9114,
+        "total_tokens": 11750
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02239",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.993,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2647,
+        "cost": 0.0019872,
+        "prompt_tokens": 9284,
+        "total_tokens": 11931
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02265",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.37,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2641,
+        "cost": 0.0018415000000000003,
+        "prompt_tokens": 7851,
+        "total_tokens": 10492
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02367",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.684,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2646,
+        "cost": 0.0023182,
+        "prompt_tokens": 12598,
+        "total_tokens": 15244
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02384",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.237,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2599,
+        "cost": 0.00201098,
+        "prompt_tokens": 10531,
+        "total_tokens": 13130
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02462",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.729,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2597,
+        "cost": 0.0019359999999999998,
+        "prompt_tokens": 8972,
+        "total_tokens": 11569
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02468",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.797,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2647,
+        "cost": 0.0019261,
+        "prompt_tokens": 8673,
+        "total_tokens": 11320
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().print(...)",
+        "source": "request.getParameterValues(\"BenchmarkTest02481\")"
+      },
+      "case_id": "BenchmarkTest02481",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02481.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02481\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02481.java",
+          "line": 51,
+          "quote": "response.getWriter().print(bar.toCharArray());"
+        }
+      ],
+      "explanation": "User-controlled input from the \"BenchmarkTest02481\" request parameter is processed and then directly written to the HTTP response writer without any sanitization or encoding. This allows for potential cross-site scripting (XSS) vulnerabilities.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross Site Scripting Prevention Cheat Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 5.863,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2566,
+        "cost": 0.0019477000000000001,
+        "prompt_tokens": 9213,
+        "total_tokens": 11779
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02513",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.764,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2649,
+        "cost": 0.0018899400000000001,
+        "prompt_tokens": 9954,
+        "total_tokens": 12603
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02516",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.156,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1764,
+        "cost": 0.0013562000000000001,
+        "prompt_tokens": 6506,
+        "total_tokens": 8270
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02544",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 7.757,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2645,
+        "cost": 0.0019681,
+        "prompt_tokens": 9101,
+        "total_tokens": 11746
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02564",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.532,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2646,
+        "cost": 0.0020194,
+        "prompt_tokens": 9610,
+        "total_tokens": 12256
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02566",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 6.785,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2645,
+        "cost": 0.0019872,
+        "prompt_tokens": 9292,
+        "total_tokens": 11937
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().printf()",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02591",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02591.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02591.java",
+          "line": 68,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02591.java",
+          "line": 74,
+          "quote": "response.getWriter().printf(\"Formatted like: %1$s and %2$s.\", obj);"
+        }
+      ],
+      "explanation": "User-controlled input from the query string is extracted, decoded, and then directly passed into a printf statement that writes to the HttpServletResponse's PrintWriter. There is no sanitization or encoding applied to the input before it reaches the sink, making it vulnerable to Cross-Site Scripting.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross Site Scripting Prevention Cheat Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 7.131,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2591,
+        "cost": 0.0020618,
+        "prompt_tokens": 10254,
+        "total_tokens": 12845
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().printf(bar, obj)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02593",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02593.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02593.java",
+          "line": 70,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02593.java",
+          "line": 74,
+          "quote": "response.getWriter().printf(bar, obj);"
+        }
+      ],
+      "explanation": "User-controlled input from the query string is extracted, processed by the doSomething method, and then directly written to the response writer using printf. There is no sanitization or encoding applied to the 'bar' variable before it is printed, creating a direct path for potential XSS vulnerabilities.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "OWASP Cross Site Scripting Prevention Cheat Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 6.918,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2453,
+        "cost": 0.0020473,
+        "prompt_tokens": 10661,
+        "total_tokens": 13114
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().write()",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02608",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02608.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02608.java",
+          "line": 68,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02608.java",
+          "line": 73,
+          "quote": "response.getWriter().write(\"Parameter value: \" + bar);"
+        }
+      ],
+      "explanation": "User-controlled input from the query string is extracted, decoded, and then directly written to the HTTP response writer. This bypasses any potential sanitization or escaping mechanisms, allowing for Cross-Site Scripting (XSS) vulnerabilities.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "OWASP Cheat Sheet Series",
+          "section": "Cross Site Scripting (XSS) Prevention Cheat Sheet",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 7.071,
+      "model": "google/gemini-2.5-flash-lite",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2471,
+        "cost": 0.0020313,
+        "prompt_tokens": 10429,
+        "total_tokens": 12900
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02641",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 2.068,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02647",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 1.171,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02655",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 429: Too Many Requests",
+      "guidance": [],
+      "latency_seconds": 1.049,
+      "role": "chair",
+      "usage": {},
+      "verdict": "human_review"
+    }
+  ]
+}

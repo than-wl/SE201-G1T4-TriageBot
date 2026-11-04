@@ -1,0 +1,101 @@
+{
+  "model": "google/gemini-3.8-flash",
+  "results": [
+    {
+      "case_id": "BenchmarkTest01066",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01066\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 57,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 62,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        },
+        {
+          "file": "src/main/resources/insecureCmd.sh",
+          "line": 4,
+          "quote": "eval $FOO"
+        }
+      ],
+      "explanation": "Untrusted header input is placed into argsEnv and passed as the envp parameter to Runtime.exec(args, argsEnv). Because Java expects each element of envp to follow the 'name=value' format, passing only 'bar' does not set the $FOO environment variable consumed by insecureCmd.sh or insecureCmd.bat, preventing command injection.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.078,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2269,
+        "cost": 0.01818825,
+        "prompt_tokens": 12906,
+        "total_tokens": 15175
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01192",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01192.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"BenchmarkTest01192\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01192.java",
+          "line": 59,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01192.java",
+          "line": 64,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        },
+        {
+          "file": "src/main/resources/insecureCmd.sh",
+          "line": 4,
+          "quote": "eval $FOO"
+        }
+      ],
+      "explanation": "Untrusted input from the HTTP header is passed as an environment setting in argsEnv to Runtime.exec(). The executed script directly evaluates the environment variable via eval or direct shell interpretation without sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 17.957,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1525,
+        "cost": 0.01492875,
+        "prompt_tokens": 12280,
+        "total_tokens": 13805
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [],
+      "verdict": "true_positive"
+    }
+  ]
+}

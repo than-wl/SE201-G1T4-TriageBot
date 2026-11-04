@@ -1,0 +1,554 @@
+{
+  "configurations": [
+    {
+      "configuration": "A-scanner-only",
+      "evaluated_findings": 66,
+      "f1": 0.6667,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00310",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00454",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00907",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01028",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01051",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01182",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01212",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01344",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01404",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01443",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01472",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01628",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01664",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01865",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01941",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01965",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02030",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02048",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02069",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02089",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02111",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02235",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02239",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02265",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02367",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02384",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02462",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02468",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02481",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02513",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02544",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02566",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02593",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 33,
+      "fp_removed": 0,
+      "fp_removed_rate": 0.0,
+      "fp_retained": 33,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 0,
+      "genuine_in_sample": 33,
+      "genuine_retained": 33,
+      "genuine_retained_rate": 1.0,
+      "human_review": 0,
+      "human_review_rate": 0.0,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": null,
+      "precision": 0.5,
+      "recall": 1.0,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 0,
+        "completion_tokens_total": null,
+        "cost_reported": 0,
+        "cost_total": null,
+        "latency_max_seconds": null,
+        "latency_mean_seconds": null,
+        "latency_reported": 0,
+        "prompt_tokens_reported": 0,
+        "prompt_tokens_total": null
+      }
+    },
+    {
+      "configuration": "C-council",
+      "evaluated_findings": 66,
+      "f1": 0.9524,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest01033",
+          "expected": "true_positive",
+          "explanation": "Header parameter input is passed to Test.doSomething, which relies on org.owasp.benchmark.helpers.ThingFactory.createThing().doSomething(param). Because the implementation of ThingInterface is not provided, it cannot be determined whether the untrusted input is sanitized before being concatenated into the file path.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01066",
+          "expected": "true_positive",
+          "explanation": "The untrusted input ('bar') is passed solely into the 'envp' (environment variables) parameter of Runtime.exec(String[] cmdarray, String[] envp), while the command itself ('cmd') is determined independently by the server helper method. As the user input is not part of the command array, command injection via the command line is not possible in this context.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01192",
+          "expected": "true_positive",
+          "explanation": "The user-supplied input 'bar' is passed solely as the environment variables array ('argsEnv') to Runtime.exec(args, argsEnv), while the command arguments array ('args') contains only the system-defined 'cmd'. Because the untrusted data is not executed as a command or argument, command injection is not possible.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02516",
+          "expected": "true_positive",
+          "explanation": "The user input 'param' resolves to variable 'bar' and is passed exclusively as an environment variable in the 'envp' array to Runtime.exec(cmd, argsEnv, dir). The command string 'cmd' executed by the system is generated independently without user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 33,
+      "fp_removed": 33,
+      "fp_removed_rate": 1.0,
+      "fp_retained": 0,
+      "genuine_dismissed": 3,
+      "genuine_dismissed_rate": 0.0909,
+      "genuine_human_review": 1,
+      "genuine_in_sample": 33,
+      "genuine_retained": 29,
+      "genuine_retained_rate": 0.8788,
+      "human_review": 1,
+      "human_review_rate": 0.0152,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 1.0,
+      "recall": 0.9091,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 66,
+        "completion_tokens_total": 90151,
+        "cost_reported": 66,
+        "cost_total": 0.804441,
+        "latency_max_seconds": 32.427,
+        "latency_mean_seconds": 23.728,
+        "latency_reported": 66,
+        "prompt_tokens_reported": 66,
+        "prompt_tokens_total": 623112
+      }
+    },
+    {
+      "configuration": "D-validated-council",
+      "evaluated_findings": 66,
+      "f1": 0.9091,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00040",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00222",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00953",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00956",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01033",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01066",
+          "expected": "true_positive",
+          "explanation": "The untrusted input ('bar') is passed solely into the 'envp' (environment variables) parameter of Runtime.exec(String[] cmdarray, String[] envp), while the command itself ('cmd') is determined independently by the server helper method. As the user input is not part of the command array, command injection via the command line is not possible in this context.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01192",
+          "expected": "true_positive",
+          "explanation": "The user-supplied input 'bar' is passed solely as the environment variables array ('argsEnv') to Runtime.exec(args, argsEnv), while the command arguments array ('args') contains only the system-defined 'cmd'. Because the untrusted data is not executed as a command or argument, command injection is not possible.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01235",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01404",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01495",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01583",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Cross_Site_Scripting_Prevention_Cheat_Sheet#016"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02468",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02516",
+          "expected": "true_positive",
+          "explanation": "The user input 'param' resolves to variable 'bar' and is passed exclusively as an environment variable in the 'envp' array to Runtime.exec(cmd, argsEnv, dir). The command string 'cmd' executed by the system is generated independently without user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02593",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Cross_Site_Scripting_Prevention_Cheat_Sheet#016"
+          ],
+          "verdict": "human_review"
+        }
+      ],
+      "fp_human_review": 3,
+      "fp_in_sample": 33,
+      "fp_removed": 30,
+      "fp_removed_rate": 0.9091,
+      "fp_retained": 0,
+      "genuine_dismissed": 3,
+      "genuine_dismissed_rate": 0.0909,
+      "genuine_human_review": 8,
+      "genuine_in_sample": 33,
+      "genuine_retained": 22,
+      "genuine_retained_rate": 0.6667,
+      "human_review": 11,
+      "human_review_rate": 0.1667,
+      "invalid_output_rate": 0.1667,
+      "invalid_outputs": 11,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 0.9091,
+      "recall": 0.9091,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 66,
+        "completion_tokens_total": 90151,
+        "cost_reported": 66,
+        "cost_total": 0.804441,
+        "latency_max_seconds": 32.427,
+        "latency_mean_seconds": 23.728,
+        "latency_reported": 66,
+        "prompt_tokens_reported": 66,
+        "prompt_tokens_total": 623112
+      }
+    }
+  ],
+  "note": "Initial checkpoint sample, not a general accuracy estimate.",
+  "same_case_coverage": true,
+  "sample_size": 66
+}

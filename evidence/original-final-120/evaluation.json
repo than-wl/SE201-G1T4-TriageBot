@@ -1,0 +1,1317 @@
+{
+  "configurations": [
+    {
+      "configuration": "A-scanner-only",
+      "evaluated_findings": 120,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00114",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00361",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00436",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00476",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00481",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00530",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00813",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00861",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00897",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00948",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01026",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01068",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01092",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01159",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01220",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01309",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01341",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01385",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01402",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01469",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01491",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01586",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01591",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01607",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01688",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01751",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01753",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01754",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01755",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01841",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01915",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01943",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02045",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02052",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02067",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02108",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02110",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02115",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02116",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02149",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02153",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02201",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02268",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02282",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02283",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02313",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02329",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02341",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02376",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02381",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02488",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02546",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02554",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02572",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02609",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02631",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02666",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02667",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02713",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02714",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 60,
+      "fp_removed": 0,
+      "fp_removed_rate": 0.0,
+      "fp_retained": 60,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 0,
+      "genuine_in_sample": 60,
+      "genuine_retained": 60,
+      "genuine_retained_rate": 1.0,
+      "human_review": 0,
+      "human_review_rate": 0.0,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": null,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 0,
+        "completion_tokens_total": null,
+        "cost_reported": 0,
+        "cost_total": null,
+        "latency_max_seconds": null,
+        "latency_mean_seconds": null,
+        "latency_reported": 0,
+        "prompt_tokens_reported": 0,
+        "prompt_tokens_total": null
+      }
+    },
+    {
+      "configuration": "B-single-agent",
+      "evaluated_findings": 120,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00788",
+          "expected": "true_positive",
+          "explanation": "User input extracted from the query string is passed through `thing.doSomething(param)` before being concatenated into `fileName` and used in `FileOutputStream`. Because the behavior of `ThingInterface.doSomething` cannot be verified from the provided source code, it is uncertain whether sanitization or transformation occurs.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00861",
+          "expected": "false_positive",
+          "explanation": "User input retrieved via SeparateClassRequest is assigned to bar when switchTarget evaluates to 'C' (guess.charAt(2) from 'ABC'). The unsanitized value is directly concatenated into the LDAP search filter and executed via ctx.search.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00897",
+          "expected": "false_positive",
+          "explanation": "User input retrieved via SeparateClassRequest is assigned to 'param' and flows into 'bar' because 'switchTarget' is 'C' (guess.charAt(2) from 'ABC'). The unsanitized value is then concatenated directly into a shell execution string ('echo ' + bar) invoked by cmd.exe /c or sh -c, enabling command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00983",
+          "expected": "true_positive",
+          "explanation": "The user-supplied value from the cookie is passed via argsEnv to Runtime.getRuntime().exec(cmd, argsEnv), where argsEnv represents environment variable definitions rather than the command string or its arguments. The command itself (cmd) is obtained statically from Utils.getInsecureOSCommandString and does not incorporate the user input.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01092",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01159",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01243",
+          "expected": "true_positive",
+          "explanation": "In Test.doSomething, the expression `(7 * 42) - num > 200` evaluates constant integers: `7 * 42 = 294`, and `294 - 106 = 188`, which is not greater than 200. Thus, the ternary condition always evaluates to false, returning `param`? Wait: `(7 * 42) - num = 188`. 188 > 200 is false, so it evaluates to `param`! Wait, if it evaluates to `param`, `bar` equals `param`!",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01463",
+          "expected": "true_positive",
+          "explanation": "In Test.doSomething, the arithmetic condition `(7 * 42) - num > 200` evaluates to `(294) - 106 = 188 > 200`, which is false, returning `param`. However, `param` is constrained to HTTP parameter names where the parameter's value equals 'BenchmarkTest01463'. While parameter names are user-controlled, the arithmetic expression evaluates to 188 which is not > 200, so `bar` becomes `param`. Wait, let's recheck: (7 * 42) = 294. 294 - 106 = 188. 188 > 200 is false, so `bar = param`. `param` originates from `names.nextElement()` where `value.equals(\"BenchmarkTest01463\")`. Since the client controls request parameter names, an attacker can supply an arbitrary SQL injection string as a parameter name with value 'BenchmarkTest01463'. This value is directly concatenated into the SQL statement `{call \" + bar + \"}` without sanitization.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01491",
+          "expected": "false_positive",
+          "explanation": "The file is truncated inside the Test.doSomething method at line 120, preventing verification of whether the method returns the tainted string or performs any sanitization before returning into bar.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01625",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01753",
+          "expected": "false_positive",
+          "explanation": "User input retrieved via SeparateClassRequest is Base64 encoded and immediately decoded back to its original value, then directly concatenated into the LDAP search filter string without proper escaping or sanitization before being executed by idc.search().",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01754",
+          "expected": "false_positive",
+          "explanation": "User input retrieved via SeparateClassRequest is passed into Test.doSomething, placed in a map, and returned unchanged into bar. The variable bar is directly concatenated into the LDAP filter string on line 55 without escaping or sanitization and executed via idc.search on line 63.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01755",
+          "expected": "false_positive",
+          "explanation": "User input retrieved via SeparateClassRequest is passed into Test.doSomething, placed in a map, and returned unmodified as 'bar'. It is then concatenated directly into the LDAP search filter without sanitization or escaping and executed via idc.search().",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02037",
+          "expected": "true_positive",
+          "explanation": "In doSomething(), the ternary condition '(7 * 42) - num > 200' evaluates to '294 - 106 > 200', which simplifies to '188 > 200' (false); therefore, 'bar' is assigned the user input 'param', which is then concatenated unsanitized into the LDAP filter at line 61 and executed via idc.search at line 69.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02155",
+          "expected": "true_positive",
+          "explanation": "The untrusted input param is passed only into argsEnv (the environment variables array) of Runtime.exec(cmd, argsEnv, dir), while the command string executed comes from a static helper rather than user input. Setting an environment variable does not constitute OS command injection without demonstrating that the executed command is influenced or manipulated by malicious shell metacharacters.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02196",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated at line 122 immediately after 'case 'C':', making it impossible to verify what value is assigned to bar or returned. Because the switch branch corresponding to guess.charAt(2) ('C') is cut off, the evidence is insufficient to determine whether user input reaches the LDAP query sink.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02268",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: TimeoutError: The read operation timed out",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02275",
+          "expected": "true_positive",
+          "explanation": "In doSomething(), the ternary condition (7 * 42) - num > 200 evaluates to (294 - 106) > 200, which simplifies to 188 > 200 (false). Consequently, bar is assigned param, which contains user input. However, looking at the ternary logic (7 * 42 = 294, 294 - 106 = 188, 188 > 200 is false, returning param), user input is actually passed to bar and concatenated into the query without parameterization, making this a true positive.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02284",
+          "expected": "true_positive",
+          "explanation": "In doSomething, the condition `(7 * 42) - num > 200` evaluates to `(294) - 106 > 200`, which simplifies to `188 > 200` (always false). Therefore, `bar` is unconditionally assigned the literal string 'This should never happen' if true, but wait: `(7 * 42) - num` is 188; `188 > 200` is false, so it actually selects `param`! Let's re-calculate: 7 * 42 = 294. 294 - 106 = 188. Is 188 > 200? No, false. The ternary is `<condition> ? true_val : false_val`. Since 188 > 200 is false, `bar` receives `param`! Thus user input flows directly to `bar`, concatenated into the SQL string and executed via `statement.execute(sql, ...)`. This is a true positive.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02306",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02322",
+          "expected": "true_positive",
+          "explanation": "In doSomething, the ternary expression (7 * 42) - num > 200 evaluates to (294 - 106) > 200, which is 188 > 200 (false), causing bar to receive param. However, param is taken from request parameter names only when the parameter value matches 'BenchmarkTest02322'. While param is user-controlled via parameter names, it is formatted via printf, but more importantly, let's trace: 7*42 = 294, 294 - 106 = 188, 188 > 200 is false, so bar = param. Wait, param contains the parameter name which is untrusted input, and it's printed directly to the HTML response without escaping via response.getWriter().printf(). Therefore, this is actually a true positive.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02333",
+          "expected": "true_positive",
+          "explanation": "User-controllable parameter names are retrieved and assigned to 'param' if their value equals 'BenchmarkTest02333', which is subsequently passed to ThingInterface.doSomething() and executed inside an OS shell command ('sh -c echo ' or 'cmd.exe /c echo '). However, the implementation of ThingInterface.doSomething() is not visible in the provided code, making it impossible to determine if the input is sanitized or safe.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02356",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02364",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02515",
+          "expected": "true_positive",
+          "explanation": "The user input parameter 'bar' is passed as the second argument (the environment variables array 'envp') to Runtime.getRuntime().exec(cmd, argsEnv), while the executable command 'cmd' is derived entirely from an internal helper method rather than untrusted input. Setting environment variables via exec(String command, String[] envp) does not execute the input as an OS command.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02559",
+          "expected": "true_positive",
+          "explanation": "User-supplied query parameter 'param' is passed to 'thing.doSomething(param)', but the implementation and behavior of 'ThingInterface' / 'ThingFactory' cannot be determined from the available source code, leaving it uncertain whether the input is sanitized or returned verbatim.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02600",
+          "expected": "true_positive",
+          "explanation": "In doSomething, the condition (7 * 42) - num > 200 evaluates to (294 - 106) > 200, which is 188 > 200 (false); thus bar is set to param. However, looking closely at (7 * 42) = 294, 294 - 106 = 188. 188 > 200 is false, so it returns param! Wait! 7 * 42 = 294. 294 - 106 = 188. 188 > 200 is false, so bar = param! Thus user input is returned and written to the response writer without encoding.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02666",
+          "expected": "false_positive",
+          "explanation": "The user input retrieved via SeparateClassRequest is passed to doSomething(), which stores it in a list and returns it directly after removing index 0. The unsanitized value is concatenated with a directory path and used directly in a FileInputStream constructor without traversal guards.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 4,
+      "fp_in_sample": 60,
+      "fp_removed": 50,
+      "fp_removed_rate": 0.8333,
+      "fp_retained": 6,
+      "genuine_dismissed": 10,
+      "genuine_dismissed_rate": 0.1667,
+      "genuine_human_review": 8,
+      "genuine_in_sample": 60,
+      "genuine_retained": 42,
+      "genuine_retained_rate": 0.7,
+      "human_review": 12,
+      "human_review_rate": 0.1,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 119,
+        "completion_tokens_total": 54334,
+        "cost_reported": 119,
+        "cost_total": 0.445943,
+        "latency_max_seconds": 171.518,
+        "latency_mean_seconds": 13.455,
+        "latency_reported": 120,
+        "prompt_tokens_reported": 119,
+        "prompt_tokens_total": 322921
+      }
+    },
+    {
+      "configuration": "C-council",
+      "evaluated_findings": 120,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00788",
+          "expected": "true_positive",
+          "explanation": "Input from the query string is processed via thing.doSomething(param) before being concatenated into the file path used by FileOutputStream. Because the implementation of ThingInterface is external and absent from the evidence, it cannot be verified whether the input is sanitized or returned unsafely.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00861",
+          "expected": "false_positive",
+          "explanation": "Request parameter 'param' is assigned to 'bar' because 'guess.charAt(2)' evaluates to 'C'. 'bar' is concatenated directly into the LDAP filter query without sanitization or escaping before being executed by 'ctx.search'.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00897",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via getTheValue is assigned to param and subsequently transferred to bar because switchTarget evaluates to 'C'. This tainted string is concatenated directly into a shell command invocation executed by ProcessBuilder without validation or escaping.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00947",
+          "expected": "true_positive",
+          "explanation": "Input obtained from cookies is passed to thing.doSomething(param) before being directly concatenated into the LDAP search filter on line 75 and queried on line 79. Because the source implementation of ThingInterface and its sanitization behavior are not included in the provided code, the taint status of bar cannot be conclusively verified.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00983",
+          "expected": "true_positive",
+          "explanation": "The user input derived from the cookie flows exclusively into `argsEnv`, which is supplied as the environment variable array `envp` to `r.exec(cmd, argsEnv)`. The executed command string `cmd` itself is obtained from an internal utility method without user input concatenation, precluding command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01491",
+          "expected": "false_positive",
+          "explanation": "Untrusted input retrieved from the HTTP request is appended and placed in a map without LDAP escaping before being concatenated into an LDAP search filter query passed directly to DirContext.search().",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01625",
+          "expected": "true_positive",
+          "explanation": "Request parameter 'param' is passed to 'thing.doSomething(param)' before being concatenated directly into a SQL query. Because the implementation of ThingInterface created by ThingFactory is not provided in the source code, it cannot be determined whether 'bar' is properly sanitized.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01753",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via SeparateClassRequest is passed through base64 encoding and decoding back into bar without sanitization. It is then directly concatenated into the LDAP filter string passed to idc.search(), leaving it vulnerable to LDAP injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01754",
+          "expected": "false_positive",
+          "explanation": "Untrusted request data is retrieved via SeparateClassRequest, propagated through a HashMap in Test.doSomething, and concatenated directly into the LDAP filter string passed to idc.search without proper escaping.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01755",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via SeparateClassRequest is passed to Test.doSomething, where it is retrieved unmodified from a map and directly concatenated into an LDAP search filter without sanitization or escaping before being executed in idc.search().",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02155",
+          "expected": "true_positive",
+          "explanation": "The user-supplied value 'bar' is passed strictly as an element of the environment variables array 'argsEnv' to Runtime.exec(cmd, argsEnv, dir). The executed command 'cmd' is generated independently and does not include user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02196",
+          "expected": "true_positive",
+          "explanation": "The execution path in `doSomething` evaluates `switchTarget` to `'C'` via `guess.charAt(2)`. However, the code is truncated immediately after `case 'C':`, leaving the assignment of `bar` and subsequent return value unverifiable.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02302",
+          "expected": "true_positive",
+          "explanation": "User input controls the parameter name when its value matches 'BenchmarkTest02302', which is passed into doSomething via ThingInterface. Because the implementation of ThingInterface.doSomething is external and not present in the evidence, it cannot be verified whether the input is sanitized or returned unchanged to the File constructor.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02321",
+          "expected": "true_positive",
+          "explanation": "Untrusted parameter names are passed through string transformations in doSomething and ultimately output to the HTTP response via response.getWriter().printf. However, the exact behavior and sanitization effects of the external org.owasp.benchmark.helpers.ThingInterface implementation cannot be verified from the provided source snippet.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02323",
+          "expected": "true_positive",
+          "explanation": "Untrusted request parameter names are passed to 'thing.doSomething(param)', but the implementation of ThingInterface is external to the snippet. Without knowing whether 'doSomething' performs sanitization, escaping, or transformation, the vulnerability status cannot be determined with certainty.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02333",
+          "expected": "true_positive",
+          "explanation": "User-controlled parameter name is extracted and processed by ThingInterface.doSomething(param) before being concatenated into an OS shell command string. Because the implementation and sanitization behavior of ThingInterface cannot be verified from the snippet, it is uncertain whether the output is properly sanitized.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02515",
+          "expected": "true_positive",
+          "explanation": "The user-controlled input 'param' is placed into 'argsEnv', which is passed as the environment array ('envp') to 'Runtime.getRuntime().exec(cmd, argsEnv)'. The command string 'cmd' is generated independently by a helper method and contains no tainted user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02559",
+          "expected": "true_positive",
+          "explanation": "User input from the query string is processed by 'thing.doSomething(param)' before being appended into the file URI. Because the concrete implementation of 'ThingInterface' provided by 'ThingFactory.createThing()' is not present in the evidence, it cannot be determined whether sanitization occurs.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02666",
+          "expected": "false_positive",
+          "explanation": "User input from SeparateClassRequest is passed into doSomething, where param is shifted to index 0 after valuesList.remove(0) and returned as bar. This unvalidated input is concatenated directly into fileName and passed to FileInputStream, allowing path traversal.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 60,
+      "fp_removed": 53,
+      "fp_removed_rate": 0.8833,
+      "fp_retained": 7,
+      "genuine_dismissed": 3,
+      "genuine_dismissed_rate": 0.05,
+      "genuine_human_review": 9,
+      "genuine_in_sample": 60,
+      "genuine_retained": 48,
+      "genuine_retained_rate": 0.8,
+      "human_review": 9,
+      "human_review_rate": 0.075,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 120,
+        "completion_tokens_total": 162974,
+        "cost_reported": 120,
+        "cost_total": 1.472927,
+        "latency_max_seconds": 390.369,
+        "latency_mean_seconds": 27.177,
+        "latency_reported": 120,
+        "prompt_tokens_reported": 120,
+        "prompt_tokens_total": 1149033
+      }
+    },
+    {
+      "configuration": "D-validated-council",
+      "evaluated_findings": 120,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00011",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00215",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00788",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00861",
+          "expected": "false_positive",
+          "explanation": "Request parameter 'param' is assigned to 'bar' because 'guess.charAt(2)' evaluates to 'C'. 'bar' is concatenated directly into the LDAP filter query without sanitization or escaping before being executed by 'ctx.search'.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00897",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via getTheValue is assigned to param and subsequently transferred to bar because switchTarget evaluates to 'C'. This tainted string is concatenated directly into a shell command invocation executed by ProcessBuilder without validation or escaping.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00947",
+          "expected": "true_positive",
+          "explanation": "Input obtained from cookies is passed to thing.doSomething(param) before being directly concatenated into the LDAP search filter on line 75 and queried on line 79. Because the source implementation of ThingInterface and its sanitization behavior are not included in the provided code, the taint status of bar cannot be conclusively verified.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00950",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00983",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Explanation names `envp` but 'envp' does not appear in the source"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01092",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Injection_Prevention_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01116",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01491",
+          "expected": "false_positive",
+          "explanation": "Untrusted input retrieved from the HTTP request is appended and placed in a map without LDAP escaping before being concatenated into an LDAP search filter query passed directly to DirContext.search().",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01596",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Cross_Site_Scripting_Prevention_Cheat_Sheet#016"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01625",
+          "expected": "true_positive",
+          "explanation": "Request parameter 'param' is passed to 'thing.doSomething(param)' before being concatenated directly into a SQL query. Because the implementation of ThingInterface created by ThingFactory is not provided in the source code, it cannot be determined whether 'bar' is properly sanitized.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01753",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via SeparateClassRequest is passed through base64 encoding and decoding back into bar without sanitization. It is then directly concatenated into the LDAP filter string passed to idc.search(), leaving it vulnerable to LDAP injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01754",
+          "expected": "false_positive",
+          "explanation": "Untrusted request data is retrieved via SeparateClassRequest, propagated through a HashMap in Test.doSomething, and concatenated directly into the LDAP filter string passed to idc.search without proper escaping.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01755",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via SeparateClassRequest is passed to Test.doSomething, where it is retrieved unmodified from a map and directly concatenated into an LDAP search filter without sanitization or escaping before being executed in idc.search().",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02032",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02108",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02109",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02110",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02155",
+          "expected": "true_positive",
+          "explanation": "The user-supplied value 'bar' is passed strictly as an element of the environment variables array 'argsEnv' to Runtime.exec(cmd, argsEnv, dir). The executed command 'cmd' is generated independently and does not include user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02196",
+          "expected": "true_positive",
+          "explanation": "The execution path in `doSomething` evaluates `switchTarget` to `'C'` via `guess.charAt(2)`. However, the code is truncated immediately after `case 'C':`, leaving the assignment of `bar` and subsequent return value unverifiable.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02197",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02205",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02284",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Injection_Prevention_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02302",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02321",
+          "expected": "true_positive",
+          "explanation": "Untrusted parameter names are passed through string transformations in doSomething and ultimately output to the HTTP response via response.getWriter().printf. However, the exact behavior and sanitization effects of the external org.owasp.benchmark.helpers.ThingInterface implementation cannot be verified from the provided source snippet.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02322",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Cross_Site_Scripting_Prevention_Cheat_Sheet#016"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02323",
+          "expected": "true_positive",
+          "explanation": "Untrusted request parameter names are passed to 'thing.doSomething(param)', but the implementation of ThingInterface is external to the snippet. Without knowing whether 'doSomething' performs sanitization, escaping, or transformation, the vulnerability status cannot be determined with certainty.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02333",
+          "expected": "true_positive",
+          "explanation": "User-controlled parameter name is extracted and processed by ThingInterface.doSomething(param) before being concatenated into an OS shell command string. Because the implementation and sanitization behavior of ThingInterface cannot be verified from the snippet, it is uncertain whether the output is properly sanitized.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02515",
+          "expected": "true_positive",
+          "explanation": "The user-controlled input 'param' is placed into 'argsEnv', which is passed as the environment array ('envp') to 'Runtime.getRuntime().exec(cmd, argsEnv)'. The command string 'cmd' is generated independently by a helper method and contains no tainted user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02559",
+          "expected": "true_positive",
+          "explanation": "User input from the query string is processed by 'thing.doSomething(param)' before being appended into the file URI. Because the concrete implementation of 'ThingInterface' provided by 'ThingFactory.createThing()' is not present in the evidence, it cannot be determined whether sanitization occurs.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02600",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Cross_Site_Scripting_Prevention_Cheat_Sheet#016"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02666",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk File_Upload_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        }
+      ],
+      "fp_human_review": 4,
+      "fp_in_sample": 60,
+      "fp_removed": 50,
+      "fp_removed_rate": 0.8333,
+      "fp_retained": 6,
+      "genuine_dismissed": 2,
+      "genuine_dismissed_rate": 0.0333,
+      "genuine_human_review": 22,
+      "genuine_in_sample": 60,
+      "genuine_retained": 36,
+      "genuine_retained_rate": 0.6,
+      "human_review": 26,
+      "human_review_rate": 0.2167,
+      "invalid_output_rate": 0.1583,
+      "invalid_outputs": 19,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 120,
+        "completion_tokens_total": 162974,
+        "cost_reported": 120,
+        "cost_total": 1.472927,
+        "latency_max_seconds": 390.369,
+        "latency_mean_seconds": 27.177,
+        "latency_reported": 120,
+        "prompt_tokens_reported": 120,
+        "prompt_tokens_total": 1149033
+      }
+    }
+  ],
+  "note": "Initial checkpoint sample, not a general accuracy estimate.",
+  "same_case_coverage": true,
+  "sample_size": 120
+}

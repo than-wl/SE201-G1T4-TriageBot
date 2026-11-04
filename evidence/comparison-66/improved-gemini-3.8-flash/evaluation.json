@@ -1,0 +1,438 @@
+{
+  "configurations": [
+    {
+      "configuration": "A-scanner-only",
+      "evaluated_findings": 66,
+      "f1": 0.6667,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00310",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00454",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00907",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01028",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01051",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01182",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01212",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01344",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01404",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01443",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01472",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01628",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01664",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01865",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01941",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01965",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02030",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02048",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02069",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02089",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02111",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02235",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02239",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02265",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02367",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02384",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02462",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02468",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02481",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02513",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02544",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02566",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02593",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 33,
+      "fp_removed": 0,
+      "fp_removed_rate": 0.0,
+      "fp_retained": 33,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 0,
+      "genuine_in_sample": 33,
+      "genuine_retained": 33,
+      "genuine_retained_rate": 1.0,
+      "human_review": 0,
+      "human_review_rate": 0.0,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": null,
+      "precision": 0.5,
+      "recall": 1.0,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 0,
+        "completion_tokens_total": null,
+        "cost_reported": 0,
+        "cost_total": null,
+        "latency_max_seconds": null,
+        "latency_mean_seconds": null,
+        "latency_reported": 0,
+        "prompt_tokens_reported": 0,
+        "prompt_tokens_total": null
+      }
+    },
+    {
+      "configuration": "C-council",
+      "evaluated_findings": 66,
+      "f1": 0.9524,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest01066",
+          "expected": "true_positive",
+          "explanation": "Untrusted header input is passed only into the environment variable array 'argsEnv' via Runtime.exec(args, argsEnv). The command array 'args' contains only the internally generated command 'cmd' and is not influenced by user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01192",
+          "expected": "true_positive",
+          "explanation": "Untrusted input derived from the request headers is stored in 'bar' and passed only to 'argsEnv' in 'Runtime.getRuntime().exec(args, argsEnv)'. The command array 'args' contains only the server-determined command string, so user input does not reach the command or argument vector executed by the process.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02516",
+          "expected": "true_positive",
+          "explanation": "The untrusted input from the HTTP request is placed into an environment variable array `argsEnv` passed as the `envp` parameter to `Runtime.exec(cmd, envp, dir)`. The executed command string `cmd` is constructed independently without user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 33,
+      "fp_removed": 33,
+      "fp_removed_rate": 1.0,
+      "fp_retained": 0,
+      "genuine_dismissed": 3,
+      "genuine_dismissed_rate": 0.0909,
+      "genuine_human_review": 0,
+      "genuine_in_sample": 33,
+      "genuine_retained": 30,
+      "genuine_retained_rate": 0.9091,
+      "human_review": 0,
+      "human_review_rate": 0.0,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 1.0,
+      "recall": 0.9091,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 66,
+        "completion_tokens_total": 113774,
+        "cost_reported": 66,
+        "cost_total": 0.935804,
+        "latency_max_seconds": 34.527,
+        "latency_mean_seconds": 26.773,
+        "latency_reported": 66,
+        "prompt_tokens_reported": 66,
+        "prompt_tokens_total": 679754
+      }
+    },
+    {
+      "configuration": "D-validated-council",
+      "evaluated_findings": 66,
+      "f1": 0.9688,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest01066",
+          "expected": "true_positive",
+          "explanation": "Untrusted header input is passed only into the environment variable array 'argsEnv' via Runtime.exec(args, argsEnv). The command array 'args' contains only the internally generated command 'cmd' and is not influenced by user input, preventing command injection.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01192",
+          "expected": "true_positive",
+          "explanation": "Untrusted input derived from the request headers is stored in 'bar' and passed only to 'argsEnv' in 'Runtime.getRuntime().exec(args, argsEnv)'. The command array 'args' contains only the server-determined command string, so user input does not reach the command or argument vector executed by the process.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02516",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Explanation names `envp` but 'envp' does not appear in the source"
+          ],
+          "verdict": "human_review"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 33,
+      "fp_removed": 33,
+      "fp_removed_rate": 1.0,
+      "fp_retained": 0,
+      "genuine_dismissed": 2,
+      "genuine_dismissed_rate": 0.0606,
+      "genuine_human_review": 1,
+      "genuine_in_sample": 33,
+      "genuine_retained": 30,
+      "genuine_retained_rate": 0.9091,
+      "human_review": 1,
+      "human_review_rate": 0.0152,
+      "invalid_output_rate": 0.0152,
+      "invalid_outputs": 1,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 1.0,
+      "recall": 0.9394,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 66,
+        "completion_tokens_total": 113774,
+        "cost_reported": 66,
+        "cost_total": 0.935804,
+        "latency_max_seconds": 34.527,
+        "latency_mean_seconds": 26.773,
+        "latency_reported": 66,
+        "prompt_tokens_reported": 66,
+        "prompt_tokens_total": 679754
+      }
+    }
+  ],
+  "note": "Initial checkpoint sample, not a general accuracy estimate.",
+  "same_case_coverage": true,
+  "sample_size": 66
+}

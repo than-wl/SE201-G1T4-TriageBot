@@ -243,6 +243,10 @@ retrieval/vector DB should be a different file.
 - **Isolation:** the answer key is read only by the evaluation code, after all model calls. It never reaches a prompt or the model.
 - **Original fresh comparison:** the 66-case improvement comparison excluded all 120 cases used by the completed final evaluation; its frozen model-side sample contains no labels. Later same-set runs are labelled as regression evidence because those cases informed the CWE-78 fix.
 
+The committed raw samples, Semgrep scan and saved B/C/D outputs are indexed in
+[evidence/README.md](evidence/README.md) so reviewers can inspect or reproduce
+the reported comparisons without needing the ignored local `Context/tmp` files.
+
 ## 7. For developers
 
 Run the offline tests (no network, no API key, no credits):

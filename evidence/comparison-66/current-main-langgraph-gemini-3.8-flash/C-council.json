@@ -1,0 +1,3251 @@
+{
+  "model": "google/gemini-3.8-flash",
+  "results": [
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00026",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: HTTP 400: Bad Request",
+      "guidance": [],
+      "latency_seconds": 11.479,
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 963,
+        "cost": 0.0068535,
+        "prompt_tokens": 4323,
+        "total_tokens": 5286
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.File(param)",
+        "source": "scr.getTheParameter(\"BenchmarkTest00040\")"
+      },
+      "case_id": "BenchmarkTest00040",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00040.java",
+          "line": 46,
+          "quote": "String param = scr.getTheParameter(\"BenchmarkTest00040\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00040.java",
+          "line": 49,
+          "quote": "java.io.File fileTarget = new java.io.File(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00040.java",
+          "line": 59,
+          "quote": "if (fileTarget.exists()) {"
+        }
+      ],
+      "explanation": "Untrusted request input is assigned to 'param' and passed directly into the java.io.File constructor without sanitization or path verification. This enables path traversal and allows probing the filesystem via fileTarget.exists().",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.791,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1344,
+        "cost": 0.0113565,
+        "prompt_tokens": 8422,
+        "total_tokens": 9766
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().format(param, obj)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest00047",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00047.java",
+          "line": 44,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00047.java",
+          "line": 69,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00047.java",
+          "line": 73,
+          "quote": "response.getWriter().format(param, obj);"
+        }
+      ],
+      "explanation": "Untrusted input extracted from the HTTP query string via request.getQueryString() is URL-decoded and written directly into the HTML response body via response.getWriter().format(param, obj). No sanitization or contextual HTML entity encoding is applied, resulting in a reflected Cross-Site Scripting vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross Site Scripting Prevention Cheat Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 16.109,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1502,
+        "cost": 0.013229250000000001,
+        "prompt_tokens": 10129,
+        "total_tokens": 11631
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new ProcessBuilder(argList).start()",
+        "source": "theCookie.getValue() from request.getCookies()"
+      },
+      "case_id": "BenchmarkTest00077",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00077.java",
+          "line": 60,
+          "quote": "param = java.net.URLDecoder.decode(theCookie.getValue(), \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00077.java",
+          "line": 68,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00077.java",
+          "line": 80,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00077.java",
+          "line": 97,
+          "quote": "argList.add(\"echo \" + bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00077.java",
+          "line": 99,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(argList);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00077.java",
+          "line": 102,
+          "quote": "Process p = pb.start();"
+        }
+      ],
+      "explanation": "User input read from the 'BenchmarkTest00077' cookie is decoded and stored in param. Because 'guess.charAt(2)' evaluates to 'C', the switch branch assigns param directly to bar, which is then concatenated into a shell invocation string executed by ProcessBuilder without sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 18.717,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1899,
+        "cost": 0.01544625,
+        "prompt_tokens": 11100,
+        "total_tokens": 12999
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.queryForObject(sql, Integer.class)",
+        "source": "request.getHeader(\"BenchmarkTest00199\")"
+      },
+      "case_id": "BenchmarkTest00199",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00199.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest00199\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00199.java",
+          "line": 55,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00199.java",
+          "line": 58,
+          "quote": "String sql = \"SELECT userid from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00199.java",
+          "line": 64,
+          "quote": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.queryForObject("
+        }
+      ],
+      "explanation": "Untrusted input obtained from the HTTP header BenchmarkTest00199 flows directly into bar because (500 / 42) + num evaluates to 11 + 196 = 207, which is strictly greater than 200. The variable bar is concatenated directly into a dynamic SQL query string and executed by queryForObject without any parameterization or escaping.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 19.25,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2029,
+        "cost": 0.014017499999999999,
+        "prompt_tokens": 8545,
+        "total_tokens": 10574
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.FileOutputStream(fileName)",
+        "source": "request.getHeaderNames()"
+      },
+      "case_id": "BenchmarkTest00222",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> names = request.getHeaderNames();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 54,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 63,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 75,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 86,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00222.java",
+          "line": 88,
+          "quote": "fos = new java.io.FileOutputStream(fileName);"
+        }
+      ],
+      "explanation": "Untrusted header names obtained via request.getHeaderNames() are assigned to param. The switch condition evaluates 'ABC'.charAt(2) which is 'C', leading to bar = param. The value is concatenated into fileName and passed directly to FileOutputStream without validation or path sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection > Filename Safety",
+          "section": "File_Upload_Cheat_Sheet",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.178,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1769,
+        "cost": 0.01379175,
+        "prompt_tokens": 9544,
+        "total_tokens": 11313
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().write(bar)",
+        "source": "request.getHeaders(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest00290",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 47,
+          "quote": "param = headers.nextElement();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 51,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 54,
+          "quote": "String bar = sbxyz73567.append(\"_SafeStuff\").toString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00290.java",
+          "line": 57,
+          "quote": "response.getWriter().write(bar);"
+        }
+      ],
+      "explanation": "Untrusted input from the HTTP Referer header is retrieved and decoded, appended with a static string, and written directly to the response writer without any contextual HTML escaping or sanitization. Additionally, X-XSS-Protection is explicitly disabled, allowing reflected Cross-Site Scripting.",
+      "guidance": [
+        {
+          "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+          "doc": "DOM_based_XSS_Prevention_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.226,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1843,
+        "cost": 0.014193750000000002,
+        "prompt_tokens": 9710,
+        "total_tokens": 11553
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "r.exec(cmd + bar)",
+        "source": "request.getHeaders(\"BenchmarkTest00302\")"
+      },
+      "case_id": "BenchmarkTest00302",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00302.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"BenchmarkTest00302\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00302.java",
+          "line": 56,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00302.java",
+          "line": 58,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00302.java",
+          "line": 69,
+          "quote": "Process p = r.exec(cmd + bar);"
+        }
+      ],
+      "explanation": "Untrusted header input reaches Runtime.exec directly via string concatenation. The ternary condition (7 * 42) - num > 200 evaluates to (294 - 106) > 200, which is 188 > 200 (false), selecting the untrusted param instead of the constant string.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.882,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1296,
+        "cost": 0.0124125,
+        "prompt_tokens": 10070,
+        "total_tokens": 11366
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch assignment",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "r.exec(cmd + bar, argsEnv, new java.io.File(System.getProperty(\"user.dir\")))",
+        "source": "request.getHeaders(\"BenchmarkTest00310\")"
+      },
+      "case_id": "BenchmarkTest00310",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00310.java",
+          "line": 54,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00310.java",
+          "line": 55,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00310.java",
+          "line": 62,
+          "quote": "case 'B':"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00310.java",
+          "line": 63,
+          "quote": "bar = \"bob\";"
+        }
+      ],
+      "explanation": "The switch condition evaluates guess.charAt(1) on constant string 'ABC', which is deterministically 'B'. Under case 'B', bar is assigned the constant literal 'bob', preventing untrusted input from reaching the exec call.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#013",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > PHP",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.569,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1921,
+        "cost": 0.0147345,
+        "prompt_tokens": 10041,
+        "total_tokens": 11962
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "fis = new java.io.FileInputStream(new java.io.File(fileName));",
+        "source": "request.getParameterMap()"
+      },
+      "case_id": "BenchmarkTest00454",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00454.java",
+          "line": 53,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00454.java",
+          "line": 54,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00454.java",
+          "line": 62,
+          "quote": "fis = new java.io.FileInputStream(new java.io.File(fileName));"
+        }
+      ],
+      "explanation": "The condition ((7 * 42) - num > 200) evaluates to 208 > 200, which is always true because num is initialized to 86. As a result, bar is always assigned the hardcoded string 'This_should_always_happen', preventing untrusted input from reaching the FileInputStream sink.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.532,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1500,
+        "cost": 0.0130935,
+        "prompt_tokens": 9958,
+        "total_tokens": 11458
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch condition evaluating to true ((7 * 18) + 106 > 200)",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "Process p = r.exec(args);",
+        "source": "org.owasp.benchmark.helpers.SeparateClassRequest scr = new org.owasp.benchmark.helpers.SeparateClassRequest(request); String param = scr.getTheValue(\"BenchmarkTest00907\");"
+      },
+      "case_id": "BenchmarkTest00907",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00907.java",
+          "line": 50,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00907.java",
+          "line": 52,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00907.java",
+          "line": 75,
+          "quote": "Process p = r.exec(args);"
+        }
+      ],
+      "explanation": "The untrusted input stored in `param` is never passed to `bar` because the ternary condition `(7 * 18) + num > 200` with `num = 106` evaluates to `232 > 200`, which is constantly true. Thus, `bar` is unconditionally assigned the constant literal \"This_should_always_happen\", preventing user input from reaching the execution sink.",
+      "guidance": [],
+      "latency_seconds": 20.085,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1375,
+        "cost": 0.013032,
+        "prompt_tokens": 10501,
+        "total_tokens": 11876
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.FileInputStream(fileName)",
+        "source": "theCookie.getValue() from request.getCookies()"
+      },
+      "case_id": "BenchmarkTest00953",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00953.java",
+          "line": 60,
+          "quote": "param = java.net.URLDecoder.decode(theCookie.getValue(), \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00953.java",
+          "line": 68,
+          "quote": "String fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00953.java",
+          "line": 80,
+          "quote": "new java.io.FileOutputStream(new java.io.FileInputStream(fileName).getFD()); ) {"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00953.java",
+          "line": 105,
+          "quote": "bar = valuesList.get(0);"
+        }
+      ],
+      "explanation": "Untrusted input is extracted from a cookie value and passed into Test.doSomething, which shifts elements in a list such that the untrusted value remains at index 0 and is returned into bar. The variable bar is concatenated into fileName and opened in a FileInputStream without sanitization or path traversal validation.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 18.974,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1940,
+        "cost": 0.014598749999999999,
+        "prompt_tokens": 9765,
+        "total_tokens": 11705
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.FileInputStream(fileName)",
+        "source": "request.getCookies()"
+      },
+      "case_id": "BenchmarkTest00956",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00956.java",
+          "line": 60,
+          "quote": "param = java.net.URLDecoder.decode(theCookie.getValue(), \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00956.java",
+          "line": 68,
+          "quote": "String fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00956.java",
+          "line": 80,
+          "quote": "new java.io.FileOutputStream(new java.io.FileInputStream(fileName).getFD()); ) {"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00956.java",
+          "line": 100,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        }
+      ],
+      "explanation": "Untrusted input obtained from the cookie BenchmarkTest00956 is decoded and passed to Test.doSomething, where (500 / 42) + 196 evaluates to 207 > 200, returning the user input unmodified. The string is then concatenated into fileName and passed directly to FileInputStream/FileOutputStream without validation.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Cheat Sheet",
+          "section": "File Upload Protection > Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.399,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2010,
+        "cost": 0.01482075,
+        "prompt_tokens": 9711,
+        "total_tokens": 11721
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "Constant selection via list index: valuesList.remove(0) causes valuesList.get(1) to return constant 'moresafe'",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.File(fileURI)",
+        "source": "request.getHeader(\"BenchmarkTest01028\")"
+      },
+      "case_id": "BenchmarkTest01028",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01028.java",
+          "line": 98,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01028.java",
+          "line": 99,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01028.java",
+          "line": 100,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01028.java",
+          "line": 102,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01028.java",
+          "line": 104,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "Although user input is read via request.getHeader, method doSomething populates a list with 'safe', param, and 'moresafe', and then invokes valuesList.remove(0). As a result, valuesList.get(1) resolves to the constant string 'moresafe', preventing untrusted input from reaching the File construction sink.",
+      "guidance": [],
+      "latency_seconds": 23.072,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1930,
+        "cost": 0.0145545,
+        "prompt_tokens": 9756,
+        "total_tokens": 11686
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.FileOutputStream(new java.io.File(fileName))",
+        "source": "request.getHeader(\"BenchmarkTest01033\")"
+      },
+      "case_id": "BenchmarkTest01033",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01033.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01033\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01033.java",
+          "line": 57,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01033.java",
+          "line": 59,
+          "quote": "fos = new java.io.FileOutputStream(new java.io.File(fileName));"
+        }
+      ],
+      "explanation": "Untrusted input obtained from the HTTP header is decoded and passed without modification through ThingFactory/Thing implementations. It is concatenated directly into the file path and opened with FileOutputStream without any sanitization or path traversal protection.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Cheat Sheet",
+          "section": "File Upload Protection > Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.972,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1485,
+        "cost": 0.014412750000000002,
+        "prompt_tokens": 11792,
+        "total_tokens": 13277
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "Constant expression in ternary branch ((7 * 18) + num > 200)",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "response.getWriter().printf(\"Formatted like: %1$s and %2$s.\", obj)",
+        "source": "request.getHeader(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest01051",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01051.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01051.java",
+          "line": 66,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01051.java",
+          "line": 68,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01051.java",
+          "line": 55,
+          "quote": "response.getWriter().printf(\"Formatted like: %1$s and %2$s.\", obj);"
+        }
+      ],
+      "explanation": "Untrusted input from the Referer header is never returned because the ternary condition (7 * 18) + 106 > 200 evaluates to 232 > 200, which is always true. As a result, bar is unconditionally assigned the constant string 'This_should_always_happen', preventing user input from reaching the response writer sink.",
+      "guidance": [],
+      "latency_seconds": 19.355,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1668,
+        "cost": 0.0135945,
+        "prompt_tokens": 9786,
+        "total_tokens": 11454
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().write(bar)",
+        "source": "request.getHeader(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest01057",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01057.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01057.java",
+          "line": 65,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01057.java",
+          "line": 67,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01057.java",
+          "line": 54,
+          "quote": "response.getWriter().write(bar);"
+        }
+      ],
+      "explanation": "Untrusted input from the Referer request header flows into the doPost method. In the helper method, (7 * 42) - num > 200 computes to 294 - 106 = 188 > 200, which evaluates to false, causing 'bar' to be assigned the untrusted 'param' value without sanitization before being written directly to the response.",
+      "guidance": [
+        {
+          "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+          "doc": "DOM_based_XSS_Prevention_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.937,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1375,
+        "cost": 0.0124335,
+        "prompt_tokens": 9703,
+        "total_tokens": 11078
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "r.exec(cmd + bar)",
+        "source": "request.getHeader(\"BenchmarkTest01064\")"
+      },
+      "case_id": "BenchmarkTest01064",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01064\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 51,
+          "quote": "String bar = new Test().doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 80,
+          "quote": "map72463.put(\"keyB-72463\", param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 82,
+          "quote": "bar = (String) map72463.get(\"keyB-72463\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01064.java",
+          "line": 62,
+          "quote": "Process p = r.exec(cmd + bar);"
+        }
+      ],
+      "explanation": "Untrusted input obtained from the HTTP header is passed through a map without sanitization and concatenated into a command string executed by Runtime.exec(). This allows arbitrary command execution via shell metacharacters or by running an executable directly.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 17.029,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1681,
+        "cost": 0.014586000000000002,
+        "prompt_tokens": 11043,
+        "total_tokens": 12724
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "User input is passed exclusively as an environment variable (argsEnv) rather than the command array (args)",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "r.exec(args, argsEnv)",
+        "source": "request.getHeader(\"BenchmarkTest01066\")"
+      },
+      "case_id": "BenchmarkTest01066",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01066\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 56,
+          "quote": "String[] args = {cmd};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 57,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 62,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        }
+      ],
+      "explanation": "Untrusted input originating from the HTTP header is encoded, decoded, and placed only in argsEnv, which serves as the environment variable parameter (envp) for Runtime.exec. The command array args contains only the internal command string returned by Utils.getInsecureOSCommandString(), preventing user input from reaching the command line or arguments.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.63,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1654,
+        "cost": 0.01434975,
+        "prompt_tokens": 10863,
+        "total_tokens": 12517
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.queryForObject(sql, Long.class)",
+        "source": "request.getHeader(\"BenchmarkTest01088\")"
+      },
+      "case_id": "BenchmarkTest01088",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01088.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01088\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01088.java",
+          "line": 53,
+          "quote": "String sql = \"SELECT userid from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01088.java",
+          "line": 58,
+          "quote": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.queryForObject("
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01088.java",
+          "line": 82,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        }
+      ],
+      "explanation": "Untrusted input read from request.getHeader is assigned to bar because the conditional (500 / 42) + 196 (evaluating to 207) is greater than 200. The value is then directly concatenated into an SQL statement and executed without parameterization or sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.018,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1834,
+        "cost": 0.01359825,
+        "prompt_tokens": 8961,
+        "total_tokens": 10795
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "param.split(\" \")[0]",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().println(bar)",
+        "source": "request.getHeaders(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest01179",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01179.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01179.java",
+          "line": 56,
+          "quote": "response.getWriter().println(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01179.java",
+          "line": 65,
+          "quote": "if (param != null) bar = param.split(\" \")[0];"
+        }
+      ],
+      "explanation": "Untrusted data from the Referer header is decoded and split by space, retaining the first token, before being written directly to the response writer without sanitization. Because space-free XSS vectors can traverse this logic unchanged, the protection is ineffective.",
+      "guidance": [
+        {
+          "chunk_id": "XSS_Filter_Evasion_Cheat_Sheet#103",
+          "doc": "XSS_Filter_Evasion_Cheat_Sheet",
+          "section": "Methods to Bypass WAF \u2013 Cross-Site Scripting > WAF ByPass Strings for XSS",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/XSS_Filter_Evasion_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.033,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1564,
+        "cost": 0.01329675,
+        "prompt_tokens": 9909,
+        "total_tokens": 11473
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "valuesList.remove(0) shifts index positions such that valuesList.get(1) retrieves the constant 'moresafe' rather than param",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "ProcessBuilder pb = new ProcessBuilder(argList);",
+        "source": "java.util.Enumeration<String> headers = request.getHeaders(\"BenchmarkTest01182\");"
+      },
+      "case_id": "BenchmarkTest01182",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01182.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"BenchmarkTest01182\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01182.java",
+          "line": 88,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01182.java",
+          "line": 89,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01182.java",
+          "line": 91,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01182.java",
+          "line": 93,
+          "quote": "bar = valuesList.get(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01182.java",
+          "line": 67,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(argList);"
+        }
+      ],
+      "explanation": "Although input is retrieved from the HTTP request headers and passed into doSomething, the list operations insert 'safe' at index 0, param at index 1, and 'moresafe' at index 2. Removing index 0 shifts 'moresafe' to index 1, so bar is unconditionally assigned the constant string 'moresafe' and the tainted input never reaches the command execution sink.",
+      "guidance": [],
+      "latency_seconds": 28.011,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1635,
+        "cost": 0.01338075,
+        "prompt_tokens": 9666,
+        "total_tokens": 11301
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "user input is passed only to the environment array (envp), not into the command array",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "r.exec(args, argsEnv)",
+        "source": "request.getHeaders(\"BenchmarkTest01192\")"
+      },
+      "case_id": "BenchmarkTest01192",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01192.java",
+          "line": 58,
+          "quote": "String[] args = {cmd};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01192.java",
+          "line": 59,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01192.java",
+          "line": 64,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        }
+      ],
+      "explanation": "Although input originating from the HTTP header reaches variable `bar`, it is passed strictly into `argsEnv` as an environment variable parameter in `r.exec(args, argsEnv)`. The command executed in `args` contains only `cmd` generated by an internal helper and does not incorporate the untrusted input.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 19.247,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1433,
+        "cost": 0.01339575,
+        "prompt_tokens": 10696,
+        "total_tokens": 12129
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "valuesList.remove(0) shifts elements such that valuesList.get(1) retrieves the constant \"moresafe\" instead of the tainted input",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "connection.prepareStatement(sql, new int[] {1, 2})",
+        "source": "request.getHeaders(\"BenchmarkTest01212\")"
+      },
+      "case_id": "BenchmarkTest01212",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01212.java",
+          "line": 80,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01212.java",
+          "line": 81,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01212.java",
+          "line": 82,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01212.java",
+          "line": 84,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01212.java",
+          "line": 86,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "In Test.doSomething, the list initially contains [\"safe\", param, \"moresafe\"]. Removing index 0 shifts param to index 0 and \"moresafe\" to index 1, so valuesList.get(1) retrieves \"moresafe\", preventing untrusted data from reaching the SQL query sink.",
+      "guidance": [
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#007",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > SQL > Example",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 24.694,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2112,
+        "cost": 0.014352,
+        "prompt_tokens": 8576,
+        "total_tokens": 10688
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.File(fileURI)",
+        "source": "request.getParameter(\"BenchmarkTest01235\")"
+      },
+      "case_id": "BenchmarkTest01235",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01235.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01235\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01235.java",
+          "line": 93,
+          "quote": "map13886.put(\"keyB-13886\", param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01235.java",
+          "line": 95,
+          "quote": "bar = (String) map13886.get(\"keyB-13886\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01235.java",
+          "line": 64,
+          "quote": "+ bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01235.java",
+          "line": 65,
+          "quote": "java.io.File fileTarget = new java.io.File(fileURI);"
+        }
+      ],
+      "explanation": "Untrusted user input from request.getParameter is retrieved via a HashMap in doSomething and concatenated into a file URI. The URI is then directly used to construct a java.io.File object with no traversal validation or sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File_Upload_Cheat_Sheet",
+          "section": "File Upload Protection > Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.327,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1671,
+        "cost": 0.013892999999999999,
+        "prompt_tokens": 10169,
+        "total_tokens": 11840
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "connection.prepareStatement(sql, ...)",
+        "source": "request.getParameter(\"BenchmarkTest01304\")"
+      },
+      "case_id": "BenchmarkTest01304",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01304\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 48,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME=? and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 54,
+          "quote": "connection.prepareStatement("
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 81,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01304.java",
+          "line": 83,
+          "quote": "bar = valuesList.get(0);"
+        }
+      ],
+      "explanation": "Untrusted input obtained from request.getParameter is added to valuesList at index 1 and subsequently retrieved via valuesList.get(0) after index 0 is removed. The tainted value is concatenated directly into the dynamic SQL query string executed via prepareStatement without proper parameterization or sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 25.245,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2013,
+        "cost": 0.015216750000000001,
+        "prompt_tokens": 10224,
+        "total_tokens": 12237
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch assigning hardcoded string \"bob\"",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "response.getWriter().printf(java.util.Locale.US, bar, obj)",
+        "source": "request.getParameterMap() at line 43"
+      },
+      "case_id": "BenchmarkTest01344",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01344.java",
+          "line": 63,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01344.java",
+          "line": 64,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01344.java",
+          "line": 71,
+          "quote": "case 'B':"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01344.java",
+          "line": 72,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01344.java",
+          "line": 54,
+          "quote": "response.getWriter().printf(java.util.Locale.US, bar, obj);"
+        }
+      ],
+      "explanation": "User input from the request parameter map does not reach the response writer. In Test.doSomething, the variable guess is set to \"ABC\", so switchTarget at index 1 is always 'B', which assigns the constant string \"bob\" to bar.",
+      "guidance": [],
+      "latency_seconds": 25.563,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1759,
+        "cost": 0.01404375,
+        "prompt_tokens": 9930,
+        "total_tokens": 11689
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.File(bar, \"/Test.txt\")",
+        "source": "request.getParameterNames()"
+      },
+      "case_id": "BenchmarkTest01404",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01404.java",
+          "line": 104,
+          "quote": "String g75056 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01404.java",
+          "line": 105,
+          "quote": "String bar = thing.doSomething(g75056);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01404.java",
+          "line": 62,
+          "quote": "java.io.File fileTarget = new java.io.File(bar, \"/Test.txt\");"
+        }
+      ],
+      "explanation": "Although request parameter names are extracted and passed to Test.doSomething, the method assigns bar from thing.doSomething(g75056) using the hardcoded constant string 'barbarians_at_the_gate'. Consequently, untrusted input never flows into the File object instantiation.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Cheat Sheet",
+          "section": "File Upload Protection > Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.687,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1773,
+        "cost": 0.01636725,
+        "prompt_tokens": 12958,
+        "total_tokens": 14731
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch condition: (7 * 18) + num > 200 selects constant string",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "Runtime.getRuntime().exec(cmd + bar, argsEnv)",
+        "source": "request.getParameterNames()"
+      },
+      "case_id": "BenchmarkTest01443",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01443.java",
+          "line": 90,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01443.java",
+          "line": 92,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01443.java",
+          "line": 72,
+          "quote": "Process p = r.exec(cmd + bar, argsEnv);"
+        }
+      ],
+      "explanation": "Although user-supplied parameter names can be assigned to param, the ternary operator expression `(7 * 18) + num > 200` evaluates to `126 + 106 > 200` (232 > 200), which is always true. As a result, `bar` is unconditionally assigned the hardcoded string 'This_should_always_happen', preventing untrusted input from reaching `Runtime.getRuntime().exec`.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.615,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1612,
+        "cost": 0.01427775,
+        "prompt_tokens": 10977,
+        "total_tokens": 12589
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "statement.executeBatch()",
+        "source": "request.getParameterNames()"
+      },
+      "case_id": "BenchmarkTest01472",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01472.java",
+          "line": 102,
+          "quote": "String g60049 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01472.java",
+          "line": 103,
+          "quote": "String bar = thing.doSomething(g60049);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01472.java",
+          "line": 62,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "Although parameter data from request.getParameterNames() is read, the method Test.doSomething completely ignores the tainted variable and instead assigns the constant 'barbarians_at_the_gate' to g60049 before invoking thing.doSomething. The returned value inserted into the SQL query is derived entirely from this hardcoded string and untrusted input never reaches the SQL sink.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Forms of Injection > Query languages > SQL Injection",
+          "section": "Injection_Prevention_Cheat_Sheet#011",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 30.348,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2215,
+        "cost": 0.018198,
+        "prompt_tokens": 13189,
+        "total_tokens": 15404
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.File(fileURI)",
+        "source": "scr.getTheParameter(\"BenchmarkTest01495\")"
+      },
+      "case_id": "BenchmarkTest01495",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01495.java",
+          "line": 45,
+          "quote": "String param = scr.getTheParameter(\"BenchmarkTest01495\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01495.java",
+          "line": 97,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01495.java",
+          "line": 109,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01495.java",
+          "line": 67,
+          "quote": "+ bar,"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01495.java",
+          "line": 70,
+          "quote": "java.io.File fileTarget = new java.io.File(fileURI);"
+        }
+      ],
+      "explanation": "Untrusted input obtained via `scr.getTheParameter` is passed into `doSomething`, where `switchTarget` is evaluated from `\"ABC\".charAt(2)` which resolves to `'C'`. This causes `param` to be assigned to `bar` and subsequently concatenated into a URI path without validation before instantiation of `java.io.File`.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Cheat Sheet",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 18.484,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2057,
+        "cost": 0.0150915,
+        "prompt_tokens": 9837,
+        "total_tokens": 11894
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "ProcessBuilder pb = new ProcessBuilder(args)",
+        "source": "HttpServletRequest parameter retrieved via SeparateClassRequest"
+      },
+      "case_id": "BenchmarkTest01517",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01517.java",
+          "line": 45,
+          "quote": "String param = scr.getTheParameter(\"BenchmarkTest01517\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01517.java",
+          "line": 83,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01517.java",
+          "line": 60,
+          "quote": "String[] args = {a1, a2, \"echo \" + bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01517.java",
+          "line": 62,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(args);"
+        }
+      ],
+      "explanation": "User input retrieved via SeparateClassRequest is passed to Test.doSomething, where the condition ((500 / 42) + num > 200) evaluates to true (11 + 196 = 207 > 200) and returns the parameter. The unsanitized value is concatenated directly into a shell argument string ('echo ' + bar) passed to cmd.exe /c or sh -c via ProcessBuilder, allowing command injection.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.788,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1757,
+        "cost": 0.01491525,
+        "prompt_tokens": 11102,
+        "total_tokens": 12859
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "out.format(java.util.Locale.US, \"Formatted like: %1$s and %2$s.\", obj)",
+        "source": "request.getParameterValues(\"BenchmarkTest01583\")"
+      },
+      "case_id": "BenchmarkTest01583",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01583.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest01583\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01583.java",
+          "line": 51,
+          "quote": "Object[] obj = {\"a\", bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01583.java",
+          "line": 54,
+          "quote": "out.format(java.util.Locale.US, \"Formatted like: %1$s and %2$s.\", obj);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01583.java",
+          "line": 64,
+          "quote": "String bar = sbxyz82559.append(\"_SafeStuff\").toString();"
+        }
+      ],
+      "explanation": "Untrusted input obtained via request.getParameterValues is passed through doSomething, where it is only appended with a suffix string. It is subsequently emitted into the HTML body using PrintWriter.format without any sanitization or encoding, enabling reflected Cross-Site Scripting.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.583,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2043,
+        "cost": 0.0150945,
+        "prompt_tokens": 9911,
+        "total_tokens": 11954
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "r.exec(cmd + bar, argsEnv, new java.io.File(System.getProperty(\"user.dir\")))",
+        "source": "request.getParameterValues(\"BenchmarkTest01610\")"
+      },
+      "case_id": "BenchmarkTest01610",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01610.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest01610\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01610.java",
+          "line": 48,
+          "quote": "String bar = new Test().doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01610.java",
+          "line": 80,
+          "quote": "org.apache.commons.codec.binary.Base64.decodeBase64("
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01610.java",
+          "line": 61,
+          "quote": "r.exec(cmd + bar, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "Untrusted input from `request.getParameterValues` is retrieved into `param` and passed through Base64 encoding and immediate decoding, preserving the original string in `bar`. The unsanitized value is directly concatenated into the command string executed by `Runtime.getRuntime().exec()`, enabling command injection.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.819,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1718,
+        "cost": 0.014667,
+        "prompt_tokens": 10966,
+        "total_tokens": 12684
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "connection.prepareCall(sql, ...).executeQuery()",
+        "source": "request.getParameterValues(\"BenchmarkTest01621\")"
+      },
+      "case_id": "BenchmarkTest01621",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01621.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest01621\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01621.java",
+          "line": 79,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01621.java",
+          "line": 50,
+          "quote": "String sql = \"{call \" + bar + \"}\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01621.java",
+          "line": 60,
+          "quote": "java.sql.ResultSet rs = statement.executeQuery();"
+        }
+      ],
+      "explanation": "User input from request parameter 'BenchmarkTest01621' is passed to doSomething, where the condition (7 * 42) - 106 > 200 evaluates to 188 > 200 (false). This selects 'param', which is directly concatenated into a SQL statement executed without parameterization or sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#007",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > SQL > Example",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 19.065,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1038,
+        "cost": 0.00990525,
+        "prompt_tokens": 8017,
+        "total_tokens": 9055
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch assignment",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "statement.execute(sql, new String[] {\"username\", \"password\"})",
+        "source": "request.getParameterValues(\"BenchmarkTest01628\")"
+      },
+      "case_id": "BenchmarkTest01628",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01628.java",
+          "line": 70,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01628.java",
+          "line": 71,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01628.java",
+          "line": 78,
+          "quote": "case 'B':"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01628.java",
+          "line": 79,
+          "quote": "bar = \"bob\";"
+        }
+      ],
+      "explanation": "The untrusted request parameter never reaches the SQL sink because switchTarget evaluates charAt(1) of constant 'ABC', which is always 'B'. In case 'B', bar is set to the hardcoded literal 'bob', preventing untrusted input propagation.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.957,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1894,
+        "cost": 0.014319750000000001,
+        "prompt_tokens": 9623,
+        "total_tokens": 11517
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "org.owasp.esapi.ESAPI.encoder().encodeForHTML(param)",
+        "protection_effective": "yes",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().println(bar.toCharArray())",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest01664",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01664.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01664.java",
+          "line": 81,
+          "quote": "String bar = org.owasp.esapi.ESAPI.encoder().encodeForHTML(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01664.java",
+          "line": 73,
+          "quote": "response.getWriter().println(bar.toCharArray());"
+        }
+      ],
+      "explanation": "Untrusted input obtained via request.getQueryString() is passed into Test.doSomething, where it is sanitized via org.owasp.esapi.ESAPI.encoder().encodeForHTML before being written to the response writer. Because HTML entity encoding is the appropriate defense for HTML body context, the vulnerability is neutralized.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.644,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1849,
+        "cost": 0.014570999999999999,
+        "prompt_tokens": 10183,
+        "total_tokens": 12032
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "List manipulation drops the user input: 'safe' is removed at index 0, shifting 'moresafe' to index 1, which is assigned to bar",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "Runtime.getRuntime().exec(cmd + bar, argsEnv)",
+        "source": "request.getCookies()"
+      },
+      "case_id": "BenchmarkTest01865",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01865.java",
+          "line": 95,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01865.java",
+          "line": 98,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01865.java",
+          "line": 100,
+          "quote": "bar = valuesList.get(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01865.java",
+          "line": 78,
+          "quote": "Process p = r.exec(cmd + bar, argsEnv);"
+        }
+      ],
+      "explanation": "Although untrusted data is read from the request cookie, method doSomething adds 'safe', param, and 'moresafe' to an ArrayList, then removes index 0 and retrieves index 1. This means bar is always assigned the constant 'moresafe', preventing any user input from reaching Runtime.exec().",
+      "guidance": [],
+      "latency_seconds": 32.631,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1468,
+        "cost": 0.014065499999999998,
+        "prompt_tokens": 11414,
+        "total_tokens": 12882
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "ctx.search(base, filter, sc)",
+        "source": "request.getHeader(\"BenchmarkTest01902\")"
+      },
+      "case_id": "BenchmarkTest01902",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01902.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01902\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01902.java",
+          "line": 51,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01902.java",
+          "line": 118,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01902.java",
+          "line": 120,
+          "quote": "bar = valuesList.get(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01902.java",
+          "line": 60,
+          "quote": "String filter = \"(&(objectclass=person)(uid=\" + bar + \"))\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01902.java",
+          "line": 63,
+          "quote": "ctx.search(base, filter, sc);"
+        }
+      ],
+      "explanation": "Untrusted input obtained via request.getHeader is passed to doSomething(), where it is added to a list at index 1 and subsequently retrieved from index 0 after removing the element at index 0. The unsanitized value is then concatenated directly into an LDAP search filter and executed by ctx.search, leading to LDAP injection.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#013",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > LDAP Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 26.137,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1786,
+        "cost": 0.01505325,
+        "prompt_tokens": 11141,
+        "total_tokens": 12927
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().printf(bar, obj)",
+        "source": "request.getHeader(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest01922",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 51,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 68,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 70,
+          "quote": "bar = valuesList.get(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01922.java",
+          "line": 55,
+          "quote": "response.getWriter().printf(bar, obj);"
+        }
+      ],
+      "explanation": "Untrusted input from the HTTP Referer header is retrieved and decoded before being passed to doSomething(), which stores it at index 1 and, after removing index 0, returns it via valuesList.get(0). The unescaped value is then written directly to the HTTP response stream using response.getWriter().printf(), resulting in a reflected XSS vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+          "doc": "DOM_based_XSS_Prevention_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.135,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1994,
+        "cost": 0.01468875,
+        "prompt_tokens": 9615,
+        "total_tokens": 11609
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "hardcoded constant value passed to helper",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "r.exec(cmd, argsEnv)",
+        "source": "request.getHeader(\"BenchmarkTest01941\")"
+      },
+      "case_id": "BenchmarkTest01941",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01941.java",
+          "line": 94,
+          "quote": "String g20426 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01941.java",
+          "line": 95,
+          "quote": "String bar = thing.doSomething(g20426);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01941.java",
+          "line": 61,
+          "quote": "Process p = r.exec(cmd, argsEnv);"
+        }
+      ],
+      "explanation": "Although untrusted input is read from HTTP header 'BenchmarkTest01941' and passed into doSomething, the method ignores the derived value and passes the constant string 'barbarians_at_the_gate' to thing.doSomething. Consequently, neither the command nor the argsEnv array contains tainted data reaching the exec sink.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 24.848,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1476,
+        "cost": 0.0159855,
+        "prompt_tokens": 13934,
+        "total_tokens": 15410
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.queryForObject(sql, Long.class)",
+        "source": "request.getHeader(\"BenchmarkTest01965\")"
+      },
+      "case_id": "BenchmarkTest01965",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01965.java",
+          "line": 79,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01965.java",
+          "line": 81,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01965.java",
+          "line": 53,
+          "quote": "String sql = \"SELECT userid from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "Although the HTTP header is retrieved at lines 44-45, the helper method doSomething evaluates (7 * 18) + num > 200 where num is 106. Because (126 + 106) = 232 > 200 is always true, bar is invariably assigned the constant string 'This_should_always_happen', preventing untrusted input from reaching the SQL query sink.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 24.928,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1570,
+        "cost": 0.01239675,
+        "prompt_tokens": 8679,
+        "total_tokens": 10249
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch replacing tainted parameter with hardcoded literal",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.File(fileURI)",
+        "source": "request.getHeaders(\"BenchmarkTest02030\")"
+      },
+      "case_id": "BenchmarkTest02030",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02030.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"BenchmarkTest02030\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02030.java",
+          "line": 118,
+          "quote": "String g60868 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02030.java",
+          "line": 119,
+          "quote": "String bar = thing.doSomething(g60868);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02030.java",
+          "line": 75,
+          "quote": "java.io.File fileTarget = new java.io.File(fileURI);"
+        }
+      ],
+      "explanation": "While untrusted input is read from request headers, the helper method doSomething ignores the processed input and assigns the constant string 'barbarians_at_the_gate' to g60868 before calling thing.doSomething(g60868). Because the returned string used in the File sink is entirely derived from a constant value, untrusted data never reaches the sink.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.8,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1643,
+        "cost": 0.0161745,
+        "prompt_tokens": 13351,
+        "total_tokens": 14994
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "hardcoded constant assignment",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "response.getWriter().printf(java.util.Locale.US, \"Formatted like: %1$s and %2$s.\", obj)",
+        "source": "request.getHeaders(\"Referer\")"
+      },
+      "case_id": "BenchmarkTest02048",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02048.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02048.java",
+          "line": 83,
+          "quote": "String g96053 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02048.java",
+          "line": 84,
+          "quote": "String bar = thing.doSomething(g96053);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02048.java",
+          "line": 57,
+          "quote": "response.getWriter().printf(java.util.Locale.US, \"Formatted like: %1$s and %2$s.\", obj);"
+        }
+      ],
+      "explanation": "Although the untrusted 'Referer' header is read and parsed, the value passed to 'thing.doSomething' and ultimately returned to the output stream is hardcoded to the constant 'barbarians_at_the_gate'. As a result, user input never reaches the response writer sink.",
+      "guidance": [
+        {
+          "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+          "doc": "DOM_based_XSS_Prevention_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/DOM_based_XSS_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 24.896,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1670,
+        "cost": 0.01633725,
+        "prompt_tokens": 13433,
+        "total_tokens": 15103
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch selecting constant string \"bob\"",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "r.exec(cmd + bar, argsEnv)",
+        "source": "request.getHeaders(\"BenchmarkTest02069\")"
+      },
+      "case_id": "BenchmarkTest02069",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02069.java",
+          "line": 79,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02069.java",
+          "line": 80,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02069.java",
+          "line": 88,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02069.java",
+          "line": 65,
+          "quote": "Process p = r.exec(cmd + bar, argsEnv);"
+        }
+      ],
+      "explanation": "Although tainted input is retrieved from request headers, the helper method doSomething uses a deterministic switch based on guess.charAt(1) ('B') to set bar to the hardcoded literal \"bob\". As a result, untrusted input never reaches the Runtime.exec sink.",
+      "guidance": [],
+      "latency_seconds": 28.463,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1666,
+        "cost": 0.01407825,
+        "prompt_tokens": 10441,
+        "total_tokens": 12107
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant truthy condition ((7 * 42) - num > 200) ensuring only constant string is used",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "connection.prepareStatement(sql, java.sql.ResultSet.TYPE_FORWARD_ONLY, java.sql.ResultSet.CONCUR_READ_ONLY)",
+        "source": "request.getHeaders(\"BenchmarkTest02089\")"
+      },
+      "case_id": "BenchmarkTest02089",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02089.java",
+          "line": 81,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02089.java",
+          "line": 82,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02089.java",
+          "line": 85,
+          "quote": "return bar;"
+        }
+      ],
+      "explanation": "Untrusted header input passed to doSomething is never assigned to the SQL query. The condition (7 * 42) - 86 evaluates to 208 > 200, which is statically always true, so bar is unconditionally set to a constant string.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 17.705,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1897,
+        "cost": 0.01432875,
+        "prompt_tokens": 9620,
+        "total_tokens": 11517
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "hardcoded constant selection via list operations",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.FileInputStream(fileName)",
+        "source": "request.getParameter(\"BenchmarkTest02111\")"
+      },
+      "case_id": "BenchmarkTest02111",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02111.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest02111\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02111.java",
+          "line": 78,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02111.java",
+          "line": 79,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02111.java",
+          "line": 81,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02111.java",
+          "line": 83,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "In doSomething, 'safe', param, and 'moresafe' are sequentially added to valuesList. Removing element 0 shifts the list such that index 1 becomes 'moresafe', so valuesList.get(1) always returns the constant string 'moresafe' instead of user input.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File_Upload_Cheat_Sheet",
+          "section": "File Upload Protection > Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.568,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1547,
+        "cost": 0.0128655,
+        "prompt_tokens": 9419,
+        "total_tokens": 10966
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch override in doSomething()",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "response.getWriter().println(bar.toCharArray());",
+        "source": "request.getParameterMap()"
+      },
+      "case_id": "BenchmarkTest02235",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02235.java",
+          "line": 62,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02235.java",
+          "line": 63,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02235.java",
+          "line": 53,
+          "quote": "response.getWriter().println(bar.toCharArray());"
+        }
+      ],
+      "explanation": "Untrusted input is extracted into param, but the subsequent call to doSomething evaluates the condition (7 * 42) - 86 > 200 (208 > 200), which is always true. Thus, bar is invariably assigned the hardcoded safe string 'This_should_always_happen' and untrusted input never reaches the response writer.",
+      "guidance": [],
+      "latency_seconds": 20.537,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1675,
+        "cost": 0.01336875,
+        "prompt_tokens": 9450,
+        "total_tokens": 11125
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant assignment via list manipulation",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "response.getWriter().write(bar.toCharArray())",
+        "source": "request.getParameterMap()"
+      },
+      "case_id": "BenchmarkTest02239",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02239.java",
+          "line": 62,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02239.java",
+          "line": 63,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02239.java",
+          "line": 64,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02239.java",
+          "line": 66,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02239.java",
+          "line": 68,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "In doSomething, the list is populated with 'safe' at index 0, param at index 1, and 'moresafe' at index 2. When valuesList.remove(0) is called, the elements shift left, making 'moresafe' the element at index 1, which is assigned to bar and written to the response.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 28.467,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2366,
+        "cost": 0.0158325,
+        "prompt_tokens": 9280,
+        "total_tokens": 11646
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch via list manipulation returning 'moresafe'",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "connection.prepareCall(sql, ...).executeQuery()",
+        "source": "request.getParameterMap()"
+      },
+      "case_id": "BenchmarkTest02265",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02265.java",
+          "line": 43,
+          "quote": "java.util.Map<String, String[]> map = request.getParameterMap();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02265.java",
+          "line": 78,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02265.java",
+          "line": 79,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02265.java",
+          "line": 81,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02265.java",
+          "line": 83,
+          "quote": "bar = valuesList.get(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02265.java",
+          "line": 52,
+          "quote": "String sql = \"{call \" + bar + \"}\";"
+        }
+      ],
+      "explanation": "Although user input is retrieved via request.getParameterMap(), the helper method doSomething inserts the parameter into an ArrayList at index 1 between 'safe' and 'moresafe'. When valuesList.remove(0) is executed, 'moresafe' shifts to index 1, meaning valuesList.get(1) always returns the constant string 'moresafe', so user input never reaches the SQL sink.",
+      "guidance": [
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#007",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > SQL > Example",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.184,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1825,
+        "cost": 0.013545,
+        "prompt_tokens": 8935,
+        "total_tokens": 10760
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "statement.execute(sql, new int[] {1, 2})",
+        "source": "request.getParameterNames()"
+      },
+      "case_id": "BenchmarkTest02367",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02367.java",
+          "line": 99,
+          "quote": "String g41891 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02367.java",
+          "line": 100,
+          "quote": "String bar = thing.doSomething(g41891);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02367.java",
+          "line": 67,
+          "quote": "statement.execute(sql, new int[] {1, 2});"
+        }
+      ],
+      "explanation": "Although input is read via request parameter names, in doSomething() the tainted parameter is ignored in the final query computation; instead, a hardcoded constant string 'barbarians_at_the_gate' is passed to thing.doSomething() and returned as 'bar'. Thus, untrusted input never reaches the SQL execution sink.",
+      "guidance": [],
+      "latency_seconds": 22.497,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2158,
+        "cost": 0.01753725,
+        "prompt_tokens": 12593,
+        "total_tokens": 14751
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "Collection manipulation in doSomething selects constant \"moresafe\"",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "idc.search(base, filter, sc) at line 63",
+        "source": "scr.getTheParameter(\"BenchmarkTest02384\") at line 45"
+      },
+      "case_id": "BenchmarkTest02384",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02384.java",
+          "line": 115,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02384.java",
+          "line": 116,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02384.java",
+          "line": 117,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02384.java",
+          "line": 119,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02384.java",
+          "line": 121,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "In doSomething, the list initially contains [\"safe\", param, \"moresafe\"]. Removing index 0 leaves [param, \"moresafe\"], so valuesList.get(1) returns the hardcoded constant \"moresafe\", preventing untrusted user input from reaching the LDAP filter.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#013",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > LDAP Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 29.579,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2372,
+        "cost": 0.01649025,
+        "prompt_tokens": 10127,
+        "total_tokens": 12499
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.File(new java.io.File(org.owasp.benchmark.helpers.Utils.TESTFILES_DIR), bar)",
+        "source": "request.getParameterValues(\"BenchmarkTest02462\")"
+      },
+      "case_id": "BenchmarkTest02462",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02462.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02462\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02462.java",
+          "line": 73,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02462.java",
+          "line": 74,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02462.java",
+          "line": 82,
+          "quote": "bar = \"bob\";"
+        }
+      ],
+      "explanation": "User input read from request.getParameterValues is passed into doSomething, but it is never returned because switchTarget is statically evaluated as 'B' from 'ABC'.charAt(1). Consequently, case 'B' always executes and assigns the constant string 'bob' to bar, preventing user input from reaching the File constructor.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.76,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1663,
+        "cost": 0.013229250000000001,
+        "prompt_tokens": 9324,
+        "total_tokens": 10987
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "List manipulation drops the user input and assigns constant \"moresafe\" to bar via valuesList.remove(0) and valuesList.get(1)",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.FileInputStream(fileName)",
+        "source": "request.getParameterValues(\"BenchmarkTest02468\")"
+      },
+      "case_id": "BenchmarkTest02468",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02468.java",
+          "line": 80,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02468.java",
+          "line": 81,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02468.java",
+          "line": 83,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02468.java",
+          "line": 85,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "User input `param` is added to `valuesList` at index 1, but after `valuesList.remove(0)` shifts the elements, `valuesList.get(1)` retrieves the hardcoded string \"moresafe\". Thus, untrusted input does not reach the file stream sink.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Protection",
+          "section": "Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.282,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1531,
+        "cost": 0.01293075,
+        "prompt_tokens": 9586,
+        "total_tokens": 11117
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02481",
+      "citations": [],
+      "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+      "guidance": [],
+      "latency_seconds": 26.45,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2657,
+        "cost": 0.01687125,
+        "prompt_tokens": 9210,
+        "total_tokens": 11867
+      },
+      "verdict": "human_review"
+    },
+    {
+      "analysis": {
+        "protection": "Constant switch variable deterministically sets bar to \"bob\"",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "r.exec(args, argsEnv, new java.io.File(System.getProperty(\"user.dir\")))",
+        "source": "request.getParameterValues(\"BenchmarkTest02513\")"
+      },
+      "case_id": "BenchmarkTest02513",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02513.java",
+          "line": 73,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02513.java",
+          "line": 74,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02513.java",
+          "line": 82,
+          "quote": "bar = \"bob\";"
+        }
+      ],
+      "explanation": "In doSomething, switchTarget is statically derived from 'ABC'.charAt(1), which always evaluates to 'B'. Consequently, the switch statement deterministically executes case 'B' and assigns the constant string 'bob' to bar, discarding the tainted user input before it can reach the exec call.",
+      "guidance": [],
+      "latency_seconds": 19.876,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1221,
+        "cost": 0.01257375,
+        "prompt_tokens": 10660,
+        "total_tokens": 11881
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "Passed as the envp (environment variables) array parameter to Runtime.exec, not as the command string",
+        "protection_effective": "yes",
+        "reaches_sink": "yes",
+        "sink": "r.exec(cmd, argsEnv, new java.io.File(System.getProperty(\"user.dir\")))",
+        "source": "request.getParameterValues(\"BenchmarkTest02516\")"
+      },
+      "case_id": "BenchmarkTest02516",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02516.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02516\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02516.java",
+          "line": 53,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02516.java",
+          "line": 56,
+          "quote": "Process p = r.exec(cmd, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "User input retrieved at line 43 is placed into the `argsEnv` array and passed to `Runtime.getRuntime().exec(String command, String[] envp, File dir)` as the `envp` parameter at line 56. The executed command string `cmd` itself is obtained independently without user input, preventing command injection.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.523,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1966,
+        "cost": 0.01509,
+        "prompt_tokens": 10290,
+        "total_tokens": 12256
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch selecting hardcoded literal",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "statement.execute(sql, new int[] {1, 2})",
+        "source": "request.getParameterValues(\"BenchmarkTest02544\")"
+      },
+      "case_id": "BenchmarkTest02544",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02544.java",
+          "line": 68,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02544.java",
+          "line": 69,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02544.java",
+          "line": 76,
+          "quote": "case 'B':"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02544.java",
+          "line": 77,
+          "quote": "bar = \"bob\";"
+        }
+      ],
+      "explanation": "Although input is received via request.getParameterValues, method doSomething uses the constant switchTarget from \"ABC\".charAt(1) which resolves to 'B'. This deterministically executes case 'B' and sets bar to \"bob\", preventing any user input from reaching the SQL query execution.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.309,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1528,
+        "cost": 0.0132195,
+        "prompt_tokens": 9986,
+        "total_tokens": 11514
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "new java.io.FileOutputStream(new java.io.File(fileName), false)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02564",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02564.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02564.java",
+          "line": 104,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02564.java",
+          "line": 116,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02564.java",
+          "line": 78,
+          "quote": "fos = new java.io.FileOutputStream(new java.io.File(fileName), false);"
+        }
+      ],
+      "explanation": "Untrusted input obtained from request.getQueryString() is passed into doSomething(). Because 'ABC'.charAt(2) evaluates to 'C', execution takes case 'C', returning the unsanitized parameter to be concatenated into fileName and passed directly to FileOutputStream.",
+      "guidance": [
+        {
+          "chunk_id": "File_Upload_Cheat_Sheet#011",
+          "doc": "File Upload Cheat Sheet",
+          "section": "File Upload Protection > Filename Safety",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/File_Upload_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 19.494,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1534,
+        "cost": 0.01363275,
+        "prompt_tokens": 10507,
+        "total_tokens": 12041
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "Constant switch statement target evaluates to 'B', hardcoding the returned string to 'bob'",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "new java.io.FileInputStream(fileName)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02566",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02566.java",
+          "line": 99,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02566.java",
+          "line": 100,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02566.java",
+          "line": 108,
+          "quote": "bar = \"bob\";"
+        }
+      ],
+      "explanation": "Although untrusted data is read from the query string, method doSomething uses the constant switch target 'ABC'.charAt(1) which evaluates to 'B'. This unconditionally selects the branch setting bar to the hardcoded string 'bob', completely decoupling the filename from user input.",
+      "guidance": [],
+      "latency_seconds": 18.332,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1591,
+        "cost": 0.01314825,
+        "prompt_tokens": 9576,
+        "total_tokens": 11167
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().printf(\"Formatted like: %1$s and %2$s.\", obj);",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02591",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02591.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02591.java",
+          "line": 68,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02591.java",
+          "line": 81,
+          "quote": "String bar = sbxyz9811.append(\"_SafeStuff\").toString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02591.java",
+          "line": 74,
+          "quote": "response.getWriter().printf(\"Formatted like: %1$s and %2$s.\", obj);"
+        }
+      ],
+      "explanation": "Untrusted input obtained from request.getQueryString() is parsed, decoded, and passed to doSomething(), which only appends the static string '_SafeStuff'. The resulting value is printed directly to the HTTP response via response.getWriter().printf without HTML encoding or validation, leaving the application vulnerable to reflected XSS.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross Site Scripting Prevention Cheat Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.614,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1655,
+        "cost": 0.01431975,
+        "prompt_tokens": 10818,
+        "total_tokens": 12473
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "constant branch in doSomething() where (7 * 18) + 106 > 200 evaluates to true",
+        "protection_effective": "yes",
+        "reaches_sink": "no",
+        "sink": "response.getWriter().printf(bar, obj)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02593",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02593.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02593.java",
+          "line": 74,
+          "quote": "response.getWriter().printf(bar, obj);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02593.java",
+          "line": 83,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02593.java",
+          "line": 85,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        }
+      ],
+      "explanation": "Untrusted input extracted from the query string is passed to doSomething(), but the condition (7 * 18) + num > 200 evaluates to 232 > 200, which is always true. As a result, the ternary operator always selects the hardcoded string constant 'This_should_always_happen', preventing user input from reaching the response writer sink.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross Site Scripting Prevention Cheat Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 16.371,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1732,
+        "cost": 0.014745749999999998,
+        "prompt_tokens": 11001,
+        "total_tokens": 12733
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "response.getWriter().write(\"Parameter value: \" + bar)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02608",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02608.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02608.java",
+          "line": 70,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02608.java",
+          "line": 73,
+          "quote": "response.getWriter().write(\"Parameter value: \" + bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02608.java",
+          "line": 79,
+          "quote": "String bar = param;"
+        }
+      ],
+      "explanation": "Untrusted input extracted from request.getQueryString() is passed into doSomething and returned unaltered. It is written directly to the text/html HTTP response stream via response.getWriter().write without sanitization or HTML encoding, resulting in reflected XSS.",
+      "guidance": [
+        {
+          "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#016",
+          "doc": "Cross Site Scripting Prevention Cheat Sheet",
+          "section": "Other Controls > XSS Prevention Rules Summary",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 14.332,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1561,
+        "cost": 0.01383675,
+        "prompt_tokens": 10644,
+        "total_tokens": 12205
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.query(sql, ...)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02641",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02641.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02641.java",
+          "line": 70,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02641.java",
+          "line": 72,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02641.java",
+          "line": 75,
+          "quote": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.query("
+        }
+      ],
+      "explanation": "Untrusted input obtained from request.getQueryString() is parsed, decoded, and returned without modification by doSomething. It is then directly concatenated into an SQL string and executed by JDBCtemplate.query without parameterized queries or sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.173,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1647,
+        "cost": 0.0145215,
+        "prompt_tokens": 11127,
+        "total_tokens": 12774
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "statement.executeBatch()",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02647",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02647.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02647.java",
+          "line": 70,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02647.java",
+          "line": 72,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02647.java",
+          "line": 77,
+          "quote": "statement.addBatch(sql);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02647.java",
+          "line": 78,
+          "quote": "int[] counts = statement.executeBatch();"
+        }
+      ],
+      "explanation": "Untrusted input extracted from request.getQueryString() is passed into doSomething(), which only applies base64 encoding followed immediately by base64 decoding, returning the unmodified input. The returned string is directly concatenated into a dynamic SQL query and executed with statement.executeBatch() without parameterization or escaping.",
+      "guidance": [
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 19.222,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2174,
+        "cost": 0.0157635,
+        "prompt_tokens": 10148,
+        "total_tokens": 12322
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "statement.executeUpdate(sql)",
+        "source": "request.getQueryString()"
+      },
+      "case_id": "BenchmarkTest02655",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02655.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02655.java",
+          "line": 70,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02655.java",
+          "line": 72,
+          "quote": "String sql = \"INSERT INTO users (username, password) VALUES ('foo','\" + bar + \"')\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02655.java",
+          "line": 77,
+          "quote": "int count = statement.executeUpdate(sql);"
+        }
+      ],
+      "explanation": "Untrusted input from request.getQueryString() is parsed, decoded, passed through doSomething without modification, and directly concatenated into an SQL INSERT statement. This unescaped string is executed via statement.executeUpdate(), exposing the application to SQL injection.",
+      "guidance": [
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#007",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > SQL > Example",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        },
+        {
+          "chunk_id": "Injection_Prevention_Cheat_Sheet#011",
+          "doc": "Injection_Prevention_Cheat_Sheet",
+          "section": "Forms of Injection > Query languages > SQL Injection",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Injection_Prevention_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.447,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1582,
+        "cost": 0.0136215,
+        "prompt_tokens": 10252,
+        "total_tokens": 11834
+      },
+      "verdict": "true_positive"
+    }
+  ]
+}

@@ -1,0 +1,88 @@
+{
+  "selection": {
+    "status": "frozen",
+    "partition": "test",
+    "split_seed": 201,
+    "test_fraction": 0.5,
+    "sample_seed": 201,
+    "categories": {
+      "CWE-22": 16,
+      "CWE-78": 16,
+      "CWE-79": 16,
+      "CWE-89": 16,
+      "CWE-90": 2
+    },
+    "selected": 66,
+    "excluded_prior_cases": 120,
+    "rule": "one CWE-matching Semgrep alert per case, balanced by label on the evaluation side"
+  },
+  "composition": {
+    "CWE-22": {
+      "cwe": "CWE-22",
+      "partition": "test",
+      "seed": 201,
+      "requested": 16,
+      "selected": 16,
+      "shortfall": 0,
+      "excluded_prior_cases": 120,
+      "eligible_vulnerable": 45,
+      "eligible_safe": 38,
+      "selected_vulnerable": 8,
+      "selected_safe": 8
+    },
+    "CWE-78": {
+      "cwe": "CWE-78",
+      "partition": "test",
+      "seed": 201,
+      "requested": 16,
+      "selected": 16,
+      "shortfall": 0,
+      "excluded_prior_cases": 120,
+      "eligible_vulnerable": 46,
+      "eligible_safe": 35,
+      "selected_vulnerable": 8,
+      "selected_safe": 8
+    },
+    "CWE-79": {
+      "cwe": "CWE-79",
+      "partition": "test",
+      "seed": 201,
+      "requested": 16,
+      "selected": 16,
+      "shortfall": 0,
+      "excluded_prior_cases": 120,
+      "eligible_vulnerable": 89,
+      "eligible_safe": 48,
+      "selected_vulnerable": 8,
+      "selected_safe": 8
+    },
+    "CWE-89": {
+      "cwe": "CWE-89",
+      "partition": "test",
+      "seed": 201,
+      "requested": 16,
+      "selected": 16,
+      "shortfall": 0,
+      "excluded_prior_cases": 120,
+      "eligible_vulnerable": 101,
+      "eligible_safe": 64,
+      "selected_vulnerable": 8,
+      "selected_safe": 8
+    },
+    "CWE-90": {
+      "cwe": "CWE-90",
+      "partition": "test",
+      "seed": 201,
+      "requested": 2,
+      "selected": 2,
+      "shortfall": 0,
+      "excluded_prior_cases": 120,
+      "eligible_vulnerable": 1,
+      "eligible_safe": 1,
+      "selected_vulnerable": 1,
+      "selected_safe": 1
+    }
+  },
+  "semgrep_version": "1.178.0",
+  "scan_date": "2026-10-28T04:35:19+00:00"
+}

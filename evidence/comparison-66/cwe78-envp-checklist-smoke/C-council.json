@@ -1,0 +1,56 @@
+{
+  "model": "google/gemini-3.8-flash",
+  "results": [
+    {
+      "analysis": {
+        "protection": "none",
+        "protection_effective": "no",
+        "reaches_sink": "yes",
+        "sink": "r.exec(args, argsEnv)",
+        "source": "request.getHeader(\"BenchmarkTest01066\")"
+      },
+      "case_id": "BenchmarkTest01066",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01066\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 57,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01066.java",
+          "line": 62,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        },
+        {
+          "file": "src/main/resources/insecureCmd.sh",
+          "line": 4,
+          "quote": "eval $FOO"
+        }
+      ],
+      "explanation": "Untrusted input from the HTTP header is passed into the environment array (argsEnv) of Runtime.getRuntime().exec(). Because an attacker controls the environment string, setting FOO=<payload> results in arbitrary command execution when the invoked script evaluates FOO via 'eval $FOO' or '%FOO%'.",
+      "guidance": [
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#010",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Code examples > Java",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 18.983,
+      "model": "google/gemini-3.8-flash",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1906,
+        "cost": 0.017219250000000002,
+        "prompt_tokens": 13429,
+        "total_tokens": 15335
+      },
+      "verdict": "true_positive"
+    }
+  ]
+}

@@ -1,0 +1,1371 @@
+{
+  "configurations": [
+    {
+      "configuration": "A-scanner-only",
+      "evaluated_findings": 100,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00104",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00191",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00329",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00333",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00517",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00763",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00838",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01010",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01085",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01095",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01213",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01215",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01219",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01303",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01305",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01310",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01315",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01387",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01467",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01468",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01629",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01713",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01714",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01717",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01719",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01722",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01729",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01877",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01878",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01879",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01967",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01969",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02097",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02174",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02175",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02180",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02188",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02267",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02278",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02279",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02361",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02366",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02536",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02539",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02540",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02626",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02633",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02634",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02639",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02652",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 50,
+      "fp_removed": 0,
+      "fp_removed_rate": 0.0,
+      "fp_retained": 50,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 0,
+      "genuine_in_sample": 50,
+      "genuine_retained": 50,
+      "genuine_retained_rate": 1.0,
+      "human_review": 0,
+      "human_review_rate": 0.0,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": null,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 0,
+        "completion_tokens_total": null,
+        "cost_reported": 0,
+        "cost_total": null,
+        "latency_max_seconds": null,
+        "latency_mean_seconds": null,
+        "latency_reported": 0,
+        "prompt_tokens_reported": 0,
+        "prompt_tokens_total": null
+      }
+    },
+    {
+      "configuration": "B-single-agent",
+      "evaluated_findings": 100,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00198",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00204",
+          "expected": "true_positive",
+          "explanation": "HTTP header input is passed into thing.doSomething(param) before being concatenated into an SQL INSERT query executed via java.sql.Statement. Because the implementation and sanitization behavior of ThingInterface.doSomething cannot be determined from the provided code, there is insufficient evidence to confirm exploitability.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00595",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00839",
+          "expected": "true_positive",
+          "explanation": "The ternary expression evaluating `(7 * 42) - num > 200` with `num = 106` results in `(294) - 106 = 188 > 200`, which is false, assigning `bar = param`? Wait: 7 * 42 = 294. 294 - 106 = 188. 188 > 200 is false, so bar = param! Wait! Let me re-calculate: 7 * 42 = 294. 294 - 106 = 188. 188 > 200 is FALSE, so bar receives `param`, not the constant string! Therefore `bar` is indeed user input `param`, which gets concatenated directly into the SQL string without parameterization.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01004",
+          "expected": "true_positive",
+          "explanation": "Although user-supplied cookie data enters 'param' and a dynamic query string is constructed, the value of 'bar' is determined by a hardcoded switch statement on 'guess.charAt(2)' where guess is 'ABC'. The branch 'case 'A'' assigning 'param' is unreachable because the switch target is constant 'C', preventing user input from reaching the SQL sink.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01010",
+          "expected": "false_positive",
+          "explanation": "The implementation of `Test.doSomething` is truncated at line 96, leaving it uncertain whether the method returns the tainted `param` or a safe constant. Because the data flow into `bar` and the subsequent SQL sink cannot be fully verified from the provided source snippet, human review is required.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01085",
+          "expected": "false_positive",
+          "explanation": "User input from the HTTP header is passed via param to Test.doSomething, but the method implementation is truncated after line 81. Because the return value assigned to bar cannot be determined from the available code, the taint status of the executed SQL query cannot be verified.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01087",
+          "expected": "true_positive",
+          "explanation": "Although user input is retrieved via request.getHeader and decoded, the method doSomething sets bar to the constant string 'This should never happen' because (7 * 42) - 106 equals 188, which is not greater than 200... wait, 7 * 42 = 294; 294 - 106 = 188. 188 > 200 is false, so bar is assigned param! Since 188 > 200 is false, the ternary operator evaluates the false branch, which is param. Therefore, bar receives the untrusted param and is concatenated directly into the SQL string executed by queryForObject without parameterization.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01091",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01215",
+          "expected": "false_positive",
+          "explanation": "Input is taken from request headers and passed to Test.doSomething, but the method's implementation is truncated at the switch statement. Without knowing whether bar is assigned user-controlled param or a hardcoded constant, taint propagation cannot be determined.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01303",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01381",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01465",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01466",
+          "expected": "true_positive",
+          "explanation": "The parameter name is controlled by request input when its value matches 'BenchmarkTest01466' and is passed into Test.doSomething, but the implementation of doSomething is truncated after line 105, leaving it uncertain whether the value is sanitized or transformed before being concatenated into the SQL statement.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01467",
+          "expected": "false_positive",
+          "explanation": "The parameter name is passed into `Test.doSomething(request, param)` to produce `bar`, which is concatenated into a raw SQL query. However, the implementation of `doSomething` is truncated and missing from the provided code, making it impossible to determine whether the input is sanitized, modified, or returned as-is.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01468",
+          "expected": "false_positive",
+          "explanation": "User input is extracted from request parameter names when a value matches 'BenchmarkTest01468' and passed into Test().doSomething(request, param), before the result is concatenated into a SQL statement executed by queryForList. However, the implementation of doSomething is truncated in the provided evidence, making it impossible to determine whether the input is sanitized, transformed, or ignored.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01715",
+          "expected": "true_positive",
+          "explanation": "Parameter data extracted from the query string is processed via ThingFactory/ThingInterface implementation before being concatenated into an SQL query string. Because the behavior and sanitization logic of ThingInterface.doSomething(param) cannot be determined from the provided evidence, the alert cannot be definitively confirmed as a true positive or false positive.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01720",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01721",
+          "expected": "true_positive",
+          "explanation": "The alert flags SQL injection where user-derived input `bar` is concatenated into a SQL statement, but the implementation of `Test().doSomething(request, param)` is truncated and missing from the provided code snippet. Without seeing whether `doSomething` sanitizes, validates, or constant-replaces the parameter, it is impossible to conclusively confirm or dismiss the vulnerability.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01722",
+          "expected": "false_positive",
+          "explanation": "The alert flags SQL concatenation into JDBCtemplate.query, but the body of Test.doSomething is truncated at line 115, making it impossible to determine whether the returned variable 'bar' actually derives from user input 'param' or remains a safe constant.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01882",
+          "expected": "true_positive",
+          "explanation": "User input from HTTP cookies is decoded and passed into doSomething(), but the source code cuts off mid-method at line 111. Without the remaining body and return statement of doSomething(), it cannot be determined whether the returned value 'bar' concatenated into the SQL statement is user-tainted or a safe constant.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01883",
+          "expected": "true_positive",
+          "explanation": "Cookie input flows into the SQL query construction, but the implementation of 'doSomething' that generates 'bar' is truncated, making it impossible to determine if the input is sanitized, transformed, or ignored.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01967",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething is truncated at line 83, making it impossible to determine whether untrusted input in param flows into bar or is replaced with a safe constant.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01970",
+          "expected": "true_positive",
+          "explanation": "The switch target is deterministically set to 'C' (guess.charAt(2)), but the implementation of case 'C' in doSomething is truncated after line 84. Without the remaining code, it is impossible to determine whether bar is assigned user-controlled input param or a safe constant.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02175",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02177",
+          "expected": "true_positive",
+          "explanation": "The HTTP request parameter 'param' is passed to 'doSomething', but the implementation of 'doSomething' is truncated at line 91, making it impossible to determine whether 'bar' is tainted or safe constants/sanitization are applied.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02188",
+          "expected": "false_positive",
+          "explanation": "User input from request.getParameter is passed to doSomething and concatenated into an SQL query executed via Statement.executeQuery. However, the definition of doSomething is truncated at line 78, making it impossible to determine whether the returned string safely sanitizes or ignores the input.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02273",
+          "expected": "true_positive",
+          "explanation": "The implementation of doSomething is truncated at line 80, making it impossible to determine whether the user-controlled param is returned or replaced with a safe constant.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02354",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02536",
+          "expected": "false_positive",
+          "explanation": "The alert identifies untrusted input from request.getParameterValues entering a SQL query via doSomething; however, the implementation of doSomething is truncated after line 78, leaving it uncertain whether the input param is actually propagated into bar or replaced with a safe constant.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02539",
+          "expected": "false_positive",
+          "explanation": "User input from request parameter 'BenchmarkTest02539' is passed to method doSomething, whose implementation is truncated and missing from the source code. Without the body of doSomething, it cannot be determined whether the value is sanitized, transformed into a constant, or passed through unmodified into the dynamically concatenated SQL statement.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02542",
+          "expected": "true_positive",
+          "explanation": "User input from request.getParameterValues is passed into doSomething, which delegates processing to thing.doSomething(param). Because the implementation of ThingInterface/ThingFactory is external and not provided in the snippet, it cannot be determined whether input is sanitized or safely handled before being concatenated into the SQL statement executed on line 55.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02545",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02633",
+          "expected": "false_positive",
+          "explanation": "Untrusted user input extracted from the request query string is processed via doSomething and directly concatenated into the SQL statement without parameterized binding or sanitization. It is then executed via connection.prepareStatement, leading to a SQL injection vulnerability.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02634",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02639",
+          "expected": "false_positive",
+          "explanation": "The untrusted parameter from the query string is passed into doSomething(), but the implementation of doSomething() is cut off at line 100 before its return statement is visible. Without the remaining code, it cannot be determined whether 'bar' retains untrusted input or is replaced before being concatenated into the SQL query at line 73.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02652",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        }
+      ],
+      "fp_human_review": 15,
+      "fp_in_sample": 50,
+      "fp_removed": 34,
+      "fp_removed_rate": 0.68,
+      "fp_retained": 1,
+      "genuine_dismissed": 3,
+      "genuine_dismissed_rate": 0.06,
+      "genuine_human_review": 18,
+      "genuine_in_sample": 50,
+      "genuine_retained": 29,
+      "genuine_retained_rate": 0.58,
+      "human_review": 33,
+      "human_review_rate": 0.33,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 100,
+        "completion_tokens_total": 49415,
+        "cost_reported": 100,
+        "cost_total": 0.355241,
+        "latency_max_seconds": 26.161,
+        "latency_mean_seconds": 13.812,
+        "latency_reported": 100,
+        "prompt_tokens_reported": 100,
+        "prompt_tokens_total": 226580
+      }
+    },
+    {
+      "configuration": "C-council",
+      "evaluated_findings": 100,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00198",
+          "expected": "true_positive",
+          "explanation": "User input from the HTTP header is passed to thing.doSomething(param) before being concatenated into an unparameterized SQL query executed via JDBCtemplate.queryForObject. Because the implementation and behavior of ThingInterface/ThingFactory cannot be determined from the provided evidence, it is uncertain whether the value is safely sanitized or validated.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00204",
+          "expected": "true_positive",
+          "explanation": "Header input is passed through thing.doSomething(param) before being directly concatenated into an SQL statement executed by statement.executeUpdate. Because thing.doSomething() is an external interface whose implementation is not visible in the provided code, it cannot be determined whether sanitization occurs.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00767",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00841",
+          "expected": "true_positive",
+          "explanation": "While 'switchTarget' deterministically resolves to 'C' (guess.charAt(2)) and assigns 'param' to 'bar', the origin and taint status of 'param' cannot be verified because its declaration and assignment are truncated from the snippet.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01003",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01004",
+          "expected": "true_positive",
+          "explanation": "The source code cuts off at line 99 inside the switch statement in `doSomething`. Because `switchTarget` evaluates to 'C' (`\"ABC\".charAt(2)`), and neither `case 'C'` nor the remainder of the method is visible in the provided code, it is impossible to determine whether `bar` is set to user input `param` or a safe constant.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01010",
+          "expected": "false_positive",
+          "explanation": "The source code cuts off at line 96 inside the Test.doSomething method, making it impossible to determine whether the returned string assigned to 'bar' contains tainted user input or a safe value when concatenated into the SQL statement.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01084",
+          "expected": "true_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01085",
+          "expected": "false_positive",
+          "explanation": "The source code cuts off inside `doSomething` at line 81, making it impossible to determine what value is returned and assigned to `bar` before being interpolated into the SQL query on line 54.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01215",
+          "expected": "false_positive",
+          "explanation": "The helper method Test.doSomething is truncated after line 86, so it is impossible to determine whether the returned value 'bar' is assigned the tainted user parameter or a safe constant value before being concatenated into the SQL query.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01465",
+          "expected": "true_positive",
+          "explanation": "The implementation of Test.doSomething cuts off at line 90, making it impossible to determine how param is processed or what value is assigned to bar before being concatenated into the SQL statement on line 63.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01466",
+          "expected": "true_positive",
+          "explanation": "The source code cuts off at line 105 inside Test.doSomething, making it impossible to determine how param is handled or what value bar receives before being concatenated into the SQL statement.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01467",
+          "expected": "false_positive",
+          "explanation": "The source code truncates at line 91 inside Test.doSomething, leaving the handling, validation, or sanitization of request and param unknown before bar is concatenated into the SQL statement.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01468",
+          "expected": "false_positive",
+          "explanation": "The value of 'bar' concatenated into the SQL statement depends on 'Test().doSomething(request, param)', but the method implementation is cut off at line 91, making it impossible to determine if the input is sanitized or safely handled.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01721",
+          "expected": "true_positive",
+          "explanation": "User input extracted from the query string is passed into Test().doSomething(request, param), and its result is concatenated directly into an SQL statement. However, the implementation of doSomething is truncated after line 115, making it impossible to determine if the value is sanitized or transformed safely.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01722",
+          "expected": "false_positive",
+          "explanation": "The implementation of Test.doSomething is truncated at line 115, making it impossible to determine whether the returned value 'bar' incorporates the tainted user input 'param' or remains a safe value.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01882",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 111, so it cannot be determined whether the method returns the tainted param or the constant safe value before it is concatenated into the SQL query on line 68.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01883",
+          "expected": "true_positive",
+          "explanation": "Cookie input is passed to doSomething() and subsequently concatenated into a dynamic SQL query, but doSomething's implementation is truncated from the evidence, making it impossible to determine whether the input is properly sanitized or validated.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01967",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated at line 83, making it impossible to determine whether the returned value 'bar' is derived from the untrusted parameter 'param' or set to a safe constant.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01970",
+          "expected": "true_positive",
+          "explanation": "The evaluation of switchTarget resolves to 'C' via guess.charAt(2), but the source code is truncated immediately after case 'C': and case 'D':. Because the assignment to bar and the return value of doSomething cannot be verified, evidence is insufficient to determine if untrusted input reaches the SQL sink.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02088",
+          "expected": "true_positive",
+          "explanation": "Header input is passed through ThingFactory.createThing().doSomething(param) and concatenated into a SQL statement, but the external implementation of ThingInterface cannot be verified from the provided source lines.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02175",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated after line 76, making it impossible to determine which element from valuesList or what value is ultimately returned to bar. Because the data flow to the SQL query cannot be fully traced within the provided evidence, human review is required.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02177",
+          "expected": "true_positive",
+          "explanation": "The source code for method doSomething is truncated after line 91, making it impossible to determine whether the user-controlled parameter flows into the returned value bar or is sanitized/replaced.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02188",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething cuts off abruptly at line 78 ('new String('), making it impossible to determine what value is returned to variable bar. Because the transformation and potential sanitization or discarding of the tainted param cannot be verified from the provided source code, human review is required.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02273",
+          "expected": "true_positive",
+          "explanation": "The source code cuts off at line 80 inside the doSomething method, preventing verification of whether switchTarget resolves to assign tainted param or a safe constant to bar before it is concatenated into the SQL statement.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02278",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02536",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething is truncated after line 78, leaving the switch cases and the assignment/return of bar undetermined. Because it cannot be verified from the provided source whether user-controlled input in param is returned and concatenated into the SQL statement, the evidence is insufficient.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02539",
+          "expected": "false_positive",
+          "explanation": "User input from request.getParameterValues is passed into doSomething, but the method implementation is cut off at line 78. Without the implementation of doSomething, it is impossible to determine whether the returned value is sanitized, safe, or directly tainted when concatenated into the SQL query.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02542",
+          "expected": "true_positive",
+          "explanation": "User input obtained via request.getParameterValues is passed into doSomething and processed by thing.doSomething before being concatenated directly into an SQL statement executed by java.sql.Statement.execute. Because the implementation details and sanitization logic of ThingInterface are absent from the provided source code, the evidence is insufficient to confirm or rule out vulnerability.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02633",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02639",
+          "expected": "false_positive",
+          "explanation": "The method doSomething is truncated at line 100 before returning a value, making it impossible to determine whether user input is sanitized or returned unchanged into the SQL query.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02652",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated at line 102, preventing verification of whether the returned value 'bar' interpolated into the SQL query is sanitized, encoded, or safely transformed.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        }
+      ],
+      "fp_human_review": 15,
+      "fp_in_sample": 50,
+      "fp_removed": 35,
+      "fp_removed_rate": 0.7,
+      "fp_retained": 0,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 17,
+      "genuine_in_sample": 50,
+      "genuine_retained": 33,
+      "genuine_retained_rate": 0.66,
+      "human_review": 32,
+      "human_review_rate": 0.32,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 100,
+        "completion_tokens_total": 141000,
+        "cost_reported": 100,
+        "cost_total": 1.142351,
+        "latency_max_seconds": 47.909,
+        "latency_mean_seconds": 26.696,
+        "latency_reported": 100,
+        "prompt_tokens_reported": 100,
+        "prompt_tokens_total": 818135
+      }
+    },
+    {
+      "configuration": "D-validated-council",
+      "evaluated_findings": 100,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00198",
+          "expected": "true_positive",
+          "explanation": "User input from the HTTP header is passed to thing.doSomething(param) before being concatenated into an unparameterized SQL query executed via JDBCtemplate.queryForObject. Because the implementation and behavior of ThingInterface/ThingFactory cannot be determined from the provided evidence, it is uncertain whether the value is safely sanitized or validated.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00204",
+          "expected": "true_positive",
+          "explanation": "Header input is passed through thing.doSomething(param) before being directly concatenated into an SQL statement executed by statement.executeUpdate. Because thing.doSomething() is an external interface whose implementation is not visible in the provided code, it cannot be determined whether sanitization occurs.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00767",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Missing citations"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest00841",
+          "expected": "true_positive",
+          "explanation": "While 'switchTarget' deterministically resolves to 'C' (guess.charAt(2)) and assigns 'param' to 'bar', the origin and taint status of 'param' cannot be verified because its declaration and assignment are truncated from the snippet.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01003",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Missing citations"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01004",
+          "expected": "true_positive",
+          "explanation": "The source code cuts off at line 99 inside the switch statement in `doSomething`. Because `switchTarget` evaluates to 'C' (`\"ABC\".charAt(2)`), and neither `case 'C'` nor the remainder of the method is visible in the provided code, it is impossible to determine whether `bar` is set to user input `param` or a safe constant.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01010",
+          "expected": "false_positive",
+          "explanation": "The source code cuts off at line 96 inside the Test.doSomething method, making it impossible to determine whether the returned string assigned to 'bar' contains tainted user input or a safe value when concatenated into the SQL statement.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01084",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Missing citations"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01085",
+          "expected": "false_positive",
+          "explanation": "The source code cuts off inside `doSomething` at line 81, making it impossible to determine what value is returned and assigned to `bar` before being interpolated into the SQL query on line 54.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01215",
+          "expected": "false_positive",
+          "explanation": "The helper method Test.doSomething is truncated after line 86, so it is impossible to determine whether the returned value 'bar' is assigned the tainted user parameter or a safe constant value before being concatenated into the SQL query.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01465",
+          "expected": "true_positive",
+          "explanation": "The implementation of Test.doSomething cuts off at line 90, making it impossible to determine how param is processed or what value is assigned to bar before being concatenated into the SQL statement on line 63.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01466",
+          "expected": "true_positive",
+          "explanation": "The source code cuts off at line 105 inside Test.doSomething, making it impossible to determine how param is handled or what value bar receives before being concatenated into the SQL statement.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01467",
+          "expected": "false_positive",
+          "explanation": "The source code truncates at line 91 inside Test.doSomething, leaving the handling, validation, or sanitization of request and param unknown before bar is concatenated into the SQL statement.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01468",
+          "expected": "false_positive",
+          "explanation": "The value of 'bar' concatenated into the SQL statement depends on 'Test().doSomething(request, param)', but the method implementation is cut off at line 91, making it impossible to determine if the input is sanitized or safely handled.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01721",
+          "expected": "true_positive",
+          "explanation": "User input extracted from the query string is passed into Test().doSomething(request, param), and its result is concatenated directly into an SQL statement. However, the implementation of doSomething is truncated after line 115, making it impossible to determine if the value is sanitized or transformed safely.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01722",
+          "expected": "false_positive",
+          "explanation": "The implementation of Test.doSomething is truncated at line 115, making it impossible to determine whether the returned value 'bar' incorporates the tainted user input 'param' or remains a safe value.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01882",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 111, so it cannot be determined whether the method returns the tainted param or the constant safe value before it is concatenated into the SQL query on line 68.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01883",
+          "expected": "true_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "genuine_human_review",
+          "reasons": [
+            "Guidance 1: doc, section or url does not match chunk Injection_Prevention_Cheat_Sheet#011"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01967",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated at line 83, making it impossible to determine whether the returned value 'bar' is derived from the untrusted parameter 'param' or set to a safe constant.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01970",
+          "expected": "true_positive",
+          "explanation": "The evaluation of switchTarget resolves to 'C' via guess.charAt(2), but the source code is truncated immediately after case 'C': and case 'D':. Because the assignment to bar and the return value of doSomething cannot be verified, evidence is insufficient to determine if untrusted input reaches the SQL sink.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02088",
+          "expected": "true_positive",
+          "explanation": "Header input is passed through ThingFactory.createThing().doSomething(param) and concatenated into a SQL statement, but the external implementation of ThingInterface cannot be verified from the provided source lines.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02175",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated after line 76, making it impossible to determine which element from valuesList or what value is ultimately returned to bar. Because the data flow to the SQL query cannot be fully traced within the provided evidence, human review is required.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02177",
+          "expected": "true_positive",
+          "explanation": "The source code for method doSomething is truncated after line 91, making it impossible to determine whether the user-controlled parameter flows into the returned value bar or is sanitized/replaced.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02188",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething cuts off abruptly at line 78 ('new String('), making it impossible to determine what value is returned to variable bar. Because the transformation and potential sanitization or discarding of the tainted param cannot be verified from the provided source code, human review is required.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02273",
+          "expected": "true_positive",
+          "explanation": "The source code cuts off at line 80 inside the doSomething method, preventing verification of whether switchTarget resolves to assign tainted param or a safe constant to bar before it is concatenated into the SQL statement.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02278",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Missing citations"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02536",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething is truncated after line 78, leaving the switch cases and the assignment/return of bar undetermined. Because it cannot be verified from the provided source whether user-controlled input in param is returned and concatenated into the SQL statement, the evidence is insufficient.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02539",
+          "expected": "false_positive",
+          "explanation": "User input from request.getParameterValues is passed into doSomething, but the method implementation is cut off at line 78. Without the implementation of doSomething, it is impossible to determine whether the returned value is sanitized, safe, or directly tainted when concatenated into the SQL query.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02542",
+          "expected": "true_positive",
+          "explanation": "User input obtained via request.getParameterValues is passed into doSomething and processed by thing.doSomething before being concatenated directly into an SQL statement executed by java.sql.Statement.execute. Because the implementation details and sanitization logic of ThingInterface are absent from the provided source code, the evidence is insufficient to confirm or rule out vulnerability.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02633",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Missing citations"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02639",
+          "expected": "false_positive",
+          "explanation": "The method doSomething is truncated at line 100 before returning a value, making it impossible to determine whether user input is sanitized or returned unchanged into the SQL query.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02652",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated at line 102, preventing verification of whether the returned value 'bar' interpolated into the SQL query is sanitized, encoded, or safely transformed.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        }
+      ],
+      "fp_human_review": 15,
+      "fp_in_sample": 50,
+      "fp_removed": 35,
+      "fp_removed_rate": 0.7,
+      "fp_retained": 0,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 17,
+      "genuine_in_sample": 50,
+      "genuine_retained": 33,
+      "genuine_retained_rate": 0.66,
+      "human_review": 32,
+      "human_review_rate": 0.32,
+      "invalid_output_rate": 0.06,
+      "invalid_outputs": 6,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 100,
+        "completion_tokens_total": 141000,
+        "cost_reported": 100,
+        "cost_total": 1.142351,
+        "latency_max_seconds": 47.909,
+        "latency_mean_seconds": 26.696,
+        "latency_reported": 100,
+        "prompt_tokens_reported": 100,
+        "prompt_tokens_total": 818135
+      }
+    }
+  ],
+  "note": "Initial checkpoint sample, not a general accuracy estimate.",
+  "same_case_coverage": true,
+  "sample_size": 100
+}

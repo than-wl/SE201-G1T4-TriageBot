@@ -1,0 +1,102 @@
+{
+  "selection": {
+    "status": "frozen",
+    "partition": "test",
+    "split_seed": 201,
+    "test_fraction": 0.5,
+    "sample_seed": 201,
+    "categories": {
+      "CWE-22": 24,
+      "CWE-78": 24,
+      "CWE-79": 24,
+      "CWE-89": 24,
+      "CWE-501": 12,
+      "CWE-643": 12
+    },
+    "selected": 120,
+    "excluded_prior_cases": 186,
+    "rule": "one CWE-matching Semgrep alert per case, balanced by label on the evaluation side"
+  },
+  "composition": {
+    "CWE-22": {
+      "cwe": "CWE-22",
+      "partition": "test",
+      "seed": 201,
+      "requested": 24,
+      "selected": 24,
+      "shortfall": 0,
+      "excluded_prior_cases": 186,
+      "eligible_vulnerable": 37,
+      "eligible_safe": 30,
+      "selected_vulnerable": 12,
+      "selected_safe": 12
+    },
+    "CWE-501": {
+      "cwe": "CWE-501",
+      "partition": "test",
+      "seed": 201,
+      "requested": 12,
+      "selected": 12,
+      "shortfall": 0,
+      "excluded_prior_cases": 186,
+      "eligible_vulnerable": 23,
+      "eligible_safe": 9,
+      "selected_vulnerable": 6,
+      "selected_safe": 6
+    },
+    "CWE-643": {
+      "cwe": "CWE-643",
+      "partition": "test",
+      "seed": 201,
+      "requested": 12,
+      "selected": 12,
+      "shortfall": 0,
+      "excluded_prior_cases": 186,
+      "eligible_vulnerable": 7,
+      "eligible_safe": 6,
+      "selected_vulnerable": 6,
+      "selected_safe": 6
+    },
+    "CWE-78": {
+      "cwe": "CWE-78",
+      "partition": "test",
+      "seed": 201,
+      "requested": 24,
+      "selected": 24,
+      "shortfall": 0,
+      "excluded_prior_cases": 186,
+      "eligible_vulnerable": 38,
+      "eligible_safe": 27,
+      "selected_vulnerable": 12,
+      "selected_safe": 12
+    },
+    "CWE-79": {
+      "cwe": "CWE-79",
+      "partition": "test",
+      "seed": 201,
+      "requested": 24,
+      "selected": 24,
+      "shortfall": 0,
+      "excluded_prior_cases": 186,
+      "eligible_vulnerable": 81,
+      "eligible_safe": 40,
+      "selected_vulnerable": 12,
+      "selected_safe": 12
+    },
+    "CWE-89": {
+      "cwe": "CWE-89",
+      "partition": "test",
+      "seed": 201,
+      "requested": 24,
+      "selected": 24,
+      "shortfall": 0,
+      "excluded_prior_cases": 186,
+      "eligible_vulnerable": 93,
+      "eligible_safe": 56,
+      "selected_vulnerable": 12,
+      "selected_safe": 12
+    }
+  },
+  "semgrep_version": "1.178.0",
+  "scan_date": "2026-10-17T20:11:28+00:00"
+}
