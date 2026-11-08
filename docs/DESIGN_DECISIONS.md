@@ -593,3 +593,23 @@ numbers, and prevents tuning on the comparison set until it looks good.
 **Consequence.** The step 4 result is reported whichever way it falls. A second
 measurement on the comparison set after tuning would break this rule; the
 comparison set is measured once per configuration.
+
+## 27. The reasoning worksheet is dropped from the final version
+
+**Decision.** The `semantic` profile, and so the final version, runs without the
+reasoning worksheet and its consistency repair. Step 4 builds on step 2 (the
+`evidence` profile) and changes only the guidance retrieval.
+
+**Why.** On the 96-case comparison set (EXPERIMENTS.md, steps 3 and 1c) the
+worksheet changed nothing beyond the noise floor for the council (sent to a
+human 4 to 3), and the single agent dismissed more real vulnerabilities with it
+(3 to 5). It worked as designed: all 96 answers filled every field and every
+verdict agreed with its worksheet, so the repair call never fired. The problem
+it targeted, a verdict that contradicts the model's own reasoning, appeared in
+earlier runs with a ±25-line window and did not occur once the AI saw enough
+code. Keeping it would add about 8% to cost and a second prompt shape for no
+measured gain.
+
+**Consequence.** The `worksheet` profile and its runs stay, so step 3 remains
+replayable. The worksheet code stays behind its switch (`REVIEW_WORKSHEET_ENABLED`)
+and can be turned back on if a later evaluation shows a need.

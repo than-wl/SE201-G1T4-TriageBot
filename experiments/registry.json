@@ -90,10 +90,10 @@
       "id": "4",
       "title": "Semantic retrieval",
       "question": "Does semantic retrieval hold up?",
-      "changes": "The guidance ranker: the curated CWE map, then semantic search with the official MITRE text of the alert's CWE.",
+      "changes": "The guidance ranker: the curated CWE map, then semantic search with the official MITRE text of the alert's CWE. Built on step 2 (evidence profile, council); the worksheet from step 3 showed no benefit and is not carried forward.",
       "case_set": "comparison",
       "before": {
-        "reuse": "3-after"
+        "reuse": "2-after"
       },
       "after": {
         "profile": "semantic",

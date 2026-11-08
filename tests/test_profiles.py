@@ -131,7 +131,7 @@ class ProfileTest(unittest.TestCase):
         self.assert_profile("worksheet", window=60, related=True, worksheet=True, retrieval="map")
 
     def test_semantic_profile(self):
-        self.assert_profile("semantic", window=60, related=True, worksheet=True, retrieval="semantic")
+        self.assert_profile("semantic", window=60, related=True, worksheet=False, retrieval="semantic")
 
     def test_profiles_match_the_documented_table(self):
         table = {name: (p["SOURCE_WINDOW_LINES"], p["SOURCE_RELATED_ENABLED"],
@@ -141,7 +141,7 @@ class ProfileTest(unittest.TestCase):
             "base": (25, False, False, "map"),
             "evidence": (60, True, False, "map"),
             "worksheet": (60, True, True, "map"),
-            "semantic": (60, True, True, "semantic"),
+            "semantic": (60, True, False, "semantic"),
         })
 
     def test_consistency_repair_fires_only_with_the_worksheet(self):

@@ -20,6 +20,69 @@ is specific to them: the scanner, the evidence builder, the prompts and the
 validator work the same way for any alert. They were chosen because the
 Benchmark has enough cases of each to measure on.
 
+## Results so far, in story order
+
+This section is the narrative for the presentation. The step numbers are the
+order the experiments were defined in; the story below reads them in the order
+that explains them best. All results are on the frozen 96-case comparison set
+(4 types × 24, half real, half safe), Gemini 3.8 Flash at temperature 0.
+
+**The noise floor.** The base council was run twice with identical settings.
+The two runs differed on 1 case of 96 (sent to a human: 31 vs 32) and on
+nothing else. A difference of 2 or more cases, especially in real
+vulnerabilities dismissed, is therefore more than run-to-run noise.
+
+| Run | Reviewer | Evidence | F1 | Real vulnerabilities dismissed (of 48) | False alarms removed (of 48) | Sent to a human (of 96) | Cost (US$) | Mean latency (s) |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| `1-before` | single agent | ±25 lines | 81.1% | 3 | 30 | 32 | 0.35 | 11.0 |
+| `1-after` | council | ±25 lines | 82.9% | 2 | 31 | 31 | 1.07 | 20.2 |
+| `1-after-repeat-2` | council (identical rerun) | ±25 lines | 82.9% | 2 | 31 | 32 | 1.07 | 21.0 |
+| `1b-before` | single agent | ±60 lines + related code | 93.8% | 3 | 45 | 4 | 0.41 | 11.1 |
+| `2-after` | council | ±60 lines + related code | 96.0% | 0 | 44 | 4 | 1.37 | 20.9 |
+| `1c-before` | single agent | + worksheet | 91.5% | 5 | 45 | 3 | 0.47 | 11.4 |
+| `3-after` | council | + worksheet | 96.0% | 0 | 44 | 3 | 1.48 | 21.4 |
+
+Precision, recall and F1 count a case sent to a human as kept. Council figures
+are the same before and after the deterministic validator, except one answer
+the validator rejected in `2-after` (sent to a human either way).
+
+**1. With little code, the reviewer design makes no difference (step 1).** At
+±25 lines the council and the single agent reached the same verdict on 94 of 96
+cases. Both sent about a third of all cases to a human, and path traversal was
+worst: 15 of 24 cases escalated by either reviewer. The AI could not see the
+code that decides the answer, and three reviewers cannot make up for that.
+
+**2. Showing the AI the code it needs is the largest gain (step 2).** With ±60
+lines plus the methods, files and scripts the code refers to, the council's F1
+rose from 82.9% to 96.0%, cases sent to a human fell from 31 to 4, and false
+alarms removed rose from 31 to 44 of 48. The single agent improved the same way
+(81.1% to 93.8%). The extra evidence cost about 29% more per run.
+
+**3. Once the AI has the code, the council's value is safety (step 1b).** With
+the same evidence, both reviewers removed about the same number of false alarms
+(44 vs 45), but the council dismissed 0 real vulnerabilities against the single
+agent's 3. In the cases where they differed, the Analyst and Skeptic disagreed
+and the Chair kept the alert, or the Chair overruled two specialists who both
+called a real vulnerability a false alarm. The Chair leans towards keeping an
+alert when in doubt, which once kept a safe case too. The Analyst and Skeptic
+disagreed on only 2 to 4 cases per run, so the council matters on few cases,
+but those are the dangerous ones. The price is about 3× the cost and 2× the
+latency of a single agent.
+
+**4. The reasoning worksheet adds nothing measurable (steps 3 and 1c).** For the
+council nothing changed beyond the noise floor (sent to a human 4 to 3). For the
+single agent, real vulnerabilities dismissed went from 3 to 5. The worksheet
+worked as designed: every answer filled in all of its fields, and every verdict
+agreed with its worksheet, so the consistency repair never fired. It had
+nothing to catch. The "reasoned right, labelled wrong" problem it was built for
+was seen in earlier runs with less code; with enough evidence it did not occur.
+The worksheet was therefore dropped from the final version (design decision 27).
+
+**Next:** step 4 replaces the hand-made guidance table with semantic retrieval,
+on top of step 2's version; step 5 rebuilds the mutation test; step 6 runs the
+final version once on the unseen final test, and reports the whole system next
+to Semgrep alone to show how far Semgrep's recall limits it.
+
 ## Why we split the cases
 
 TriageBot trains no model, but people tune it: we read the cases it gets wrong
@@ -64,7 +127,7 @@ switches from one profile to the next, so exactly one group changes.
 | --- | --- | --- | --- | --- |
 | Source window, lines either side of the alert | 25 | 60 | 60 | 60 |
 | Related source (other files, called methods, referenced scripts) | off | on | on | on |
-| Reasoning worksheet (`analysis` field) and consistency repair | off | off | on | on |
+| Reasoning worksheet (`analysis` field) and consistency repair | off | off | on | off |
 | Guidance retrieval | `map` | `map` | `map` | `semantic` |
 
 What each setting means:
@@ -134,7 +197,7 @@ marked as a false alarm. Costs are the provider's reported cost in US dollars.
 | 1 | Does a council beat one agent? | `base` profile, single agent | `base` profile, council (run twice to measure the noise between identical runs) | comparison |
 | 2 | Does showing the AI more of the code help? | step 1 council | `evidence` profile, council | comparison |
 | 3 | Does a reasoning worksheet with a consistency check help? | step 2 | `worksheet` profile, council | comparison |
-| 4 | Does semantic retrieval hold up? | step 3 | `semantic` profile, council | comparison |
+| 4 | Does semantic retrieval hold up? | step 2 (the worksheet was dropped after step 3) | `semantic` profile, council | comparison |
 | 5 | Does the verdict follow the code? | rebuilt mutation test (later task) | | mutation |
 | 6 | Headline result | final profile, single agent and council, run once (later task) | | final test |
 
@@ -154,14 +217,14 @@ recorded in each run manifest.
 - **Case set:** comparison (96 cases).
 - **Cost estimate:** before 96 calls, about US$0.38; after 288 calls per run,
   about US$1.54, twice: about US$3.46 in all.
-- **Status:** not run yet.
+- **Status:** run on 8 Nov 2026.
 - **Commands:**
   - show: `python -m triagebot experiment show 1`
   - replay: `python -m triagebot experiment replay 1`
   - re-run: `python -m triagebot experiment run 1` (both sides), then
     `python -m triagebot experiment run 1 --side after --repeat 2`
-- **Result:** _to be filled in after the run._
-- **Finding:** _to be filled in after the run._
+- **Result:** single agent F1 81.1%, 3 real vulnerabilities dismissed, 30 of 48 false alarms removed, 32 of 96 sent to a human; council 82.9%, 2, 31, 31; council rerun 82.9%, 2, 31, 32. Same verdict on 94 of 96 cases.
+- **Finding:** with ±25 lines the reviewer design makes no difference; both lack the code that decides the answer. The two identical council runs differ by 1 case: the noise floor.
 
 ### Steps 1b and 1c: does the council's value depend on the evidence?
 
@@ -181,11 +244,11 @@ for each.
   code, and once it also fills in the reasoning worksheet?
 - **Case set:** comparison (96 cases).
 - **Cost estimate:** 96 single-agent calls each, about US$0.38 each.
-- **Status:** not run yet.
+- **Status:** run on 8 Nov 2026.
 - **Commands:** `python -m triagebot experiment show 1b` (or `1c`);
   `python -m triagebot experiment run 1b --side before` (or `1c`).
-- **Result:** _to be filled in after the run._
-- **Finding:** _to be filled in after the run._
+- **Result:** with more code, single agent F1 93.8% with 3 real vulnerabilities dismissed vs council 96.0% with 0; with the worksheet too, single agent 91.5% with 5 dismissed vs council 96.0% with 0. False alarms removed: 45 vs 44 in both.
+- **Finding:** once the AI has the code, the council removes no more false alarms than one agent, but it stops real vulnerabilities being dismissed, for about 3× the cost and 2× the latency.
 
 ### Step 2: Does showing the AI more of the code help?
 
@@ -195,13 +258,13 @@ for each.
 - **After:** `evidence` profile, council (run `2-after`).
 - **Case set:** comparison (96 cases).
 - **Cost estimate:** 288 calls, about US$1.54.
-- **Status:** not run yet.
+- **Status:** run on 8 Nov 2026.
 - **Commands:**
   - show: `python -m triagebot experiment show 2`
   - replay: `python -m triagebot experiment replay 2`
   - re-run: `python -m triagebot experiment run 2`
-- **Result:** _to be filled in after the run._
-- **Finding:** _to be filled in after the run._
+- **Result:** council F1 82.9% → 96.0%; real vulnerabilities dismissed 2 → 0; false alarms removed 31 → 44 of 48; sent to a human 31 → 4 of 96; cost US$1.07 → 1.37.
+- **Finding:** the largest gain of any step. Most uncertainty came from missing code, not weak reasoning.
 
 ### Step 3: Does a reasoning worksheet with a consistency check help?
 
@@ -211,22 +274,23 @@ for each.
 - **After:** `worksheet` profile, council (run `3-after`).
 - **Case set:** comparison (96 cases).
 - **Cost estimate:** 288 calls, about US$1.54, plus up to 96 repair calls.
-- **Status:** not run yet.
+- **Status:** run on 8 Nov 2026.
 - **Commands:**
   - show: `python -m triagebot experiment show 3`
   - replay: `python -m triagebot experiment replay 3`
   - re-run: `python -m triagebot experiment run 3`
-- **Result:** _to be filled in after the run._
-- **Finding:** _to be filled in after the run._
+- **Result:** council unchanged (F1 96.0%, 0 dismissed, 44 removed; sent to a human 4 → 3). Every answer filled in the worksheet and agreed with it; the repair never fired.
+- **Finding:** no measurable benefit once the AI has enough code, and the single agent dismissed more real vulnerabilities with it (3 → 5). Dropped from the final version (design decision 27).
 
 ### Step 4: Does semantic retrieval hold up?
 
 - **Question:** can semantic retrieval from the official CWE text replace the
   hand-made weakness-to-cheat-sheet table without losing accuracy?
-- **Before:** step 3's run `3-after`, reused.
+- **Before:** step 2's run `2-after`, reused. The worksheet from step 3 is not
+  carried forward (design decision 27), so step 4 changes only the retrieval.
 - **After:** `semantic` profile, council (run `4-after`).
 - **Case set:** comparison (96 cases).
-- **Cost estimate:** 288 calls, about US$1.54, plus up to 96 repair calls.
+- **Cost estimate:** 288 calls, about US$1.40.
   Preparation is free and local, once:
   `python -m triagebot.nodes.context.cwe_catalogue` (MITRE catalogue) and
   `python -m triagebot.nodes.context.vector_store` (embeds the knowledge base).

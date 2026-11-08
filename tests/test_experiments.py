@@ -127,7 +127,7 @@ class ExperimentTest(unittest.TestCase):
         self.assertEqual(by_id["1"]["before"], {"profile": "base", "modes": ["single"]})
         self.assertEqual((by_id["1"]["after"]["profile"], by_id["1"]["after"]["repeats"]), ("base", 2))
         for step_id, before, profile in (("2", "1-after", "evidence"), ("3", "2-after", "worksheet"),
-                                         ("4", "3-after", "semantic")):
+                                         ("4", "2-after", "semantic")):
             self.assertEqual(by_id[step_id]["before"], {"reuse": before})
             self.assertEqual(by_id[step_id]["after"], {"profile": profile, "modes": ["council"]})
         for step_id in "1234":

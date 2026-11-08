@@ -11,7 +11,7 @@ for one run, then restores what was there before:
 | ------------------------------------ | ----- | -------- | --------- | -------- |
 | Source window, lines either side     | 25    | 60       | 60        | 60       |
 | Related source                       | off   | on       | on        | on       |
-| Reasoning worksheet + repair         | off   | off      | on        | on       |
+| Reasoning worksheet + repair         | off   | off      | on        | off      |
 | Guidance retrieval                   | map   | map      | map       | semantic |
 
 The engineering fixes in ENGINEERING_FIXES are not switches: they stay on in
@@ -47,10 +47,10 @@ PROFILES = {
         "REVIEW_WORKSHEET_ENABLED": True,
         "RETRIEVAL_MODE": "map",
     },
-    "semantic": {
+    "semantic": {          # builds on "evidence": the worksheet was dropped after step 3
         "SOURCE_WINDOW_LINES": 60,
         "SOURCE_RELATED_ENABLED": True,
-        "REVIEW_WORKSHEET_ENABLED": True,
+        "REVIEW_WORKSHEET_ENABLED": False,
         "RETRIEVAL_MODE": "semantic",
     },
 }
