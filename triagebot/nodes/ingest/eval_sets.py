@@ -6,7 +6,7 @@ builds, from the recorded Semgrep scan, the answer key and the fixed dev/test
 split (seed 201, test fraction 0.5):
 
 - pilot       dev   the checkpoint sample (100 CWE-89 cases, 50/50), checked
-                    against evidence/checkpoint-100/selected_alerts.json
+                    against archive/checkpoint/checkpoint-100/selected_alerts.json
 - comparison  dev   CWE-22, 78, 79, 89 x 24 (12 real, 12 safe), no pilot case
 - final-test  test  CWE-22, 78, 79, 89 x 30 (15 real, 15 safe), no retired case
 
@@ -101,18 +101,34 @@ def _case_ids(path) -> set[str]:
     return {item["case_id"] if isinstance(item, dict) else item for item in items}
 
 
+def _evidence_dirs(evidence_dir) -> list[Path]:
+    """One folder or several (default: the archived evidence, config.RETIRED_EVIDENCE_DIRS)."""
+    if evidence_dir is None:
+        evidence_dir = config.RETIRED_EVIDENCE_DIRS
+    if isinstance(evidence_dir, (str, Path)):
+        evidence_dir = [evidence_dir]
+    return [Path(d) for d in evidence_dir]
+
+
 def retired_cases(evidence_dir) -> dict:
-    """Every case in a selected_alerts file under evidence/, plus the fresh-120 audit list."""
-    evidence_dir = Path(evidence_dir)
-    sources = {}
-    for path in sorted(evidence_dir.rglob("*selected_alerts.json")):
-        sources[path.relative_to(evidence_dir).as_posix()] = _case_ids(path)
-    audit = evidence_dir / "fresh-120" / "prior_case_audit.json"
-    if audit.is_file():
-        sources[audit.relative_to(evidence_dir).as_posix()] = set(
-            json.loads(audit.read_text(encoding="utf-8"))["prior_case_ids"])
+    """Every case in a selected_alerts file under the evidence folder(s), plus the fresh-120 audit list.
+
+    Each file is named relative to the folder it was found in; the archive keeps
+    the names the files had when they all sat under evidence/.
+    """
+    dirs = _evidence_dirs(evidence_dir)
+    found = []
+    for root in dirs:
+        found += [(path.relative_to(root).as_posix(), path) for path in root.rglob("*selected_alerts.json")]
+    sources = {name: _case_ids(path) for name, path in sorted(found)}
+    for root in dirs:
+        audit = root / "fresh-120" / "prior_case_audit.json"
+        if audit.is_file():
+            sources[audit.relative_to(root).as_posix()] = set(
+                json.loads(audit.read_text(encoding="utf-8"))["prior_case_ids"])
     if not sources:
-        raise EvalSetError(f"no earlier samples found under {repo_path(evidence_dir)}")
+        raise EvalSetError("no earlier samples found under "
+                           + ", ".join(repo_path(d) for d in dirs))
     union = sorted(set().union(*sources.values()))
     return {
         "reason": RETIRED_REASON,
@@ -148,7 +164,7 @@ def build(semgrep_path=None, answer_key_path=None, evidence_dir=None, pilot_refe
     """
     semgrep_path = Path(semgrep_path or config.RECORDED_SCAN)
     answer_key_path = Path(answer_key_path or config.ANSWER_KEY or "")
-    evidence_dir = Path(evidence_dir or config.EVIDENCE_DIR)
+    evidence_dir = _evidence_dirs(evidence_dir)
     samples_dir = Path(samples_dir or config.SAMPLES_DIR)
     if pilot_reference is None:
         pilot_reference = config.CHECKPOINT_EVIDENCE_SAMPLE
@@ -256,7 +272,8 @@ def main(argv=None) -> int:
     b = sub.add_parser("build", help="build data/samples/ (pilot, comparison, final-test, retired)")
     b.add_argument("--semgrep", type=Path, default=config.RECORDED_SCAN)
     b.add_argument("--answer-key", type=Path, default=config.ANSWER_KEY)
-    b.add_argument("--evidence", type=Path, default=config.EVIDENCE_DIR)
+    b.add_argument("--evidence", type=Path, nargs="+", default=list(config.RETIRED_EVIDENCE_DIRS),
+                   help="folder(s) of earlier samples for the retired list (default: archive/checkpoint archive/evidence)")
     b.add_argument("--out", type=Path, default=config.SAMPLES_DIR)
     m = sub.add_parser("mutation", help="build data/samples/mutation.json for step 5 "
                                         "(needs the Benchmark source; reads the pilot and comparison sets)")
@@ -264,7 +281,8 @@ def main(argv=None) -> int:
     m.add_argument("--answer-key", type=Path, default=config.ANSWER_KEY)
     m.add_argument("--benchmark", type=Path, default=config.BENCHMARK_ROOT,
                    help="the OWASP Benchmark checkout (default BENCHMARK_ROOT); only read")
-    m.add_argument("--evidence", type=Path, default=config.EVIDENCE_DIR)
+    m.add_argument("--evidence", type=Path, nargs="+", default=list(config.RETIRED_EVIDENCE_DIRS),
+                   help="folder(s) of earlier samples for the retired list (default: archive/checkpoint archive/evidence)")
     m.add_argument("--out", type=Path, default=config.SAMPLES_DIR)
     args = parser.parse_args(argv)
     if args.command == "mutation":

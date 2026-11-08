@@ -5,7 +5,8 @@ below asks one question, changes one group of settings, and is measured on
 one frozen set of cases. Every run is saved with a record of exactly what
 produced it, and can be shown and re-scored from the terminal for free.
 
-Earlier results (`FINAL_RESULTS.md`, `IMPROVEMENT_EXPERIMENT_LOG.md`) record
+Earlier results ([archive/FINAL_RESULTS.md](archive/FINAL_RESULTS.md),
+[archive/IMPROVEMENT_EXPERIMENT_LOG.md](archive/IMPROVEMENT_EXPERIMENT_LOG.md)) record
 runs made before this plan. They are kept for the record and are superseded by
 this document (see [Earlier runs](#earlier-runs)).
 
@@ -128,7 +129,7 @@ real vulnerabilities and half safe code. The files and their build rules are in
 
 | Set | Half | Cases | Composition | Rule | Fingerprint (SHA-256) |
 | --- | --- | ---: | --- | --- | --- |
-| `pilot` | development | 100 | CWE-89: 50 real, 50 safe | Exactly the checkpoint sample; the builder checks it against `evidence/checkpoint-100/` | `2b633145f724…` |
+| `pilot` | development | 100 | CWE-89: 50 real, 50 safe | Exactly the checkpoint sample; the builder checks it against `archive/checkpoint/checkpoint-100/` | `2b633145f724…` |
 | `comparison` | development | 96 | CWE-22, 78, 79, 89: 24 each (12 real, 12 safe) | Excludes every pilot case | `311c5e73b3e9…` |
 | `final-test` | test | 120 | CWE-22, 78, 79, 89: 30 each (15 real, 15 safe) | Excludes every retired case | `3182ce45723d…` |
 | retired | both | 407 | Case IDs only | Every case used by an earlier run | — |
@@ -592,7 +593,7 @@ verdicts is what the paid run measures.
   (safe becomes vulnerable, or the reverse), does TriageBot's verdict flip too?
   A reviewer that reads the code should follow the change; one that answers
   from surface cues (the file name, the sink, the guidance) will not.
-- **What was wrong before.** The old test (`verification/mutation_check.py`,
+- **What was wrong before.** The old test (`archive/verification/mutation_check.py`,
   kept as a record) could not answer this:
   1. *Different baselines.* The originals were not judged the same way for
      each reviewer: the council's "original" results came from a version of the
@@ -815,15 +816,16 @@ retrieved OWASP material, not from hand-written notes about failed cases.
 
 ## Earlier runs
 
-The old samples and results under `evidence/` are archived:
+The old samples and results are archived in [archive/](archive/README.md):
 
-- `checkpoint-100/`: the checkpoint run (the pilot's 100 SQL-injection cases);
-- `original-final-120/`: the first frozen 120-case final evaluation;
-- `comparison-66/`: the 66-case improvement comparison and its re-runs;
-- `fresh-120/`: the second 120-case evaluation.
+- `archive/checkpoint/checkpoint-100/`: the checkpoint run (the pilot's 100
+  SQL-injection cases), with the checkpoint report;
+- `archive/evidence/original-final-120/`: the first frozen 120-case final evaluation;
+- `archive/evidence/comparison-66/`: the 66-case improvement comparison and its re-runs;
+- `archive/evidence/fresh-120/`: the second 120-case evaluation.
 
 They changed several things at once and were not recorded as one change per
 run. Their cases are retired (`data/samples/retired_cases.json`, 407 cases),
-and they are not used for any new claim. `FINAL_RESULTS.md` and
-`IMPROVEMENT_EXPERIMENT_LOG.md` describe them and stay unchanged apart from a
-note at the top.
+and they are not used for any new claim. `archive/FINAL_RESULTS.md` and
+`archive/IMPROVEMENT_EXPERIMENT_LOG.md` describe them and stay unchanged apart
+from a note at the top.

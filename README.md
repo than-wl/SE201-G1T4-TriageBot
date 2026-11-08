@@ -2,84 +2,73 @@
 
 [![tests](https://github.com/than-wl/SE201-G1T4-TriageBot/actions/workflows/tests.yml/badge.svg)](https://github.com/than-wl/SE201-G1T4-TriageBot/actions/workflows/tests.yml)
 
-TriageBot sorts static-analysis security alerts into real vulnerabilities, false alarms and "needs a human", citing the source code behind every decision.
+## 1. What TriageBot is
 
-**Status:** Final-project evaluation and repository finalisation are complete;
-team review and the presentation deck remain. The council runs
-on LangGraph (Phase 1), with opt-in SQLite checkpoint sessions (Phase 2) and an
-optional semantic guidance retrieval mode that is off by default (design decision
-21). No human-in-the-loop pause is claimed. The recorded comparison in
-`IMPROVEMENT_EXPERIMENT_LOG.md` now includes the merged LangGraph path and the
-resource-aware CWE-78 fix. Its latest same-set run is regression evidence, not a
-new unseen evaluation.
+A static-analysis scanner such as Semgrep flags code that *might* be
+vulnerable, and many of its alerts are false alarms that a developer must still
+read. TriageBot is a second stage after the scanner: for each alert it gathers
+the code and security guidance that decide the answer, and an AI council
+sorts the alert into **likely a real vulnerability**, **likely a false alarm**
+or **needs a human**. Every verdict must quote the source it relies on, and
+deterministic code checks those quotes. TriageBot never adds alerts, so the
+scanner's recall is its ceiling.
 
-**Evaluation rebuild:** the evaluation is being rebuilt as a small number of
-clean, replayable experiments, one change per step, on frozen case sets. The
-plan, the case sets and every result are in [EXPERIMENTS.md](EXPERIMENTS.md);
-it supersedes the earlier runs summarised below.
+[Architecture diagram](docs/architecture/README.md) (editable Mermaid source:
+[docs/architecture/TriageBot_Architecture_Diagram.mmd](docs/architecture/TriageBot_Architecture_Diagram.mmd)).
 
-## 1. What TriageBot does
+## 2. Results
 
-A static application security testing (SAST) scanner such as Semgrep flags code that *might* be vulnerable, and many of its alerts are false alarms that a developer must still read. TriageBot is a layer after the scanner: for each Semgrep alert it gathers evidence (the surrounding source code, helper facts and relevant OWASP guidance) and an AI review sorts the alert into **likely a real vulnerability**, **likely a false positive**, or **needs human review**.
+All current results are in **[EXPERIMENTS.md](EXPERIMENTS.md)**, the single
+source of truth: what each experiment asked, what changed, and every number.
+They were measured on the OWASP Benchmark (Java) for four weakness types: path
+traversal (CWE-22), OS command injection (CWE-78), cross-site scripting (CWE-79)
+and SQL injection (CWE-89). Gemini 3.8 Flash, temperature 0.
 
-Every decision must quote the source code it relies on, and deterministic code checks those quotes; a decision that cannot be justified goes to human review. TriageBot does not replace the scanner and never adds new alerts: it can only filter, so the scanner's own recall is its ceiling.
+**Council vs single agent on 120 unseen cases** (step 6, runs `6-before` and
+`6-after`, run once after the code freeze):
 
-We measure it on the OWASP Benchmark Java test suite, whose answer key says which test cases are really vulnerable, and compare it with simpler baselines (scanner only, a single AI agent).
+| | Single agent | Council (validated) |
+| --- | ---: | ---: |
+| Precision / recall / F1 | 94.3% / 83.3% / 88.5% | 95.2% / 98.3% / **96.7%** |
+| Real vulnerabilities dismissed (of 60) | 10 | **1** |
+| False alarms removed (of 60) | 57 | 57 |
+| Sent to a human (of 120) | 2 | 1 |
+| Cost (US$) / mean latency (s) | 0.53 / 9.9 | 1.76 / 18.8 |
 
-[View the latest TriageBot architecture diagram](docs/architecture/README.md).
-Its editable Mermaid source is
-[docs/architecture/TriageBot_Architecture_Diagram.mmd](docs/architecture/TriageBot_Architecture_Diagram.mmd).
+**Whole system vs Semgrep alone** (a projection of step 6 over the whole
+benchmark for the four types; `evidence/whole_system/6-after.md`): precision
+59.6% → **97.1%**, recall 86.0% → 85.0%, false alarms left 453 → about 20. Of
+the about 117 real vulnerabilities still missed, 109 are ones Semgrep never
+flagged: Semgrep is now the bottleneck.
 
-## 2. Evaluation results
+**Does the verdict follow the code?** (step 5, runs `5-before` and `5-after`):
+in 22 pairs, one character was changed so that the right answer flipped while
+Semgrep's alert stayed the same. Mutation score: council **100%** (22 of 22),
+single agent 53% (8 of the 15 it got right to begin with).
 
-The scanner baseline (Semgrep alone, before TriageBot), from the recorded scan, CWE-matched, over all 2,740 OWASP Benchmark v1.2 test cases:
+**Semantic retrieval** (step 4, run `4-after`): guidance found by search,
+anchored on each weakness's MITRE record, held accuracy within the noise floor
+(F1 95.0% vs 96.0%) and needs no hand-written weakness-to-guidance table.
 
-| Measure | Value |
-| --- | --- |
-| Precision (flagged test cases that are real) | **65.5%** |
-| Recall (real vulnerabilities flagged) | **68.6%** |
-| F1 | **67.0%** |
-| False alarms to remove | 512 of 1,482 flagged test cases (34.5%) |
-| Recall ceiling for TriageBot | 68.6% |
-| Blind spots (nothing caught) | Weak randomness (0 of 218), Insecure cookie (0 of 36) |
+**Semgrep alone, all categories** (a different scope: all 2,740 Benchmark cases
+across all 11 categories, `p/java`, CWE-matched): precision 65.5%, recall
+68.6%, F1 67.0%. Menu option 1 shows it.
 
-![The scanner-baseline screen of python -m triagebot](docs/screenshots/baseline.svg)
-
-On the balanced 100-case SQL-injection checkpoint sample, the council removed 35 of 50 false positives, wrongly dismissed none of the 50 genuine findings, and sent 32 cases to human review. These are preliminary one-category results; see [CHECKPOINT_REPORT.md](CHECKPOINT_REPORT.md) for definitions, precision/recall/F1, costs, failures and limitations.
-
-The frozen final test used 120 unseen cases balanced across five CWE categories.
-The raw council achieved 89.1% precision, 95.0% recall, and 91.9% F1; it
-removed 53 of 60 false positives but wrongly dismissed 3 of 60 genuine
-findings. Deterministic validation reduced genuine dismissals to 2, while
-increasing human review from 9 to 26 cases. A five-pair mutation check scored
-0/5 required verdict flips, so these benchmark results are promising evidence,
-not production readiness. See [FINAL_RESULTS.md](FINAL_RESULTS.md) for the full
-scanner comparison, per-category metrics, costs, failure analysis and threats
-to validity.
-
-After the resource-aware command-injection fix, a second frozen evaluation used
-120 different cases across six CWE categories, with zero overlap with prior
-model-tested cases. The latest raw council achieved **93.8% precision, 100.0%
-recall and 96.8% F1**, removing 56 of 60 false positives and wrongly dismissing
-none of the 60 genuine findings. Deterministic validation also dismissed none,
-but sent 14 cases to human review—12 because the newly tested CWE-501 category
-has no matched guidance. This is the strongest current generalisation evidence,
-not a production-safety guarantee.
+Earlier runs (the checkpoint, the first and second 120-case evaluations, the
+66-case comparison) are superseded and kept in [archive/](archive/README.md).
 
 ## 3. Quick start
 
-Tested with Python 3.12.7 and Git 2.45 on Windows 11. Run every command from the repository root, in a terminal.
+Tested with Python 3.12.7 on Windows 11. Run every command from the repository
+root.
 
-**1. Prerequisites:** [Git](https://git-scm.com/downloads) and Python 3.10 or newer. On macOS the built-in `python3` may be 3.9; check with `python3 --version` and install a newer one from [python.org](https://www.python.org/downloads/) or Homebrew (`brew install python@3.12`) if needed. TriageBot stops with a clear message on an older Python.
-
-**2. Clone this repository**
+**1. Python and a virtual environment.** Python 3.10 or newer, and
+[Git](https://git-scm.com/downloads).
 
 ```bash
 git clone https://github.com/than-wl/SE201-G1T4-TriageBot.git
 cd SE201-G1T4-TriageBot
 ```
-
-**3. Create the environment, activate it, install**
 
 | Windows (PowerShell) | macOS / Linux |
 | --- | --- |
@@ -87,304 +76,213 @@ cd SE201-G1T4-TriageBot
 | `.\.venv\Scripts\Activate.ps1` | `source .venv/bin/activate` |
 | `python -m pip install -r requirements.txt` | `python -m pip install -r requirements.txt` |
 
-The last line installs everything, including Semgrep 1.178.0 for optional re-scans. The prompt now starts with `(.venv)`. Activate it again in every new terminal. From here on, `python` means the venv's Python on every platform.
+Activate the environment again in every new terminal. From here on, `python`
+means the venv's Python.
 
-**4. Prepare the guidance retrieval (once)**
+**2. The API key (only for paid runs).** Copy `.env.example` to `.env` and set
+your own `OPENROUTER_API_KEY` there. Never commit `.env`; it is git-ignored.
+Every free command below works without it.
 
-TriageBot finds its guidance by semantic search, anchored on the official MITRE description of each alert's weakness (design decision 29). Two one-time steps prepare it. Both run locally and make no model calls:
+**3. The OWASP Benchmark** (about 100 MB, at the pinned commit, in
+`Context/tmp/BenchmarkJava`):
 
 ```bash
-python -m triagebot.nodes.context.cwe_catalogue   # downloads the MITRE CWE catalogue (SHA-256 pinned)
-python -m triagebot.nodes.context.vector_store    # downloads the embedding model, builds the local vector store
+git clone https://github.com/OWASP-Benchmark/BenchmarkJava.git Context/tmp/BenchmarkJava
 ```
 
-The second takes a few minutes on CPU the first time. Both write only to the git-ignored `Context/tmp/`. The scanner baseline (option 1) does not need them; triage, evaluation and experiment runs stop with these two commands if either is missing.
+```bash
+git -C Context/tmp/BenchmarkJava checkout 8b67a88d73b2594570fc21150705283de884620b
+```
 
-**5. Run TriageBot**
+The menu's setup check also offers to clone it for you.
+
+**4. Prepare the guidance retrieval (once; free and local, no model calls):**
+
+```bash
+python -m triagebot.nodes.context.cwe_catalogue
+```
+
+```bash
+python -m triagebot.nodes.context.vector_store
+```
+
+The first downloads the MITRE CWE catalogue (SHA-256 checked). The second
+downloads the embedding model and builds the local vector store: **the first
+build takes several minutes and prints nothing until it finishes.** Both write
+only to the git-ignored `Context/tmp/`.
+
+**5. Open the menu:**
 
 ```bash
 python -m triagebot
 ```
 
-The menu starts with a setup check. If the OWASP Benchmark (about 100 MB) is missing it asks *"Clone the OWASP Benchmark now? [y/N]"*; answer `y`, or clone it yourself at the pinned commit:
-
-```bash
-git clone https://github.com/OWASP-Benchmark/BenchmarkJava.git Context/tmp/BenchmarkJava
-git -C Context/tmp/BenchmarkJava checkout 8b67a88d73b2594570fc21150705283de884620b
-```
-
-Then choose `1` for the scanner baseline. No Semgrep scan is needed: the repository includes the recorded scan everyone scores ([data/semgrep/README.md](data/semgrep/README.md)).
-
-## 4. Using TriageBot
-
-`python -m triagebot` opens the menu:
-
-| Option | What it shows |
+| Option | What it does |
 | --- | --- |
-| 1 Scanner baseline | How good Semgrep is alone: the scan used (recorded or your re-scan), headline precision, recall and F1, a table by vulnerability type, what this means for TriageBot (false alarms to remove, recall ceiling, blind spots) and the checkpoint test set. `r` re-runs Semgrep first; `d` afterwards shows the technical details. |
-| 2 Triage one alert | Runs one sampled Semgrep finding through either the single agent or the Analyst / Skeptic / Chair council, then validates and saves the result. This makes paid OpenRouter calls. |
-| 3 Evaluate a sample | Runs the checkpoint sample through the single-agent and council configurations, validates the council output, and scores the saved results. It asks for confirmation before making paid calls. |
-| 4 Experiments | Lists the experiment steps in [EXPERIMENTS.md](EXPERIMENTS.md) and whether each has saved runs. For a chosen step: **Show** the before/after table (free, offline), **Replay** it by re-scoring the saved outputs (free, needs the Benchmark answer key), or **Run** it (paid; it shows the estimated cost and asks first). |
+| 1 Scanner baseline | Semgrep alone over the whole benchmark (free) |
+| 2 Triage one alert | One case through the single agent or the council (paid) |
+| 3 Evaluate a sample | The checkpoint sample through each configuration, scored (paid; asks first) |
+| 4 Experiments | Every step of EXPERIMENTS.md: show, replay (free) or run (paid; asks first) |
 
-The same actions as subcommands, for scripts:
+**6. Check the set-up** (Python, venv, Benchmark and its commit, the scan, the
+case sets), with the fix for anything missing:
 
 ```bash
-python -m triagebot check [--no-fail]
-python -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details] [--export-svg PATH]
-python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
-python -m triagebot evaluate [--sample PATH] [--mode single,council]
+python -m triagebot check
+```
+
+## 4. Runnable examples
+
+**Free** (no model calls, no API key):
+
+```bash
 python -m triagebot experiment list
-python -m triagebot experiment show STEP
-python -m triagebot experiment replay STEP [--answer-key PATH]
-python -m triagebot experiment run STEP [--side before|after] [--repeat N] [--limit N] [--answer-key PATH]
-                                       [--i-know-this-reruns-the-final-test]
 ```
-
-- `check`: the setup check (Python version, virtual environment, rich, the Benchmark folder and its commit, the scan, Semgrep, the experiment case sets) with OK / MISSING / WARNING and the command that fixes each problem, shown for your OS. Exit code 1 while something required is missing; `--no-fail` always exits 0 (used by CI, where the Benchmark is never cloned).
-- `baseline`: menu option 1. It also writes the ingest files to `Context/tmp/checkpoint/` (`alerts.json`, `selected_alerts.json`, `ingest_report.json`, `split.json`, `scanner_predictions.json`, `baseline.json`).
-  - `--rescan` re-runs Semgrep into `Context/tmp/semgrep-owasp.json` (needs Semgrep from `requirements.txt` and internet; a few minutes). That local re-scan is then used instead of the recorded scan until you delete it; the previous one is kept as `semgrep-owasp.previous.json`, and a failed scan falls back to the current one.
-  - `--details` adds the file-matched comparison, CWE mismatch pairs, ingest counts and files written.
-  - `--export-svg PATH` also saves the screen as an SVG image (how the screenshot above was made).
-- `triage`: runs one case from `selected_alerts.json` through `single` or `council` mode and saves `triage-<case>-<mode>.json`.
-- `evaluate`: runs every selected case through the requested modes, writes `B-single-agent.json`, `C-council.json`, `D-validated-council.json`, and scores them into `evaluation.json`. The answer key is loaded only after the model calls finish.
-- `experiment`: menu option 4 ([EXPERIMENTS.md](EXPERIMENTS.md)).
-  - `list` shows every step, its question and whether saved runs exist; `show STEP` prints the before/after table from the saved evaluation files. Both are offline and need no API key and no answer key.
-  - `replay STEP` re-scores the saved outputs against the answer key, makes no model calls, and confirms the numbers match the saved evaluation (exit code 1 if they do not).
-  - `run STEP` is a **paid** run. Before any call it prints the case set, profile, modes, number of calls and the estimated cost, and asks for confirmation. It saves after every case to `evidence/experiments/<step>-<side>[-repeat-N]/`, so an interrupted run resumes without repeating finished cases. `--side` runs one side, `--repeat 2` is the second identical council run of step 1, and `--limit N` runs only the first N cases (a smoke test). Step 6 runs the final test, which is run once: it refuses to start with uncommitted changes to tracked files (commit first; the run records its commit) and refuses a fresh run once it has results. An interrupted run resumes; starting over needs `--i-know-this-reruns-the-final-test`, which moves the old results aside.
-- The frozen case sets the experiments use are built with `python -m triagebot.nodes.ingest.eval_sets build` (no model calls; see [data/samples/README.md](data/samples/README.md)).
-
-## 5. How it works
-
-| Stage | What it does | Code location | Status |
-| --- | --- | --- | --- |
-| Ingest | Semgrep JSON to normalised alerts; scanner baseline; dev/test split and sample; frozen experiment case sets | `triagebot/nodes/ingest/` | Built |
-| Context payload | Source window, directly called methods, bounded related-file graph, helper facts and guidance | `triagebot/nodes/context/` | Built |
-| Review | Single agent, or Analyst / Skeptic / Chair council; optional structured reasoning worksheet with a consistency guard (per-type checklists removed, design decision 25) | `triagebot/nodes/review/` | Built and connected |
-| Validate | Exact multi-file citations plus safe normalization of known guidance metadata | `triagebot/nodes/validate/` | Built |
-| Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
-| Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Built; all four menu options and matching subcommands are connected |
-| Experiments | Named setting profiles, the step registry, paid runs with cost confirmation, free show and replay | `triagebot/profiles.py`, `triagebot/experiments.py`, `experiments/registry.json` | Built; steps 1 to 4 runnable, 5 and 6 planned |
-
-**Current council orchestration (Phase 1):** `triagebot/council_graph.py` runs
-`build_context → [Analyst || Skeptic] → Chair → validate` using LangGraph.
-The explicit waiting edge joins both specialist reports before Chair runs once.
-`triagebot/state.py` defines JSON-compatible council state; callers, KB objects,
-and live timing handles remain in per-invocation runtime context. The single-agent
-comparison baseline remains plain Python. `triagebot/execution.py` contains shared,
-framework-neutral metadata and validation-context helpers.
-
-Phase 1 itself introduced no persistence. Phase 2 adds the opt-in durable commands
-below; existing `triage`, `evaluate`, the interactive menu and single-agent baseline
-remain ephemeral/unchanged. There is still no HITL interrupt or human-review report.
-The [existing reusable handover](docs/IMPLEMENTATION_HANDOVER.md) is updated in place,
-not replaced by another handover.
-
-The data shapes passed between stages are the shared contracts in `triagebot/schemas.py`. Runtime settings (model, budgets, paths, the pinned benchmark commit) live in `triagebot/config.py`, and the model callers (live OpenRouter and offline fixture) in `triagebot/llm/`. The reasoning behind these choices is in [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
-
-### Opt-in durable council sessions (Phase 2)
-
-Install the updated requirements. The default local database is
-`.triagebot/checkpoints.sqlite`; use `--db PATH` for a different file (not
-`:memory:`). No cloud service/account is needed. Existing commands do not create
-this database automatically. The SQLite adapter may bring `sqlite-vec` as a
-transitive package; no embedding index, extension-based retrieval or RAG change
-is configured/used here.
-
-Start a **new paid council run**, with the same model selected by
-`OPENROUTER_MODEL` and key as normal. Its unique thread ID is persisted and printed
-BEFORE model execution. Starting the same case again creates a separate run.
 
 ```bash
-python -m triagebot council-start --case BenchmarkTest00008
-# Optional: --sample PATH --db PATH --out DIR --benchmark-root PATH
+python -m triagebot experiment show 6
 ```
-
-Inspect it without a key, source checkout or model call:
 
 ```bash
-python -m triagebot council-status --thread-id YOUR-UUID
+python -m triagebot experiment replay 4
 ```
-
-Continue the **same** unfinished run, after checking the status and acknowledging
-possible replay/duplicate billing:
 
 ```bash
-python -m triagebot council-resume --thread-id YOUR-UUID --allow-replay
-# Optional: --db PATH --out DIR --benchmark-root PATH
+python -m triagebot.nodes.context.retrieval --explain CWE-22 --setup improved
 ```
-
-`--allow-replay` is mandatory for ANY incomplete recovery, including a session
-created but not yet executed. Completed runs return their stored result without
-this flag or new model calls. Both start and resume write the ordinary triage JSON
-contract to `council-<thread-id>.json` under `--out` (default the existing output
-directory). Status prints metadata/next nodes, not source evidence. Save the thread
-ID: this version has no run-list command. `pending` means saved graph work remains
-(including an active or failed execution), not that a human-review pause exists.
-
-**Recovery guarantees and limits**
-
-- Sync LangGraph checkpoint writes and real file-backed SQLite support recovery
-  across process restarts. Already checkpointed/pending successful work is reused
-  where the engine supports it; no automatic retry policy is added.
-- An API response and a checkpoint are NOT one transaction. A crash in between can
-  replay a call. Reported token/cost totals cover committed role reports only,
-  NOT all possibly billed/uncommitted attempts. Reconcile uncertain charges with
-  the provider before treating them as final accounting. There is no automatic
-  budget/total-spend enforcement or exactly-once guarantee.
-- A nonblocking OS file lock allows ONE executor per database at a time; specialist
-  nodes still run in parallel. Process death releases the lock automatically;
-  never delete/replace a lock file while a process holds it. Status can be read
-  while another process is active. This is a local CLI design, not a multi-user
-  service or network-filesystem/distributed-lock solution.
-- Resume requires the same source-file bytes, model setting, corpus, relevant
-  settings, product-code fingerprint, package versions and Python minor version.
-  Runtime dependencies/keys are reconstructed, not saved. If these changed, use
-  a new run; checkpoint migration across versions is not implemented. Completed
-  results remain retrievable without reconstructing the runtime.
-- Source identity is also rechecked before validation so old citations are not
-  silently checked against changed code. Do not edit source/KB/config during runs.
-- Durable `latency_seconds` is the saved ACTIVE model-node critical path:
-  `max(Analyst elapsed, Skeptic elapsed) + Chair elapsed`, excluding offline time,
-  checkpoint scheduling/I/O and validation. Ephemeral runs retain their original
-  wall-clock metric. The status labels this timing method; do not mix the two
-  definitions in latency comparisons without explicitly accounting for it.
-
-**Privacy and cleanup:** this DB includes source excerpts, guidance, model reports,
-checkpoint history and graph errors. It is not encrypted. Use only a trusted local
-DB, not an untrusted downloaded checkpoint. Credentials and benchmark answer-key
-files are not persisted by this workflow; source/model content can still be
-sensitive. No tracing backend is enabled here; inherited tracing environment
-settings remain the operator's responsibility. New DBs are private by default on
-POSIX, but Windows ACLs must be managed by the operator. Default storage and common
-SQLite sidecars are git-ignored; protect any custom location as well. With all
-executors stopped, delete the dedicated DB and associated WAL/SHM/journal/lock
-files to discard its history. Never share them in the review ZIP. A future
-retrieval/vector DB should be a different file.
-
-## 6. Evaluation method
-
-- **Dataset:** OWASP Benchmark Java v1.2 (2,740 test cases) at commit `8b67a88`. Its answer key, `expectedresults-1.2.csv`, says whether each test case is really vulnerable and which weakness (CWE) it targets.
-- **CWE-matched scoring:** an alert counts for a test case only if it names the same weakness the case targets (or an accepted equivalent), not merely because it is in the same file.
-- **Fixed split:** a 50/50 development/test split, stratified by vulnerability type and label, with seed 201. Prompts are tuned on the development half only; the checkpoint sample (100 SQL injection cases, 50 real and 50 false alarms) is drawn from it.
-- **Configurations** on the same cases: A scanner only; B single agent; C Analyst / Skeptic / Chair council; D council plus the deterministic validator.
-- **Metrics:** precision, recall, F1, false alarms removed, real vulnerabilities wrongly dismissed, human-review rate, cost and latency.
-- **Isolation:** the answer key is read only by the evaluation code, after all model calls. It never reaches a prompt or the model.
-- **Original fresh comparison:** the 66-case improvement comparison excluded all 120 cases used by the completed final evaluation; its frozen model-side sample contains no labels. Later same-set runs are labelled as regression evidence because those cases informed the CWE-78 fix.
-
-The committed raw samples, Semgrep scan and saved B/C/D outputs are indexed in
-[evidence/README.md](evidence/README.md) so reviewers can inspect or reproduce
-the reported comparisons without needing the ignored local `Context/tmp` files.
-
-## 7. For developers
-
-Run the offline tests (no network, no API key, no credits):
 
 ```bash
-python -m unittest discover -s tests -v
+python -m triagebot.nodes.context.retrieval --explain CWE-22 --setup original
 ```
-
-**CI.** [.github/workflows/tests.yml](.github/workflows/tests.yml) runs these tests and `python -m triagebot check --no-fail` on every push and pull request, on Windows, macOS and Linux with Python 3.10 and 3.12. It never clones the Benchmark or calls OpenRouter.
-
-Ingest and scanner baseline as plain text (writes the same files as `baseline`):
 
 ```bash
-python -m triagebot.nodes.ingest.run
+python verification/whole_system.py --mode council
 ```
-
-Score saved results with the evaluator (offline; the scanner-only baseline is added automatically; paths are examples):
 
 ```bash
-python -m triagebot.nodes.score.evaluate --labels Context/tmp/BenchmarkJava/expectedresults-1.2.csv --cases Context/tmp/checkpoint/selected_alerts.json --config B-single-agent=Context/tmp/checkpoint/B-single-agent.json --config C-council=Context/tmp/checkpoint/C-council.json --config D-validated-council=Context/tmp/checkpoint/D-validated-council.json
+python verification/semantic_setup_check.py --phase score
 ```
-
-It prints a metrics table and writes the full report, including every failure case, to `Context/tmp/checkpoint/evaluation.json`. Missing or unsupported verdicts count as invalid and as human review, and human review never counts as a removed false positive.
-
-**Frozen final evaluation.** The highest-band gate and fixed protocol are in
-[FINAL_PROJECT_PLAN.md](FINAL_PROJECT_PLAN.md); results and limitations are in
-[FINAL_RESULTS.md](FINAL_RESULTS.md), and the incremental before/after evidence
-is in [IMPROVEMENT_EXPERIMENT_LOG.md](IMPROVEMENT_EXPERIMENT_LOG.md). Generate the held-out five-category
-sample without making model calls:
 
 ```bash
-python -m triagebot.nodes.ingest.final_sample
+python -m triagebot baseline
 ```
 
-Freeze the unused 66-case comparison sample (excluding the completed 120
-cases) without making model calls:
+- `experiment show <step>` prints a step's before/after table from the saved
+  results and needs nothing else. `experiment replay <step>` re-scores the
+  saved verdicts against the Benchmark answer key and checks they equal the
+  committed report. Steps: 1, 1b, 1c, 2, 3, 4, 5, 6.
+- `--explain` shows the guidance one weakness gets: `improved` is the final
+  set-up, `original` the first one (all five set-up rules off). It needs step
+  4 of the quick start.
+- `whole_system.py` (`--mode council` or `single`) and `semantic_setup_check.py
+  --phase score` recompute their reports from committed data and rewrite them
+  under `evidence/`; only the date and commit lines change.
+- `baseline` is menu option 1.
+
+**Paid** (OpenRouter calls; needs the API key):
 
 ```bash
-python verification/prepare_comparison_sample.py
+python -m triagebot experiment run 4
 ```
 
-After a recorded paid run, create the overall and per-CWE report from its saved
-outputs:
+Before any call it prints the case set, the number of calls and the estimated
+cost, and asks for confirmation. It saves each case as it finishes, so an
+interrupted run resumes. Step 6 is the final test and is guarded: it refuses
+uncommitted changes and refuses a second run.
 
-```bash
-python -m triagebot.nodes.score.final_report --labels Context/tmp/BenchmarkJava/expectedresults-1.2.csv --cases Context/tmp/final/selected_alerts.json --config B-single-agent=Context/tmp/final/results/B-single-agent.json --config C-council=Context/tmp/final/results/C-council.json --config D-validated-council=Context/tmp/final/results/D-validated-council.json --out Context/tmp/final/final_evaluation.json
-```
+All subcommands: `python -m triagebot --help`.
 
-Runtime scans, samples, and model responses remain under ignored
-`Context/tmp/`; the repository retains reproducible code, hashes, aggregate
-results, and failure analysis without publishing API keys or raw paid outputs.
-
-**Re-scanning.** `requirements.txt` installs Semgrep 1.178.0; run `python -m triagebot baseline --rescan`. To update the committed recorded scan, follow [data/semgrep/README.md](data/semgrep/README.md).
-
-**Live model calls.** Copy `.env.example` to `.env` and set your own `OPENROUTER_API_KEY` there. Never commit `.env` or paste a key into source files, issues or chat.
-
-**Feasibility scripts** in `verification/` are kept as historical evidence. The self-test is offline:
-
-```bash
-python verification/openrouter_smoke.py --self-test
-```
-
-> **Paid calls.** `python verification/openrouter_smoke.py` (five calls) and `python verification/feasibility_checks.py` (three more) call OpenRouter and spend credits. Both need the `.env` key and the benchmark and a local scan under `Context/tmp/`. Check the budget and the account first. Recorded results: [docs/feasibility/](docs/feasibility/).
-
-**Repository layout**
+## 5. Where things are
 
 ```text
-triagebot/       product code, one folder per pipeline stage under nodes/
-tests/           offline unit tests and fixtures (no network)
-data/semgrep/    the recorded Semgrep scan (scanner output only, no answer-key data)
-data/samples/    frozen experiment case sets (label-free alerts) and their manifests
-experiments/     the experiment step registry (registry.json); results go to evidence/experiments/
-docs/            design decisions, architecture diagram, screenshots, proposal, feasibility reports
-verification/    feasibility-stage scripts, kept as historical evidence
-ai-log/          per-member AI use logs
-Context/         local-only workspace (benchmark clone, re-scans, outputs); only its README and .gitignore are tracked
+triagebot/       the product: one folder per pipeline stage under nodes/, the CLI, profiles, experiments
+experiments/     the experiment step registry (registry.json)
+data/samples/    the frozen case sets (label-free) and their fingerprints
+data/semgrep/    the recorded Semgrep scan everyone scores
+evidence/        every experiment run, the retrieval check and the whole-system projection
+verification/    free checks: retrieval quality, whole system vs Semgrep, feasibility scripts
+tests/           offline tests (no network, no API key)
+docs/            design decisions, architecture diagram, proposal, feasibility reports
+ai-log/          each member's AI-use log
+archive/         superseded runs and documents, kept as the record
 ```
 
-**Branches and commits.** Work on a branch (for example `checkpoint/<name>-<topic>` or `chore/<topic>`) and merge through a pull request. Every commit containing AI-assisted work carries an `Assisted-by: <tool> (<model>)` trailer.
+## 6. How it works
 
-## 8. Troubleshooting
+- **Evidence pack.** For each alert TriageBot builds what the AI sees: ±60 lines
+  of the alert's file, the methods that code calls, the project files and
+  scripts it references, and security guidance. The guidance is found by
+  semantic search over the OWASP Cheat Sheet Series, anchored on the alert's
+  MITRE CWE record, which is attached first (design decisions 28 and 29). An
+  alert with no valid CWE goes to human review. The answer key never reaches a
+  prompt.
+- **Council.** An Analyst and a Skeptic review the evidence in parallel, and a
+  Chair weighs both reports and decides (`triagebot/council_graph.py`, on
+  LangGraph). The single agent is the plain-Python baseline it is compared with.
+- **Deterministic validator.** Every verdict must cite exact file, line and
+  quoted text from the evidence; malformed output or a citation that does not
+  match becomes "needs a human" (`triagebot/nodes/validate/`).
+- **Durable sessions.** `council-start`, `council-status` and `council-resume`
+  save a council run to a local SQLite file (`.triagebot/checkpoints.sqlite`,
+  git-ignored) so it can be resumed after a crash. Resuming an unfinished run
+  needs `--allow-replay`, because a call may be billed twice. The file holds
+  source excerpts and model reports; do not share it.
 
-- **"No module named rich", or no `(.venv)` at the start of the prompt:** the environment is not active. Activate it (`.\.venv\Scripts\Activate.ps1` on Windows, `source .venv/bin/activate` on macOS/Linux) and, if needed, `python -m pip install -r requirements.txt`.
-- **PowerShell: "running scripts is disabled on this system":** allow scripts for this terminal only, then activate again:
+Settings live in `triagebot/config.py` and the experiment profiles in
+`triagebot/profiles.py`. The reasoning behind each choice is in
+[docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md).
 
-  ```powershell
-  Set-ExecutionPolicy -Scope Process RemoteSigned
-  ```
+Run the tests (offline; CI runs them on Windows, macOS and Linux):
 
-- **VS Code types the activation command onto the line you pasted** and the command fails with a parse error: run your command again on its own line.
-- **"You are in 'detached HEAD' state" after the benchmark checkout:** expected; it means the benchmark is at the pinned commit.
-- **macOS: "TriageBot needs Python 3.10 or newer (you have 3.9)":** the built-in `python3` is too old. Check with `python3 --version`, install a newer one from [python.org](https://www.python.org/downloads/) or with `brew install python@3.12`, then delete `.venv` and recreate it with the new Python (for example `python3.12 -m venv .venv`).
-- **Semgrep fails to install:** TriageBot still works with the recorded scan. Install the rest with `pip install python-dotenv rich==15.0.0` (use the versions in `requirements.txt`); only re-scans need Semgrep.
-- **Semgrep fails on Windows with `UnicodeEncodeError`:** TriageBot's re-scan sets this for you; when running Semgrep by hand, first run `$env:PYTHONUTF8 = "1"`.
-- **VS Code uses the wrong Python:** Command Palette, "Python: Select Interpreter", then choose the one in `.venv`.
+```bash
+python -m unittest discover -s tests
+```
 
-## 9. Responsible AI and safety
+## 7. Troubleshooting
 
-The full risk register, mitigations, residual risks, and human-oversight rule
-are in [RESPONSIBLE_AI_RISK_ASSESSMENT.md](RESPONSIBLE_AI_RISK_ASSESSMENT.md).
+- **The vector-store build prints nothing for minutes:** expected on the first
+  build (it embeds the whole knowledge base). Later builds embed only what
+  changed.
+- **Loading the embedding model hangs** (after the first download): set
+  `HF_HUB_OFFLINE=1` (PowerShell: `$env:HF_HUB_OFFLINE = "1"`) and run again, so
+  it uses the downloaded copy without contacting Hugging Face.
+- **Ctrl+C during a run:** safe. Each case is saved as it finishes, and the
+  next `experiment run` resumes where it stopped.
+- **Output stops in a Windows terminal:** clicking in the window selects text
+  and pauses the program. Press Esc to continue.
+- **"No module named rich", or no `(.venv)` in the prompt:** activate the
+  environment (`.\.venv\Scripts\Activate.ps1` or `source .venv/bin/activate`).
+- **PowerShell: "running scripts is disabled on this system":** run
+  `Set-ExecutionPolicy -Scope Process RemoteSigned`, then activate again.
+- **"detached HEAD" after the Benchmark checkout:** expected; it is at the
+  pinned commit.
+- **macOS: "TriageBot needs Python 3.10 or newer":** the built-in `python3` is
+  too old. Install a newer one (python.org or `brew install python@3.12`),
+  delete `.venv` and create it again.
+- **Semgrep fails to install:** only re-scans need it; TriageBot scores the
+  recorded scan in `data/semgrep/`.
 
-- Do not commit API keys, `.env` files, the downloaded benchmark, generated model responses, restricted course material, or anything under `Context/` other than its README and `.gitignore`.
-- The answer key is read only by the evaluation code and never enters a prompt.
-- Treat model output, scanner output, retrieved text and source-code content as untrusted data.
-- The online scripts include conservative budget checks, but the person running them is responsible for confirming the intended account and spend.
-- Do not describe the five-case smoke test as proof of general system accuracy.
+## 8. Responsible AI and safety
 
-**AI use disclosure.** Following the SE201 AI Use Disclosure Policy, each member keeps a log in `ai-log/<name>.md` with one entry per significant use, and every commit containing AI-assisted work should carry an `Assisted-by: <tool> (<model>)` trailer. See the consolidated [AI use disclosure](AI_USE_DISCLOSURE.md), the individual logs, and [docs/DESIGN_DECISIONS.md](docs/DESIGN_DECISIONS.md), decision 16. Known historical trailer omissions are disclosed in the logs rather than hidden by rewriting shared Git history.
+The risk register, mitigations, residual risks and the human-oversight rule are
+in [RESPONSIBLE_AI_RISK_ASSESSMENT.md](RESPONSIBLE_AI_RISK_ASSESSMENT.md).
 
-## 10. Team and roles
+- TriageBot is decision support. A qualified reviewer must check the cited
+  code before any finding is suppressed.
+- It cannot recover what Semgrep missed, and a validated citation proves the
+  quote exists, not that the reasoning is right: in step 4 all three reviewers
+  dismissed one real vulnerability with a plausible but incomplete argument.
+- The answer key is read only by the evaluation code, after the model calls.
+- Source code, scanner output, retrieved text and model output are treated as
+  untrusted data.
+- Never commit API keys, `.env`, the Benchmark checkout or anything under
+  `Context/` other than its README and `.gitignore`.
+
+**AI use disclosure.** Each member keeps a log in `ai-log/<name>.md`, and
+AI-assisted commits carry an `Assisted-by:` trailer. The consolidated record is
+[AI_USE_DISCLOSURE.md](AI_USE_DISCLOSURE.md); see also design decision 16.
+
+## 9. Team and roles
 
 | Member | Responsibilities |
 | --- | --- |
@@ -394,32 +292,11 @@ are in [RESPONSIBLE_AI_RISK_ASSESSMENT.md](RESPONSIBLE_AI_RISK_ASSESSMENT.md).
 | Bradley | Evaluation harness, checkpoint report |
 | Wei Lin | Repository setup, integration, submission |
 
-## Semantic guidance retrieval
-
-The default guidance ranker is semantic retrieval (design decision 29): it looks up the
-scanner's CWE in the official MITRE catalogue, puts that record first, and ranks the OWASP
-cheat-sheet chunks by similarity to it, with the five set-up rules step 4 measured (design
-decision 28; [EXPERIMENTS.md](EXPERIMENTS.md#semantic-retrieval-set-up-fixed-before-measuring)).
-The curated CWE-to-cheat-sheet map is still available as `RETRIEVAL_MODE = "map"` in
-`triagebot/config.py`, and experiment steps 1 to 3 use it.
-
-```bash
-pip install -r requirements.txt                              # includes fastembed
-python -m triagebot.nodes.context.cwe_catalogue              # once: MITRE CWE catalogue, SHA-256 checked
-python -m triagebot.nodes.context.vector_store               # once: embeds the knowledge base
-python -m triagebot.nodes.context.retrieval --explain CWE-89 # what one CWE gets; no model calls
-```
-
-The catalogue is written under the git-ignored `Context/tmp/cwe/`, and the knowledge-base
-vector store is a SQLite file at `Context/tmp/kb_vectors.sqlite`. Preparing the store
-embeds the whole knowledge base (a few minutes on CPU); later runs embed only what changed.
-Alerts with no CWE, or an unknown or deprecated CWE, are sent to human review in either mode.
-
-## Third-party content
+## 10. Third-party content
 
 - **OWASP Cheat Sheet Series** (the guidance knowledge base): CC BY-SA 4.0; see
   [triagebot/nodes/context/kb/README.md](triagebot/nodes/context/kb/README.md).
-- **MITRE CWE** (semantic retrieval quotes a weakness's description and mitigations, and
-  searches with its name and alternate terms): © The MITRE Corporation, used under the
-  CWE Terms of Use reproduced in
+- **MITRE CWE** (semantic retrieval quotes a weakness's description and
+  mitigations, and searches with its name and alternate terms): © The MITRE
+  Corporation, used under the CWE Terms of Use reproduced in
   [triagebot/nodes/context/MITRE_CWE_NOTICE.md](triagebot/nodes/context/MITRE_CWE_NOTICE.md).

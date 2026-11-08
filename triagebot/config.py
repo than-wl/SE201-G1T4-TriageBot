@@ -163,7 +163,11 @@ SAMPLES_DIR = _REPO_ROOT / "data" / "samples"          # frozen case sets (commi
 EXPERIMENT_REGISTRY = _REPO_ROOT / "experiments" / "registry.json"
 EXPERIMENTS_OUT = _REPO_ROOT / "evidence" / "experiments"
 EVIDENCE_DIR = _REPO_ROOT / "evidence"
-CHECKPOINT_EVIDENCE_SAMPLE = EVIDENCE_DIR / "checkpoint-100" / "selected_alerts.json"
+ARCHIVE_DIR = _REPO_ROOT / "archive"                  # superseded runs, kept as the record
+# Folders whose earlier samples make up the retired list (data/samples/retired_cases.json).
+# Each case file is named relative to its folder, as when they all sat under evidence/.
+RETIRED_EVIDENCE_DIRS = (ARCHIVE_DIR / "checkpoint", ARCHIVE_DIR / "evidence")
+CHECKPOINT_EVIDENCE_SAMPLE = ARCHIVE_DIR / "checkpoint" / "checkpoint-100" / "selected_alerts.json"
 EVAL_SET_CWES = ("CWE-22", "CWE-78", "CWE-79", "CWE-89")
 EVAL_COMPARISON_PER_CWE = 24   # 12 real + 12 safe per category, dev half
 EVAL_FINAL_TEST_PER_CWE = 30   # 15 real + 15 safe per category, test half

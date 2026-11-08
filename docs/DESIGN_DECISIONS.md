@@ -494,7 +494,7 @@ so the plain-Python single-agent path and the graph run the same code.
 from the recorded scan, the answer key and the fixed split (decision 18):
 
 - `pilot` (development half): exactly the 100-case checkpoint sample; the
-  builder stops if it differs from `evidence/checkpoint-100/`. With the other
+  builder stops if it differs from `archive/checkpoint/checkpoint-100/`. With the other
   unused development cases it forms the **exploration set**, where failures
   are read and ideas tried.
 - `comparison` (development half): CWE-22, 78, 79 and 89, 24 cases each, half
@@ -503,7 +503,8 @@ from the recorded scan, the answer key and the fixed split (decision 18):
   half safe, run once after the code freeze.
 
 `data/samples/retired_cases.json` lists the 407 cases used by any earlier run
-(every `selected_alerts.json` under `evidence/` plus the fresh-120 audit list,
+(every `selected_alerts.json` in the archived evidence, `archive/checkpoint/` and
+`archive/evidence/`, plus the fresh-120 audit list,
 which adds the OpenRouter smoke-test case). The final test must share no case
 with it; the builder asserts this, and asserts the same for the comparison set.
 
@@ -754,7 +755,7 @@ with seed 201; two strata have only two eligible cases, so the set has 22
 pairs, not 24. Both sides run the final version (the `semantic` profile),
 single agent and council, on one commit. The mutants run from overlay roots
 and are scored against the flipped answers. The result is a mutation score per
-configuration and direction. The old `verification/mutation_check.py` is kept
+configuration and direction. The old `archive/verification/mutation_check.py` is kept
 as a record and marked superseded.
 
 **Why.** The old test could not show whether verdicts follow the code. Its

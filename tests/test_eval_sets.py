@@ -194,7 +194,7 @@ class CommittedSets(unittest.TestCase):
 
     def test_retired_list_matches_the_evidence_folder(self):
         committed = self.load(eval_sets.RETIRED_NAME)
-        self.assertEqual(committed, eval_sets.retired_cases(config.EVIDENCE_DIR))
+        self.assertEqual(committed, eval_sets.retired_cases(config.RETIRED_EVIDENCE_DIRS))
         self.assertEqual(committed["case_ids"], sorted(committed["case_ids"]))
 
     @unittest.skipUnless(config.ANSWER_KEY and Path(config.ANSWER_KEY).is_file(),

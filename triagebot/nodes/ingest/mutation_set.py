@@ -234,7 +234,7 @@ def build(semgrep_path=None, answer_key_path=None, benchmark_root=None, evidence
 
     semgrep_path = Path(semgrep_path or config.RECORDED_SCAN)
     answer_key_path = Path(answer_key_path or config.ANSWER_KEY or "")
-    evidence_dir = Path(evidence_dir or config.EVIDENCE_DIR)
+    evidence_dir = eval_sets._evidence_dirs(evidence_dir)
     samples_dir = Path(samples_dir or config.SAMPLES_DIR)
     cwes = tuple(cwes or config.EVAL_SET_CWES)
     seed = config.SPLIT_SEED if seed is None else seed

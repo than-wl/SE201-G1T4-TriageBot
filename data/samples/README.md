@@ -16,7 +16,7 @@ apart from the cases we report.
 
 | Set | Half of the split | Cases | Composition | What it is for |
 | --- | --- | ---: | --- | --- |
-| `pilot` | development | 100 | SQL injection (CWE-89): 50 real, 50 safe | The start of the **exploration set**. It is exactly the checkpoint sample (`evidence/checkpoint-100/`). |
+| `pilot` | development | 100 | SQL injection (CWE-89): 50 real, 50 safe | The start of the **exploration set**. It is exactly the checkpoint sample (`archive/checkpoint/checkpoint-100/`). |
 | `comparison` | development | 96 | CWE-22, CWE-78, CWE-79, CWE-89: 24 each (12 real, 12 safe) | The **comparison set**. Frozen. Steps 1 to 4 are measured on it, and nobody tunes on it. |
 | `final-test` | test | 120 | CWE-22, CWE-78, CWE-79, CWE-89: 30 each (15 real, 15 safe) | The **final test**. Run once, after the code freeze (step 6). |
 | `retired_cases.json` | both | 407 | Case IDs only | **Retired** cases: used by earlier runs, kept only as a record. |
@@ -28,8 +28,9 @@ apart from the cases we report.
   idea is tried on exploration cases first.
 - **Final test:** run once. It shares no case with the retired list (the
   builder checks this and stops if it ever does).
-- **Retired cases:** every case in a `selected_alerts.json` under `evidence/`,
-  plus the 287-case audit list in `evidence/fresh-120/prior_case_audit.json`
+- **Retired cases:** every case in a `selected_alerts.json` under `archive/checkpoint/`
+  or `archive/evidence/` (where the earlier runs were moved from `evidence/`),
+  plus the 287-case audit list in `archive/evidence/fresh-120/prior_case_audit.json`
   (which adds the one OpenRouter smoke-test case). They are never used for a
   new claim.
 - **Mutation set:** 3 pairs per direction per type were planned (24); two
@@ -83,7 +84,7 @@ are drawn with seed 201, half real and half safe. It makes no model calls.
 
 The builder stops with an error, and writes nothing, if:
 
-- the pilot differs from `evidence/checkpoint-100/selected_alerts.json`;
+- the pilot differs from `archive/checkpoint/checkpoint-100/selected_alerts.json`;
 - a category has too few eligible cases;
 - the final test, or the comparison set, would contain a retired case.
 

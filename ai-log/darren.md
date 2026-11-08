@@ -225,7 +225,7 @@ and removed during final repository cleanup; Git history preserves them.
   tests/test_pipeline.py, tests/test_checkpoints.py, EXPERIMENTS.md (new), README.md,
   docs/DESIGN_DECISIONS.md (decisions 23 to 26), FINAL_RESULTS.md (banner only),
   IMPROVEMENT_EXPERIMENT_LOG.md (banner only), ai-log/darren.md
-- **Outcome:** TODO (Darren)
+- **Outcome:** Reviewed and committed (`17deed5`); 302 tests passed and the case sets rebuilt byte-identically. Every run in steps 1 to 6 uses this groundwork.
 
 ### What I asked for
 
@@ -294,11 +294,11 @@ The assistant ran the offline suite: 302 tests before, 351 after (1 skipped), wi
 the "all switches off" result and the map-mode prompts pinned to output recorded
 from the previous code. It then installed the catalogue with the pinned-hash
 command, built the vector store and ran `--explain` for CWE-89 and CWE-22 under
-both set-ups (no model calls). TODO (Darren): own checks.
+both set-ups (no model calls). I read the `--explain` output for CWE-89 and CWE-22 under both set-ups and the staged-file summary, and checked that a test pins map-mode prompts byte for byte.
 
 ### What I kept or changed
 
-TODO (Darren)
+I kept the stop-at-first-overflow filling rule and the 1,500-character MITRE cap unchanged, so step 4 differs from `2-after` in retrieval only. I changed the semantic-mode prompt label to name MITRE and OWASP, and left the "CSS" alternate term for the retrieval-quality check.
 
 ## 2026-11-09 — Step 4, item 2: free retrieval-quality check of the set-up rules
 
@@ -313,7 +313,7 @@ TODO (Darren)
   characters in the pack 2,173 → 1,135 (the MITRE chunk is not graded and takes budget).
   `+R5` matches `original` exactly, as expected. Part B: expected sheet in pack 9 of 10
   (original) vs 10 of 10 (improved). CWE-79 "CSS" check: no chunk about CSS styling; three
-  mention CSS as an XSS context, all graded 2. Finding left as TODO for Darren.
+  mention CSS as an XSS context, all graded 2. The finding was written in EXPERIMENTS.md by the planning assistant and reviewed by me.
 
 ### What I asked for
 
@@ -332,11 +332,11 @@ no commits; changes staged only.
 The assistant ran the offline suite: 351 tests before, 367 after (1 skipped). Phase 1 listed
 24 chunks; they were graded blind in a separate chat (`relevance_labels_added.json`, with
 its `_meta` block) and phase 2 was run on the merged labels with Hugging Face forced
-offline. TODO (Darren): own checks.
+offline. I confirmed the to-grade list carried no configuration, rank or score, and read the part A and B tables, including the drop for CWE-22, against the wrong-platform column rather than precision alone.
 
 ### What I kept or changed
 
-TODO (Darren)
+I kept the set-up unchanged after seeing the results (design decisions 26 and 28). For time, the 24 extra chunks were graded by Claude in the planning chat rather than by a team member; they are recorded as AI-graded and unreviewed.
 
 ## 2026-11-09 — Step 5: the mutation test is rebuilt (runnable, not run)
 
@@ -378,8 +378,82 @@ The assistant ran the offline suite: 384 tests before, 408 after (2 skipped). It
 the mutation set twice from the recorded scan and the Benchmark checkout (byte-identical),
 showed the step 5 plan without running it, and checked the evidence packs of all 22 real
 pairs with a stub knowledge base, in a temporary folder outside the repository.
-TODO (Darren): own checks.
+I read the eligibility counts and the 22 selected pairs, the confirmation that comments are stripped and that only the mutated line differs between packs, and the trace of the vector-store wipe.
 
 ### What I kept or changed
 
-TODO (Darren)
+I accepted 22 pairs rather than widening the rules to reach 24, kept the misleading "This should never happen" literal as part of the test, and had it built in a separate git worktree so step 6 could run undisturbed.
+
+## 2026-11-09 — Step 5: run, recorded and merged
+
+- **Tool (model):** Claude Code (claude-opus-5-5) built step 5 (entry above); Claude (chat,
+  the planning and review assistant) reviewed the results and drafted the step 5 result and
+  finding in EXPERIMENTS.md
+- **Files:** evidence/experiments/5-before/ (new), evidence/experiments/5-after/ (new, with
+  mutation_score.json), EXPERIMENTS.md (step 5 result and finding; story item 7)
+- **Outcome:** Step 5 merged into main (`e54eef6`; one conflict, in EXPERIMENTS.md) and run
+  by Darren on that commit, clean tree, both sides: 176 model calls, US$0.83 in total
+  (US$0.414 before, US$0.414 after), 2 failed calls (both on the after side). Recorded in
+  `2a89a0d`. Mutation score: council 100% (22 of 22 pairs, raw and validated), single agent
+  53.3% (8 killed, 6 survived, 1 escalated, of the 15 pairs whose original it got right;
+  real → safe 4 of 4, safe → real 4 of 11). `experiment replay 5` matches the saved
+  evaluation.
+
+### What I asked for
+
+Run step 5 (both sides, single agent and council, the `semantic` profile, one commit) after
+merging the rebuilt mutation test into main, then record the result and what it shows in
+EXPERIMENTS.md, next to the old test's numbers.
+
+### How I checked it
+
+I merged `step5` into main (one conflict in EXPERIMENTS.md, resolved with the planning assistant by keeping both sections), ran step 5 (US$0.83) and read the mutation-score table.
+
+### What I kept or changed
+
+The council's 100% is reported with the caveat that it dismissed a real case with the same pattern once in step 4 (`BenchmarkTest01983`).
+
+## 2026-11-09 — Final clean-up: archive, README, command check, AI-use records
+
+- **Tool (model):** Claude Code (claude-opus-5-5); prompt PROMPT_06, written with the
+  planning assistant (Claude, in a chat)
+- **Files:** archive/ (new: README.md, and moved with `git mv`: FINAL_RESULTS.md,
+  IMPROVEMENT_EXPERIMENT_LOG.md, FINAL_PROJECT_PLAN.md, SUBMISSION_CHECKLIST.md,
+  checkpoint/CHECKPOINT_REPORT.md, checkpoint/checkpoint-100/, evidence/fresh-120/,
+  evidence/comparison-66/, evidence/original-final-120/, evidence/prior-samples/,
+  evidence/semgrep/, verification/mutation_check.py, prepare_comparison_sample.py,
+  repeat_check.py, context_retrieval_check.py, semantic_measurement.py),
+  triagebot/config.py, triagebot/nodes/ingest/eval_sets.py,
+  triagebot/nodes/ingest/mutation_set.py, tests/test_eval_sets.py, README.md (rewritten),
+  evidence/README.md (rewritten), EXPERIMENTS.md (links), docs/DESIGN_DECISIONS.md (links),
+  data/samples/README.md (paths), RESPONSIBLE_AI_RISK_ASSESSMENT.md, AI_USE_DISCLOSURE.md,
+  ai-log/darren.md
+- **Outcome:** Superseded runs and documents moved to archive/ with history kept. The
+  retired-case builder now reads the archived samples (`config.RETIRED_EVIDENCE_DIRS`) and
+  rebuilds `data/samples/retired_cases.json` byte for byte. README rewritten around the
+  current results. Stale figures replaced in the risk assessment and the disclosure. The
+  risk assessment's broader-scan claim checked: `p/java` + `p/security-audit` raises
+  Semgrep's recall over all 2,740 cases from 70.3% to 88.3% file-matched (68.6% to 86.5%
+  CWE-matched), all of it from weak randomness (0 to 218) and insecure cookie (0 to 36); for
+  the four measured types it is 86.0% either way. Every free command passed; the full suite
+  passed (408 tests, 1 skipped). No paid or model calls.
+
+### What I asked for
+
+Move superseded material into archive/ without deleting it, fix every link and stale number
+in the current documents, rewrite the README (results, quick start, runnable examples, a map,
+how it works, troubleshooting), check that every free command still works, and add the final
+phase to the AI-use disclosure and this log. No commits, no paid runs, no change to code
+behaviour or to the experiment evidence; changes staged only.
+
+### How I checked it
+
+The assistant ran the full suite, `experiment list`, `show` and `replay` for every step, both
+`--explain` set-ups, `whole_system.py` in both modes, `semantic_setup_check.py --phase score`,
+the setup check and `baseline`. The two report scripts rewrote their evidence files with a
+new date and commit only; those files were restored to the committed versions.
+I read the move list, the stale-number changes and the recomputed 70.3% → 88.3% claim, and checked the README results against EXPERIMENTS.md.
+
+### What I kept or changed
+
+I changed the disclosure to credit Hong Yi with spotting the mismatched mutation baselines, and menu option 4's label from "the planned experiments" to "the experiments".

@@ -6,7 +6,7 @@ Interactive menu (no arguments), from the repository root:
     1  Scanner baseline   How good is Semgrep alone? Scored against the OWASP answer key.
     2  Triage one alert   One finding through the whole pipeline, every stage shown.
     3  Evaluate a sample  The checkpoint sample through each configuration, scored.
-    4  Experiments        The planned experiments: show (free), replay (free) or run (paid).
+    4  Experiments        The experiments: show (free), replay (free) or run (paid).
     q  Quit
 
 The menu starts with the setup check (triagebot/check.py) and, if the
@@ -102,7 +102,7 @@ OPTIONS = (
     ("1", "Scanner baseline", "How good is Semgrep alone? Scored against the OWASP answer key.", True),
     ("2", "Triage one alert", "One finding through the whole pipeline, every stage shown.", True),
     ("3", "Evaluate a sample", "The checkpoint sample through each configuration, scored.", True),
-    ("4", "Experiments", "The planned experiments: show (free), replay (free) or run (paid).", True),
+    ("4", "Experiments", "The experiments: show (free), replay (free) or run (paid).", True),
 )
 PROMPT = "Choose 1, 2, 3, 4 or q: "
 REVIEW_MODES = ("single", "council")
@@ -1082,7 +1082,7 @@ def parser() -> argparse.ArgumentParser:
     cr.add_argument("--allow-replay", action="store_true",
                     help="acknowledge possible duplicate model charges for an incomplete run")
 
-    x = sub.add_parser("experiment", help="menu option 4: the planned experiments (EXPERIMENTS.md)")
+    x = sub.add_parser("experiment", help="menu option 4: the experiments (EXPERIMENTS.md)")
     xs = x.add_subparsers(dest="experiment_command", required=True)
     xs.add_parser("list", help="every step, its question, and whether saved runs exist (offline)")
     xshow = xs.add_parser("show", help="before/after table from saved runs (offline, free)")
