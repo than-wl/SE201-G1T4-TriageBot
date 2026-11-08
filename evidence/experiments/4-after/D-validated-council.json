@@ -1,0 +1,4822 @@
+{
+  "model": "google/gemini-3.8-flash",
+  "results": [
+    {
+      "case_id": "BenchmarkTest00001",
+      "citations": [],
+      "explanation": "Validation failed; human review required.",
+      "guidance": [],
+      "latency_seconds": 20.676,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "human_review",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 802,
+        "cost": 0.00902025,
+        "prompt_tokens": 8017,
+        "total_tokens": 8819
+      },
+      "validated": false,
+      "validation_errors": [
+        "Missing citations"
+      ],
+      "validation_repairs": [],
+      "verdict": "human_review"
+    },
+    {
+      "case_id": "BenchmarkTest00006",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00006.java",
+          "line": 46,
+          "quote": "param = request.getHeader(\"BenchmarkTest00006\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00006.java",
+          "line": 62,
+          "quote": "argList.add(\"echo \" + param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00006.java",
+          "line": 66,
+          "quote": "pb.command(argList);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00006.java",
+          "line": 69,
+          "quote": "Process p = pb.start();"
+        }
+      ],
+      "explanation": "Untrusted input read from the HTTP request header is decoded and concatenated directly into a shell command line passed to ProcessBuilder via 'cmd.exe /c' or 'sh -c'. Because the argument is executed in a command shell without sanitization or allowlisting, it permits arbitrary OS command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 15.481,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1720,
+        "cost": 0.014544,
+        "prompt_tokens": 10792,
+        "total_tokens": 12512
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00013",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00013.java",
+          "line": 45,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00013.java",
+          "line": 48,
+          "quote": "param = headers.nextElement();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00013.java",
+          "line": 52,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00013.java",
+          "line": 56,
+          "quote": "response.getWriter().format(java.util.Locale.US, param, obj);"
+        }
+      ],
+      "explanation": "Untrusted data from the 'Referer' request header is URL-decoded and passed directly as the format string argument to response.getWriter().format() without sanitization or output encoding. Since the response content type is set to 'text/html;charset=UTF-8', this creates a Reflected Cross-Site Scripting (XSS) vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.061,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1586,
+        "cost": 0.01263375,
+        "prompt_tokens": 8915,
+        "total_tokens": 10501
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00025",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00025.java",
+          "line": 44,
+          "quote": "String param = request.getParameter(\"BenchmarkTest00025\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00025.java",
+          "line": 47,
+          "quote": "String sql = \"SELECT userid from USERS where USERNAME='foo' and PASSWORD='\" + param + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00025.java",
+          "line": 52,
+          "quote": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.queryForObject("
+        }
+      ],
+      "explanation": "The HTTP request parameter 'BenchmarkTest00025' is retrieved without validation and directly concatenated into an SQL query string. This dynamically built query is then executed by DatabaseHelper.JDBCtemplate.queryForObject, creating a SQL injection vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 20.403,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1188,
+        "cost": 0.0142725,
+        "prompt_tokens": 13090,
+        "total_tokens": 14278
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00061",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00061.java",
+          "line": 60,
+          "quote": "param = java.net.URLDecoder.decode(theCookie.getValue(), \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00061.java",
+          "line": 75,
+          "quote": "java.io.File fileTarget = new java.io.File(bar, \"/Test.txt\");"
+        }
+      ],
+      "explanation": "User input retrieved from the 'BenchmarkTest00061' cookie is URL-decoded, round-tripped through Base64 without alteration, and passed directly into the java.io.File constructor as the parent pathname. Because no validation or sanitization is performed against directory traversal sequences, an attacker can target arbitrary directories on the filesystem.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 21.369,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1645,
+        "cost": 0.01321275,
+        "prompt_tokens": 9392,
+        "total_tokens": 11037
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00159",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00159.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest00159\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00159.java",
+          "line": 53,
+          "quote": "String bar = thing.doSomething(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00159.java",
+          "line": 65,
+          "quote": "String[] args = {a1, a2, \"echo \" + bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00159.java",
+          "line": 67,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(args);"
+        }
+      ],
+      "explanation": "Untrusted input obtained from the HTTP request header is decoded and passed without sanitization through ThingInterface.doSomething into a shell command string, which is then executed via ProcessBuilder. Because the command is interpreted through cmd.exe /c or sh -c, this directly leads to OS command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 15.816,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1524,
+        "cost": 0.013571999999999999,
+        "prompt_tokens": 10476,
+        "total_tokens": 12000
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00287",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00287.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00287.java",
+          "line": 47,
+          "quote": "param = headers.nextElement();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00287.java",
+          "line": 51,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00287.java",
+          "line": 59,
+          "quote": "response.getWriter().write(bar.toCharArray(), 0, length);"
+        }
+      ],
+      "explanation": "Untrusted input obtained from the HTTP 'Referer' header is URL-decoded and written directly into the HTTP response body via response.getWriter().write without contextual output encoding or sanitization, causing reflected XSS in an HTML response context.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 21.284,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1582,
+        "cost": 0.01256925,
+        "prompt_tokens": 8849,
+        "total_tokens": 10431
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00308",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00308.java",
+          "line": 56,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00308.java",
+          "line": 57,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00308.java",
+          "line": 58,
+          "quote": "else bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00308.java",
+          "line": 70,
+          "quote": "Process p = r.exec(cmd + bar, argsEnv);"
+        }
+      ],
+      "explanation": "Untrusted header input stored in 'param' is never passed to Runtime.exec(). The condition '(7 * 42) - num > 200' evaluates to 208 > 200, which is always true, ensuring 'bar' is assigned a static constant string and making the tainted branch dead code.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 21.747,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1569,
+        "cost": 0.014215499999999999,
+        "prompt_tokens": 11109,
+        "total_tokens": 12678
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00343",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00343.java",
+          "line": 56,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00343.java",
+          "line": 57,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00343.java",
+          "line": 60,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "The condition ((7 * 42) - num > 200) evaluates statically to 208 > 200, which is always true. Consequently, 'bar' is always assigned the constant string 'This_should_always_happen', preventing untrusted request header input from ever reaching the SQL statement.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 20.236,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1277,
+        "cost": 0.01429275,
+        "prompt_tokens": 12672,
+        "total_tokens": 13949
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00433",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00433.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest00433\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00433.java",
+          "line": 50,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00433.java",
+          "line": 53,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00433.java",
+          "line": 57,
+          "quote": "org.owasp.benchmark.helpers.DatabaseHelper.JDBCtemplate.queryForList(sql);"
+        }
+      ],
+      "explanation": "Untrusted input from the HTTP parameter 'BenchmarkTest00433' flows into 'bar' because the condition (500 / 42) + 196 > 200 evaluates to 207 > 200 (true). The unvalidated parameter is directly concatenated into a dynamic SQL query executed by JdbcTemplate.queryForList, creating an SQL injection vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 21.392,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1736,
+        "cost": 0.0168315,
+        "prompt_tokens": 13762,
+        "total_tokens": 15498
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00743",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00743.java",
+          "line": 49,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00743.java",
+          "line": 50,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00743.java",
+          "line": 58,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00743.java",
+          "line": 72,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00743.java",
+          "line": 75,
+          "quote": "Process p = r.exec(cmd, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "The variable 'bar' included in argsEnv is determined by evaluating guess.charAt(1) on constant 'ABC', which resolves to 'B'. This strictly executes case 'B', assigning 'bar' the hardcoded literal 'bob' rather than the tainted 'param'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 21.27,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1448,
+        "cost": 0.013773,
+        "prompt_tokens": 11124,
+        "total_tokens": 12572
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00862",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00862.java",
+          "line": 50,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00862.java",
+          "line": 52,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00862.java",
+          "line": 55,
+          "quote": "new java.io.File(org.owasp.benchmark.helpers.Utils.TESTFILES_DIR, bar);"
+        }
+      ],
+      "explanation": "The condition `(7 * 18) + num > 200` always evaluates to true (126 + 106 = 232 > 200), meaning `bar` is unconditionally assigned the constant string 'This_should_always_happen'. Because the request-derived variable `param` never reaches the `File` constructor, no user input influences the file path.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 24.625,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1226,
+        "cost": 0.013548000000000001,
+        "prompt_tokens": 11934,
+        "total_tokens": 13160
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest00999",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00999.java",
+          "line": 96,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00999.java",
+          "line": 97,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00999.java",
+          "line": 69,
+          "quote": "String sql = \"{call \" + bar + \"}\";"
+        }
+      ],
+      "explanation": "The user input in 'param' never reaches the SQL statement sink. In Test.doSomething, the condition '(7 * 42) - num > 200' evaluates to 208 > 200, which is always true, ensuring 'bar' is always set to the hardcoded constant string.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 26.848,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1558,
+        "cost": 0.0162255,
+        "prompt_tokens": 13844,
+        "total_tokens": 15402
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01001",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01001.java",
+          "line": 92,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01001.java",
+          "line": 94,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01001.java",
+          "line": 68,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME=? and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "Untrusted input from the cookie in 'param' never reaches the SQL query string. The ternary condition '(7 * 18) + num > 200' evaluates to 232 > 200, which is statically always true, ensuring that 'bar' is always set to the constant string 'This_should_always_happen'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 23.506,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1661,
+        "cost": 0.0165975,
+        "prompt_tokens": 13825,
+        "total_tokens": 15486
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01029",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01029.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01029\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01029.java",
+          "line": 51,
+          "quote": "String bar = new Test().doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01029.java",
+          "line": 70,
+          "quote": "+ bar,"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01029.java",
+          "line": 73,
+          "quote": "java.io.File fileTarget = new java.io.File(fileURI);"
+        }
+      ],
+      "explanation": "User input retrieved from the HTTP header 'BenchmarkTest01029' is URL-decoded and passed unmodified through ThingInterface into a file URI path. Because this path is directly used to instantiate a File object and check its existence without any sanitization, an attacker can supply directory traversal sequences like '../' to target arbitrary files.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 20.005,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1622,
+        "cost": 0.015018,
+        "prompt_tokens": 11914,
+        "total_tokens": 13536
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01054",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01054.java",
+          "line": 54,
+          "quote": "response.getWriter().println(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01054.java",
+          "line": 62,
+          "quote": "String bar = org.springframework.web.util.HtmlUtils.htmlEscape(param);"
+        }
+      ],
+      "explanation": "The user-controlled input read from the Referer header is sanitized using Spring's HtmlUtils.htmlEscape before being written to the HTTP response, neutralizing any HTML injection.",
+      "guidance": [
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        },
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 15.744,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1099,
+        "cost": 0.01083075,
+        "prompt_tokens": 8946,
+        "total_tokens": 10045
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc from retrieved chunk",
+        "Guidance 2: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01089",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01089.java",
+          "line": 82,
+          "quote": "map11607.put(\"keyA-11607\", \"a_Value\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01089.java",
+          "line": 86,
+          "quote": "bar = (String) map11607.get(\"keyA-11607\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01089.java",
+          "line": 54,
+          "quote": "\"SELECT TOP 1 USERNAME from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "Although user input is read from the request header, inside Test.doSomething the variable bar is unconditionally assigned to the constant map entry 'keyA-11607' ('a_Value'). Because the value interpolated into the SQL query is hardcoded, no user taint reaches the SQL execution sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 20.022,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1686,
+        "cost": 0.01699425,
+        "prompt_tokens": 14229,
+        "total_tokens": 15915
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01111",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01111.java",
+          "line": 46,
+          "quote": "String name = (String) names.nextElement();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01111.java",
+          "line": 54,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01111.java",
+          "line": 102,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01111.java",
+          "line": 67,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01111.java",
+          "line": 68,
+          "quote": "fis = new java.io.FileInputStream(fileName);"
+        }
+      ],
+      "explanation": "An arbitrary header name supplied by the client via request.getHeaderNames() is stored in param and preserved through Test.doSomething since (500 / 42) + 196 evaluates to 207 (> 200). The untrusted value is concatenated directly into fileName without sanitization or directory traversal prevention and passed to java.io.FileInputStream.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 33.009,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 3046,
+        "cost": 0.021252,
+        "prompt_tokens": 13106,
+        "total_tokens": 16152
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01193",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01193.java",
+          "line": 96,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01193.java",
+          "line": 97,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01193.java",
+          "line": 78,
+          "quote": "Process p = r.exec(args, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "The user input in 'param' never reaches the command execution sink because the condition in Test.doSomething evaluates (7 * 42) - 86 > 200 (208 > 200), which is statically true. Therefore, 'bar' is always set to the hardcoded constant string 'This_should_always_happen'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 25.154,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1668,
+        "cost": 0.01502175,
+        "prompt_tokens": 11689,
+        "total_tokens": 13357
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01233",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01233.java",
+          "line": 73,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01233.java",
+          "line": 74,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01233.java",
+          "line": 82,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01233.java",
+          "line": 50,
+          "quote": "new java.io.File(org.owasp.benchmark.helpers.Utils.TESTFILES_DIR), bar);"
+        }
+      ],
+      "explanation": "The user input parameter passed to doSomething is bypassed because switchTarget is deterministically derived as 'B' from the constant string 'ABC'. As a result, only case 'B' executes, setting bar to the constant string 'bob' before it is passed to the File constructor.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 17.136,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1178,
+        "cost": 0.013698000000000002,
+        "prompt_tokens": 12374,
+        "total_tokens": 13552
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01236",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01236.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01236\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01236.java",
+          "line": 46,
+          "quote": "String bar = new Test().doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01236.java",
+          "line": 64,
+          "quote": "+ bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01236.java",
+          "line": 65,
+          "quote": "java.io.File fileTarget = new java.io.File(fileURI);"
+        }
+      ],
+      "explanation": "User input from request.getParameter is passed without sanitization through Test.doSomething (which delegates to ThingInterface implementations that return the string unchanged) directly into a file URI. This allows directory traversal sequences to be resolved when instantiating the java.io.File target.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 25.405,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1471,
+        "cost": 0.014284500000000002,
+        "prompt_tokens": 11691,
+        "total_tokens": 13162
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01255",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01255.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01255\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01255.java",
+          "line": 57,
+          "quote": "String bar = org.apache.commons.lang.StringEscapeUtils.escapeHtml(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01255.java",
+          "line": 49,
+          "quote": "response.getWriter().print(bar.toCharArray());"
+        }
+      ],
+      "explanation": "The untrusted input from request.getParameter is sanitized using org.apache.commons.lang.StringEscapeUtils.escapeHtml prior to being rendered in the response body. This properly neutralizes HTML markup and prevents reflected cross-site scripting.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 16.372,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1447,
+        "cost": 0.01212375,
+        "prompt_tokens": 8930,
+        "total_tokens": 10377
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01263",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01263.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01263\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01263.java",
+          "line": 59,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01263.java",
+          "line": 71,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01263.java",
+          "line": 49,
+          "quote": "response.getWriter().println(bar.toCharArray());"
+        }
+      ],
+      "explanation": "Untrusted input retrieved from 'request.getParameter' is passed into 'doSomething', where 'switchTarget' evaluates to index 2 of 'ABC' ('C'), setting 'bar' to 'param'. The unsanitized value is then written directly to the HTTP response via 'println', causing a reflected Cross-Site Scripting (XSS) vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 18.618,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1845,
+        "cost": 0.01404675,
+        "prompt_tokens": 9504,
+        "total_tokens": 11349
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01311",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01311.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01311\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01311.java",
+          "line": 71,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01311.java",
+          "line": 48,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01311.java",
+          "line": 53,
+          "quote": "statement.execute(sql);"
+        }
+      ],
+      "explanation": "HTTP request parameter BenchmarkTest01311 is retrieved and passed to doSomething, where the condition (500 / 42) + 196 > 200 (11 + 196 = 207 > 200) always evaluates to true, assigning the untrusted input to bar. The unsanitized value is concatenated directly into a dynamic SQL query and executed with statement.execute(sql), resulting in SQL injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 21.774,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1487,
+        "cost": 0.015272999999999998,
+        "prompt_tokens": 12929,
+        "total_tokens": 14416
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01313",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01313.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest01313\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01313.java",
+          "line": 71,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01313.java",
+          "line": 74,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01313.java",
+          "line": 76,
+          "quote": "bar = valuesList.get(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01313.java",
+          "line": 48,
+          "quote": "String sql = \"INSERT INTO users (username, password) VALUES ('foo','\" + bar + \"')\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01313.java",
+          "line": 53,
+          "quote": "int count = statement.executeUpdate(sql);"
+        }
+      ],
+      "explanation": "HTTP request parameter 'BenchmarkTest01313' is added to an ArrayList at index 1 and subsequently shifted to index 0 after valuesList.remove(0). It is returned into 'bar' and directly concatenated into an SQL INSERT query executed via statement.executeUpdate(sql) without any parameterization or sanitization.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 22.471,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1729,
+        "cost": 0.015486,
+        "prompt_tokens": 12003,
+        "total_tokens": 13732
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01350",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01350.java",
+          "line": 43,
+          "quote": "java.util.Map<String, String[]> map = request.getParameterMap();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01350.java",
+          "line": 47,
+          "quote": "if (values != null) param = values[0];"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01350.java",
+          "line": 56,
+          "quote": "response.getWriter().write(bar.toCharArray(), 0, length);"
+        }
+      ],
+      "explanation": "Untrusted user input obtained via request.getParameterMap() is assigned to param and passed unchanged through ThingInterface (Thing1 or Thing2). The resulting string is directly written to the HTTP response body with text/html content type without neutralization or escaping, leading to reflected cross-site scripting.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 25.089,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1513,
+        "cost": 0.014228999999999999,
+        "prompt_tokens": 11407,
+        "total_tokens": 12920
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01360",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01360.java",
+          "line": 43,
+          "quote": "java.util.Map<String, String[]> map = request.getParameterMap();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01360.java",
+          "line": 78,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01360.java",
+          "line": 90,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01360.java",
+          "line": 61,
+          "quote": "Process p = r.exec(cmd + bar);"
+        }
+      ],
+      "explanation": "Untrusted input retrieved from request.getParameterMap() is passed via 'param' to Test.doSomething, where 'guess.charAt(2)' evaluates to 'C', causing 'bar' to take the tainted value. The unsanitized value is then concatenated directly into the OS command executed by Runtime.getRuntime().exec().",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 21.384,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1689,
+        "cost": 0.015228000000000002,
+        "prompt_tokens": 11859,
+        "total_tokens": 13548
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01391",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01391.java",
+          "line": 43,
+          "quote": "java.util.Map<String, String[]> map = request.getParameterMap();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01391.java",
+          "line": 52,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01391.java",
+          "line": 57,
+          "quote": "java.sql.ResultSet rs = statement.executeQuery(sql);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01391.java",
+          "line": 74,
+          "quote": "map24596.put(\"keyB-24596\", param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01391.java",
+          "line": 76,
+          "quote": "bar = (String) map24596.get(\"keyB-24596\");"
+        }
+      ],
+      "explanation": "Untrusted input obtained from request.getParameterMap() is assigned to param and placed into a HashMap under 'keyB-24596'. It is subsequently retrieved unaltered as 'bar', concatenated into an SQL query string, and executed via Statement.executeQuery(), resulting in CWE-89.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 22.695,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1884,
+        "cost": 0.0170715,
+        "prompt_tokens": 13342,
+        "total_tokens": 15226
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01392",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01392.java",
+          "line": 74,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01392.java",
+          "line": 76,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01392.java",
+          "line": 52,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "Tainted input received in `param` never reaches the SQL statement. In `Test.doSomething`, the ternary condition `(7 * 18) + num > 200` constantly evaluates to 232 > 200 (true), unconditionally assigning `bar` the safe constant string \"This_should_always_happen\".",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 25.315,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1532,
+        "cost": 0.01555575,
+        "prompt_tokens": 13081,
+        "total_tokens": 14613
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01396",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01396.java",
+          "line": 46,
+          "quote": "String[] values = map.get(\"BenchmarkTest01396\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01396.java",
+          "line": 52,
+          "quote": "String sql = \"INSERT INTO users (username, password) VALUES ('foo','\" + bar + \"')\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01396.java",
+          "line": 57,
+          "quote": "int count = statement.executeUpdate(sql, new String[] {\"USERNAME\", \"PASSWORD\"});"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01396.java",
+          "line": 73,
+          "quote": "String bar = thing.doSomething(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/helpers/ThingFactory.java",
+          "line": 26,
+          "quote": "public static ThingInterface createThing() {"
+        }
+      ],
+      "explanation": "Request parameter input is passed through thing.doSomething(param) before being concatenated into an SQL INSERT statement executed via executeUpdate. Because the runtime implementation instantiated by ThingFactory (or its fallback classes Thing1/Thing2) is missing from the evidence, whether the input is neutralized or sanitized cannot be definitively established.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 30.327,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "human_review",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2570,
+        "cost": 0.019383,
+        "prompt_tokens": 12994,
+        "total_tokens": 15564
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "human_review"
+    },
+    {
+      "case_id": "BenchmarkTest01430",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01430.java",
+          "line": 53,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01430.java",
+          "line": 60,
+          "quote": "String bar = new Test().doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01430.java",
+          "line": 72,
+          "quote": "String[] args = {a1, a2, \"echo \" + bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01430.java",
+          "line": 74,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(args);"
+        }
+      ],
+      "explanation": "Untrusted HTTP parameter names are assigned to 'param' when a matching parameter value is found, passed into Test.doSomething where the value is Base64 encoded and decoded unchanged, and then directly concatenated into a shell command line ('echo ' + bar) invoked via ProcessBuilder.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.888,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2000,
+        "cost": 0.0162225,
+        "prompt_tokens": 11630,
+        "total_tokens": 13630
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01460",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01460.java",
+          "line": 53,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01460.java",
+          "line": 62,
+          "quote": "String sql = \"{call \" + bar + \"}\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01460.java",
+          "line": 68,
+          "quote": "connection.prepareCall("
+        }
+      ],
+      "explanation": "An attacker-controlled parameter name from request.getParameterNames() is assigned to param when its value equals 'BenchmarkTest01460'. This value is stored and retrieved from a HashMap unaltered via Test.doSomething, then directly concatenated into the SQL string executed by connection.prepareCall, enabling SQL injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 22.719,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1623,
+        "cost": 0.0163335,
+        "prompt_tokens": 13663,
+        "total_tokens": 15286
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01592",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01592.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest01592\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01592.java",
+          "line": 64,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01592.java",
+          "line": 51,
+          "quote": "response.getWriter().println(bar);"
+        }
+      ],
+      "explanation": "Untrusted input obtained via request.getParameterValues is passed into doSomething, where the condition (7 * 42) - num > 200 evaluates to 188 > 200 (false), causing bar to receive param. The unencoded input is subsequently written directly to the HTTP response with an HTML content type, resulting in cross-site scripting (CWE-79).",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.953,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1514,
+        "cost": 0.012583500000000001,
+        "prompt_tokens": 9208,
+        "total_tokens": 10722
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01595",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01595.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest01595\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01595.java",
+          "line": 51,
+          "quote": "response.getWriter().write(bar.toCharArray());"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01595.java",
+          "line": 59,
+          "quote": "String bar = org.apache.commons.lang.StringEscapeUtils.escapeHtml(param);"
+        }
+      ],
+      "explanation": "The user input retrieved via request.getParameterValues is properly HTML escaped using StringEscapeUtils.escapeHtml before being written to the HTTP response, neutralizing potential cross-site scripting attacks.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.987,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1339,
+        "cost": 0.01171125,
+        "prompt_tokens": 8920,
+        "total_tokens": 10259
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01631",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01631.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest01631\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01631.java",
+          "line": 73,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01631.java",
+          "line": 50,
+          "quote": "String sql = \"INSERT INTO users (username, password) VALUES ('foo','\" + bar + \"')\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01631.java",
+          "line": 55,
+          "quote": "int count = statement.executeUpdate(sql, new String[] {\"USERNAME\", \"PASSWORD\"});"
+        }
+      ],
+      "explanation": "User input from request.getParameterValues is assigned to param and returned by Test.doSomething because integer division and addition (500 / 42) + 196 evaluates to 207, which is greater than 200. The unsanitized value is directly concatenated into a dynamic SQL INSERT statement and executed via Statement.executeUpdate, creating a SQL injection vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 20.949,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1934,
+        "cost": 0.016212,
+        "prompt_tokens": 11946,
+        "total_tokens": 13880
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01666",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01666.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01666.java",
+          "line": 68,
+          "quote": "param = java.net.URLDecoder.decode(param, \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01666.java",
+          "line": 73,
+          "quote": "response.getWriter().println(bar.toCharArray());"
+        }
+      ],
+      "explanation": "Untrusted input extracted from the HTTP query string is decoded and only transformed by replacing the final character with 'Z'. It is then printed directly to the HTTP response with 'text/html' content type without any HTML encoding or sanitization, resulting in reflected XSS.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.244,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1862,
+        "cost": 0.01453875,
+        "prompt_tokens": 10075,
+        "total_tokens": 11937
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01685",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01685.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01685.java",
+          "line": 114,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01685.java",
+          "line": 87,
+          "quote": "args = new String[] {a1, a2, cmd + bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01685.java",
+          "line": 95,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        }
+      ],
+      "explanation": "Untrusted input extracted from the HTTP query string is assigned to 'bar' via doSomething() and subsequently concatenated into the command argument passed to a shell invocation ('sh -c' or 'cmd.exe /c') executed via Runtime.getRuntime().exec(). Because the user input is executed in a command shell without sanitization, this leads to OS command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 24.474,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2221,
+        "cost": 0.017445000000000002,
+        "prompt_tokens": 12155,
+        "total_tokens": 14376
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01692",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01692.java",
+          "line": 118,
+          "quote": "String g28453 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01692.java",
+          "line": 119,
+          "quote": "String bar = thing.doSomething(g28453);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01692.java",
+          "line": 83,
+          "quote": "r.exec(cmd + bar, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "Although user input is parsed from the query string, the method Test.doSomething discards the tainted parameter and instead computes its return value from the hardcoded string constant 'barbarians_at_the_gate'. As a result, no untrusted input reaches the Runtime.exec sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 23.828,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1713,
+        "cost": 0.01707525,
+        "prompt_tokens": 14202,
+        "total_tokens": 15915
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01747",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01747.java",
+          "line": 97,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01747.java",
+          "line": 98,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01747.java",
+          "line": 69,
+          "quote": "java.io.File fileTarget = new java.io.File(fileURI);"
+        }
+      ],
+      "explanation": "The user input parameter is never used to construct the File URI because the condition ((7 * 42) - num > 200) always evaluates to true (208 > 200), forcing bar to be the hardcoded string 'This_should_always_happen'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 22.878,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1475,
+        "cost": 0.015154500000000001,
+        "prompt_tokens": 12831,
+        "total_tokens": 14306
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01752",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01752.java",
+          "line": 45,
+          "quote": "String param = scr.getTheValue(\"BenchmarkTest01752\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01752.java",
+          "line": 47,
+          "quote": "String bar = new Test().doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01752.java",
+          "line": 49,
+          "quote": "String fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01752.java",
+          "line": 61,
+          "quote": "new java.io.FileOutputStream(new java.io.FileInputStream(fileName).getFD()); ) {"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01752.java",
+          "line": 80,
+          "quote": "map11351.put(\"keyB-11351\", param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01752.java",
+          "line": 82,
+          "quote": "bar = (String) map11351.get(\"keyB-11351\");"
+        }
+      ],
+      "explanation": "User input obtained via scr.getTheValue is returned without sanitization through Test.doSomething via a HashMap lookup. It is directly concatenated to TESTFILES_DIR and passed to FileInputStream, resulting in a path traversal vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 21.119,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1621,
+        "cost": 0.015732,
+        "prompt_tokens": 12871,
+        "total_tokens": 14492
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01780",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01780.java",
+          "line": 80,
+          "quote": "map90655.put(\"keyA-90655\", \"a_Value\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01780.java",
+          "line": 84,
+          "quote": "bar = (String) map90655.get(\"keyA-90655\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01780.java",
+          "line": 59,
+          "quote": "String[] args = {a1, a2, \"echo \" + bar};"
+        }
+      ],
+      "explanation": "Although parameter data is passed into Test.doSomething, the variable bar is unconditionally reassigned on line 84 to the constant value 'a_Value' from keyA-90655 before being returned. Consequently, no tainted data reaches the ProcessBuilder command execution.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 17.863,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1567,
+        "cost": 0.01432875,
+        "prompt_tokens": 11270,
+        "total_tokens": 12837
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01794",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01794.java",
+          "line": 45,
+          "quote": "String param = scr.getTheValue(\"BenchmarkTest01794\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01794.java",
+          "line": 64,
+          "quote": "args = new String[] {a1, a2, cmd + bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01794.java",
+          "line": 72,
+          "quote": "Process p = r.exec(args, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01794.java",
+          "line": 91,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        }
+      ],
+      "explanation": "Untrusted request data is retrieved and passed to Test.doSomething, where the condition ((500 / 42) + 196 > 200, i.e., 207 > 200) always evaluates to true, preserving the tainted input in bar. On non-Windows platforms, bar is concatenated into a shell command ('sh -c ls ' + bar) and executed via Runtime.getRuntime().exec without sanitization, leading to command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.159,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1715,
+        "cost": 0.01539375,
+        "prompt_tokens": 11950,
+        "total_tokens": 13665
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01880",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01880.java",
+          "line": 68,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME=? and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01880.java",
+          "line": 94,
+          "quote": "map99153.put(\"keyA-99153\", \"a_Value\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01880.java",
+          "line": 98,
+          "quote": "bar = (String) map99153.get(\"keyA-99153\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01880.java",
+          "line": 100,
+          "quote": "return bar;"
+        }
+      ],
+      "explanation": "Although cookie input is extracted and passed to doSomething(), line 98 overwrites 'bar' with the value associated with 'keyA-99153', which is the static constant 'a_Value'. As a result, the value interpolated into the SQL statement on line 68 is not user-controlled, making SQL injection impossible.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 22.649,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1380,
+        "cost": 0.015819,
+        "prompt_tokens": 14192,
+        "total_tokens": 15572
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01885",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01885.java",
+          "line": 88,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01885.java",
+          "line": 89,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01885.java",
+          "line": 90,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01885.java",
+          "line": 92,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01885.java",
+          "line": 94,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "In method doSomething, valuesList is populated with 'safe' at index 0, the tainted param at index 1, and 'moresafe' at index 2. After valuesList.remove(0) executes, param shifts to index 0 and 'moresafe' shifts to index 1, so valuesList.get(1) always returns the constant 'moresafe', preventing user input from reaching the SQL query.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 22.296,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2061,
+        "cost": 0.01809975,
+        "prompt_tokens": 13828,
+        "total_tokens": 15889
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01907",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01907.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01907\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01907.java",
+          "line": 88,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01907.java",
+          "line": 57,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01907.java",
+          "line": 59,
+          "quote": "fos = new java.io.FileOutputStream(new java.io.File(fileName));"
+        }
+      ],
+      "explanation": "In doSomething, the condition (7 * 42) - num > 200 evaluates to 188 > 200 (false), selecting the false branch of the ternary operator which assigns the unsanitized user header param to bar. This value is concatenated directly into fileName and passed to FileOutputStream, allowing path traversal.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 27.418,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1541,
+        "cost": 0.01522575,
+        "prompt_tokens": 12596,
+        "total_tokens": 14137
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01928",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01928.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"BenchmarkTest01928\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01928.java",
+          "line": 84,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01928.java",
+          "line": 96,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01928.java",
+          "line": 63,
+          "quote": "argList.add(\"echo \" + bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01928.java",
+          "line": 70,
+          "quote": "Process p = pb.start();"
+        }
+      ],
+      "explanation": "User input from the 'BenchmarkTest01928' HTTP header is returned unsanitized by doSomething() because 'ABC'.charAt(2) matches case 'C'. The tainted value is then concatenated directly into a shell execution string ('echo ' + bar) invoked via ProcessBuilder with cmd.exe or sh, leading to command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 19.227,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1792,
+        "cost": 0.0155835,
+        "prompt_tokens": 11818,
+        "total_tokens": 13610
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01937",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01937.java",
+          "line": 78,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01937.java",
+          "line": 79,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01937.java",
+          "line": 80,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01937.java",
+          "line": 82,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01937.java",
+          "line": 84,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "In doSomething, valuesList adds 'safe', param, and 'moresafe'. When valuesList.remove(0) is called, 'safe' is removed, shifting param to index 0 and 'moresafe' to index 1. As a result, valuesList.get(1) always returns the hardcoded string 'moresafe', preventing untrusted input from reaching Runtime.exec().",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 16.728,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1539,
+        "cost": 0.014526750000000001,
+        "prompt_tokens": 11674,
+        "total_tokens": 13213
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01939",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01939.java",
+          "line": 78,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01939.java",
+          "line": 79,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01939.java",
+          "line": 80,
+          "quote": "else bar = param;"
+        }
+      ],
+      "explanation": "In doSomething, the condition (7 * 42) - num > 200 with num = 86 evaluates to 208 > 200, which is always true. As a result, bar is unconditionally assigned the safe constant string 'This_should_always_happen', preventing the tainted request parameter from ever reaching the command execution sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 19.081,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1207,
+        "cost": 0.013040999999999999,
+        "prompt_tokens": 11353,
+        "total_tokens": 12560
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01983",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01983.java",
+          "line": 54,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01983.java",
+          "line": 64,
+          "quote": "new java.io.File(org.owasp.benchmark.helpers.Utils.TESTFILES_DIR, bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01983.java",
+          "line": 89,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        }
+      ],
+      "explanation": "Although the ternary condition evaluates to false and returns 'param', 'param' is set to the HTTP header name rather than the header value. HTTP header field names are restricted by HTTP specifications to tokens that cannot contain path traversal characters such as '/' or '\\\\', preventing path traversal.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 22.388,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1324,
+        "cost": 0.01444875,
+        "prompt_tokens": 12645,
+        "total_tokens": 13969
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01987",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01987.java",
+          "line": 54,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01987.java",
+          "line": 108,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01987.java",
+          "line": 120,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01987.java",
+          "line": 80,
+          "quote": "+ bar,"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01987.java",
+          "line": 83,
+          "quote": "java.io.File fileTarget = new java.io.File(fileURI);"
+        }
+      ],
+      "explanation": "User-controllable header name input is assigned to param and passed to doSomething(), where guess.charAt(2) evaluates to 'C', returning param untouched as bar. This untrusted value is directly appended into a file URI path and instantiated as a java.io.File without validation, leading to path traversal.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 33.196,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 987,
+        "cost": 0.010530000000000001,
+        "prompt_tokens": 9105,
+        "total_tokens": 10092
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest01990",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01990.java",
+          "line": 94,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01990.java",
+          "line": 95,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01990.java",
+          "line": 103,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01990.java",
+          "line": 69,
+          "quote": "fos = new java.io.FileOutputStream(fileName);"
+        }
+      ],
+      "explanation": "In doSomething, switchTarget is evaluated from \"ABC\".charAt(1), which is deterministically 'B'. Consequently, case 'B' always executes, assigning the constant 'bob' to bar and completely ignoring the user input.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 17.008,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1201,
+        "cost": 0.014394,
+        "prompt_tokens": 13187,
+        "total_tokens": 14388
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02026",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02026.java",
+          "line": 80,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02026.java",
+          "line": 81,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02026.java",
+          "line": 82,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02026.java",
+          "line": 84,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02026.java",
+          "line": 86,
+          "quote": "bar = valuesList.get(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02026.java",
+          "line": 57,
+          "quote": "new java.io.File(org.owasp.benchmark.helpers.Utils.TESTFILES_DIR), bar);"
+        }
+      ],
+      "explanation": "In method doSomething, valuesList initially contains 'safe' at index 0, param at index 1, and 'moresafe' at index 2. Removing the element at index 0 shifts the list such that index 1 evaluates to the hardcoded constant 'moresafe', meaning user input never reaches the File constructor.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 21.898,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1452,
+        "cost": 0.01491075,
+        "prompt_tokens": 12621,
+        "total_tokens": 14073
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02098",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02098.java",
+          "line": 73,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02098.java",
+          "line": 74,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02098.java",
+          "line": 81,
+          "quote": "case 'B':"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02098.java",
+          "line": 82,
+          "quote": "bar = \"bob\";"
+        }
+      ],
+      "explanation": "In doSomething, switchTarget is statically evaluated from 'ABC'.charAt(1) which yields 'B'. The switch statement deterministically executes case 'B' and sets bar to the hardcoded constant 'bob', preventing any tainted request input from reaching the SQL query.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 17.185,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1200,
+        "cost": 0.014451,
+        "prompt_tokens": 13268,
+        "total_tokens": 14468
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02105",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02105.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest02105\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02105.java",
+          "line": 49,
+          "quote": "new java.io.File(org.owasp.benchmark.helpers.Utils.TESTFILES_DIR, bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02105.java",
+          "line": 78,
+          "quote": "bar = valuesList.get(0);"
+        }
+      ],
+      "explanation": "The HTTP request parameter 'BenchmarkTest02105' is retrieved on line 43 and passed to doSomething(), which stores it at index 1 and retrieves it after removing index 0. The unsanitized value is then passed directly as the child path in the java.io.File constructor on line 49, allowing path traversal.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 24.354,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1653,
+        "cost": 0.0153795,
+        "prompt_tokens": 12241,
+        "total_tokens": 13894
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02106",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02106.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest02106\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02106.java",
+          "line": 48,
+          "quote": "java.io.File fileTarget = new java.io.File(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02106.java",
+          "line": 58,
+          "quote": "if (fileTarget.exists()) {"
+        }
+      ],
+      "explanation": "Untrusted input from the HTTP parameter 'BenchmarkTest02106' is processed via Base64 encoding and decoding in doSomething, which leaves traversal characters unmodified. This unsanitized path is supplied directly to java.io.File, permitting path traversal and unauthorized existence probing via exists().",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 20.562,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1237,
+        "cost": 0.01135425,
+        "prompt_tokens": 8954,
+        "total_tokens": 10191
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02107",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02107.java",
+          "line": 48,
+          "quote": "java.io.File fileTarget = new java.io.File(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02107.java",
+          "line": 71,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02107.java",
+          "line": 72,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        }
+      ],
+      "explanation": "In doSomething, the condition ((7 * 42) - num > 200) evaluates to 208 > 200, which is always true. Therefore, bar is always assigned the hardcoded safe string 'This_should_always_happen', preventing untrusted input from reaching the File constructor.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 24.335,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1491,
+        "cost": 0.012216,
+        "prompt_tokens": 8833,
+        "total_tokens": 10324
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02135",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02135.java",
+          "line": 49,
+          "quote": "response.getWriter().write(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02135.java",
+          "line": 75,
+          "quote": "String g95930 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02135.java",
+          "line": 76,
+          "quote": "String bar = thing.doSomething(g95930);"
+        }
+      ],
+      "explanation": "Although user input is read into param, the value passed to thing.doSomething() and returned to be written to the response writer is a hardcoded string constant 'barbarians_at_the_gate', breaking taint flow to the sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 17.656,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1126,
+        "cost": 0.0132675,
+        "prompt_tokens": 12060,
+        "total_tokens": 13186
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02146",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02146.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest02146\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02146.java",
+          "line": 74,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02146.java",
+          "line": 77,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02146.java",
+          "line": 79,
+          "quote": "bar = valuesList.get(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02146.java",
+          "line": 57,
+          "quote": "Process p = r.exec(cmd + bar);"
+        }
+      ],
+      "explanation": "Untrusted input obtained via request.getParameter is stored in a list and retrieved back via doSomething, after which it is concatenated directly into an OS command string executed by Runtime.getRuntime().exec() without neutralization.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 16.078,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1545,
+        "cost": 0.014392499999999999,
+        "prompt_tokens": 11465,
+        "total_tokens": 13010
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02156",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02156.java",
+          "line": 70,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02156.java",
+          "line": 71,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02156.java",
+          "line": 74,
+          "quote": "return bar;"
+        }
+      ],
+      "explanation": "In doSomething, the condition ((7 * 42) - num > 200) evaluates to 208 > 200, which is always true. Therefore, bar is consistently assigned the constant literal 'This_should_always_happen', preventing tainted user input from reaching the exec invocation.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 24.365,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1645,
+        "cost": 0.014481,
+        "prompt_tokens": 11083,
+        "total_tokens": 12728
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02187",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02187.java",
+          "line": 43,
+          "quote": "String param = request.getParameter(\"BenchmarkTest02187\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02187.java",
+          "line": 67,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02187.java",
+          "line": 79,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02187.java",
+          "line": 48,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02187.java",
+          "line": 53,
+          "quote": "statement.execute(sql);"
+        }
+      ],
+      "explanation": "User input from the request parameter 'BenchmarkTest02187' flows into 'doSomething', where switchTarget resolves to 'C' via guess.charAt(2), causing the unvalidated input to be assigned to 'bar'. The resulting tainted string is directly concatenated into a dynamic SQL statement and executed via Statement.execute().",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 25.706,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1823,
+        "cost": 0.01670775,
+        "prompt_tokens": 13162,
+        "total_tokens": 14985
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02231",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02231.java",
+          "line": 80,
+          "quote": "String g60610 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02231.java",
+          "line": 81,
+          "quote": "String bar = thing.doSomething(g60610);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02231.java",
+          "line": 54,
+          "quote": "response.getWriter().printf(\"Formatted like: %1$s and %2$s.\", obj);"
+        }
+      ],
+      "explanation": "Although user input is accepted into the param argument, doSomething() breaks taint propagation by invoking thing.doSomething() on a static constant 'barbarians_at_the_gate' and returning that value. Because the string outputted to the response writer does not contain user input, no cross-site scripting vulnerability exists.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 22.869,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1195,
+        "cost": 0.013739999999999999,
+        "prompt_tokens": 12345,
+        "total_tokens": 13540
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02251",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02251.java",
+          "line": 43,
+          "quote": "java.util.Map<String, String[]> map = request.getParameterMap();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02251.java",
+          "line": 90,
+          "quote": "if ((500 / 42) + num > 200) bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02251.java",
+          "line": 67,
+          "quote": "args = new String[] {a1, a2, cmd + bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02251.java",
+          "line": 73,
+          "quote": "Process p = r.exec(args);"
+        }
+      ],
+      "explanation": "Untrusted user input from request.getParameterMap() is assigned to 'param' and returned as 'bar' through doSomething(), where the condition (500 / 42) + 196 > 200 evaluates to true (207 > 200). In non-Windows environments, 'bar' is concatenated directly into the shell command string passed to 'sh -c' and executed via Runtime.getRuntime().exec() without any validation or neutralization.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 20.95,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1561,
+        "cost": 0.01472625,
+        "prompt_tokens": 11830,
+        "total_tokens": 13391
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02270",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02270.java",
+          "line": 43,
+          "quote": "java.util.Map<String, String[]> map = request.getParameterMap();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02270.java",
+          "line": 47,
+          "quote": "if (values != null) param = values[0];"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02270.java",
+          "line": 78,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02270.java",
+          "line": 90,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02270.java",
+          "line": 52,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME=? and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02270.java",
+          "line": 58,
+          "quote": "connection.prepareStatement("
+        }
+      ],
+      "explanation": "Untrusted input read from request.getParameterMap() is passed to doSomething(), where 'guess.charAt(2)' evaluates to 'C', causing 'bar' to take the value of 'param'. This tainted string is concatenated directly into the SQL query and executed via prepareStatement(), resulting in a SQL injection vulnerability.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 22.156,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1650,
+        "cost": 0.01649325,
+        "prompt_tokens": 13741,
+        "total_tokens": 15391
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02271",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02271.java",
+          "line": 75,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02271.java",
+          "line": 77,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02271.java",
+          "line": 52,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME=? and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "The alert is a false positive because the variable bar is assigned a hardcoded constant string. The ternary expression (7 * 18) + num > 200 evaluates to 232 > 200, which is always true, so user-controlled input never reaches the SQL statement.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 14.975,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1245,
+        "cost": 0.014537249999999998,
+        "prompt_tokens": 13158,
+        "total_tokens": 14403
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02285",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02285.java",
+          "line": 72,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02285.java",
+          "line": 74,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02285.java",
+          "line": 52,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "The user input param is never incorporated into the executed SQL query. In doSomething, the condition (7 * 18) + num > 200 with num = 106 evaluates to 232 > 200, which is always true, permanently assigning the hardcoded string 'This_should_always_happen' to bar.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 21.615,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1458,
+        "cost": 0.015106500000000002,
+        "prompt_tokens": 12852,
+        "total_tokens": 14310
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02331",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02331.java",
+          "line": 63,
+          "quote": "response.getWriter().write(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02331.java",
+          "line": 69,
+          "quote": "String bar = org.owasp.esapi.ESAPI.encoder().encodeForHTML(param);"
+        }
+      ],
+      "explanation": "Before being written to the response writer, the untrusted parameter name is properly sanitized using ESAPI's HTML encoder, mitigating XSS in the response's HTML context.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.614,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1244,
+        "cost": 0.01163925,
+        "prompt_tokens": 9299,
+        "total_tokens": 10543
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02340",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02340.java",
+          "line": 99,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02340.java",
+          "line": 100,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02340.java",
+          "line": 108,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02340.java",
+          "line": 85,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        }
+      ],
+      "explanation": "In method doSomething, guess is initialized as the literal 'ABC' and switchTarget is assigned guess.charAt(1) ('B'). This deterministically evaluates case 'B', assigning the constant string 'bob' to bar, preventing user input from reaching the Runtime.exec sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 22.012,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1490,
+        "cost": 0.0145845,
+        "prompt_tokens": 11996,
+        "total_tokens": 13486
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02344",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02344.java",
+          "line": 52,
+          "quote": "if (value.equals(\"BenchmarkTest02344\")) {"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02344.java",
+          "line": 65,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02344.java",
+          "line": 68,
+          "quote": "Process p = r.exec(cmd, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02344.java",
+          "line": 86,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        }
+      ],
+      "explanation": "In doSomething, (7 * 42) - 106 evaluates to 188 > 200 (false), so bar evaluates directly to param, which is an attacker-controlled HTTP parameter name. The attacker can supply an HTTP parameter name formatted as 'FOO=<command>' with value 'BenchmarkTest02344', injecting into the FOO environment variable passed in argsEnv to r.exec; the executed script insecureCmd evaluates $FOO directly, leading to command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 23.397,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1487,
+        "cost": 0.014358,
+        "prompt_tokens": 11709,
+        "total_tokens": 13196
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02377",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02377.java",
+          "line": 45,
+          "quote": "String param = scr.getTheParameter(\"BenchmarkTest02377\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02377.java",
+          "line": 48,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02377.java",
+          "line": 50,
+          "quote": "java.io.File fileTarget = new java.io.File(bar, \"/Test.txt\");"
+        }
+      ],
+      "explanation": "Untrusted user input obtained via scr.getTheParameter is propagated through doSomething into the File constructor as the parent path without validation, allowing directory traversal to test for file existence.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 19.023,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1143,
+        "cost": 0.01080825,
+        "prompt_tokens": 8696,
+        "total_tokens": 9839
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02414",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02414.java",
+          "line": 45,
+          "quote": "String param = scr.getTheParameter(\"BenchmarkTest02414\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02414.java",
+          "line": 79,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02414.java",
+          "line": 91,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02414.java",
+          "line": 60,
+          "quote": "argList.add(\"echo \" + bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02414.java",
+          "line": 62,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(argList);"
+        }
+      ],
+      "explanation": "User input from the request parameter flows directly into doSomething, where guess.charAt(2) yields 'C', preserving param into bar. The unsanitized value is concatenated into an argument executed via a shell command ('cmd.exe /c' or 'sh -c') using ProcessBuilder, leading to OS command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS_Command_Injection_Defense_Cheat_Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 27.653,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2059,
+        "cost": 0.01644675,
+        "prompt_tokens": 11634,
+        "total_tokens": 13693
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02429",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02429.java",
+          "line": 45,
+          "quote": "String param = scr.getTheParameter(\"BenchmarkTest02429\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02429.java",
+          "line": 48,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02429.java",
+          "line": 71,
+          "quote": "Process p = r.exec(args);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02429.java",
+          "line": 86,
+          "quote": "String bar = thing.doSomething(param);"
+        }
+      ],
+      "explanation": "The HTTP request parameter is passed into thing.doSomething(param) via ThingFactory.createThing(), and its return value is subsequently passed directly into Runtime.getRuntime().exec. However, the source code for ThingInterface implementations (e.g., Thing1, Thing2) is not provided, making it impossible to determine whether the input is sanitized or neutralized.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 22.229,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "human_review",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1641,
+        "cost": 0.015526499999999999,
+        "prompt_tokens": 12497,
+        "total_tokens": 14138
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "human_review"
+    },
+    {
+      "case_id": "BenchmarkTest02467",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02467.java",
+          "line": 103,
+          "quote": "String g60326 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02467.java",
+          "line": 104,
+          "quote": "String bar = thing.doSomething(g60326);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02467.java",
+          "line": 54,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02467.java",
+          "line": 55,
+          "quote": "fis = new java.io.FileInputStream(fileName);"
+        }
+      ],
+      "explanation": "Although user input is accepted via request parameters, the return value of doSomething is computed strictly from the hardcoded constant 'barbarians_at_the_gate' rather than the tainted input. Because no user-controlled data reaches the file path used by FileInputStream, path traversal is impossible.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 21.773,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1278,
+        "cost": 0.014529750000000001,
+        "prompt_tokens": 12983,
+        "total_tokens": 14261
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02470",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02470.java",
+          "line": 83,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02470.java",
+          "line": 84,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02470.java",
+          "line": 56,
+          "quote": "fos = new java.io.FileOutputStream(fileName, false);"
+        }
+      ],
+      "explanation": "In doSomething, the arithmetic expression (7 * 42) - num with num = 86 evaluates to 208 > 200, which is always true. Therefore, bar is consistently assigned the hardcoded string 'This_should_always_happen', preventing user-controlled input from ever reaching the FileOutputStream sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 15.87,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1218,
+        "cost": 0.01396425,
+        "prompt_tokens": 12529,
+        "total_tokens": 13747
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02482",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02482.java",
+          "line": 58,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02482.java",
+          "line": 59,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02482.java",
+          "line": 67,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02482.java",
+          "line": 51,
+          "quote": "response.getWriter().print(bar.toCharArray());"
+        }
+      ],
+      "explanation": "The user input parameter 'param' never reaches the HTTP response writer. In doSomething, 'switchTarget' is statically derived from 'ABC'.charAt(1), resolving consistently to 'B' and setting 'bar' to the safe literal 'bob'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 15.263,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1469,
+        "cost": 0.012462750000000002,
+        "prompt_tokens": 9272,
+        "total_tokens": 10741
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02483",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02483.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02483\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02483.java",
+          "line": 48,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02483.java",
+          "line": 51,
+          "quote": "response.getWriter().print(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02483.java",
+          "line": 57,
+          "quote": "String bar = param;"
+        }
+      ],
+      "explanation": "Untrusted user input obtained from request.getParameterValues is passed through doSomething unmodified and written directly into the HTTP response body via response.getWriter().print without any escaping or validation, resulting in reflected cross-site scripting.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 24.435,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1538,
+        "cost": 0.0124815,
+        "prompt_tokens": 8952,
+        "total_tokens": 10490
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02484",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02484.java",
+          "line": 59,
+          "quote": "map12535.put(\"keyA-12535\", \"a_Value\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02484.java",
+          "line": 63,
+          "quote": "bar = (String) map12535.get(\"keyA-12535\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02484.java",
+          "line": 65,
+          "quote": "return bar;"
+        }
+      ],
+      "explanation": "Although user input is placed into the map at keyB-12535, doSomething immediately overwrites bar with the value retrieved from keyA-12535, returning the constant 'a_Value'. As a result, no untrusted data reaches the response writer.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 25.453,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1615,
+        "cost": 0.010555499999999999,
+        "prompt_tokens": 5999,
+        "total_tokens": 7614
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02489",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02489.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02489\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02489.java",
+          "line": 48,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02489.java",
+          "line": 52,
+          "quote": "response.getWriter().printf(bar, obj);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02489.java",
+          "line": 58,
+          "quote": "String bar = param;"
+        }
+      ],
+      "explanation": "Untrusted input obtained via request.getParameterValues is passed directly into doSomething and returned as bar without sanitization. It is then rendered into an HTML response via response.getWriter().printf(bar, obj), enabling reflected Cross-Site Scripting.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.115,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1564,
+        "cost": 0.0126255,
+        "prompt_tokens": 9014,
+        "total_tokens": 10578
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02491",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02491.java",
+          "line": 77,
+          "quote": "String g17852 = \"barbarians_at_the_gate\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02491.java",
+          "line": 78,
+          "quote": "String bar = thing.doSomething(g17852);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02491.java",
+          "line": 51,
+          "quote": "response.getWriter().println(bar.toCharArray());"
+        }
+      ],
+      "explanation": "Although user input is accepted into param, it is completely abandoned after intermediate string transformations. The value returned and written to the HTTP response is derived exclusively from the hardcoded string literal 'barbarians_at_the_gate', preventing any untrusted data from reaching the sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 21.294,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1446,
+        "cost": 0.014548500000000002,
+        "prompt_tokens": 12168,
+        "total_tokens": 13614
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02494",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02494.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02494\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02494.java",
+          "line": 51,
+          "quote": "response.getWriter().write(bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02494.java",
+          "line": 60,
+          "quote": "bar = sbxyz57919.replace(param.length() - \"Z\".length(), param.length(), \"Z\").toString();"
+        }
+      ],
+      "explanation": "Untrusted user input obtained via request.getParameterValues is only modified by appending/replacing the final character with 'Z' before being written directly to the response writer without any HTML sanitization or encoding.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 20.513,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1472,
+        "cost": 0.01242225,
+        "prompt_tokens": 9203,
+        "total_tokens": 10675
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02495",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02495.java",
+          "line": 62,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02495.java",
+          "line": 63,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02495.java",
+          "line": 70,
+          "quote": "case 'B':"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02495.java",
+          "line": 71,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02495.java",
+          "line": 54,
+          "quote": "response.getWriter().write(bar, 0, length);"
+        }
+      ],
+      "explanation": "In doSomething, guess is hardcoded to 'ABC' and switchTarget is evaluated as guess.charAt(1), which is deterministically 'B'. The switch statement always executes case 'B', assigning the literal 'bob' to bar, preventing user input from reaching the response writer.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 20.672,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1431,
+        "cost": 0.012375,
+        "prompt_tokens": 9345,
+        "total_tokens": 10776
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02517",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02517.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02517\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02517.java",
+          "line": 48,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02517.java",
+          "line": 71,
+          "quote": "String bar = thing.doSomething(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02517.java",
+          "line": 56,
+          "quote": "Process p = r.exec(cmd, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "Tainted input from the HTTP request parameter is passed to doSomething(), which delegates to an implementation of ThingInterface loaded dynamically by ThingFactory. Because neither thing.properties nor the Thing implementations (such as Thing1 or Thing2) are included in the evidence, the transformation or sanitization applied to the parameter cannot be verified.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 27.131,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "human_review",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1911,
+        "cost": 0.01625625,
+        "prompt_tokens": 12120,
+        "total_tokens": 14031
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "human_review"
+    },
+    {
+      "case_id": "BenchmarkTest02533",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02533.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest02533\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02533.java",
+          "line": 50,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME=? and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02533.java",
+          "line": 81,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02533.java",
+          "line": 83,
+          "quote": "bar = valuesList.get(0);"
+        }
+      ],
+      "explanation": "Untrusted user input obtained from request.getParameterValues is passed into doSomething, where it is retained at index 0 after removing 'safe' and assigned to 'bar'. This unvalidated value is concatenated directly into the SQL query passed to connection.prepareStatement, allowing SQL injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 19.524,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1430,
+        "cost": 0.015423,
+        "prompt_tokens": 13414,
+        "total_tokens": 14844
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02558",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02558.java",
+          "line": 95,
+          "quote": "int num = 86;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02558.java",
+          "line": 96,
+          "quote": "if ((7 * 42) - num > 200) bar = \"This_should_always_happen\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02558.java",
+          "line": 72,
+          "quote": "java.io.File fileTarget = new java.io.File(bar, \"/Test.txt\");"
+        }
+      ],
+      "explanation": "In doSomething, the condition ((7 * 42) - num > 200) evaluates with num = 86 to 208 > 200, which is always true. As a result, bar is unconditionally set to the hardcoded constant 'This_should_always_happen', preventing any user input from reaching the File constructor.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 23.856,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1805,
+        "cost": 0.014107500000000002,
+        "prompt_tokens": 9785,
+        "total_tokens": 11590
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02562",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02562.java",
+          "line": 108,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02562.java",
+          "line": 110,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02562.java",
+          "line": 76,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02562.java",
+          "line": 77,
+          "quote": "fis = new java.io.FileInputStream(fileName);"
+        }
+      ],
+      "explanation": "In doSomething(), the ternary condition (7 * 42) - num > 200 calculates (294 - 106) > 200, which evaluates to 188 > 200 (false). Because the condition is false, the expression evaluates to the false branch 'param', allowing unsanitized user input to be passed directly to FileInputStream.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 20.845,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1149,
+        "cost": 0.0142275,
+        "prompt_tokens": 13225,
+        "total_tokens": 14374
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02579",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02579.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02579.java",
+          "line": 70,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02579.java",
+          "line": 74,
+          "quote": "response.getWriter().format(bar, obj);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02579.java",
+          "line": 81,
+          "quote": "if (param != null) bar = param.split(\" \")[0];"
+        }
+      ],
+      "explanation": "Untrusted input extracted from request.getQueryString() is decoded and passed through doSomething() without sanitization or HTML encoding. It is then written directly to the HTTP response via response.getWriter().format(bar, obj), permitting reflected cross-site scripting.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 24.949,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2047,
+        "cost": 0.015054,
+        "prompt_tokens": 9837,
+        "total_tokens": 11884
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02587",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02587.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02587.java",
+          "line": 70,
+          "quote": "String bar = doSomething(request, param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02587.java",
+          "line": 74,
+          "quote": "response.getWriter().printf(java.util.Locale.US, \"Formatted like: %1$s and %2$s.\", obj);"
+        }
+      ],
+      "explanation": "Query string input extracted from the request is decoded and passed through doSomething, which only appends and truncates text before splitting on whitespace, leaving whitespace-free HTML/XSS payloads intact. The resulting unescaped string is printed directly into an HTML response stream via response.getWriter().printf.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 23.788,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 2084,
+        "cost": 0.01760925,
+        "prompt_tokens": 13059,
+        "total_tokens": 15143
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02594",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02594.java",
+          "line": 82,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02594.java",
+          "line": 84,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02594.java",
+          "line": 73,
+          "quote": "response.getWriter().println(bar.toCharArray());"
+        }
+      ],
+      "explanation": "Untrusted input from the query string is passed to doSomething, but the ternary condition ((7 * 18) + 106 > 200, or 232 > 200) is always true. As a result, bar is assigned the hardcoded string 'This_should_always_happen', preventing user data from reaching the response writer.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 19.328,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1247,
+        "cost": 0.012073500000000001,
+        "prompt_tokens": 9863,
+        "total_tokens": 11110
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02597",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02597.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02597.java",
+          "line": 82,
+          "quote": "bar = sbxyz19350.replace(param.length() - \"Z\".length(), param.length(), \"Z\").toString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02597.java",
+          "line": 73,
+          "quote": "response.getWriter().println(bar);"
+        }
+      ],
+      "explanation": "Untrusted input obtained from request.getQueryString() is decoded and passed to doSomething(), which only replaces the final character with 'Z'. The unescaped string is then written directly to the HTTP response body with a 'text/html' content type, resulting in reflected Cross-Site Scripting (XSS).",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 22.332,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1445,
+        "cost": 0.0129135,
+        "prompt_tokens": 9993,
+        "total_tokens": 11438
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk",
+        "Guidance 2: normalised doc from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02601",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02601.java",
+          "line": 76,
+          "quote": "response.getWriter().write(bar.toCharArray(), 0, length);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02601.java",
+          "line": 83,
+          "quote": "String bar = org.apache.commons.lang.StringEscapeUtils.escapeHtml(param);"
+        }
+      ],
+      "explanation": "The user input extracted from the query string is encoded using org.apache.commons.lang.StringEscapeUtils.escapeHtml before being written to the response writer, adequately preventing Cross-Site Scripting in the HTML context.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "MITRE_CWE",
+          "section": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 19.042,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1382,
+        "cost": 0.012354750000000001,
+        "prompt_tokens": 9563,
+        "total_tokens": 10945
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02610",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02610.java",
+          "line": 111,
+          "quote": "valuesList.add(\"safe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02610.java",
+          "line": 112,
+          "quote": "valuesList.add(param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02610.java",
+          "line": 113,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02610.java",
+          "line": 115,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02610.java",
+          "line": 117,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "Although user input is supplied to doSomething, the list manipulation ensures that user-controlled data is discarded: removing index 0 ('safe') shifts 'moresafe' to index 1, so bar is assigned the hardcoded string 'moresafe' rather than param.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 29.858,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1988,
+        "cost": 0.016559249999999998,
+        "prompt_tokens": 12139,
+        "total_tokens": 14127
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02640",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02640.java",
+          "line": 94,
+          "quote": "String guess = \"ABC\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02640.java",
+          "line": 95,
+          "quote": "char switchTarget = guess.charAt(1);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02640.java",
+          "line": 103,
+          "quote": "bar = \"bob\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02640.java",
+          "line": 73,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "Although user input is read from the query string and a dynamic SQL query is executed, the input is passed into doSomething where switchTarget is hardcoded as 'ABC'.charAt(1), resolving to 'B'. As a result, bar is unconditionally set to the constant string 'bob', preventing any tainted user data from reaching the SQL sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 21.428,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1600,
+        "cost": 0.016875750000000002,
+        "prompt_tokens": 14501,
+        "total_tokens": 16101
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02648",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02648.java",
+          "line": 91,
+          "quote": "map91488.put(\"keyA-91488\", \"a_Value\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02648.java",
+          "line": 95,
+          "quote": "bar = (String) map91488.get(\"keyA-91488\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02648.java",
+          "line": 72,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        }
+      ],
+      "explanation": "Although user input is parsed from the query string and passed into doSomething, the return value bar is assigned to the constant 'a_Value' from key 'keyA-91488'. Because bar is hardcoded and safe before being appended to the SQL string, untrusted input never reaches the SQL execution sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 22.986,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1330,
+        "cost": 0.01542075,
+        "prompt_tokens": 13911,
+        "total_tokens": 15241
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02650",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02650.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02650.java",
+          "line": 91,
+          "quote": "char switchTarget = guess.charAt(2);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02650.java",
+          "line": 103,
+          "quote": "bar = param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02650.java",
+          "line": 72,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02650.java",
+          "line": 77,
+          "quote": "statement.execute(sql, new int[] {1, 2});"
+        }
+      ],
+      "explanation": "Untrusted input extracted from the HTTP request query string is decoded and passed to doSomething(), where 'guess.charAt(2)' evaluates to 'C', returning the untrusted parameter. This value is subsequently concatenated directly into a dynamic SQL query and executed with java.sql.Statement.execute(), resulting in SQL injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "MITRE_CWE",
+          "section": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 20.684,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1610,
+        "cost": 0.016628999999999998,
+        "prompt_tokens": 14122,
+        "total_tokens": 15732
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02668",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02668.java",
+          "line": 45,
+          "quote": "String param = scr.getTheValue(\"BenchmarkTest02668\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02668.java",
+          "line": 82,
+          "quote": "map94533.put(\"keyB-94533\", param);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02668.java",
+          "line": 84,
+          "quote": "bar = (String) map94533.get(\"keyB-94533\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02668.java",
+          "line": 53,
+          "quote": "fileName = org.owasp.benchmark.helpers.Utils.TESTFILES_DIR + bar;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02668.java",
+          "line": 55,
+          "quote": "fos = new java.io.FileOutputStream(fileName, false);"
+        }
+      ],
+      "explanation": "User input obtained from SeparateClassRequest is passed to doSomething(), where it is placed into and retrieved from a HashMap without sanitization. It is then directly concatenated to the test directory path to create a FileOutputStream, allowing path traversal.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 21.128,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1518,
+        "cost": 0.01534725,
+        "prompt_tokens": 12873,
+        "total_tokens": 14391
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02669",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02669.java",
+          "line": 84,
+          "quote": "valuesList.add(\"moresafe\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02669.java",
+          "line": 86,
+          "quote": "valuesList.remove(0);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02669.java",
+          "line": 88,
+          "quote": "bar = valuesList.get(1);"
+        }
+      ],
+      "explanation": "In method doSomething, 'safe', param, and 'moresafe' are sequentially added to valuesList. Calling valuesList.remove(0) shifts 'moresafe' into index 1, meaning valuesList.get(1) always resolves to the hardcoded constant 'moresafe' and the user input never reaches FileOutputStream.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "MITRE_CWE",
+          "section": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 24.184,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "false_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1617,
+        "cost": 0.015446249999999998,
+        "prompt_tokens": 12510,
+        "total_tokens": 14127
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "false_positive"
+    },
+    {
+      "case_id": "BenchmarkTest02699",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02699.java",
+          "line": 45,
+          "quote": "String param = scr.getTheValue(\"BenchmarkTest02699\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02699.java",
+          "line": 81,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02699.java",
+          "line": 59,
+          "quote": "String[] args = {a1, a2, \"echo \" + bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02699.java",
+          "line": 61,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(args);"
+        }
+      ],
+      "explanation": "In doSomething, the expression `(7 * 42) - num > 200` evaluates to `(294 - 106) > 200`, which is `188 > 200` (false). Therefore, `bar` evaluates to the untrusted `param`, which is subsequently concatenated into the shell argument passed to ProcessBuilder, leading to OS command injection.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "MITRE_CWE",
+          "section": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 21.786,
+      "model": "google/gemini-3.8-flash",
+      "original_verdict": "true_positive",
+      "role": "chair",
+      "usage": {
+        "completion_tokens": 1284,
+        "cost": 0.01293975,
+        "prompt_tokens": 10833,
+        "total_tokens": 12117
+      },
+      "validated": true,
+      "validation_errors": [],
+      "validation_repairs": [
+        "Guidance 1: normalised doc, section from retrieved chunk"
+      ],
+      "verdict": "true_positive"
+    }
+  ]
+}

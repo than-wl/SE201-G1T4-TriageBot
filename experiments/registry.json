@@ -90,7 +90,7 @@
       "id": "4",
       "title": "Semantic retrieval",
       "question": "Does semantic retrieval hold up?",
-      "changes": "The guidance ranker: the curated CWE map, then semantic search with the official MITRE text of the alert's CWE. Built on step 2 (evidence profile, council); the worksheet from step 3 showed no benefit and is not carried forward.",
+      "changes": "The guidance source: the hand-made CWE table is replaced by semantic search over the OWASP cheat sheets, anchored on the alert's MITRE CWE record, with the set-up rules R1-R5 fixed before measuring (design decision 28). Built on step 2 (evidence profile, council); the worksheet from step 3 showed no benefit and is not carried forward.",
       "case_set": "comparison",
       "before": {
         "reuse": "2-after"

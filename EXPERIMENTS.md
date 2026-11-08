@@ -41,6 +41,7 @@ vulnerabilities dismissed, is therefore more than run-to-run noise.
 | `2-after` | council | ±60 lines + related code | 96.0% | 0 | 44 | 4 | 1.37 | 20.9 |
 | `1c-before` | single agent | + worksheet | 91.5% | 5 | 45 | 3 | 0.47 | 11.4 |
 | `3-after` | council | + worksheet | 96.0% | 0 | 44 | 3 | 1.48 | 21.4 |
+| `4-after` | council | ±60 lines + related code, semantic guidance | 95.0% | 1 | 44 | 4 | 1.40 | 21.9 |
 
 Precision, recall and F1 count a case sent to a human as kept. Council figures
 are the same before and after the deterministic validator, except one answer
@@ -78,8 +79,18 @@ nothing to catch. The "reasoned right, labelled wrong" problem it was built for
 was seen in earlier runs with less code; with enough evidence it did not occur.
 The worksheet was therefore dropped from the final version (design decision 27).
 
-**Next:** step 4 replaces the hand-made guidance table with semantic retrieval,
-on top of step 2's version; step 5 rebuilds the mutation test; step 6 runs the
+**5. Semantic retrieval replaces the hand-made table without losing accuracy
+(step 4).** The guidance now comes from search over the OWASP sheets, anchored
+on the alert's MITRE record, with the set-up fixed in advance. On the
+comparison set it matched step 2 within the noise floor (F1 96.0% vs 95.0%; one
+real path traversal dismissed by all three reviewers with a plausible but
+incomplete argument). The free check showed why it scales: for 10 weaknesses
+outside the benchmark, the right sheet reached the guidance in all 10, with no
+hand-written entries, and 5 of the 10 have no row in the old table. It also
+showed that a relevance score is a proxy: the set-up that scored best on it
+returned the most wrong-language advice.
+
+**Next:** step 5 rebuilds the mutation test; step 6 runs the
 final version once on the unseen final test, and reports the whole system next
 to Semgrep alone to show how far Semgrep's recall limits it.
 
@@ -300,13 +311,30 @@ for each.
   `python -m triagebot.nodes.context.cwe_catalogue` (MITRE catalogue) and
   `python -m triagebot.nodes.context.vector_store` (embeds the knowledge base).
   The run stops with these commands if either is missing.
-- **Status:** set-up fixed; not yet measured.
+- **Status:** run on 9 Nov 2026.
 - **Commands:**
   - show: `python -m triagebot experiment show 4`
   - replay: `python -m triagebot experiment replay 4`
   - re-run: `python -m triagebot experiment run 4`
-- **Result:** _to be filled in after the run._
-- **Finding:** _to be filled in after the run._
+- **Result:** council F1 96.0% → 95.0%; real vulnerabilities dismissed 0 → 1 of 48; false alarms removed 44 → 44 of 48; sent to a human 4 → 4 of 96; cost US$1.37 → 1.40; failed model calls 1 → 4 of 288.
+- **Finding:** accuracy holds, within the noise floor. Only two cases changed
+  outcome, both path traversal (CWE-22):
+  - `BenchmarkTest00001`, a real vulnerability, went from kept to sent to a
+    human because the Chair's answer could not be parsed. Both specialists had
+    called it real. This is a model-call failure, not a retrieval effect.
+  - `BenchmarkTest01983`, a real vulnerability, was dismissed. In `2-after`
+    both specialists had already called it a false alarm and the Chair
+    overruled them. In `4-after` all three agreed it was safe, arguing that an
+    HTTP header *name* cannot contain `/` or `\`. The argument sounds right
+    but is incomplete: `..` is a legal header name and still climbs one
+    directory. One case cannot be traced to the guidance; it is the Chair's
+    safety net not firing.
+
+  By the rule agreed in advance, semantic retrieval holds accuracy (one case of
+  96, inside the noise floor of two or more) while removing the hand-made table
+  and covering any CWE MITRE knows. Failed model calls rose from 1 to 4 of 288
+  (a parse failure, a cut-off answer and an HTTP 400 among them); only one
+  changed an outcome. Too few to call a trend; watched in step 6.
 
 #### The step 4 rule, agreed in advance
 
