@@ -163,6 +163,30 @@ recorded in each run manifest.
 - **Result:** _to be filled in after the run._
 - **Finding:** _to be filled in after the run._
 
+### Steps 1b and 1c: does the council's value depend on the evidence?
+
+Added after step 1's first council run (8 Nov). At the `base` profile the
+council and the single agent reached the same verdict on 94 of 96 cases, while
+an earlier run with 60 lines of code had shown a clear council advantage. So
+the council-versus-single comparison is repeated at the next two profiles,
+reusing the council runs of steps 2 and 3 and adding only a single-agent run
+for each.
+
+| Step | Before (new run) | After (reused) |
+| --- | --- | --- |
+| 1b | `evidence` profile, single agent (run `1b-before`) | step 2 council (`2-after`) |
+| 1c | `worksheet` profile, single agent (run `1c-before`) | step 3 council (`3-after`) |
+
+- **Question:** does the council beat one agent once the AI sees more of the
+  code, and once it also fills in the reasoning worksheet?
+- **Case set:** comparison (96 cases).
+- **Cost estimate:** 96 single-agent calls each, about US$0.38 each.
+- **Status:** not run yet.
+- **Commands:** `python -m triagebot experiment show 1b` (or `1c`);
+  `python -m triagebot experiment run 1b --side before` (or `1c`).
+- **Result:** _to be filled in after the run._
+- **Finding:** _to be filled in after the run._
+
 ### Step 2: Does showing the AI more of the code help?
 
 - **Question:** does a wider source window, plus the code the alert's code

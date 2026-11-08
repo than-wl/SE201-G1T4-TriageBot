@@ -122,7 +122,7 @@ class ExperimentTest(unittest.TestCase):
 
     def test_registry_describes_the_six_steps(self):
         steps = experiments.load_registry()
-        self.assertEqual([s["id"] for s in steps], ["1", "2", "3", "4", "5", "6"])
+        self.assertEqual([s["id"] for s in steps], ["1", "1b", "1c", "2", "3", "4", "5", "6"])
         by_id = {s["id"]: s for s in steps}
         self.assertEqual(by_id["1"]["before"], {"profile": "base", "modes": ["single"]})
         self.assertEqual((by_id["1"]["after"]["profile"], by_id["1"]["after"]["repeats"]), ("base", 2))
@@ -284,7 +284,8 @@ class ExperimentTest(unittest.TestCase):
         self.assertIn("the noise between identical runs", printed)
 
         states = {row["step"]["id"]: row["state"] for row in experiments.list_steps()}
-        self.assertEqual(states, {"1": "run", "2": "not run yet", "3": "not run yet",
+        self.assertEqual(states, {"1": "run", "1b": "not run yet", "1c": "not run yet",
+                                  "2": "not run yet", "3": "not run yet",
                                   "4": "not run yet", "5": "planned (later task)",
                                   "6": "planned (later task)"})
         later = experiments.show_table("2")

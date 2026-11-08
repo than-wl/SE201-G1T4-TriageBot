@@ -7,9 +7,52 @@
       "question": "Does a council beat one agent?",
       "changes": "The reviewer: one agent, then the Analyst / Skeptic / Chair council. The evidence and settings stay at the base profile.",
       "case_set": "comparison",
-      "before": {"profile": "base", "modes": ["single"]},
-      "after": {"profile": "base", "modes": ["council"], "repeats": 2},
+      "before": {
+        "profile": "base",
+        "modes": [
+          "single"
+        ]
+      },
+      "after": {
+        "profile": "base",
+        "modes": [
+          "council"
+        ],
+        "repeats": 2
+      },
       "repeat_note": "The council is run twice with identical settings; the difference between the two runs is the noise between identical runs."
+    },
+    {
+      "id": "1b",
+      "title": "Council versus single agent, with more code",
+      "question": "Does the council beat one agent once the AI sees more of the code?",
+      "changes": "The reviewer, as in step 1, but at the evidence profile (60 lines either side plus related source). Step 1 compared them at the base profile; this tests whether the council's value depends on the evidence it gets.",
+      "case_set": "comparison",
+      "before": {
+        "profile": "evidence",
+        "modes": [
+          "single"
+        ]
+      },
+      "after": {
+        "reuse": "2-after"
+      }
+    },
+    {
+      "id": "1c",
+      "title": "Council versus single agent, with more code and the worksheet",
+      "question": "Does the council beat one agent once the AI also fills in the reasoning worksheet?",
+      "changes": "The reviewer, as in step 1, but at the worksheet profile (more code plus the reasoning worksheet and consistency repair).",
+      "case_set": "comparison",
+      "before": {
+        "profile": "worksheet",
+        "modes": [
+          "single"
+        ]
+      },
+      "after": {
+        "reuse": "3-after"
+      }
     },
     {
       "id": "2",
@@ -17,8 +60,15 @@
       "question": "Does showing the AI more of the code help?",
       "changes": "The evidence: source window 25 to 60 lines either side, and related source (called methods, other files, referenced scripts) switched on.",
       "case_set": "comparison",
-      "before": {"reuse": "1-after"},
-      "after": {"profile": "evidence", "modes": ["council"]}
+      "before": {
+        "reuse": "1-after"
+      },
+      "after": {
+        "profile": "evidence",
+        "modes": [
+          "council"
+        ]
+      }
     },
     {
       "id": "3",
@@ -26,8 +76,15 @@
       "question": "Does a reasoning worksheet with a consistency check help?",
       "changes": "The output: a structured analysis (source, sink, reaches the sink, protection, protection effective) is required, and a verdict that contradicts it gets one repair call.",
       "case_set": "comparison",
-      "before": {"reuse": "2-after"},
-      "after": {"profile": "worksheet", "modes": ["council"]}
+      "before": {
+        "reuse": "2-after"
+      },
+      "after": {
+        "profile": "worksheet",
+        "modes": [
+          "council"
+        ]
+      }
     },
     {
       "id": "4",
@@ -35,8 +92,15 @@
       "question": "Does semantic retrieval hold up?",
       "changes": "The guidance ranker: the curated CWE map, then semantic search with the official MITRE text of the alert's CWE.",
       "case_set": "comparison",
-      "before": {"reuse": "3-after"},
-      "after": {"profile": "semantic", "modes": ["council"]},
+      "before": {
+        "reuse": "3-after"
+      },
+      "after": {
+        "profile": "semantic",
+        "modes": [
+          "council"
+        ]
+      },
       "rule": "Agreed in advance: if semantic retrieval holds or improves accuracy on the comparison set, it is reported as an improvement. If not, it stays the design choice, argued on scalability and maintainability, and the accuracy difference is stated plainly. Any tuning happens on exploration cases only, followed by one measurement on the comparison set."
     },
     {
