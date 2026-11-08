@@ -87,7 +87,10 @@ What each setting means:
 
 **On in every profile** (engineering fixes, not experiments): strict JSON
 schema output; guidance-label normalisation in the validator; the LangGraph
-council. The per-type checklists are **off in every profile** (removed; see
+council; an output token limit of 2,000. The limit was raised from 900 after the
+step 1 smoke test: the model's hidden reasoning counts against it, and one call
+spent 746 of 900 tokens reasoning, so its answer was cut off and became a failed
+call. Only tokens actually generated are billed. The per-type checklists are **off in every profile** (removed; see
 [What we removed and why](#what-we-removed-and-why)).
 
 ## How a run is recorded

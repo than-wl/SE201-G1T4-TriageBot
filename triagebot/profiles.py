@@ -66,6 +66,7 @@ ENGINEERING_FIXES = (
     "strict JSON schema output",
     "guidance-label normalisation in the validator",
     "LangGraph council (Analyst || Skeptic -> Chair)",
+    "output token limit with room for hidden reasoning (2000)",
 )
 
 CATALOGUE_COMMAND = "python -m triagebot.nodes.context.cwe_catalogue"

@@ -135,7 +135,11 @@ class OpenRouterCaller:
             "finish_reason": raw["choices"][0].get("finish_reason"),
             "raw_content": content,
         }
-        return _parse_json(content)
+        result = _parse_json(content)
+        if "_error" in result and self.last_call["finish_reason"] == "length":
+            # Name the real cause: the answer hit max_tokens (hidden reasoning counts).
+            result = {"_error": "answer cut off at the output token limit (finish_reason=length)"}
+        return result
 
 
 def _api_key() -> str:

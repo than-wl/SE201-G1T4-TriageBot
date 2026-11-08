@@ -120,8 +120,11 @@ COMPARISON_SAMPLE_SIZES = {
 }
 
 # --- review (model-call) limits ------------------------------------------
-REVIEW_MAX_TOKENS = 900        # short JSON answer; headroom over the 700
-                               # that the live run showed truncating chatty replies
+REVIEW_MAX_TOKENS = 2000       # the answer itself is ~400-600 tokens, but the model's
+                               # hidden reasoning counts against this limit too: in the
+                               # step 1 smoke test (8 Nov) a Skeptic call spent 746 of
+                               # 900 tokens reasoning and its JSON was cut off. Only
+                               # tokens actually generated are billed.
 REVIEW_TEMPERATURE = 0.0       # recorded runs must be reproducible
 # Reasoning worksheet: ask for the structured "analysis" object (and require it in
 # the strict JSON schema), then repair a verdict that contradicts it. Read at call
