@@ -109,23 +109,26 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(run["validated"]["verdict"], "true_positive")
         self.assertEqual(run["review"]["usage"]["cost"], 0.002)
 
-    def test_cwe_specific_checklist_is_routed_into_the_system_prompt(self):
+    def test_no_cwe_specific_checklist_reaches_the_system_prompt(self):
+        # Decision 25: the per-type checklists were written from failed cases and are
+        # removed in every profile; every CWE gets the same system prompt.
         response = {
             "verdict": "human_review", "explanation": "More analysis needed.",
             "citations": [{"file": ALERT["file"], "line": 2, "quote": "input"}],
             "guidance": [],
         }
-        expectations = {
-            "CWE-78": "command string versus an argument or environment array",
-            "CWE-90": "LDAP filter construction",
-        }
-        for cwe, expected in expectations.items():
+        prompts = {}
+        for cwe in ("CWE-78", "CWE-89", "CWE-90"):
             with self.subTest(cwe=cwe):
                 caller = CannedCaller(response)
                 pipeline.triage(
                     dict(ALERT, cwe=cwe), mode="single", caller_factory=lambda: caller,
                     kb=EmptyKnowledgeBase(), benchmark_root=self.root)
-                self.assertIn(expected, caller.request["system"])
+                prompts[cwe] = caller.request["system"]
+                for removed in ("checklist", "command string versus an argument",
+                                "LDAP filter construction"):
+                    self.assertNotIn(removed, prompts[cwe])
+        self.assertEqual(len(set(prompts.values())), 1)
 
     def test_payload_includes_a_helper_far_beyond_the_alert(self):
         source = self.root / ALERT["file"]
@@ -234,9 +237,6 @@ class PipelineTest(unittest.TestCase):
         self.assertTrue(any("getCommand()" in line for line in related[helper_file]["lines"]))
         self.assertIn('2: eval "$FOO"', related[script_file]["lines"])
         self.assertTrue(any("r.exec(" in line for line in run["payload"]["facts"]["sink_apis"]))
-        self.assertIn("child process or script consumes environment values", caller.request["system"])
-        self.assertIn("attacker-controlled envp element can supply its own name=value",
-                      caller.request["system"])
         self.assertTrue(run["validated"]["validated"], run["validated"]["validation_errors"])
 
     def test_council_runs_both_specialists_then_chair_and_sums_usage(self):

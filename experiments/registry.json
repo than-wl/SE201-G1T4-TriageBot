@@ -1,0 +1,59 @@
+{
+  "description": "The planned experiments (EXPERIMENTS.md). Each step changes one group of settings, scored on one frozen case set. A side either runs (profile + modes) or reuses another step's saved run at no cost.",
+  "steps": [
+    {
+      "id": "1",
+      "title": "Council versus single agent",
+      "question": "Does a council beat one agent?",
+      "changes": "The reviewer: one agent, then the Analyst / Skeptic / Chair council. The evidence and settings stay at the base profile.",
+      "case_set": "comparison",
+      "before": {"profile": "base", "modes": ["single"]},
+      "after": {"profile": "base", "modes": ["council"], "repeats": 2},
+      "repeat_note": "The council is run twice with identical settings; the difference between the two runs is the noise between identical runs."
+    },
+    {
+      "id": "2",
+      "title": "More of the code",
+      "question": "Does showing the AI more of the code help?",
+      "changes": "The evidence: source window 25 to 60 lines either side, and related source (called methods, other files, referenced scripts) switched on.",
+      "case_set": "comparison",
+      "before": {"reuse": "1-after"},
+      "after": {"profile": "evidence", "modes": ["council"]}
+    },
+    {
+      "id": "3",
+      "title": "Reasoning worksheet",
+      "question": "Does a reasoning worksheet with a consistency check help?",
+      "changes": "The output: a structured analysis (source, sink, reaches the sink, protection, protection effective) is required, and a verdict that contradicts it gets one repair call.",
+      "case_set": "comparison",
+      "before": {"reuse": "2-after"},
+      "after": {"profile": "worksheet", "modes": ["council"]}
+    },
+    {
+      "id": "4",
+      "title": "Semantic retrieval",
+      "question": "Does semantic retrieval hold up?",
+      "changes": "The guidance ranker: the curated CWE map, then semantic search with the official MITRE text of the alert's CWE.",
+      "case_set": "comparison",
+      "before": {"reuse": "3-after"},
+      "after": {"profile": "semantic", "modes": ["council"]},
+      "rule": "Agreed in advance: if semantic retrieval holds or improves accuracy on the comparison set, it is reported as an improvement. If not, it stays the design choice, argued on scalability and maintainability, and the accuracy difference is stated plainly. Any tuning happens on exploration cases only, followed by one measurement on the comparison set."
+    },
+    {
+      "id": "5",
+      "title": "Mutation test",
+      "question": "Does the verdict follow the code?",
+      "changes": "Rebuilt mutation test: small code changes that should flip the verdict.",
+      "case_set": "mutation",
+      "planned": "later task: the mutation set and its runner are not built yet"
+    },
+    {
+      "id": "6",
+      "title": "Headline result",
+      "question": "How well does the final system do on cases it has never seen?",
+      "changes": "Nothing is changed: the final profile, single agent and council, run once after the code freeze.",
+      "case_set": "final-test",
+      "planned": "later task: run once after the code freeze, with the profile chosen by steps 1 to 4"
+    }
+  ]
+}

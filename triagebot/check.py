@@ -167,6 +167,24 @@ def check_semgrep(find=semgrep_exe) -> Check:
                  "pip install -r requirements.txt", required=False)
 
 
+EVAL_SETS = ("pilot", "comparison", "final-test")
+EVAL_SETS_BUILD = "python -m triagebot.nodes.ingest.eval_sets build"
+
+
+def check_case_sets(samples_dir=None) -> Check:
+    """WARNING only: option 4 (experiments) reads the committed frozen case sets."""
+    samples_dir = Path(samples_dir or config.SAMPLES_DIR)
+    missing = [name for name in EVAL_SETS
+               if not (samples_dir / f"{name}.json").is_file()
+               or not (samples_dir / f"{name}.manifest.json").is_file()]
+    if not missing:
+        return Check("Experiment case sets", OK, rel_path(samples_dir), required=False)
+    return Check("Experiment case sets", WARNING,
+                 f"missing in {rel_path(samples_dir)}: {', '.join(missing)} (needed by option 4)",
+                 f"git restore {rel_path(samples_dir)}   (or rebuild: {EVAL_SETS_BUILD})",
+                 required=False)
+
+
 def run_checks(run=subprocess.run) -> list[Check]:
     """Every check, in display order (the commit check only when it applies)."""
     bench = check_benchmark()
@@ -175,7 +193,7 @@ def run_checks(run=subprocess.run) -> list[Check]:
         commit = check_commit(run=run)
         if commit:
             checks.append(commit)
-    return checks + [check_scan(), check_semgrep()]
+    return checks + [check_scan(), check_semgrep(), check_case_sets()]
 
 
 def blocking(checks) -> list[Check]:

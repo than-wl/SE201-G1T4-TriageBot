@@ -1,0 +1,61 @@
+{
+  "set": "final-test",
+  "purpose": "held out: run once, after the code freeze (step 6)",
+  "rule": "one CWE-matching Semgrep alert per case (lowest start_line, then rule_id); cases drawn with the sample seed, balanced by label on the evaluation side",
+  "partition": "test",
+  "split_seed": 201,
+  "test_fraction": 0.5,
+  "sample_seed": 201,
+  "excludes": {
+    "sets": [
+      "retired"
+    ],
+    "cases": 407
+  },
+  "overlap_with_retired": 0,
+  "scan": {
+    "file": "data/semgrep/semgrep-owasp-p-java-1.178.0.json",
+    "sha256": "5614cdba5382269cf1f5d3c610df08c36c14bac92fc2d4ab45467f4961ef0001"
+  },
+  "answer_key_sha256": "1809f6a690c6cf7dd6685df6ebe2eef8fe3ca93d19a7ca0ce45987ca4f5d78e1",
+  "sample": {
+    "file": "data/samples/final-test.json",
+    "sha256": "3182ce45723df68a6932c2dfbf747811cf60a5fee3170c172a1222b575f7c543"
+  },
+  "cases": 120,
+  "composition": {
+    "CWE-22": {
+      "requested": 30,
+      "selected": 30,
+      "real": 15,
+      "safe": 15,
+      "eligible_real": 25,
+      "eligible_safe": 18
+    },
+    "CWE-78": {
+      "requested": 30,
+      "selected": 30,
+      "real": 15,
+      "safe": 15,
+      "eligible_real": 26,
+      "eligible_safe": 15
+    },
+    "CWE-79": {
+      "requested": 30,
+      "selected": 30,
+      "real": 15,
+      "safe": 15,
+      "eligible_real": 69,
+      "eligible_safe": 28
+    },
+    "CWE-89": {
+      "requested": 30,
+      "selected": 30,
+      "real": 15,
+      "safe": 15,
+      "eligible_real": 81,
+      "eligible_safe": 43
+    }
+  },
+  "fingerprint_note": "SHA-256 of the file with LF line endings"
+}

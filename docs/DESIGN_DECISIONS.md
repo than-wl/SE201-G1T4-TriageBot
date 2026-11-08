@@ -485,3 +485,111 @@ so the plain-Python single-agent path and the graph run the same code.
   creation and resume is not caught.
 - PR #14's reported numbers were produced before the graph. They are not claimed for the
   graph path until the comparison is re-run there.
+
+
+## 23. Frozen evaluation case sets and a retired-case list
+
+**Decision.** Every new result is measured on one of three frozen case sets in
+`data/samples/`, built by `python -m triagebot.nodes.ingest.eval_sets build`
+from the recorded scan, the answer key and the fixed split (decision 18):
+
+- `pilot` (development half): exactly the 100-case checkpoint sample; the
+  builder stops if it differs from `evidence/checkpoint-100/`. With the other
+  unused development cases it forms the **exploration set**, where failures
+  are read and ideas tried.
+- `comparison` (development half): CWE-22, 78, 79 and 89, 24 cases each, half
+  real and half safe, no pilot case. Frozen; only measured, never tuned on.
+- `final-test` (test half): the same four CWEs, 30 cases each, half real and
+  half safe, run once after the code freeze.
+
+`data/samples/retired_cases.json` lists the 407 cases used by any earlier run
+(every `selected_alerts.json` under `evidence/` plus the fresh-120 audit list,
+which adds the OpenRouter smoke-test case). The final test must share no case
+with it; the builder asserts this, and asserts the same for the comparison set.
+
+**Why.** We train no model, but we tune by hand: we read the cases TriageBot
+gets wrong and change it. A change made after reading a case tends to fix that
+case, so a set that was read cannot also measure the change. Earlier runs mixed
+the two and changed several things at once. Fixing the sets in advance, with
+fingerprints, makes every later step comparable with every other.
+
+**Consequence.** Sample files hold only NormalisedAlert fields (decision 7);
+the manifests hold the rule, seed, scan and sample SHA-256 and per-CWE counts,
+never a per-case label. Fingerprints are taken over LF line endings and
+`.gitattributes` keeps the files LF, so they match on Windows and macOS.
+Building twice gives byte-identical files. The final test leaves 15 safe
+command-injection cases eligible for 15 places, so the test half has no spare
+CWE-78 safe case after this set.
+
+## 24. Experiment profiles and the one-change-per-step rule
+
+**Decision.** `triagebot/profiles.py` defines four named profiles, `base`,
+`evidence`, `worksheet` and `semantic`, each a value for the same four switches:
+source window (25 or 60 lines), related source (on or off), reasoning worksheet
+with consistency repair (on or off), and guidance retrieval (`map` or
+`semantic`). `use_profile(name)` applies one for the length of a run and
+restores the previous settings afterwards, even on failure. Each experiment step
+(`EXPERIMENTS.md`, `experiments/registry.json`) moves from one profile to the
+next, so exactly one group of settings changes, and is measured on the same
+frozen comparison set.
+
+**Why.** A before/after difference can only be attributed to a change if
+nothing else changed. Naming the groups makes that checkable: each run manifest
+records the profile and every setting it applied.
+
+**Consequence.**
+
+- The switches are read at call time: `SOURCE_RELATED_ENABLED` in
+  `source_context.py`, `REVIEW_WORKSHEET_ENABLED` in `prompts.report_contract()`,
+  `openrouter.report_schema()` and `execution.repair_if_inconsistent()`, and
+  `RETRIEVAL_MODE` when a `KnowledgeBase` is created. With the worksheet off the
+  `analysis` object is neither asked for nor allowed by the strict schema, and
+  the repair never fires. The config defaults equal the `worksheet` profile, so
+  commands run outside an experiment behave as before, and with the worksheet on
+  the prompts and schema are byte-identical to the previous ones.
+- Engineering fixes are not switched: strict JSON schema output, guidance-label
+  normalisation in the validator and the LangGraph council stay on everywhere.
+- A `semantic` run stops before any call, naming the command to run, while the
+  MITRE catalogue or the vector store is missing.
+- The durable council sessions (decision 20) add the profile name and settings
+  to their provenance, so a session started under one profile cannot be resumed
+  under another.
+- Every run is resumable (one JSON line per finished case), replayable for free
+  (`experiment replay` re-scores the saved outputs and checks they match the
+  saved evaluation) and shown for free (`experiment show`, offline, no key).
+
+## 25. The per-type checklists are removed
+
+**Decision.** The short trusted checklists the prompt added for CWE-78 and
+CWE-90 (`_CWE_CHECKLISTS` and `for_cwe()` in `prompts.py`) are removed for good,
+in every profile. Every weakness now gets the same system prompt.
+
+**Why.** Both were written after reading specific cases the council had got
+wrong (the CWE-78 environment-array cases and the LDAP helper flows). That tunes
+the prompt to the cases it is measured on, which is what the case split
+(decision 23) exists to prevent. Hand-written notes per weakness also do not
+scale beyond the Benchmark's categories.
+
+**Consequence.** Results recorded with the checklists (the 66-case runs from the
+improvement change of 29 October onwards, and the fresh 120) are not reproducible
+with the current code; they are archived evidence (decision 23). The tests that expected the checklists now
+check that no checklist reaches any prompt. Weakness-specific guidance, if
+needed, must come from the retrieved OWASP material.
+
+## 26. The step 4 rule for semantic retrieval, agreed in advance
+
+**Decision.** Step 4 compares semantic retrieval (decision 21) with the curated
+map on the comparison set. If semantic retrieval holds or improves accuracy, it
+is reported as an improvement. If not, it remains the design choice, argued on
+scalability and maintainability, and the slide states the accuracy difference
+plainly. Any tuning of its set-up happens on exploration cases only, followed by
+one measurement on the comparison set.
+
+**Why.** Semantic retrieval is preferred for reasons accuracy does not capture:
+it needs no hand-made table and covers any CWE the MITRE catalogue knows. Fixing
+the reporting rule before the run prevents choosing the story after seeing the
+numbers, and prevents tuning on the comparison set until it looks good.
+
+**Consequence.** The step 4 result is reported whichever way it falls. A second
+measurement on the comparison set after tuning would break this rule; the
+comparison set is measured once per configuration.

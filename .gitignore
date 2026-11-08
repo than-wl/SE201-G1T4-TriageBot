@@ -28,3 +28,6 @@ __pycache__/
 *.db-shm
 *.db-journal
 *.db.run.lock
+
+# Personal prompt files for coding assistants (not shared)
+*.local.md

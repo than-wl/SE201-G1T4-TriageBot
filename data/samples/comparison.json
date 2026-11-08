@@ -1,0 +1,883 @@
+{
+  "selection": {
+    "set": "comparison",
+    "rule": "one CWE-matching Semgrep alert per case (lowest start_line, then rule_id); cases drawn with the sample seed, balanced by label on the evaluation side",
+    "partition": "dev",
+    "split_seed": 201,
+    "test_fraction": 0.5,
+    "sample_seed": 201,
+    "categories": {
+      "CWE-22": 24,
+      "CWE-78": 24,
+      "CWE-79": 24,
+      "CWE-89": 24
+    },
+    "selected": 96
+  },
+  "alerts": [
+    {
+      "case_id": "BenchmarkTest00001",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00001.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 72,
+      "end_line": 72,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest00006",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00006.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 62,
+      "end_line": 62,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest00013",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00013.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 56,
+      "end_line": 56,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest00025",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00025.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 51,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00061",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00061.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 75,
+      "end_line": 75,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest00159",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00159.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 67,
+      "end_line": 67,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest00287",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00287.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 59,
+      "end_line": 59,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest00308",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00308.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 70,
+      "end_line": 70,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest00343",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00343.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 65,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00433",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00433.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00743",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00743.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 75,
+      "end_line": 75,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest00862",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00862.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 54,
+      "end_line": 55,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest00999",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00999.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 74,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01001",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01001.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 73,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01029",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01029.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 73,
+      "end_line": 73,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01054",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01054.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 54,
+      "end_line": 54,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest01089",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01089.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01111",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01111.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 68,
+      "end_line": 68,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01193",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01193.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 78,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01233",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01233.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 48,
+      "end_line": 50,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01236",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01236.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 65,
+      "end_line": 65,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01255",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01255.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 49,
+      "end_line": 49,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest01263",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01263.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 49,
+      "end_line": 49,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest01311",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01311.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01313",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01313.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 51,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01350",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01350.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 56,
+      "end_line": 56,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest01360",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01360.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 61,
+      "end_line": 61,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01391",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01391.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01392",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01392.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01396",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01396.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01430",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01430.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 74,
+      "end_line": 74,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01460",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01460.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 67,
+      "end_line": 71,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01592",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01592.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest01595",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01595.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest01631",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01631.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 55,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01666",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01666.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 73,
+      "end_line": 73,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest01685",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01685.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 95,
+      "end_line": 95,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01692",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01692.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 82,
+      "end_line": 83,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01747",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01747.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 69,
+      "end_line": 69,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01752",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01752.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 60,
+      "end_line": 61,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01780",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01780.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 61,
+      "end_line": 61,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01794",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01794.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 72,
+      "end_line": 72,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01880",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01880.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01885",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01885.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 73,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01907",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01907.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 59,
+      "end_line": 59,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01928",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01928.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 63,
+      "end_line": 63,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01937",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01937.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 62,
+      "end_line": 62,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01939",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01939.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 62,
+      "end_line": 62,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest01983",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01983.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 63,
+      "end_line": 64,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01987",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01987.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 83,
+      "end_line": 83,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest01990",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01990.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 69,
+      "end_line": 69,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02026",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02026.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 55,
+      "end_line": 57,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02098",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02098.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02105",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02105.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 48,
+      "end_line": 49,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02106",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02106.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 48,
+      "end_line": 48,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02107",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02107.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 48,
+      "end_line": 48,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02135",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02135.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 49,
+      "end_line": 49,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02146",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02146.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 57,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02156",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02156.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 54,
+      "end_line": 54,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02187",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02187.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02231",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02231.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 54,
+      "end_line": 54,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02251",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02251.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 73,
+      "end_line": 73,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02270",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02270.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 62,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02271",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02271.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02285",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02285.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02331",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02331.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 63,
+      "end_line": 63,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02340",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02340.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 85,
+      "end_line": 85,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02344",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02344.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 68,
+      "end_line": 68,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02377",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02377.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 50,
+      "end_line": 50,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02414",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02414.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 60,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02429",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02429.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 71,
+      "end_line": 71,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02467",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02467.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 55,
+      "end_line": 55,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02470",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02470.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 56,
+      "end_line": 56,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02482",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02482.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02483",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02483.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02484",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02484.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02489",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02489.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 52,
+      "end_line": 52,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02491",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02491.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02494",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02494.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02495",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02495.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 54,
+      "end_line": 54,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02517",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02517.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 56,
+      "end_line": 56,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02533",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02533.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02558",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02558.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 72,
+      "end_line": 72,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02562",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02562.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 77,
+      "end_line": 77,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02579",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02579.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 74,
+      "end_line": 74,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02587",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02587.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 74,
+      "end_line": 74,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02594",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02594.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 73,
+      "end_line": 73,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02597",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02597.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 73,
+      "end_line": 73,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02601",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02601.java",
+      "rule_id": "java.lang.security.audit.xss.no-direct-response-writer.no-direct-response-writer",
+      "cwe": "CWE-79",
+      "start_line": 76,
+      "end_line": 76,
+      "message": "Detected a request with potential user-input going into a OutputStream or Writer object. This bypasses any view or template environments, including HTML escaping, which may expose this application to cross-site scripting (XSS) vulnerabilities. Consider using a view technology such as JavaServer Faces (JSFs) which automatically escapes HTML views."
+    },
+    {
+      "case_id": "BenchmarkTest02610",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02610.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 95,
+      "end_line": 95,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    },
+    {
+      "case_id": "BenchmarkTest02640",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02640.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 75,
+      "end_line": 75,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02648",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02648.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 77,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02650",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02650.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 77,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02668",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02668.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 55,
+      "end_line": 55,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02669",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02669.java",
+      "rule_id": "java.lang.security.httpservlet-path-traversal.httpservlet-path-traversal",
+      "cwe": "CWE-22",
+      "start_line": 55,
+      "end_line": 55,
+      "message": "Detected a potential path traversal. A malicious actor could control the location of this file, to include going backwards in the directory with '../'. To address this, ensure that user-controlled variables in file paths are sanitized. You may also consider using a utility method such as org.apache.commons.io.FilenameUtils.getName(...) to only retrieve the file name from the path."
+    },
+    {
+      "case_id": "BenchmarkTest02699",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02699.java",
+      "rule_id": "java.lang.security.audit.tainted-cmd-from-http-request.tainted-cmd-from-http-request",
+      "cwe": "CWE-78",
+      "start_line": 61,
+      "end_line": 61,
+      "message": "Detected input from a HTTPServletRequest going into a 'ProcessBuilder' or 'exec' command. This could lead to command injection if variables passed into the exec commands are not properly sanitized. Instead, avoid using these OS commands with user-supplied input, or, if you must use these commands, use a whitelist of specific values."
+    }
+  ]
+}

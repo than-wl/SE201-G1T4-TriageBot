@@ -16,49 +16,65 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
+from triagebot import config
+
 _API = "https://openrouter.ai/api/v1/chat/completions"
 _DEFAULT_MODEL = "google/gemini-3.8-flash"   # proposal model (decision 6)
-_REPORT_SCHEMA = {
+_ANALYSIS_SCHEMA = {
     "type": "object",
     "properties": {
-        "verdict": {"type": "string", "enum": [
-            "true_positive", "false_positive", "human_review"]},
-        "analysis": {
-            "type": "object",
-            "properties": {
-                "source": {"type": "string"}, "sink": {"type": "string"},
-                "reaches_sink": {"type": "string", "enum": ["yes", "no", "uncertain"]},
-                "protection": {"type": "string"},
-                "protection_effective": {
-                    "type": "string", "enum": ["yes", "no", "uncertain"]},
-            },
-            "required": ["source", "sink", "reaches_sink", "protection",
-                         "protection_effective"],
-            "additionalProperties": False,
-        },
-        "explanation": {"type": "string"},
-        "citations": {"type": "array", "items": {
-            "type": "object",
-            "properties": {
-                "file": {"type": "string"}, "line": {"type": "integer"},
-                "quote": {"type": "string"},
-            },
-            "required": ["file", "line", "quote"],
-            "additionalProperties": False,
-        }},
-        "guidance": {"type": "array", "items": {
-            "type": "object",
-            "properties": {
-                "chunk_id": {"type": "string"}, "doc": {"type": "string"},
-                "section": {"type": "string"}, "url": {"type": "string"},
-            },
-            "required": ["chunk_id", "doc", "section", "url"],
-            "additionalProperties": False,
-        }},
+        "source": {"type": "string"}, "sink": {"type": "string"},
+        "reaches_sink": {"type": "string", "enum": ["yes", "no", "uncertain"]},
+        "protection": {"type": "string"},
+        "protection_effective": {
+            "type": "string", "enum": ["yes", "no", "uncertain"]},
     },
-    "required": ["verdict", "analysis", "explanation", "citations", "guidance"],
+    "required": ["source", "sink", "reaches_sink", "protection",
+                 "protection_effective"],
     "additionalProperties": False,
 }
+_REPORT_PROPERTIES = {
+    "verdict": {"type": "string", "enum": [
+        "true_positive", "false_positive", "human_review"]},
+    "explanation": {"type": "string"},
+    "citations": {"type": "array", "items": {
+        "type": "object",
+        "properties": {
+            "file": {"type": "string"}, "line": {"type": "integer"},
+            "quote": {"type": "string"},
+        },
+        "required": ["file", "line", "quote"],
+        "additionalProperties": False,
+    }},
+    "guidance": {"type": "array", "items": {
+        "type": "object",
+        "properties": {
+            "chunk_id": {"type": "string"}, "doc": {"type": "string"},
+            "section": {"type": "string"}, "url": {"type": "string"},
+        },
+        "required": ["chunk_id", "doc", "section", "url"],
+        "additionalProperties": False,
+    }},
+}
+
+
+def report_schema(worksheet: bool | None = None) -> dict:
+    """The strict JSON schema for a review report, built at call time.
+
+    The "analysis" worksheet is a required property only while
+    config.REVIEW_WORKSHEET_ENABLED is on (or ``worksheet`` says so), so a
+    profile can switch it off for one run. Strict output stays on in every profile.
+    """
+    if worksheet is None:
+        worksheet = config.REVIEW_WORKSHEET_ENABLED
+    # Same key order as before the switch existed: verdict, analysis, then the rest.
+    keys = ["verdict", "analysis", "explanation", "citations", "guidance"]
+    if not worksheet:
+        keys.remove("analysis")
+    properties = {key: _ANALYSIS_SCHEMA if key == "analysis" else _REPORT_PROPERTIES[key]
+                  for key in keys}
+    return {"type": "object", "properties": properties, "required": keys,
+            "additionalProperties": False}
 
 
 def configured_model():
@@ -85,7 +101,7 @@ class OpenRouterCaller:
             "reasoning": {"effort": "minimal", "exclude": True},
             "provider": {"require_parameters": True},
             "response_format": {"type": "json_schema", "json_schema": {
-                "name": "triage", "strict": True, "schema": _REPORT_SCHEMA}},
+                "name": "triage", "strict": True, "schema": report_schema()}},
             "messages": [
                 {"role": "system", "content": request["system"]},
                 {"role": "user", "content": request["user"]},

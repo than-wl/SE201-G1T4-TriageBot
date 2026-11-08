@@ -49,6 +49,9 @@ SOURCE_WINDOW_LINES = 60       # reaches benchmark helpers while keeping prompts
                                # 66-case experiment was measured at 60 together with the
                                # related-file context below, so 60 is kept until the team
                                # compares the two on the same cases)
+# Related source: same-file methods the window calls, other project files it
+# references, and scripts those files name. Off = the window only (profile "base").
+SOURCE_RELATED_ENABLED = True
 SOURCE_RELATED_MAX_FILES = 4   # bounded direct/transitive project helper context
 SOURCE_RELATED_MAX_LINES = 120
 SOURCE_RELATED_MAX_LINES_PER_FILE = 60
@@ -120,6 +123,26 @@ COMPARISON_SAMPLE_SIZES = {
 REVIEW_MAX_TOKENS = 900        # short JSON answer; headroom over the 700
                                # that the live run showed truncating chatty replies
 REVIEW_TEMPERATURE = 0.0       # recorded runs must be reproducible
+# Reasoning worksheet: ask for the structured "analysis" object (and require it in
+# the strict JSON schema), then repair a verdict that contradicts it. Read at call
+# time, so a profile (triagebot/profiles.py) can switch it off.
+REVIEW_WORKSHEET_ENABLED = True
+
+# --- experiments (EXPERIMENTS.md) ------------------------------------------
+# The profile applied by profiles.use_profile(); None outside an experiment.
+ACTIVE_PROFILE = None
+SAMPLES_DIR = _REPO_ROOT / "data" / "samples"          # frozen case sets (committed)
+EXPERIMENT_REGISTRY = _REPO_ROOT / "experiments" / "registry.json"
+EXPERIMENTS_OUT = _REPO_ROOT / "evidence" / "experiments"
+EVIDENCE_DIR = _REPO_ROOT / "evidence"
+CHECKPOINT_EVIDENCE_SAMPLE = EVIDENCE_DIR / "checkpoint-100" / "selected_alerts.json"
+EVAL_SET_CWES = ("CWE-22", "CWE-78", "CWE-79", "CWE-89")
+EVAL_COMPARISON_PER_CWE = 24   # 12 real + 12 safe per category, dev half
+EVAL_FINAL_TEST_PER_CWE = 30   # 15 real + 15 safe per category, test half
+# Planning estimates only (US$ per case, before consistency repairs); the
+# real spend is read from each call's usage and saved in run_manifest.json.
+EXPERIMENT_COST_PER_CASE = {"single": 0.004, "council": 0.016}
+EXPERIMENT_CALLS_PER_CASE = {"single": 1, "council": 3}
 
 # --- durable council execution (opt-in; not the historical course checkpoint) ---
 COUNCIL_DB = _REPO_ROOT / ".triagebot" / "checkpoints.sqlite"

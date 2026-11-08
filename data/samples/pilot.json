@@ -1,0 +1,916 @@
+{
+  "selection": {
+    "set": "pilot",
+    "rule": "one CWE-matching Semgrep alert per case (lowest start_line, then rule_id); cases drawn with the sample seed, balanced by label on the evaluation side",
+    "partition": "dev",
+    "split_seed": 201,
+    "test_fraction": 0.5,
+    "sample_seed": 201,
+    "categories": {
+      "CWE-89": 100
+    },
+    "selected": 100
+  },
+  "alerts": [
+    {
+      "case_id": "BenchmarkTest00008",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00008.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00018",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00018.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 59,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00027",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00027.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 50,
+      "end_line": 52,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00038",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00038.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 63,
+      "end_line": 79,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00104",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00104.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 76,
+      "end_line": 76,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00108",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00108.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 92,
+      "end_line": 92,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00109",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00109.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 80,
+      "end_line": 80,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00191",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00191.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 81,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00198",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00198.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 60,
+      "end_line": 62,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00204",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00204.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00329",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00329.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 65,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00333",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00333.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 65,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00439",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00439.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 51,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00517",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00517.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 62,
+      "end_line": 62,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00595",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00595.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 72,
+      "end_line": 73,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00603",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00603.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 69,
+      "end_line": 69,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00763",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00763.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 74,
+      "end_line": 75,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00767",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00767.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 75,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00838",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00838.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 96,
+      "end_line": 101,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00839",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00839.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 82,
+      "end_line": 83,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00841",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00841.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 94,
+      "end_line": 94,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest00997",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00997.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 74,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01003",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01003.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 74,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01004",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01004.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 74,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01010",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01010.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 71,
+      "end_line": 71,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01084",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01084.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 59,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01085",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01085.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 56,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01087",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01087.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01091",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01091.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01095",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01095.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01213",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01213.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 60,
+      "end_line": 61,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01215",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01215.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 59,
+      "end_line": 61,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01219",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01219.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01303",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01303.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 54,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01305",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01305.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 54,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01310",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01310.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01315",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01315.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 51,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01381",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01381.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01382",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01382.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01387",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01387.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 59,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01395",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01395.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01465",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01465.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 65,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01466",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01466.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 64,
+      "end_line": 80,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01467",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01467.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 66,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01468",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01468.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 66,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01470",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01470.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 66,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01474",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01474.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 67,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01629",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01629.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 55,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01630",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01630.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 55,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01713",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01713.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 77,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01714",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01714.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 81,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01715",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01715.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 81,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01717",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01717.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 82,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01719",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01719.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01720",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01720.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 75,
+      "end_line": 75,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01721",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01721.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 74,
+      "end_line": 90,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01722",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01722.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 74,
+      "end_line": 90,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01729",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01729.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 75,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01877",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01877.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 74,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01878",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01878.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 74,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01879",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01879.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 73,
+      "end_line": 77,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01882",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01882.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 70,
+      "end_line": 86,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01883",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01883.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 70,
+      "end_line": 71,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01967",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01967.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01969",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01969.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 59,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest01970",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01970.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 59,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02088",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02088.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 60,
+      "end_line": 64,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02092",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02092.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 60,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02094",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02094.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 60,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02097",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02097.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02099",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02099.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 58,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02174",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02174.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02175",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02175.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 51,
+      "end_line": 51,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02177",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02177.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 50,
+      "end_line": 66,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02180",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02180.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 52,
+      "end_line": 54,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02188",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02188.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 51,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02267",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02267.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 57,
+      "end_line": 57,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02273",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02273.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 55,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02278",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02278.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02279",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02279.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 56,
+      "end_line": 58,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02281",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02281.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 56,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02354",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02354.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 67,
+      "end_line": 68,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02359",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02359.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 66,
+      "end_line": 68,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02361",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02361.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 65,
+      "end_line": 67,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02366",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02366.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 67,
+      "end_line": 67,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02528",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02528.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 55,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02530",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02530.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02532",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02532.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 59,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02535",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02535.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 60,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02536",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02536.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02539",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02539.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 52,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02540",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02540.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 53,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02542",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02542.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 55,
+      "end_line": 55,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02545",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02545.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 53,
+      "end_line": 55,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02626",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02626.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 77,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02633",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02633.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 78,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02634",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02634.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 81,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02639",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02639.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 75,
+      "end_line": 75,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02649",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02649.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 77,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    },
+    {
+      "case_id": "BenchmarkTest02652",
+      "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02652.java",
+      "rule_id": "java.lang.security.audit.sqli.tainted-sql-from-http-request.tainted-sql-from-http-request",
+      "cwe": "CWE-89",
+      "start_line": 77,
+      "end_line": 77,
+      "message": "Detected input from a HTTPServletRequest going into a SQL sink or statement. This could lead to SQL injection if variables in the SQL statement are not properly sanitized. Use parameterized SQL queries or properly sanitize user input instead."
+    }
+  ]
+}

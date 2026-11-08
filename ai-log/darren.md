@@ -206,3 +206,45 @@ commits requiring another AI-use entry. This is a completeness check, not a new
 claim that every documentation edit used AI. The checkpoint task guides and old
 Draw.io/PNG diagram paths named in the historical entries above were superseded
 and removed during final repository cleanup; Git history preserves them.
+
+
+## 2026-11-08 — Experiment groundwork: frozen case sets, profiles, runner
+
+- **Tool (model):** Claude Code (claude-opus-5-5); prompt written by Darren
+- **Files:** triagebot/nodes/ingest/eval_sets.py (new), triagebot/profiles.py (new),
+  triagebot/experiments.py (new), experiments/registry.json (new),
+  data/samples/ (new: pilot, comparison, final-test, their manifests,
+  retired_cases.json, README.md), .gitattributes (new), triagebot/config.py,
+  triagebot/__main__.py, triagebot/check.py, triagebot/checkpoints.py,
+  triagebot/execution.py, triagebot/llm/openrouter.py,
+  triagebot/nodes/context/source_context.py, triagebot/nodes/context/vector_store.py,
+  triagebot/nodes/review/prompts.py, triagebot/nodes/review/council/analyst.py,
+  triagebot/nodes/review/council/skeptic.py, triagebot/nodes/review/council/chair.py,
+  triagebot/nodes/review/single_agent/baseline.py, tests/test_eval_sets.py (new),
+  tests/test_profiles.py (new), tests/test_experiments.py (new), tests/test_cli.py,
+  tests/test_pipeline.py, tests/test_checkpoints.py, EXPERIMENTS.md (new), README.md,
+  docs/DESIGN_DECISIONS.md (decisions 23 to 26), FINAL_RESULTS.md (banner only),
+  IMPROVEMENT_EXPERIMENT_LOG.md (banner only), ai-log/darren.md
+- **Outcome:** TODO (Darren)
+
+### What I asked for
+
+Lay the groundwork for rebuilding the evaluation as a few clean, replayable
+experiments, one change per step, on frozen case sets. Build three label-free
+case sets (the pilot equal to the checkpoint sample, a 96-case comparison set and
+a 120-case final test that avoids every retired case) with fingerprinted
+manifests and a retired-case list. Add named profiles that switch the source
+window, related source, the reasoning worksheet and retrieval for one run;
+remove the per-type checklists for good. Add an experiment runner with a step
+registry, a paid `run` that prints a cost estimate and asks first and saves after
+every case, and free `show` and `replay` commands, plus menu option 4. Document
+it all in EXPERIMENTS.md and the design decisions. No paid model calls, no
+commits; changes staged only.
+
+### How I checked it
+
+Ran the full test suite (302 pass) and had the case sets rebuilt independently on a second machine: byte-identical, with fingerprints matching the manifests. Confirmed no answer-key fields in the sample files, checked the four profiles against the plan, and dry-ran the paid command up to the cost confirmation.
+
+### What I kept or changed
+
+Kept as generated.

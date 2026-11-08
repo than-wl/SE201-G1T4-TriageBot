@@ -10,8 +10,7 @@ import json
 
 from triagebot import config
 from triagebot.nodes.review.report import assemble, failure
-from triagebot.nodes.review.prompts import (CHAIR_SYSTEM, REPAIR_SYSTEM, for_cwe,
-                                            to_prompt_block)
+from triagebot.nodes.review.prompts import system_prompt, to_prompt_block
 
 
 def review(payload, analyst_report, skeptic_report, caller):
@@ -23,7 +22,7 @@ def review(payload, analyst_report, skeptic_report, caller):
         json.dumps(skeptic_report, indent=1),
     ])
     request = {
-        "system": for_cwe(CHAIR_SYSTEM, payload),
+        "system": system_prompt("chair"),
         "user": user,
         "max_tokens": config.REVIEW_MAX_TOKENS,
         "temperature": config.REVIEW_TEMPERATURE,
@@ -44,7 +43,7 @@ def repair(payload, report, issue, caller):
         issue,
     ])
     result = caller.complete({
-        "system": for_cwe(REPAIR_SYSTEM, payload),
+        "system": system_prompt("repair"),
         "user": user,
         "max_tokens": config.REVIEW_MAX_TOKENS,
         "temperature": config.REVIEW_TEMPERATURE,

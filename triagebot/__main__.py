@@ -6,6 +6,7 @@ Interactive menu (no arguments), from the repository root:
     1  Scanner baseline   How good is Semgrep alone? Scored against the OWASP answer key.
     2  Triage one alert   One finding through the whole pipeline, every stage shown.
     3  Evaluate a sample  The checkpoint sample through each configuration, scored.
+    4  Experiments        The planned experiments: show (free), replay (free) or run (paid).
     q  Quit
 
 The menu starts with the setup check (triagebot/check.py) and, if the
@@ -20,6 +21,10 @@ Non-interactive subcommands (same functions as the menu options):
                                  [--export-svg PATH]
     python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
     python -m triagebot evaluate [--sample PATH] [--mode single,council]
+    python -m triagebot experiment list
+    python -m triagebot experiment show STEP
+    python -m triagebot experiment replay STEP [--answer-key PATH]
+    python -m triagebot experiment run STEP [--side before|after] [--repeat N] [--limit N]
 
 baseline: runs the ingest stage (triagebot.nodes.ingest.run.build), writes
 the same files to --out (default Context/tmp/checkpoint/), and shows the
@@ -35,6 +40,12 @@ saves the screen as an SVG (README screenshot).
 
 triage and evaluate run the connected review pipeline. They require an
 OpenRouter API key and therefore make paid model calls.
+
+experiment: the steps in EXPERIMENTS.md (triagebot/experiments.py). list and
+show are offline and need no API key or answer key; replay re-scores saved
+outputs against the answer key without model calls; run prints the cost
+estimate and asks before any paid call, saving after every case so an
+interrupted run resumes.
 
 check: prints the setup table; exit code 1 while a required item is MISSING
 (0 with --no-fail, for CI, where the Benchmark is never cloned).
@@ -76,8 +87,8 @@ except ImportError:
              f"the prompt then shows \"(.venv)\") and run: pip install -r requirements.txt   "
              f"(see README, Quick start).")
 
-from triagebot import check, config, pipeline
-from triagebot.nodes.ingest import run
+from triagebot import check, config, experiments, pipeline, profiles
+from triagebot.nodes.ingest import eval_sets, run
 from triagebot.nodes.score import evaluate as scoring
 
 console = Console(highlight=False)
@@ -88,8 +99,9 @@ OPTIONS = (
     ("1", "Scanner baseline", "How good is Semgrep alone? Scored against the OWASP answer key.", True),
     ("2", "Triage one alert", "One finding through the whole pipeline, every stage shown.", True),
     ("3", "Evaluate a sample", "The checkpoint sample through each configuration, scored.", True),
+    ("4", "Experiments", "The planned experiments: show (free), replay (free) or run (paid).", True),
 )
-PROMPT = "Choose 1, 2, 3 or q: "
+PROMPT = "Choose 1, 2, 3, 4 or q: "
 REVIEW_MODES = ("single", "council")
 
 SEMGREP_RULESET = "p/java"
@@ -603,6 +615,186 @@ def council_resume(thread_id, db=None, out=None, benchmark_root=None, allow_repl
     return 0
 
 
+# --- experiments (EXPERIMENTS.md) --------------------------------------------
+
+EXPERIMENT_ERRORS = (experiments.ExperimentError, eval_sets.EvalSetError, profiles.ProfileError,
+                     OSError, ValueError, KeyError, json.JSONDecodeError)
+RUN_STATE = {"none": "no saved run", "partial": "in progress", "complete": "saved"}
+
+
+def experiment_list() -> int:
+    """`experiment list`: every step, its question, and whether saved runs exist (offline)."""
+    try:
+        rows = experiments.list_steps()
+    except EXPERIMENT_ERRORS as error:
+        return _fail(str(error))
+    table = Table(title="Experiments (EXPERIMENTS.md)", title_justify="left", title_style="bold",
+                  box=box.SIMPLE_HEAD)
+    for column in ("Step", "Question", "Case set", "Status", "Saved runs"):
+        table.add_column(column, no_wrap=column in ("Step", "Case set"))
+    for row in rows:
+        step = row["step"]
+        saved = [f"{r['name']} ({RUN_STATE[r['state']]}{', reused' if r['reused'] else ''})"
+                 for r in row["runs"] if r["state"] != "none"]
+        runs = ", ".join(saved) or ("none" if row["runs"] else DASH)
+        table.add_row(step["id"], step["question"], step["case_set"], row["state"], runs)
+    console.print(table)
+    return 0
+
+
+def experiment_show(step_id) -> int:
+    """`experiment show`: the before/after table from saved evaluation files (offline)."""
+    try:
+        data = experiments.show_table(step_id)
+    except EXPERIMENT_ERRORS as error:
+        return _fail(str(error))
+    step = data["step"]
+    _section(f"Step {step['id']}: {step['question']}")
+    console.print(step.get("changes", ""), markup=False)
+    if step.get("planned"):
+        console.print(f"Not runnable yet: {step['planned']}.", markup=False)
+        return 0
+    if not data["rows"]:
+        console.print(f"No saved run for step {step['id']} yet.", markup=False)
+    else:
+        table = Table(box=box.SIMPLE_HEAD)
+        for number, header in enumerate(data["headers"]):
+            table.add_column(header, justify="left" if number == 0 else "right", no_wrap=number == 0)
+        for row in data["rows"]:
+            table.add_row(*row)
+        console.print(table)
+        for line in data["legend"]:
+            console.print(line, style="dim", markup=False)
+        console.print("Precision, recall and F1 count a case sent to a human as kept.", style="dim")
+    for note in data["notes"]:
+        console.print(note, markup=False)
+    for name in data["missing"]:
+        console.print(f"Not run yet: {name}.", markup=False)
+    commands = experiments.commands(step["id"])
+    if data["missing"] or data["notes"]:
+        console.print(f"Run it (paid, asks first): {commands['run']}", markup=False)
+    if data["rows"]:
+        console.print(f"Re-score it (free, needs the answer key): {commands['replay']}", markup=False)
+    return 0
+
+
+def _answer_key_path(answer_key):
+    path = Path(answer_key or config.ANSWER_KEY or "")
+    return path if path.is_file() else None
+
+
+def experiment_replay(step_id, answer_key=None) -> int:
+    """`experiment replay`: re-score saved outputs against the answer key; no model calls."""
+    key = _answer_key_path(answer_key)
+    if key is None:
+        return _fail(f"replay needs the OWASP Benchmark answer key ({SETUP_HINT}), "
+                     "or pass --answer-key PATH")
+    try:
+        results = experiments.replay(step_id, key)
+    except EXPERIMENT_ERRORS as error:
+        return _fail(str(error))
+    if not results:
+        console.print(f"No finished run to replay for step {step_id}.", markup=False)
+        return 0
+    for result in results:
+        status = Text("matches", style="green") if result["matches"] else Text("DIFFERS", style="bold red")
+        console.print(Text(f"{result['run']}: ") + status)
+        for check_name, ok in result["checks"].items():
+            console.print(f"  {'OK' if ok else 'DIFFERS'}  {check_name}", markup=False)
+    return 0 if all(result["matches"] for result in results) else 1
+
+
+def _describe(settings) -> str:
+    return (f"window ±{settings['SOURCE_WINDOW_LINES']}, related source "
+            f"{'on' if settings['SOURCE_RELATED_ENABLED'] else 'off'}, worksheet "
+            f"{'on' if settings['REVIEW_WORKSHEET_ENABLED'] else 'off'}, retrieval "
+            f"{settings['RETRIEVAL_MODE']}")
+
+
+def _show_plan(plan) -> None:
+    step = plan["step"]
+    console.print()
+    console.print(Text(f"Step {step['id']}, {plan['side']} side: {step['question']}", style="bold"))
+    grid = Table.grid(padding=(0, 2))
+    grid.add_column(style="dim")
+    grid.add_column()
+    scope = (f"first {len(plan['alerts'])} of {plan['cases_in_set']}, --limit {plan['limit']}"
+             if plan["limit"] else f"all {plan['cases_in_set']}")
+    per_case = " + ".join(f"{config.EXPERIMENT_CALLS_PER_CASE[m]} {m}" for m in plan["modes"])
+    cost = " + ".join(f"US${config.EXPERIMENT_COST_PER_CASE[m]}" for m in plan["modes"])
+    repairs = (f", plus up to {plan['max_repair_calls']} consistency repairs"
+               if plan["max_repair_calls"] else "")
+    for label, value in (
+            ("Case set", f"{plan['case_set']}: {plan['cases_in_set']} cases, SHA-256 "
+                         f"{plan['case_set_sha256'][:12]}"),
+            ("Run folder", check.rel_path(plan["dir"])),
+            ("Profile", f"{plan['profile']} ({_describe(plan['settings'])})"),
+            ("Modes", ", ".join(plan["modes"])),
+            ("Cases", f"{len(plan['remaining'])} to run ({scope}); {plan['already_saved']} already saved"),
+            ("Model", f"{plan['model']}, temperature {config.REVIEW_TEMPERATURE}"),
+            ("Model calls", f"{plan['calls']} ({per_case} per case){repairs}"),
+            ("Estimated cost", f"about US${plan['estimated_cost']:.2f} ({cost} per case; "
+                               "the real spend is recorded)")):
+        grid.add_row(label, Text(value))
+    console.print(grid)
+
+
+def experiment_run(step_id, side=None, repeat=1, limit=None, answer_key=None,
+                   caller_factory=None, benchmark_root=None) -> int:
+    """`experiment run`: a PAID run, after showing the estimate and asking for confirmation."""
+    try:
+        plans = experiments.plan(step_id, side, repeat, limit)
+        for plan in plans:
+            profiles.require_ready(plan["profile"])
+    except EXPERIMENT_ERRORS as error:
+        return _fail(str(error))
+    key = _answer_key_path(answer_key)
+    if key is None:
+        return _fail(f"answer key not found ({SETUP_HINT}); it scores the run after the model calls")
+    root = benchmark_root or config.BENCHMARK_ROOT
+    if not root or not Path(root).is_dir():
+        return _fail(f"OWASP Benchmark source not found ({SETUP_HINT})")
+
+    for plan in plans:
+        _show_plan(plan)
+    calls = sum(plan["calls"] for plan in plans)
+    cost = sum(plan["estimated_cost"] for plan in plans)
+    console.print()
+    if calls:
+        if len(plans) > 1:
+            console.print(f"[bold]Total:[/] {calls} model calls, about US${cost:.2f}.")
+        if caller_factory is None and not _has_api_key():
+            console.print("[yellow]Note:[/] no OPENROUTER_API_KEY found (environment or .env); "
+                          "the run will stop before any call.")
+        if _ask(f"Make {calls} paid model calls (about US${cost:.2f})? \\[y/N]: ") not in ("y", "yes"):
+            console.print("Cancelled: no model calls were made.")
+            return 0
+        if caller_factory is None and not _has_api_key():
+            return _fail("OPENROUTER_API_KEY not set (environment or repo-root .env); no calls made")
+
+    def progress(done, total, case_id):
+        console.print(f"  [{done}/{total}] {case_id} saved", markup=False)
+
+    for plan in plans:
+        console.print(f"Running {plan['name']}...", markup=False)
+        try:
+            experiments.execute(plan, key, caller_factory, root, progress)
+        except KeyboardInterrupt:
+            console.print()
+            return _fail(f"interrupted; finished cases are saved in {check.rel_path(plan['dir'])}. "
+                         "Run the same command to resume.")
+        except EXPERIMENT_ERRORS as error:
+            return _fail(f"{error}\nFinished cases are saved; run the same command to resume.")
+        console.print(f"Saved: {check.rel_path(plan['dir'])}/ (see report.md)", markup=False)
+    return experiment_show(step_id)
+
+
+def _has_api_key() -> bool:
+    from triagebot.llm.openrouter import _api_key
+
+    return bool(_api_key())
+
+
 # --- front door 1: interactive menu ----------------------------------------
 
 class _Quit(Exception):
@@ -703,12 +895,45 @@ def _menu_evaluate(answer_key, out) -> None:
     _ask("Press Enter to return to the menu")
 
 
+def _menu_experiments(answer_key) -> None:
+    experiment_list()
+    step = _ask("Step (for example 1; [bold]\\[Enter][/] = back to menu): ")
+    if not step:
+        return
+    try:
+        experiments.get_step(step)
+    except EXPERIMENT_ERRORS as error:
+        console.print(str(error), markup=False)
+        _ask("Press Enter to return to the menu")
+        return
+    choice = _ask("[bold]s[/] = show (free)   [bold]r[/] = replay (free, needs the Benchmark answer key)   "
+                  "[bold]p[/] = run (paid, asks first)   [bold]\\[Enter][/] = back: ")
+    if choice in ("s", "show"):
+        experiment_show(step)
+    elif choice in ("r", "replay"):
+        experiment_replay(step, answer_key)
+    elif choice in ("p", "run"):
+        if not _menu_check(show_when_ready=False):
+            console.print("[yellow]A run needs the items marked MISSING above.[/]")
+        else:
+            limit = _ask("Cases to run ([bold]\\[Enter][/] = all, or a number for a smoke test): ")
+            if limit and not limit.isdigit():
+                console.print(f"Not a number: {limit!r}.", markup=False)
+            else:
+                experiment_run(step, limit=int(limit) if limit else None, answer_key=answer_key)
+    else:
+        return
+    console.print()
+    _ask("Press Enter to return to the menu")
+
+
 def menu(semgrep=None, answer_key=None, out=None) -> int:
     """Loop until q (or end of input)."""
     actions = {
         "1": lambda: _menu_baseline(semgrep, answer_key, out),
         "2": lambda: _menu_triage(out),
         "3": lambda: _menu_evaluate(answer_key, out),
+        "4": lambda: _menu_experiments(answer_key),
     }
     try:
         _menu_check()
@@ -786,6 +1011,23 @@ def parser() -> argparse.ArgumentParser:
     cr.add_argument("--benchmark-root", help="source checkout (default BENCHMARK_ROOT)")
     cr.add_argument("--allow-replay", action="store_true",
                     help="acknowledge possible duplicate model charges for an incomplete run")
+
+    x = sub.add_parser("experiment", help="menu option 4: the planned experiments (EXPERIMENTS.md)")
+    xs = x.add_subparsers(dest="experiment_command", required=True)
+    xs.add_parser("list", help="every step, its question, and whether saved runs exist (offline)")
+    xshow = xs.add_parser("show", help="before/after table from saved runs (offline, free)")
+    xshow.add_argument("step", help="step number, for example 1")
+    xreplay = xs.add_parser("replay", help="re-score saved outputs against the answer key (free)")
+    xreplay.add_argument("step", help="step number, for example 1")
+    xreplay.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
+    xrun = xs.add_parser("run", help="PAID run; prints the cost estimate and asks first")
+    xrun.add_argument("step", help="step number, for example 1")
+    xrun.add_argument("--side", choices=("before", "after"),
+                      help="run one side only (default: every side that is not reused)")
+    xrun.add_argument("--repeat", type=int, default=1,
+                      help="which identical run this is (step 1's second council run: --repeat 2)")
+    xrun.add_argument("--limit", type=int, help="run only the first N cases (smoke test)")
+    xrun.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
     return p
 
 
@@ -805,6 +1047,14 @@ def main(argv=None) -> int:
         return council_status(args.thread_id, args.db)
     if args.command == "council-resume":
         return council_resume(args.thread_id, args.db, args.out, args.benchmark_root, args.allow_replay)
+    if args.command == "experiment":
+        if args.experiment_command == "list":
+            return experiment_list()
+        if args.experiment_command == "show":
+            return experiment_show(args.step)
+        if args.experiment_command == "replay":
+            return experiment_replay(args.step, args.answer_key)
+        return experiment_run(args.step, args.side, args.repeat, args.limit, args.answer_key)
     return menu()
 
 

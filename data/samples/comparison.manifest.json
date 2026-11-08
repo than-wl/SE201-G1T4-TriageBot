@@ -1,0 +1,61 @@
+{
+  "set": "comparison",
+  "purpose": "frozen: measured for steps 1 to 4, never tuned on",
+  "rule": "one CWE-matching Semgrep alert per case (lowest start_line, then rule_id); cases drawn with the sample seed, balanced by label on the evaluation side",
+  "partition": "dev",
+  "split_seed": 201,
+  "test_fraction": 0.5,
+  "sample_seed": 201,
+  "excludes": {
+    "sets": [
+      "pilot"
+    ],
+    "cases": 100
+  },
+  "overlap_with_retired": 0,
+  "scan": {
+    "file": "data/semgrep/semgrep-owasp-p-java-1.178.0.json",
+    "sha256": "5614cdba5382269cf1f5d3c610df08c36c14bac92fc2d4ab45467f4961ef0001"
+  },
+  "answer_key_sha256": "1809f6a690c6cf7dd6685df6ebe2eef8fe3ca93d19a7ca0ce45987ca4f5d78e1",
+  "sample": {
+    "file": "data/samples/comparison.json",
+    "sha256": "311c5e73b3e909af005711a03a1aa04be69b060a13fe1923dc16dee615d7e91a"
+  },
+  "cases": 96,
+  "composition": {
+    "CWE-22": {
+      "requested": 24,
+      "selected": 24,
+      "real": 12,
+      "safe": 12,
+      "eligible_real": 63,
+      "eligible_safe": 56
+    },
+    "CWE-78": {
+      "requested": 24,
+      "selected": 24,
+      "real": 12,
+      "safe": 12,
+      "eligible_real": 54,
+      "eligible_safe": 49
+    },
+    "CWE-79": {
+      "requested": 24,
+      "selected": 24,
+      "real": 12,
+      "safe": 12,
+      "eligible_real": 101,
+      "eligible_safe": 48
+    },
+    "CWE-89": {
+      "requested": 24,
+      "selected": 24,
+      "real": 12,
+      "safe": 12,
+      "eligible_real": 71,
+      "eligible_safe": 17
+    }
+  },
+  "fingerprint_note": "SHA-256 of the file with LF line endings"
+}

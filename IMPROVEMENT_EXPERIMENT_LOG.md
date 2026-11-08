@@ -1,5 +1,10 @@
 # TriageBot Improvement Experiment Log
 
+> **Earlier runs.** This file records runs made before the experiment plan in
+> [EXPERIMENTS.md](EXPERIMENTS.md), which supersedes it. Its cases are retired
+> (`data/samples/retired_cases.json`) and are not used for any new claim. The
+> contents below are unchanged.
+
 This file records what we change, why we change it, and whether it actually
 improves TriageBot. Keep failed experiments: they are useful evidence, not
 something to hide.

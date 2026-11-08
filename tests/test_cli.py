@@ -183,10 +183,38 @@ class Menu(TempDir):
         self.assertIn("up to 4 model calls per finding", printed)
 
     def test_invalid_input_reprompts(self):
-        code, printed, prompts = self.run_menu("x", "", "4", "q")
+        code, printed, prompts = self.run_menu("x", "", "5", "q")
         self.assertEqual((code, prompts), (0, 4))
         self.assertIn("Unknown option 'x'", printed)
         self.assertNotIn("not yet available", printed.lower())
+
+    def test_option_4_lists_steps_then_shows_a_step_for_free(self):
+        with mock.patch.object(cli, "experiment_show", return_value=0) as show, \
+                mock.patch.object(cli, "experiment_run") as paid:
+            code, printed, prompts = self.run_menu("4", "1", "s", "", "q")
+        self.assertEqual((code, prompts), (0, 5))
+        self.assertIn("Experiments (EXPERIMENTS.md)", printed)
+        self.assertIn("Does a council beat one agent?", printed)
+        self.assertIn("p = run (paid, asks first)", printed)
+        show.assert_called_once_with("1")
+        paid.assert_not_called()
+
+    def test_option_4_replay_and_run_go_to_the_subcommand_functions(self):
+        with mock.patch.object(cli, "experiment_replay", return_value=0) as replay:
+            self.run_menu("4", "2", "r", "", "q")
+        replay.assert_called_once_with("2", str(ANSWER_KEY))
+        with mock.patch.object(cli, "experiment_run", return_value=0) as paid:
+            self.run_menu("4", "1", "p", "5", "", "q")
+        paid.assert_called_once_with("1", limit=5, answer_key=str(ANSWER_KEY))
+
+    def test_option_4_back_and_unknown_step_make_no_calls(self):
+        with mock.patch.object(cli, "experiment_run") as paid, \
+                mock.patch.object(cli, "experiment_show") as show:
+            self.assertEqual(self.run_menu("4", "", "q")[0], 0)
+            _, printed, _ = self.run_menu("4", "9", "", "q")
+        self.assertIn("unknown step '9'", printed)
+        paid.assert_not_called()
+        show.assert_not_called()
 
     def test_menu_and_subcommand_call_the_same_functions(self):
         ctx = object()
@@ -576,6 +604,19 @@ class SetupChecks(TempDir):
         self.assertIn("pip install -r requirements.txt", warning.fix)
         self.assertEqual(check.check_semgrep(lambda: self.tmp / "semgrep.exe").status, check.OK)
         self.assertEqual(check.blocking([warning]), [])
+
+    def test_experiment_case_sets_are_only_a_warning(self):
+        samples = self.tmp / "samples"
+        missing = check.check_case_sets(samples)
+        self.assertEqual((missing.status, missing.required), (check.WARNING, False))
+        self.assertIn("pilot, comparison, final-test", missing.detail)
+        self.assertIn(check.EVAL_SETS_BUILD, missing.fix)
+        samples.mkdir()
+        for name in check.EVAL_SETS:
+            (samples / f"{name}.json").write_text("{}", encoding="utf-8")
+            (samples / f"{name}.manifest.json").write_text("{}", encoding="utf-8")
+        self.assertEqual(check.check_case_sets(samples).status, check.OK)
+        self.assertEqual(check.check_case_sets().status, check.OK)     # the committed sets
 
     def test_subcommand_prints_words_and_fixes(self):
         with mock.patch.object(cli.check, "run_checks", return_value=checks(bench=check.MISSING,

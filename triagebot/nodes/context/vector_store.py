@@ -8,6 +8,11 @@ chunks. So adding a document later means chunking it and calling sync() again.
 Search is exact cosine similarity over the loaded matrix (numpy). The table does
 not depend on how search is done, so an index can be added later without
 migrating the data.
+
+Prepare the store once before a semantic run (embeds the whole KB; a few
+minutes on CPU, and fastembed downloads its model the first time):
+
+    python -m triagebot.nodes.context.vector_store
 """
 
 import hashlib
@@ -89,3 +94,16 @@ class VectorStore:
             return chunks, np.zeros((0, 0), dtype=np.float32)
         matrix = np.vstack([np.frombuffer(r[5], dtype=np.float32) for r in rows])
         return chunks, matrix
+
+
+def prepare(path=None) -> int:
+    """Embed the committed KB into the store at ``path``; return the chunk count."""
+    from triagebot.nodes.context.retrieval import KnowledgeBase
+
+    kb = KnowledgeBase(mode="semantic", vector_db=path)
+    ids, _ = kb._semantic_index()
+    return len(ids)
+
+
+if __name__ == "__main__":
+    print(f"Vector store ready: {prepare()} chunks in {config.KB_VECTOR_DB}")

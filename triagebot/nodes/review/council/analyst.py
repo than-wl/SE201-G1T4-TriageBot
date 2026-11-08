@@ -7,12 +7,12 @@ neither sees the other's report (blinded until the Chair joins).
 
 from triagebot import config
 from triagebot.nodes.review.report import assemble, failure
-from triagebot.nodes.review.prompts import ANALYST_SYSTEM, for_cwe, to_prompt_block
+from triagebot.nodes.review.prompts import system_prompt, to_prompt_block
 
 
 def review(payload, caller):
     request = {
-        "system": for_cwe(ANALYST_SYSTEM, payload),
+        "system": system_prompt("analyst"),
         "user": to_prompt_block(payload),
         "max_tokens": config.REVIEW_MAX_TOKENS,
         "temperature": config.REVIEW_TEMPERATURE,

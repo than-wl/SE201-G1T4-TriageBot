@@ -1,0 +1,35 @@
+{
+  "set": "pilot",
+  "purpose": "exploration: the checkpoint sample; read failures and try ideas here",
+  "rule": "one CWE-matching Semgrep alert per case (lowest start_line, then rule_id); cases drawn with the sample seed, balanced by label on the evaluation side",
+  "partition": "dev",
+  "split_seed": 201,
+  "test_fraction": 0.5,
+  "sample_seed": 201,
+  "excludes": {
+    "sets": [],
+    "cases": 0
+  },
+  "overlap_with_retired": 100,
+  "scan": {
+    "file": "data/semgrep/semgrep-owasp-p-java-1.178.0.json",
+    "sha256": "5614cdba5382269cf1f5d3c610df08c36c14bac92fc2d4ab45467f4961ef0001"
+  },
+  "answer_key_sha256": "1809f6a690c6cf7dd6685df6ebe2eef8fe3ca93d19a7ca0ce45987ca4f5d78e1",
+  "sample": {
+    "file": "data/samples/pilot.json",
+    "sha256": "2b633145f724df28b6fffb112bbcce8304fbfa73d14aaa4100f4c8e7bebc578d"
+  },
+  "cases": 100,
+  "composition": {
+    "CWE-89": {
+      "requested": 100,
+      "selected": 100,
+      "real": 50,
+      "safe": 50,
+      "eligible_real": 121,
+      "eligible_safe": 67
+    }
+  },
+  "fingerprint_note": "SHA-256 of the file with LF line endings"
+}

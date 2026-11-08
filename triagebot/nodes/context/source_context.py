@@ -86,10 +86,16 @@ def _class_references(text, relationship):
 
 
 def build_source_context(root, alert, clean_lines):
-    """Return the alert window plus directly related same-file and helper code."""
+    """Return the alert window plus directly related same-file and helper code.
+
+    With config.SOURCE_RELATED_ENABLED off, only the window is returned: no
+    called-method bodies outside it, no other files and no scripts.
+    """
     start = max(1, alert["start_line"] - config.SOURCE_WINDOW_LINES)
     end = min(len(clean_lines), alert["end_line"] + config.SOURCE_WINDOW_LINES)
     selected = set(range(start, end + 1))
+    if not config.SOURCE_RELATED_ENABLED:
+        return {"file": alert["file"], "lines": _numbered(clean_lines, selected), "related": []}
 
     calls = set(_CALL.findall("\n".join(clean_lines[number - 1] for number in selected)))
     for name, (method_start, method_end) in _method_spans(clean_lines).items():

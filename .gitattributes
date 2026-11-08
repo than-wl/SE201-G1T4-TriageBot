@@ -1,0 +1,6 @@
+# Frozen case sets and experiment evidence are fingerprinted by SHA-256.
+# Keep them LF on every checkout so the files on disk match their hashes.
+data/samples/*.json text eol=lf
+data/samples/*.md text eol=lf
+experiments/*.json text eol=lf
+evidence/experiments/** text eol=lf

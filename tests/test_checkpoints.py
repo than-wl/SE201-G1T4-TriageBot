@@ -167,6 +167,30 @@ class CheckpointTest(unittest.TestCase):
                 self.resume(tid)
         self.assertEqual(self.factory.calls, [])
 
+    def test_profile_change_refuses_resume_without_calls(self):
+        from triagebot.profiles import use_profile
+
+        with use_profile("base"):
+            tid = self.create()
+        status = inspect_council_run(tid, self.db)
+        self.assertEqual(status["status"], "pending")
+        with use_profile("evidence"):
+            with self.assertRaisesRegex(ValueError, "Incompatible resume.*profile"):
+                self.resume(tid)
+        self.assertEqual(self.factory.calls, [])
+        with use_profile("base"):                       # the same profile resumes
+            self.assertEqual(self.resume(tid)["validated"]["verdict"], "true_positive")
+
+    def test_profile_name_alone_is_part_of_the_provenance(self):
+        from triagebot.profiles import use_profile
+
+        with use_profile("worksheet"):
+            tid = self.create()
+        # No profile active: same switch values (the defaults) but no profile name.
+        with self.assertRaisesRegex(ValueError, "Incompatible resume; changed: profile"):
+            self.resume(tid)
+        self.assertEqual(self.factory.calls, [])
+
     def test_package_version_change_refuses_resume_without_calls(self):
         tid = self.create()
         with patch("triagebot.checkpoints.version", return_value="incompatible-version"):

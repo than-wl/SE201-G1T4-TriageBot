@@ -1,5 +1,10 @@
 # TriageBot Final Results
 
+> **Earlier runs.** This file records runs made before the experiment plan in
+> [EXPERIMENTS.md](EXPERIMENTS.md), which supersedes it. Its cases are retired
+> (`data/samples/retired_cases.json`) and are not used for any new claim. The
+> contents below are unchanged.
+
 ## What did we test?
 
 Semgrep scans source code for possible security problems, but some of its

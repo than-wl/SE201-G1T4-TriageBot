@@ -13,6 +13,11 @@ optional semantic guidance retrieval mode that is off by default (design decisio
 resource-aware CWE-78 fix. Its latest same-set run is regression evidence, not a
 new unseen evaluation.
 
+**Evaluation rebuild:** the evaluation is being rebuilt as a small number of
+clean, replayable experiments, one change per step, on frozen case sets. The
+plan, the case sets and every result are in [EXPERIMENTS.md](EXPERIMENTS.md);
+it supersedes the earlier runs summarised below.
+
 ## 1. What TriageBot does
 
 A static application security testing (SAST) scanner such as Semgrep flags code that *might* be vulnerable, and many of its alerts are false alarms that a developer must still read. TriageBot is a layer after the scanner: for each Semgrep alert it gathers evidence (the surrounding source code, helper facts and relevant OWASP guidance) and an AI review sorts the alert into **likely a real vulnerability**, **likely a false positive**, or **needs human review**.
@@ -108,6 +113,7 @@ Then choose `1` for the scanner baseline. No Semgrep scan is needed: the reposit
 | 1 Scanner baseline | How good Semgrep is alone: the scan used (recorded or your re-scan), headline precision, recall and F1, a table by vulnerability type, what this means for TriageBot (false alarms to remove, recall ceiling, blind spots) and the checkpoint test set. `r` re-runs Semgrep first; `d` afterwards shows the technical details. |
 | 2 Triage one alert | Runs one sampled Semgrep finding through either the single agent or the Analyst / Skeptic / Chair council, then validates and saves the result. This makes paid OpenRouter calls. |
 | 3 Evaluate a sample | Runs the checkpoint sample through the single-agent and council configurations, validates the council output, and scores the saved results. It asks for confirmation before making paid calls. |
+| 4 Experiments | Lists the experiment steps in [EXPERIMENTS.md](EXPERIMENTS.md) and whether each has saved runs. For a chosen step: **Show** the before/after table (free, offline), **Replay** it by re-scoring the saved outputs (free, needs the Benchmark answer key), or **Run** it (paid; it shows the estimated cost and asks first). |
 
 The same actions as subcommands, for scripts:
 
@@ -116,26 +122,36 @@ python -m triagebot check [--no-fail]
 python -m triagebot baseline [--semgrep PATH] [--answer-key PATH] [--out DIR] [--rescan] [--details] [--export-svg PATH]
 python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
 python -m triagebot evaluate [--sample PATH] [--mode single,council]
+python -m triagebot experiment list
+python -m triagebot experiment show STEP
+python -m triagebot experiment replay STEP [--answer-key PATH]
+python -m triagebot experiment run STEP [--side before|after] [--repeat N] [--limit N] [--answer-key PATH]
 ```
 
-- `check`: the setup check (Python version, virtual environment, rich, the Benchmark folder and its commit, the scan, Semgrep) with OK / MISSING / WARNING and the command that fixes each problem, shown for your OS. Exit code 1 while something required is missing; `--no-fail` always exits 0 (used by CI, where the Benchmark is never cloned).
+- `check`: the setup check (Python version, virtual environment, rich, the Benchmark folder and its commit, the scan, Semgrep, the experiment case sets) with OK / MISSING / WARNING and the command that fixes each problem, shown for your OS. Exit code 1 while something required is missing; `--no-fail` always exits 0 (used by CI, where the Benchmark is never cloned).
 - `baseline`: menu option 1. It also writes the ingest files to `Context/tmp/checkpoint/` (`alerts.json`, `selected_alerts.json`, `ingest_report.json`, `split.json`, `scanner_predictions.json`, `baseline.json`).
   - `--rescan` re-runs Semgrep into `Context/tmp/semgrep-owasp.json` (needs Semgrep from `requirements.txt` and internet; a few minutes). That local re-scan is then used instead of the recorded scan until you delete it; the previous one is kept as `semgrep-owasp.previous.json`, and a failed scan falls back to the current one.
   - `--details` adds the file-matched comparison, CWE mismatch pairs, ingest counts and files written.
   - `--export-svg PATH` also saves the screen as an SVG image (how the screenshot above was made).
 - `triage`: runs one case from `selected_alerts.json` through `single` or `council` mode and saves `triage-<case>-<mode>.json`.
 - `evaluate`: runs every selected case through the requested modes, writes `B-single-agent.json`, `C-council.json`, `D-validated-council.json`, and scores them into `evaluation.json`. The answer key is loaded only after the model calls finish.
+- `experiment`: menu option 4 ([EXPERIMENTS.md](EXPERIMENTS.md)).
+  - `list` shows every step, its question and whether saved runs exist; `show STEP` prints the before/after table from the saved evaluation files. Both are offline and need no API key and no answer key.
+  - `replay STEP` re-scores the saved outputs against the answer key, makes no model calls, and confirms the numbers match the saved evaluation (exit code 1 if they do not).
+  - `run STEP` is a **paid** run. Before any call it prints the case set, profile, modes, number of calls and the estimated cost, and asks for confirmation. It saves after every case to `evidence/experiments/<step>-<side>[-repeat-N]/`, so an interrupted run resumes without repeating finished cases. `--side` runs one side, `--repeat 2` is the second identical council run of step 1, and `--limit N` runs only the first N cases (a smoke test).
+- The frozen case sets the experiments use are built with `python -m triagebot.nodes.ingest.eval_sets build` (no model calls; see [data/samples/README.md](data/samples/README.md)).
 
 ## 5. How it works
 
 | Stage | What it does | Code location | Status |
 | --- | --- | --- | --- |
-| Ingest | Semgrep JSON to normalised alerts; scanner baseline; dev/test split and sample | `triagebot/nodes/ingest/` | Built |
+| Ingest | Semgrep JSON to normalised alerts; scanner baseline; dev/test split and sample; frozen experiment case sets | `triagebot/nodes/ingest/` | Built |
 | Context payload | Source window, directly called methods, bounded related-file graph, helper facts and guidance | `triagebot/nodes/context/` | Built |
-| Review | Single agent, or Analyst / Skeptic / Chair council; structured reasoning, consistency guard and CWE checklists | `triagebot/nodes/review/` | Built and connected |
+| Review | Single agent, or Analyst / Skeptic / Chair council; optional structured reasoning worksheet with a consistency guard (per-type checklists removed, design decision 25) | `triagebot/nodes/review/` | Built and connected |
 | Validate | Exact multi-file citations plus safe normalization of known guidance metadata | `triagebot/nodes/validate/` | Built |
 | Score | Evaluation against the OWASP answer key | `triagebot/nodes/score/` | Built |
-| Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Built; all three menu options and matching subcommands are connected |
+| Pipeline and terminal menu | Connects the stages end to end | `triagebot/pipeline.py`, `triagebot/__main__.py` | Built; all four menu options and matching subcommands are connected |
+| Experiments | Named setting profiles, the step registry, paid runs with cost confirmation, free show and replay | `triagebot/profiles.py`, `triagebot/experiments.py`, `experiments/registry.json` | Built; steps 1 to 4 runnable, 5 and 6 planned |
 
 **Current council orchestration (Phase 1):** `triagebot/council_graph.py` runs
 `build_context → [Analyst || Skeptic] → Chair → validate` using LangGraph.
@@ -317,6 +333,8 @@ python verification/openrouter_smoke.py --self-test
 triagebot/       product code, one folder per pipeline stage under nodes/
 tests/           offline unit tests and fixtures (no network)
 data/semgrep/    the recorded Semgrep scan (scanner output only, no answer-key data)
+data/samples/    frozen experiment case sets (label-free alerts) and their manifests
+experiments/     the experiment step registry (registry.json); results go to evidence/experiments/
 docs/            design decisions, architecture diagram, screenshots, proposal, feasibility reports
 verification/    feasibility-stage scripts, kept as historical evidence
 ai-log/          per-member AI use logs

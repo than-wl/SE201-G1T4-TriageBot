@@ -19,7 +19,7 @@ from uuid import UUID, uuid4
 from langgraph.checkpoint.sqlite import SqliteSaver
 from langgraph.graph import START
 
-from triagebot import config
+from triagebot import config, profiles
 from triagebot.council_graph import CouncilContext, build_council_graph, council_result
 from triagebot.llm.openrouter import OpenRouterCaller, configured_model
 from triagebot.nodes.context.retrieval import KnowledgeBase
@@ -164,10 +164,15 @@ def _provenance(alert, kb, benchmark_root, model):
         "model": model, "code_sha256": _sha(_json(code).encode()),
         "kb_sha256": _sha(_json(corpus).encode()),
         "config": {name: getattr(config, name) for name in (
-            "SOURCE_WINDOW_LINES", "SOURCE_RELATED_MAX_FILES", "SOURCE_RELATED_MAX_LINES",
+            "SOURCE_WINDOW_LINES", "SOURCE_RELATED_ENABLED", "SOURCE_RELATED_MAX_FILES",
+            "SOURCE_RELATED_MAX_LINES",
             "SOURCE_RELATED_MAX_LINES_PER_FILE", "GUIDANCE_MAX_CHARS", "RETRIEVAL_TOP_K",
             "RETRIEVAL_MODE", "SEMANTIC_MIN_SCORE", "EMBEDDING_MODEL",
-            "REVIEW_MAX_TOKENS", "REVIEW_TEMPERATURE", "BENCHMARK_COMMIT")},
+            "REVIEW_MAX_TOKENS", "REVIEW_TEMPERATURE", "REVIEW_WORKSHEET_ENABLED",
+            "BENCHMARK_COMMIT")},
+        # The experiment profile (name and switches), so a session started under one
+        # profile cannot be resumed under another.
+        "profile": profiles.provenance(),
         "versions": {name: version(name) for name in (
             "langgraph", "langgraph-checkpoint", "langgraph-checkpoint-sqlite",
             "langchain-core")},

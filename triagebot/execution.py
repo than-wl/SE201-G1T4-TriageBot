@@ -3,6 +3,7 @@
 import hashlib
 from pathlib import Path
 
+from triagebot import config
 from triagebot.nodes.review.consistency import problem as consistency_problem
 
 
@@ -56,8 +57,12 @@ def repair_if_inconsistent(payload, review, role_reports, caller_factory, repair
 
     A repaired report that is still inconsistent is escalated to human_review. The
     repaired report is appended to ``role_reports`` (the caller's list). No automatic
-    retry beyond this single repair call.
+    retry beyond this single repair call. With the reasoning worksheet off
+    (config.REVIEW_WORKSHEET_ENABLED) there is no analysis to check against, so
+    this never calls the model.
     """
+    if not config.REVIEW_WORKSHEET_ENABLED:
+        return review
     issue = consistency_problem(review)
     if not issue:
         return review
