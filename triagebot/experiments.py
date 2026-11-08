@@ -259,6 +259,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
         name = run_name(step["id"], name_side, repeat)
         folder = out_root / name
         settings = profiles.get(spec["profile"])
+        retrieval = profiles.retrieval_provenance(settings)
         modes = list(spec["modes"])
         model = _requested_model()
         existing = folder / MANIFEST
@@ -267,6 +268,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
             changed = [label for label, a, b in (
                 ("profile", old["profile"]["settings"], settings),
                 ("profile name", old["profile"]["name"], spec["profile"]),
+                ("retrieval set-up", old.get("retrieval"), retrieval),
                 ("case set", old["case_set"]["sha256"], set_manifest["sample"]["sha256"]),
                 ("modes", old["modes"], modes),
                 ("model", old["model"]["requested"], model)) if a != b]
@@ -284,7 +286,8 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
         per_case = sum(config.EXPERIMENT_CALLS_PER_CASE[m] for m in modes)
         plans.append({
             "step": step, "side": name_side, "repeat": repeat, "name": name, "dir": folder,
-            "profile": spec["profile"], "settings": settings, "modes": modes, "model": model,
+            "profile": spec["profile"], "settings": settings, "retrieval": retrieval,
+            "modes": modes, "model": model,
             "case_set": step["case_set"], "case_set_sha256": set_manifest["sample"]["sha256"],
             "cases_in_set": len(alerts), "limit": limit, "alerts": selected,
             "remaining": remaining, "already_saved": len(selected) - len(remaining),
@@ -318,6 +321,7 @@ def _start_manifest(plan_, git) -> dict:
             "modes": plan_["modes"],
             "configurations": [c for m in plan_["modes"] for c in CONFIGURATIONS[m]],
             "model": {"requested": plan_["model"], "reported": []},
+            **({"retrieval": plan_["retrieval"]} if plan_.get("retrieval") else {}),
             "temperature": config.REVIEW_TEMPERATURE,
             "max_tokens": config.REVIEW_MAX_TOKENS,
             "benchmark_commit": config.BENCHMARK_COMMIT,

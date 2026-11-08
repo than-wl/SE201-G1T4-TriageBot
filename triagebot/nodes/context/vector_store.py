@@ -9,8 +9,9 @@ Search is exact cosine similarity over the loaded matrix (numpy). The table does
 not depend on how search is done, so an index can be added later without
 migrating the data.
 
-Prepare the store once before a semantic run (embeds the whole KB; a few
-minutes on CPU, and fastembed downloads its model the first time):
+Prepare the store once before a semantic run (embeds the whole KB, plus the
+pieces of oversized chunks that the improved set-up searches; a few minutes on
+CPU, and fastembed downloads its model the first time):
 
     python -m triagebot.nodes.context.vector_store
 """
@@ -97,7 +98,12 @@ class VectorStore:
 
 
 def prepare(path=None) -> int:
-    """Embed the committed KB into the store at ``path``; return the chunk count."""
+    """Embed the committed KB into the store at ``path``; return the number of rows.
+
+    The rows are every chunk plus the pieces of the chunks longer than the R4 cap
+    (design decision 28), so both the original and the improved semantic set-up
+    can search the store without re-embedding.
+    """
     from triagebot.nodes.context.retrieval import KnowledgeBase
 
     kb = KnowledgeBase(mode="semantic", vector_db=path)
@@ -106,4 +112,4 @@ def prepare(path=None) -> int:
 
 
 if __name__ == "__main__":
-    print(f"Vector store ready: {prepare()} chunks in {config.KB_VECTOR_DB}")
+    print(f"Vector store ready: {prepare()} rows (chunks and split pieces) in {config.KB_VECTOR_DB}")

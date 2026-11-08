@@ -1,0 +1,255 @@
+{
+  "about": "Which cheat sheets semantic retrieval searches (rule R3, design decision 28). Decided from each sheet's title and opening paragraph only, never from retrieval output. Used only when SEMANTIC_KB_SCOPE is on; map retrieval ignores this file. Every sheet in kb/docs is listed exactly once: under excluded, platform or general. The common set (common.json) is always searched.",
+  "rules": {
+    "retired": "a. Title starts with \"DEPRECATED:\" or contains \"(Historical)\". Excluded.",
+    "attack_catalogue": "b. The sheet is mainly attack inputs rather than defensive guidance. Excluded.",
+    "platform": "c. The sheet is specific to one language, framework or runtime (tagged when its title or opening names that one as its scope). Excluded unless the tag equals KB_TARGET_PLATFORM. Untagged sheets are general and kept; platform-neutral infrastructure sheets (Docker, Kubernetes, CI/CD) stay untagged."
+  },
+  "platforms": [
+    "c",
+    "dotnet",
+    "java",
+    "javascript",
+    "php",
+    "python",
+    "ruby"
+  ],
+  "excluded": {
+    "Abuse_Case_Cheat_Sheet": {
+      "rule": "retired",
+      "reason": "Title contains \"(Historical)\"; its opening says the material is archived."
+    },
+    "Access_Control_Cheat_Sheet": {
+      "rule": "retired",
+      "reason": "Title starts with \"DEPRECATED:\"; it points to the Authorization Cheat Sheet."
+    },
+    "TLS_Cipher_String_Cheat_Sheet": {
+      "rule": "retired",
+      "reason": "Title starts with \"DEPRECATED:\"; it points to the Transport Layer Security Cheat Sheet."
+    },
+    "Transport_Layer_Protection_Cheat_Sheet": {
+      "rule": "retired",
+      "reason": "Title starts with \"DEPRECATED:\"; it points to the Transport Layer Security Cheat Sheet."
+    },
+    "XSS_Filter_Evasion_Cheat_Sheet": {
+      "rule": "attack_catalogue",
+      "reason": "A guide to XSS testing: mostly attack strings for testers, not defensive guidance (105 chunks)."
+    }
+  },
+  "platform": {
+    "Bean_Validation_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "java",
+      "reason": "Opening: guidance for Java Bean Validation (Jakarta Validation)."
+    },
+    "C-Based_Toolchain_Hardening_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "c",
+      "reason": "Opening: project settings for C, C++ and Objective C toolchains."
+    },
+    "Django_REST_Framework_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "python",
+      "reason": "Title: Django REST Framework, a Python framework."
+    },
+    "Django_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "python",
+      "reason": "Title: Django, a Python web framework."
+    },
+    "DotNet_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "dotnet",
+      "reason": "Title and opening: .NET security tips."
+    },
+    "FastAPI_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "python",
+      "reason": "Opening: FastAPI is a Python web framework."
+    },
+    "Injection_Prevention_in_Java_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "java",
+      "reason": "Title: injection prevention in Java (a stub pointing to the Java Security Cheat Sheet)."
+    },
+    "JAAS_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "java",
+      "reason": "Title: JAAS, the Java Authentication and Authorization Service."
+    },
+    "JavaScript_and_TypeScript_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "javascript",
+      "reason": "Title: JavaScript and TypeScript language practices."
+    },
+    "Java_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "java",
+      "reason": "Title: Java Security."
+    },
+    "Laravel_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "php",
+      "reason": "Title: Laravel, a PHP framework."
+    },
+    "NPM_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "javascript",
+      "reason": "Title and opening: npm practices for JavaScript and Node.js developers."
+    },
+    "Nextjs_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "javascript",
+      "reason": "Title: Next.js, a JavaScript framework."
+    },
+    "NodeJS_Docker_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "javascript",
+      "reason": "Title: building Node.js applications into Docker images."
+    },
+    "Nodejs_Security_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "javascript",
+      "reason": "Title and opening: Node.js-specific actions."
+    },
+    "PHP_Configuration_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "php",
+      "reason": "Title: PHP configuration (php.ini and its web servers)."
+    },
+    "Prototype_Pollution_Prevention_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "javascript",
+      "reason": "Opening: manipulating an application's JavaScript objects."
+    },
+    "Ruby_on_Rails_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "ruby",
+      "reason": "Title: Ruby on Rails."
+    },
+    "Symfony_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "php",
+      "reason": "Title: Symfony, a PHP framework."
+    },
+    "Third_Party_Javascript_Management_Cheat_Sheet": {
+      "rule": "platform",
+      "platform": "javascript",
+      "reason": "Title: managing third-party JavaScript."
+    }
+  },
+  "general": [
+    "AI-Powered_Advertising_Systems_Security_Cheat_Sheet",
+    "AI_Agent_Security_Cheat_Sheet",
+    "AML_Sanctions_AI_Agent_Payments_Cheat_Sheet",
+    "Attack_Surface_Analysis_Cheat_Sheet",
+    "Authentication_Cheat_Sheet",
+    "Authentication_Patterns_Cheat_Sheet",
+    "Authorization_Cheat_Sheet",
+    "Authorization_Decisions_And_Output_Handling_Cheat_Sheet",
+    "Authorization_Patterns_Cheat_Sheet",
+    "Authorization_Policy_And_Data_Distribution_Cheat_Sheet",
+    "Authorization_Regression_Testing_Cheat_Sheet",
+    "Authorization_Testing_Automation_Cheat_Sheet",
+    "Automotive_Security_Cheat_Sheet",
+    "Bot_Management_and_Anti-Automation_Cheat_Sheet",
+    "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+    "Business_Logic_Security_Cheat_Sheet",
+    "CI_CD_Security_Cheat_Sheet",
+    "Choosing_and_Using_Security_Questions_Cheat_Sheet",
+    "Clickjacking_Defense_Cheat_Sheet",
+    "Content_Security_Policy_Cheat_Sheet",
+    "Cookie_Theft_Mitigation_Cheat_Sheet",
+    "Credential_Stuffing_Prevention_Cheat_Sheet",
+    "Cross-Site_Request_Forgery_Prevention_Cheat_Sheet",
+    "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+    "Cryptographic_Storage_Cheat_Sheet",
+    "DOM_Clobbering_Prevention_Cheat_Sheet",
+    "DOM_based_XSS_Prevention_Cheat_Sheet",
+    "Database_Security_Cheat_Sheet",
+    "Denial_of_Service_Cheat_Sheet",
+    "Dependency_Graph_SBOM_Cheat_Sheet",
+    "Deserialization_Cheat_Sheet",
+    "Docker_Security_Cheat_Sheet",
+    "Drone_Security_Cheat_Sheet",
+    "Email_Validation_and_Verification_Cheat_Sheet",
+    "Error_Handling_Cheat_Sheet",
+    "File_Upload_Cheat_Sheet",
+    "Forgot_Password_Cheat_Sheet",
+    "GitHub_Actions_Security_Cheat_Sheet",
+    "GraphQL_Cheat_Sheet",
+    "HTML5_Security_Cheat_Sheet",
+    "HTTP_Headers_Cheat_Sheet",
+    "HTTP_Strict_Transport_Security_Cheat_Sheet",
+    "Identity_Propagation_Patterns_Cheat_Sheet",
+    "Infrastructure_as_Code_Security_Cheat_Sheet",
+    "Injection_Prevention_Cheat_Sheet",
+    "Input_Validation_Cheat_Sheet",
+    "Insecure_Direct_Object_Reference_Prevention_Cheat_Sheet",
+    "JSON_Web_Token_Cheat_Sheet",
+    "Key_Management_Cheat_Sheet",
+    "Kubernetes_Security_Cheat_Sheet",
+    "LDAP_Injection_Prevention_Cheat_Sheet",
+    "LLM_Prompt_Injection_Prevention_Cheat_Sheet",
+    "Legacy_Application_Management_Cheat_Sheet",
+    "Logging_Cheat_Sheet",
+    "Logging_Vocabulary_Cheat_Sheet",
+    "MCP_Security_Cheat_Sheet",
+    "Mass_Assignment_Cheat_Sheet",
+    "Micro_Frontend_Security_Cheat_Sheet",
+    "Microservices_Security_Cheat_Sheet",
+    "Microservices_based_Security_Arch_Doc_Cheat_Sheet",
+    "Mobile_Application_Security_Cheat_Sheet",
+    "Multi_Tenant_Security_Cheat_Sheet",
+    "Multifactor_Authentication_Cheat_Sheet",
+    "Network_Segmentation_Cheat_Sheet",
+    "NoSQL_Security_Cheat_Sheet",
+    "OAuth2_Cheat_Sheet",
+    "OS_Command_Injection_Defense_Cheat_Sheet",
+    "Passkey_Security_Cheat_Sheet",
+    "Password_Storage_Cheat_Sheet",
+    "Pinning_Cheat_Sheet",
+    "Post_Quantum_Cryptography_Cheat_Sheet",
+    "Query_Parameterization_Cheat_Sheet",
+    "RAG_Security_Cheat_Sheet",
+    "REST_Assessment_Cheat_Sheet",
+    "REST_Security_Cheat_Sheet",
+    "SAML_Security_Cheat_Sheet",
+    "SQL_Injection_Prevention_Cheat_Sheet",
+    "Secrets_Management_Cheat_Sheet",
+    "Secure_AI_Model_Ops_Cheat_Sheet",
+    "Secure_Cloud_Architecture_Cheat_Sheet",
+    "Secure_Code_Review_Cheat_Sheet",
+    "Secure_Coding_with_AI_Cheat_Sheet",
+    "Secure_Product_Design_Cheat_Sheet",
+    "Security_Terminology_Cheat_Sheet",
+    "Server_Side_Request_Forgery_Prevention_Cheat_Sheet",
+    "Server_Side_Template_Injection_Prevention_Cheat_Sheet",
+    "Serverless_FaaS_Security_Cheat_Sheet",
+    "Session_Management_Cheat_Sheet",
+    "Software_Supply_Chain_Security_Cheat_Sheet",
+    "Subdomain_Takeover_Prevention_Cheat_Sheet",
+    "Third_Party_Payment_Gateway_Integration_Cheat_Sheet",
+    "Threat_Modeling_Cheat_Sheet",
+    "Transaction_Authorization_Cheat_Sheet",
+    "Transport_Layer_Security_Cheat_Sheet",
+    "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+    "User_Privacy_Protection_Cheat_Sheet",
+    "Verifying_Third_Party_Agent_Execution_Evidence_Cheat_Sheet",
+    "Virtual_Patching_Cheat_Sheet",
+    "Vulnerability_Disclosure_Cheat_Sheet",
+    "Vulnerable_Dependency_Management_Cheat_Sheet",
+    "WebSocket_Security_Cheat_Sheet",
+    "Web_Cache_Security_Cheat_Sheet",
+    "Web_Frontend_Security_Cheat_Sheet",
+    "Web_Service_Security_Cheat_Sheet",
+    "Webhook_Security_Cheat_Sheet",
+    "Workload_Identity_Federation_Cheat_Sheet",
+    "XML_External_Entity_Prevention_Cheat_Sheet",
+    "XML_Security_Cheat_Sheet",
+    "XPath_Injection_Prevention_Cheat_Sheet",
+    "XS_Leaks_Cheat_Sheet",
+    "Zero_Trust_Architecture_Cheat_Sheet",
+    "gRPC_Security_Cheat_Sheet"
+  ]
+}

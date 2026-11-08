@@ -6,6 +6,7 @@ the ingest fixtures into a temporary data/samples/. The real registry
 (experiments/registry.json) is used throughout.
 """
 from contextlib import redirect_stderr, redirect_stdout
+import hashlib
 import io
 import json
 import os
@@ -338,6 +339,28 @@ class ExperimentTest(unittest.TestCase):
             path.write_text(json.dumps(manifest), encoding="utf-8")
             with self.assertRaisesRegex(experiments.ExperimentError, "different model"):
                 experiments.plan("1", side="after")
+
+    def test_a_semantic_run_records_its_retrieval_set_up_and_scope_hash(self):
+        plan = experiments.plan("4", side="after")[0]
+        plan["dir"].mkdir(parents=True)
+        experiments._start_manifest(plan, {"commit": None, "dirty": None, "dirty_paths": []})
+        path = self.out / "4-after" / "run_manifest.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        settings = manifest["profile"]["settings"]
+        self.assertEqual(settings, profiles.PROFILES["semantic"])
+        self.assertEqual((settings["SEMANTIC_GROUNDING"], settings["SEMANTIC_MAX_CHUNK_CHARS"],
+                          settings["KB_TARGET_PLATFORM"]), ("mitre_record", 1800, "java"))
+        scope = config.KB_DIR / "scope.json"
+        self.assertEqual(manifest["retrieval"]["kb_scope_sha256"],
+                         hashlib.sha256(scope.read_bytes()).hexdigest())
+        self.assertEqual(manifest["retrieval"]["embedding_model"], config.EMBEDDING_MODEL)
+        # A changed scope.json cannot be resumed into the same run.
+        manifest["retrieval"]["kb_scope_sha256"] = "0" * 64
+        path.write_text(json.dumps(manifest), encoding="utf-8")
+        with self.assertRaisesRegex(experiments.ExperimentError, "different retrieval set-up"):
+            experiments.plan("4", side="after")
+        # Map runs record no retrieval block, as before.
+        self.assertIsNone(experiments.plan("1", side="after")[0]["retrieval"])
 
     def test_a_limited_run_extends_to_the_full_set(self):
         experiments.execute(experiments.plan("1", side="before", limit=1)[0], ANSWER_KEY,

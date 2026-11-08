@@ -613,3 +613,78 @@ measured gain.
 **Consequence.** The `worksheet` profile and its runs stay, so step 3 remains
 replayable. The worksheet code stays behind its switch (`REVIEW_WORKSHEET_ENABLED`)
 and can be turned back on if a later evaluation shows a need.
+
+## 28. The semantic retrieval set-up is fixed before step 4 is measured
+
+**Decision.** Before step 4 is run, semantic retrieval (decision 21) gets five
+rules, each a switch in `config.py`. All five off is decision 21's set-up
+exactly; the `semantic` profile turns all five on.
+
+- **R1 Query** (`SEMANTIC_QUERY_ALT_TERMS`): the query adds MITRE's
+  `Alternate_Terms`: "{Name}. Also known as: {terms}. {Description}".
+- **R2 MITRE text** (`SEMANTIC_MITRE_GUIDANCE`, cap 1,500 characters): the
+  CWE's MITRE description, extended description and mitigations (each with
+  its phase) become the first guidance chunk, `MITRE-CWE-<id>`. It is looked
+  up by CWE ID, never embedded or searched. Examples and CVE lists are left out.
+- **R3 Sheets searched** (`SEMANTIC_KB_SCOPE`, `KB_TARGET_PLATFORM = "java"`):
+  `kb/scope.json`, written from each sheet's title and opening paragraph,
+  leaves out retired sheets, the attack-string catalogue and sheets for other
+  platforms (21 of 137).
+- **R4 Chunk size** (`SEMANTIC_MAX_CHUNK_CHARS = 1800`): longer chunks are
+  split at load time at blank lines, then line breaks, then sentence ends
+  (214 chunks into 447 pieces). The KB JSON is unchanged.
+- **R5 Grounding** (`SEMANTIC_GROUNDING = "mitre_record"`): an alert is
+  grounded if and only if its CWE has a valid, non-deprecated MITRE record.
+
+**Why.**
+
+- *Categories, not a hand-made list.* The team's investigation of decision 21's
+  set-up found that retired sheets, attack strings and sheets for Django,
+  Laravel, .NET and others could outrank guidance that applies to Java. The
+  rules name categories and are applied to every sheet from its title and
+  opening, never from retrieval results, so they cannot be tuned to the
+  results we like.
+- *A platform switch keeps the system general.* Sheets about one language or
+  framework are tagged, not deleted. Scanning a Python repository means
+  setting `KB_TARGET_PLATFORM = "python"`, not writing a new list.
+- *MITRE is attached by ID, not found by search.* A query built from a CWE's
+  own description would mostly find its own record, so searching for it would
+  look better than it is. Lookup by ID is deterministic and gives every known
+  CWE authoritative guidance, including CWEs the OWASP sheets do not cover.
+- *The grounding gate checks a fact, not a score.* At 0.0 the old threshold let
+  everything through, and decision 21 showed that cosine scores of right and
+  wrong sheets overlap, so no threshold separates them. Whether a valid MITRE
+  record exists is a fact. `SEMANTIC_MIN_SCORE` stays at 0.0 and is used only
+  by the original gate.
+- *The budget is unchanged.* Step 4 is compared with `2-after`, so the pack
+  stays at 4,000 characters and 6 chunks; the MITRE chunk counts against both.
+- *Splitting oversized chunks.* The embedding model reads only about the first
+  512 tokens, so the rest of a long chunk was never searched, and one chunk
+  could fill the whole budget.
+
+**Consequence.**
+
+- The default `RETRIEVAL_MODE` stays `"map"` until step 4 is measured. Map
+  retrieval, `cwe_map.json` and the KB JSON files are unchanged, and map mode
+  ignores the new switches.
+- The vector store holds every chunk plus the split pieces, so `python -m
+  triagebot.nodes.context.vector_store` prepares both set-ups and switching
+  between them re-embeds nothing. The pieces have new IDs (`<chunk_id>.1`, …);
+  chunks within the cap keep theirs, so their grades in
+  `verification/relevance_labels.json` stay valid.
+- Semantic run manifests record the five settings and the SHA-256 of
+  `scope.json`; a run cannot be resumed with a different set-up.
+- `python -m triagebot.nodes.context.retrieval --explain CWE-89 [--setup
+  original|improved]` shows how one CWE's pack is built, without model calls.
+- MITRE text is now quoted in prompts, so MITRE's copyright line and terms of
+  use are reproduced in `triagebot/nodes/context/MITRE_CWE_NOTICE.md` and
+  linked from the README and `kb/README.md`. In semantic mode the prompt's
+  guidance block is labelled "Retrieved guidance (MITRE CWE and OWASP Cheat
+  Sheet Series)"; map-mode prompts are byte-identical (a test pins them).
+- Two limits are kept on purpose, so step 4 differs from `2-after` in
+  retrieval only: filling the budget stops at the first chunk that does not
+  fit, and the MITRE chunk's 1,500-character cap can cut later mitigations
+  (EXPERIMENTS.md, step 4, "Known limits").
+- These rules were set without looking at any comparison-set or final-test
+  case. Any further change to the set-up follows decision 26: exploration
+  cases only, then one measurement.

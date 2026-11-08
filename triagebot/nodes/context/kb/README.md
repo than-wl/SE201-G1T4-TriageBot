@@ -25,6 +25,43 @@ fetches web content (see design decision 2 in `doc/DESIGN_DECISIONS.md`).
 | `docs/<Sheet>.json` | One file per cheat sheet: title, URL, heading-based chunks |
 | `cwe_map.json` | `CWE-xx` -> list of cheat-sheet docs covering it |
 | `common.json` | Chunks included in every payload regardless of CWE |
+| `scope.json` | Which sheets semantic retrieval searches (hand-written; see below) |
+
+## Which sheets semantic retrieval searches (`scope.json`)
+
+Map retrieval ignores this file. Semantic retrieval reads it when
+`SEMANTIC_KB_SCOPE` is on (the `semantic` profile; design decision 28). It
+was written after the team's investigation found retired sheets, an
+attack-string catalogue and sheets for other languages outranking guidance
+that applies to Java. It is decided from each sheet's **title and opening
+paragraph only**, never from retrieval output, and lists every sheet in
+`docs/` exactly once:
+
+| Section | Rule | Effect |
+| --- | --- | --- |
+| `excluded`, rule `retired` | a. Title starts with `DEPRECATED:` or contains `(Historical)` | Never searched |
+| `excluded`, rule `attack_catalogue` | b. Mainly attack inputs, not defensive guidance (only `XSS_Filter_Evasion`) | Never searched |
+| `platform` | c. Specific to one language, framework or runtime: tagged `java`, `python`, `php`, ... | Searched only when the tag equals `KB_TARGET_PLATFORM` |
+| `general` | Everything else, including platform-neutral infrastructure (Docker, Kubernetes, CI/CD) | Always searched |
+
+`common.json` is always searched. Because the rules are categories, scanning
+a Python repository means setting `KB_TARGET_PLATFORM = "python"` in
+`triagebot/config.py`, not editing a list. Experiment run manifests record
+the file's SHA-256, so a change to it is visible.
+
+**Tagging a new sheet.** Read its title and opening paragraph. If rule a or b
+applies, add it to `excluded` with the rule and a one-line reason. If it is
+about one language, framework or runtime, add it to `platform` with the tag
+(reuse a value from `platforms`) and a one-line reason. Otherwise add its
+name to `general`. `tests/test_semantic_setup.py` fails until every sheet in
+`docs/` is listed exactly once. Keep the file LF-only (`.gitattributes`).
+
+## MITRE CWE text
+
+Semantic retrieval also attaches the MITRE CWE record of the alert's
+weakness as the first guidance chunk (`MITRE-CWE-<id>`). That text is
+MITRE's, not part of this knowledge base; its copyright line and terms of use
+are in [`../MITRE_CWE_NOTICE.md`](../MITRE_CWE_NOTICE.md).
 
 ## How chunks are produced
 

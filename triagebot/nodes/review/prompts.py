@@ -160,6 +160,22 @@ def __getattr__(name):
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
+GUIDANCE_HEADERS = {
+    "map": "--- Retrieved OWASP guidance (cite only these, by chunk_id) ---",
+    # Semantic mode puts the MITRE CWE record first (design decision 28).
+    "semantic": "--- Retrieved guidance (MITRE CWE and OWASP Cheat Sheet Series); "
+                "cite only these, by chunk_id ---",
+}
+
+
+def guidance_header() -> str:
+    """The guidance block's heading for config.RETRIEVAL_MODE, read at call time.
+
+    Map mode keeps its original heading, so map-mode prompts are byte-identical.
+    """
+    return GUIDANCE_HEADERS["semantic" if config.RETRIEVAL_MODE == "semantic" else "map"]
+
+
 def to_prompt_block(payload: ContextPayload) -> str:
     """Render a payload as the shared evidence block (data, not instructions)."""
     alert = payload["alert"]
@@ -191,7 +207,7 @@ def to_prompt_block(payload: ContextPayload) -> str:
         else:
             lines.append("  (none found)")
 
-    lines += ["", "--- Retrieved OWASP guidance (cite only these, by chunk_id) ---"]
+    lines += ["", guidance_header()]
     chunks = payload["guidance"]["chunks"]
     if not chunks:
         lines.append("(no guidance matched — reason from the source code only)")

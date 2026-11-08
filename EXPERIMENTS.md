@@ -129,6 +129,7 @@ switches from one profile to the next, so exactly one group changes.
 | Related source (other files, called methods, referenced scripts) | off | on | on | on |
 | Reasoning worksheet (`analysis` field) and consistency repair | off | off | on | off |
 | Guidance retrieval | `map` | `map` | `map` | `semantic` |
+| Semantic set-up (rules R1 to R5) | — | — | — | improved: all five on |
 
 What each setting means:
 
@@ -144,9 +145,13 @@ What each setting means:
   call; a repair that still contradicts it becomes "needs a human". With it
   off, the field is neither asked for nor allowed, and no repair happens.
 - **Guidance retrieval:** `map` picks OWASP cheat-sheet sections through a
-  hand-made table from weakness (CWE) to cheat sheet. `semantic` ranks every
-  section by meaning against the official MITRE description of the alert's
+  hand-made table from weakness (CWE) to cheat sheet. `semantic` ranks
+  sections by meaning against the official MITRE description of the alert's
   weakness (design decision 21).
+- **Semantic set-up:** five rules that decide how semantic retrieval builds
+  the guidance (design decision 28; see
+  [step 4](#semantic-retrieval-set-up-fixed-before-measuring)). The `semantic`
+  profile turns all five on. The other profiles use `map`, which ignores them.
 
 **On in every profile** (engineering fixes, not experiments): strict JSON
 schema output; guidance-label normalisation in the validator; the LangGraph
@@ -295,7 +300,7 @@ for each.
   `python -m triagebot.nodes.context.cwe_catalogue` (MITRE catalogue) and
   `python -m triagebot.nodes.context.vector_store` (embeds the knowledge base).
   The run stops with these commands if either is missing.
-- **Status:** not run yet.
+- **Status:** set-up fixed; not yet measured.
 - **Commands:**
   - show: `python -m triagebot experiment show 4`
   - replay: `python -m triagebot experiment replay 4`
@@ -310,6 +315,94 @@ reported as an improvement. If not, it remains the design choice, argued on
 scalability and maintainability, and the slide states the accuracy difference
 plainly. Any tuning of its set-up happens on exploration cases only, followed
 by one measurement on the comparison set.
+
+#### Semantic retrieval set-up (fixed before measuring)
+
+Step 4 asks whether semantic retrieval can replace the hand-made table. The
+case for it is scale: the table covers only the weaknesses someone wrote down,
+while the MITRE catalogue covers every CWE. Because the comparison set is
+measured once per configuration (design decision 26), the set-up was fixed
+first, by rules stated in advance and without looking at any comparison-set or
+final-test case. The rules come from the team's investigation of decision 21's
+set-up (design decision 28).
+
+| Setting | Before (decision 21) | Now | Why |
+| --- | --- | --- | --- |
+| R1 Query | MITRE name and description | Name, alternate terms ("Also known as: …"), description | The official name misses the words the cheat sheets use, such as "XSS" or "path traversal" |
+| R2 MITRE text | Used only as the query | MITRE description and mitigations attached first, looked up by CWE ID (at most 1,500 characters) | Every known CWE gets authoritative guidance, even one the OWASP sheets do not cover |
+| R3 Sheets searched | All 137 | 116: retired sheets, the attack-string catalogue and sheets for other platforms left out | These outranked guidance that applies to Java; one setting, `KB_TARGET_PLATFORM`, switches platform |
+| R4 Chunk size | Up to 11,744 characters | Chunks over 1,800 characters split into pieces | The embedding model reads only about the first 512 tokens; one huge chunk could fill the whole budget |
+| R5 Grounding gate | A chunk scores at least 0.0 (always true) | The CWE has a valid, non-deprecated MITRE record | A score threshold cannot separate relevant from irrelevant chunks here; a record either exists or not |
+
+The guidance budget is unchanged (4,000 characters, at most 6 chunks), because
+step 4 is compared with `2-after`. In numbers: R3 leaves out 21 sheets (4
+retired, 1 attack catalogue, 16 for other platforms; 533 chunks); R4 splits 214
+chunks into 447 pieces. The improved set-up searches 2,886 chunks.
+
+**How a guidance pack is built**
+
+1. Look up the alert's CWE in MITRE; with no valid record, the alert goes to
+   human review.
+2. Put the MITRE summary and mitigations first.
+3. Search the in-scope OWASP sheets using the name, alternate terms and
+   description.
+4. Fill up to 4,000 characters.
+
+**See it for one CWE** (no model calls; only the local embedder):
+
+```bash
+python -m triagebot.nodes.context.retrieval --explain CWE-89 --setup improved
+python -m triagebot.nodes.context.retrieval --explain CWE-89 --setup original
+```
+
+It prints the query, whether the CWE is grounded and why, the start of the
+MITRE chunk, the guidance returned (rank, chunk, cosine score, characters,
+running total) and the next five results that did not fit. `original` is all
+five rules off (decision 21); `improved` is the `semantic` profile.
+
+In semantic mode the prompt labels the guidance block "Retrieved guidance
+(MITRE CWE and OWASP Cheat Sheet Series)"; map-mode prompts are unchanged,
+byte for byte.
+
+**What the set-up changes** (`--explain`, 9 Nov; CWE catalogue 5.0):
+
+| CWE | Original set-up | Improved set-up |
+| --- | --- | --- |
+| 89, SQL injection | 2 chunks, 2,256 of 4,000 chars: Injection Prevention, Query Parameterization | MITRE record (1,343 chars) + Injection Prevention: 2,965 chars. FastAPI (Python) no longer in the next five |
+| 22, path traversal | 3 chunks, 3,357 chars: File Upload + **two Laravel (PHP) chunks**; Symfony and C toolchain next | MITRE record (1,290 chars) + File Upload ×2 + XML Security: 3,969 chars. Laravel, Symfony and C toolchain gone |
+
+The knowledge base has no path-traversal sheet, so for CWE-22 the MITRE record
+is the only guidance that is about path traversal itself.
+
+Alternate terms (R1): 6 of the scan's 9 CWEs have them.
+
+| CWE | Alternate terms |
+| --- | --- |
+| 22 | Path traversal, Directory traversal, Path transversal |
+| 78 | Shell injection, Shell metacharacters, OS Command Injection |
+| 79 | Cross-site Scripting, XSS, HTML Injection, three named XSS types, CSS |
+| 89 | SQL Injection, SQLi |
+| 90 | LDAP Injection |
+| 643 | XPath Injection |
+| 326, 328, 501 | none (and CWE-501 has no MITRE mitigations, so its MITRE chunk is the description only) |
+
+**Known limits, left unchanged** so that step 4 differs from `2-after` in
+retrieval only:
+
+- *Filling stops at the first chunk that does not fit.* CWE-89 stops at 2,965
+  of 4,000 characters: the next chunk (1,785 chars) does not fit, although the
+  three after it (470, 57 and 624 chars) would have.
+- *The MITRE chunk is capped at 1,500 characters.* For CWE-22 only the first
+  mitigation fits ("accept known good" input validation); MITRE's later
+  mitigations are cut.
+
+**For the next item (the retrieval-quality check):**
+
+- Split chunks have new IDs (`<chunk_id>.1`, `.2`, …), so any that reach the
+  top results need grading; chunks within 1,800 characters keep their IDs and
+  grades.
+- CWE-79's alternate terms include "CSS" (MITRE's old abbreviation for
+  cross-site scripting). Check whether it pulls in chunks about CSS styling.
 
 ### Step 5: Does the verdict follow the code?
 

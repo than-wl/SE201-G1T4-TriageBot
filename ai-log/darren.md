@@ -248,3 +248,54 @@ Ran the full test suite (302 pass) and had the case sets rebuilt independently o
 ### What I kept or changed
 
 Kept as generated.
+
+
+## 2026-11-08 — Step 4 set-up: fix the semantic retrieval rules before measuring
+
+- **Tool (model):** Claude Code (claude-opus-5-5); prompt written by Darren (PROMPT_02)
+- **Files:** triagebot/config.py, triagebot/profiles.py, triagebot/experiments.py,
+  triagebot/nodes/context/retrieval.py, triagebot/nodes/context/cwe_catalogue.py,
+  triagebot/nodes/context/vector_store.py, triagebot/nodes/review/prompts.py,
+  triagebot/nodes/context/kb/scope.json (new),
+  triagebot/nodes/context/MITRE_CWE_NOTICE.md (new), triagebot/nodes/context/kb/README.md,
+  tests/semantic_fixture.py (new), tests/test_semantic_setup.py (new),
+  tests/test_semantic_retrieval.py, tests/test_experiments.py, .gitattributes,
+  EXPERIMENTS.md (step 4 set-up), docs/DESIGN_DECISIONS.md (decision 28), README.md,
+  ai-log/darren.md
+- **Outcome:** The step 4 semantic set-up is fixed and documented; not yet measured.
+  With the real catalogue (CWE 5.0, pinned hash verified) and vector store (3,685
+  rows: 3,238 chunks plus 447 pieces of 214 split chunks), `--explain` showed:
+  CWE-89 original 2 chunks / 2,256 chars, improved MITRE record + 1 chunk / 2,965
+  chars (a Python sheet dropped out); CWE-22 original 3 chunks / 3,357 chars, two
+  from Laravel (PHP), improved MITRE record + 3 chunks / 3,969 chars, with Laravel,
+  Symfony and the C toolchain sheet gone. 6 of the 9 scan CWEs have MITRE
+  alternate terms (none for 326, 328, 501). Kept as known limits: filling stops at
+  the first chunk that does not fit, and the 1,500-character MITRE cap cuts later
+  mitigations. Semantic prompts now label the guidance block MITRE CWE and OWASP;
+  map prompts are byte-identical.
+
+### What I asked for
+
+Fix the semantic retrieval set-up for experiment step 4 by rules stated in advance,
+each behind its own switch, with all switches off reproducing the decision 21 set-up
+exactly and the `semantic` profile turning all on: alternate terms in the query; the
+MITRE record attached first by CWE ID within the unchanged 4,000-character budget;
+a hand-written `scope.json` that leaves out retired sheets, the attack-string
+catalogue and sheets for other platforms, decided from titles and openings only;
+oversized chunks split at load time; and a grounding gate that checks for a valid
+MITRE record instead of a score. Record the set-up and the scope file's hash in run
+manifests, add a free `--explain` command, reproduce MITRE's terms of use (one fetch
+of the terms page, nothing else online), offline tests, and document it for the
+slides. No model calls, no paid runs, no commits; changes staged only.
+
+### How I checked it
+
+The assistant ran the offline suite: 302 tests before, 351 after (1 skipped), with
+the "all switches off" result and the map-mode prompts pinned to output recorded
+from the previous code. It then installed the catalogue with the pinned-hash
+command, built the vector store and ran `--explain` for CWE-89 and CWE-22 under
+both set-ups (no model calls). TODO (Darren): own checks.
+
+### What I kept or changed
+
+TODO (Darren)

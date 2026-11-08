@@ -392,9 +392,22 @@ reviewed the dev-split comparison (design decision 21).
 ```bash
 pip install -r requirements.txt                              # includes fastembed
 python -m triagebot.nodes.context.cwe_catalogue              # once: MITRE CWE catalogue, SHA-256 checked
+python -m triagebot.nodes.context.vector_store               # once: embeds the knowledge base
+python -m triagebot.nodes.context.retrieval --explain CWE-89 # what one CWE gets; no model calls
 ```
 
 The catalogue is written under the git-ignored `Context/tmp/cwe/`, and the knowledge-base
-vector store is a SQLite file at `Context/tmp/kb_vectors.sqlite`. The first semantic run
-embeds the whole knowledge base (a few minutes on CPU); later runs embed only what changed. Alerts with no CWE, an unknown or deprecated CWE, or no chunk above
-`SEMANTIC_MIN_SCORE` are sent to human review in either mode.
+vector store is a SQLite file at `Context/tmp/kb_vectors.sqlite`. Preparing the store
+embeds the whole knowledge base (a few minutes on CPU); later runs embed only what changed.
+The semantic set-up used by experiment step 4 is fixed by five rules (design decision 28;
+[EXPERIMENTS.md](EXPERIMENTS.md#semantic-retrieval-set-up-fixed-before-measuring)). Alerts
+with no CWE, or an unknown or deprecated CWE, are sent to human review in either mode.
+
+## Third-party content
+
+- **OWASP Cheat Sheet Series** (the guidance knowledge base): CC BY-SA 4.0; see
+  [triagebot/nodes/context/kb/README.md](triagebot/nodes/context/kb/README.md).
+- **MITRE CWE** (semantic retrieval quotes a weakness's description and mitigations, and
+  searches with its name and alternate terms): © The MITRE Corporation, used under the
+  CWE Terms of Use reproduced in
+  [triagebot/nodes/context/MITRE_CWE_NOTICE.md](triagebot/nodes/context/MITRE_CWE_NOTICE.md).

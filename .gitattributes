@@ -4,3 +4,5 @@ data/samples/*.json text eol=lf
 data/samples/*.md text eol=lf
 experiments/*.json text eol=lf
 evidence/experiments/** text eol=lf
+# The semantic sheet scope is fingerprinted in run manifests (SHA-256).
+triagebot/nodes/context/kb/scope.json text eol=lf

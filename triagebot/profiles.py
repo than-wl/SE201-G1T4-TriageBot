@@ -13,6 +13,19 @@ for one run, then restores what was there before:
 | Related source                       | off   | on       | on        | on       |
 | Reasoning worksheet + repair         | off   | off      | on        | off      |
 | Guidance retrieval                   | map   | map      | map       | semantic |
+| Semantic set-up (rules R1 to R5)     | -     | -        | -         | improved |
+
+The semantic set-up is fixed before step 4 is measured (design decision 28). The
+`semantic` profile turns on all five rules; the other profiles use map retrieval,
+which ignores them. SEMANTIC_SETUPS names the two set-ups `--explain` compares:
+
+| Switch                               | original (decision 21) | improved (`semantic`) |
+| ------------------------------------ | ---------------------- | --------------------- |
+| R1 SEMANTIC_QUERY_ALT_TERMS          | off                    | on                    |
+| R2 SEMANTIC_MITRE_GUIDANCE           | off                    | on (cap 1,500 chars)  |
+| R3 SEMANTIC_KB_SCOPE                 | off                    | on (platform java)    |
+| R4 SEMANTIC_MAX_CHUNK_CHARS          | 0 (off)                | 1,800                 |
+| R5 SEMANTIC_GROUNDING                | min_score              | mitre_record          |
 
 The engineering fixes in ENGINEERING_FIXES are not switches: they stay on in
 every profile. The settings are read at call time by the code that uses them
@@ -23,10 +36,36 @@ RETRIEVAL_MODE when it is created.
 """
 
 from contextlib import contextmanager
+import hashlib
 from pathlib import Path
 import sqlite3
 
 from triagebot import config
+
+# The semantic set-up rules (R1 to R5) and their parameters. "original" is the
+# decision 21 set-up (all off, the config defaults); "improved" is what the
+# semantic profile runs.
+SEMANTIC_SETUPS = {
+    "original": {
+        "SEMANTIC_QUERY_ALT_TERMS": False,
+        "SEMANTIC_MITRE_GUIDANCE": False,
+        "MITRE_GUIDANCE_MAX_CHARS": 1500,
+        "SEMANTIC_KB_SCOPE": False,
+        "KB_TARGET_PLATFORM": "java",
+        "SEMANTIC_MAX_CHUNK_CHARS": 0,
+        "SEMANTIC_GROUNDING": "min_score",
+    },
+    "improved": {
+        "SEMANTIC_QUERY_ALT_TERMS": True,
+        "SEMANTIC_MITRE_GUIDANCE": True,
+        "MITRE_GUIDANCE_MAX_CHARS": 1500,
+        "SEMANTIC_KB_SCOPE": True,
+        "KB_TARGET_PLATFORM": "java",
+        "SEMANTIC_MAX_CHUNK_CHARS": 1800,
+        "SEMANTIC_GROUNDING": "mitre_record",
+    },
+}
+SEMANTIC_SETTINGS = tuple(SEMANTIC_SETUPS["original"])
 
 PROFILES = {
     "base": {
@@ -52,9 +91,12 @@ PROFILES = {
         "SOURCE_RELATED_ENABLED": True,
         "REVIEW_WORKSHEET_ENABLED": False,
         "RETRIEVAL_MODE": "semantic",
+        **SEMANTIC_SETUPS["improved"],      # decision 28: fixed before step 4 is measured
     },
 }
-SETTINGS = tuple(PROFILES["base"])          # the switches a profile sets, in table order
+SETTINGS = tuple(PROFILES["base"])          # the switches every profile sets, in table order
+# Every switch any profile sets; use_profile() saves and restores all of them.
+ALL_SETTINGS = tuple(dict.fromkeys(key for p in PROFILES.values() for key in p))
 LABELS = {
     "SOURCE_WINDOW_LINES": "Source window, lines either side",
     "SOURCE_RELATED_ENABLED": "Related source (other files, called methods, referenced scripts)",
@@ -84,13 +126,47 @@ def get(name: str) -> dict:
 
 
 def current_settings() -> dict:
-    """The live value of every profile switch (whether or not a profile is active)."""
-    return {name: getattr(config, name) for name in SETTINGS}
+    """The live value of every profile switch (whether or not a profile is active).
+
+    The semantic set-up switches are included only while retrieval is semantic:
+    map retrieval ignores them, so map provenance is unchanged by them.
+    """
+    names = SETTINGS + (SEMANTIC_SETTINGS if config.RETRIEVAL_MODE == "semantic" else ())
+    return {name: getattr(config, name) for name in names}
 
 
 def provenance() -> dict:
     """The active profile's name and settings, for run manifests and checkpoints."""
     return {"name": config.ACTIVE_PROFILE, "settings": current_settings()}
+
+
+def _sha256(path) -> str | None:
+    path = Path(path)
+    return hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None
+
+
+def retrieval_provenance(settings: dict) -> dict | None:
+    """For a semantic run: the fixed retrieval parameters and the SHA-256 of kb/scope.json.
+
+    The set-up switches themselves are in the profile settings. None for map runs.
+    """
+    if settings.get("RETRIEVAL_MODE") != "semantic":
+        return None
+    scope = Path(config.KB_SCOPE_FILE)
+    try:
+        scope_name = scope.resolve().relative_to(config._REPO_ROOT).as_posix()
+    except ValueError:
+        scope_name = str(scope)
+    return {
+        "embedding_model": config.EMBEDDING_MODEL,
+        "cwe_catalogue_sha256": config.CWE_CATALOGUE_SHA256,
+        "query_max_chars": config.SEMANTIC_QUERY_MAX_CHARS,
+        "min_score": config.SEMANTIC_MIN_SCORE,
+        "top_k": config.RETRIEVAL_TOP_K,
+        "guidance_max_chars": config.GUIDANCE_MAX_CHARS,
+        "kb_scope_file": scope_name,
+        "kb_scope_sha256": _sha256(scope),
+    }
 
 
 def _vector_store_ready(path) -> bool:
@@ -137,12 +213,20 @@ def use_profile(name: str, *, check_ready: bool = True):
     settings = get(name)
     if check_ready:
         require_ready(name)
-    saved = {key: getattr(config, key) for key in (*SETTINGS, "ACTIVE_PROFILE")}
+    with applied({**settings, "ACTIVE_PROFILE": name}):
+        yield settings
+
+
+@contextmanager
+def applied(settings: dict):
+    """Set config values for the block (any profile switch, or ACTIVE_PROFILE), then restore
+    every profile switch, even if the block raises."""
+    keys = dict.fromkeys((*ALL_SETTINGS, "ACTIVE_PROFILE", *settings))
+    saved = {key: getattr(config, key) for key in keys}
     try:
         for key, value in settings.items():
             setattr(config, key, value)
-        config.ACTIVE_PROFILE = name
-        yield settings
+        yield
     finally:
         for key, value in saved.items():
             setattr(config, key, value)

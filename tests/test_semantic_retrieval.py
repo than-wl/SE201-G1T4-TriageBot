@@ -13,25 +13,12 @@ from unittest.mock import patch
 
 import numpy as np
 
+from semantic_fixture import CATALOGUE   # the small MITRE catalogue, shared with test_semantic_setup
 from triagebot import config
 from triagebot.execution import validation_case
 from triagebot.nodes.context.cwe_catalogue import CweCatalogue, install
 from triagebot.nodes.context.retrieval import KnowledgeBase
 from triagebot.nodes.validate.validator import validate_results
-
-CATALOGUE = """<?xml version="1.0" encoding="UTF-8"?>
-<Weakness_Catalog xmlns="http://cwe.mitre.org/cwe-8"><Weaknesses>
-  <Weakness ID="89" Name="SQL Injection" Status="Stable">
-    <Description>Input reaches an SQL command without neutralisation.</Description>
-  </Weakness>
-  <Weakness ID="916" Name="Hashing Too Weakly" Status="Draft">
-    <Description>Password hash is computed with a weak hash function.</Description>
-  </Weakness>
-  <Weakness ID="1" Name="Old Entry" Status="Deprecated">
-    <Description>Retired.</Description>
-  </Weakness>
-</Weaknesses></Weakness_Catalog>
-"""
 
 
 def _unit(values):
