@@ -1,0 +1,179 @@
+{
+ "about": "Chunks returned by semantic retrieval for the scan CWEs that have no grade in verification/relevance_labels.json. Grade each against its CWE and write the grades to verification/relevance_labels_added.json, in the same shape as relevance_labels.json ({cwe: {chunk_id: grade}}), plus a _meta block (grader, blind, rubric, date).",
+ "rubric": {
+  "2": "guidance about this weakness",
+  "1": "adjacent",
+  "0": "not relevant"
+ },
+ "count": 24,
+ "chunks": [
+  {
+   "cwe": "CWE-22",
+   "chunk_id": "Denial_of_Service_Cheat_Sheet#010",
+   "doc": "Denial_of_Service_Cheat_Sheet",
+   "section": "Application attacks > Input validation",
+   "text": "Limit file upload size and extensions: This tactic prevents DoS on file space storage or other web application functions which will use the upload as input (e.g. image resizing, PDF creation, etc. (resource exhaustion) - Checklist.\n\nLimit total request size: To make it harder for resource-consuming DoS attacks to succeed. (resource exhaustion)\n\nPrevent input based resource allocation: Again, to make it harder for resource-consuming DoS attacks to succeed. (resource exhaustion)\n\nPrevent input based function and threading interaction: User input can influence how many times a function needs to be executed, or how intensive the CPU consumption becomes. Depending on (unfiltered) user input for resource allocation could allow a DoS scenario through resource exhaustion. (resource exhaustion)\n\nInput based puzzles like captchas or simple math problems are often used to 'protect' a web form. The classic example is a webform that will send out an email after posting the request. A captcha could then prevent the mailbox from getting flooded by a malicious attacker or spambot. Puzzles serve a purpose against functionality abuse but this kind of technology will not help defend against DoS attacks."
+  },
+  {
+   "cwe": "CWE-22",
+   "chunk_id": "Symfony_Cheat_Sheet#013.1",
+   "doc": "Symfony_Cheat_Sheet",
+   "section": "Main Sections > Directory Traversal",
+   "text": "A directory or path traversal attack aims to access files and directories that are stored on a server by manipulating input data that reference files with “../” dot-dot-slash sequences and its variations or by using absolute file paths. For more details refer to OWASP Path Traversal.\n\nYou can protect your application from a directory traversal attack by validating whether the absolute path of the requested file location is correct or strip out the directory information from filename input.\n\nResolve the base directory and requested path with realpath(), rejecting failures. Include the directory separator in the containment check so a sibling such as /storage-private cannot match /storage.\n\n```\nuse Symfony\\Bundle\\FrameworkBundle\\Controller\\AbstractController;\nuse Symfony\\Component\\HttpFoundation\\Response;\nuse Symfony\\Component\\HttpKernel\\Attribute\\MapQueryParameter;\nuse Symfony\\Component\\Routing\\Annotation\\Route;\n\nclass ExampleController extends AbstractController \n{\n\n    #[Route('/download', methods: ['GET'])]\n    public function download(#[MapQueryParameter] string $filename): Response \n    {\n        $storagePath = $this->getParameter('kernel.project_dir') . '/storage';\n        $filePath = $storagePath . '/' . $filename;\n\n        $realBase = realpath($storagePath);\n        $realPath = realpath($filePath);\n\n        if ($realBase === false || $realPath === false\n            || !str_starts_with($realPath, $realBase . DIRECTORY_SEPARATOR))\n        {\n            throw $this->createNotFoundException();\n        }\n\n        // Use $realPath for the authorized file operation.\n\n    }\n}\n```"
+  },
+  {
+   "cwe": "CWE-22",
+   "chunk_id": "Symfony_Cheat_Sheet#013.2",
+   "doc": "Symfony_Cheat_Sheet",
+   "section": "Main Sections > Directory Traversal",
+   "text": "This illustrative check assumes untrusted users cannot change the directories or symbolic links between validation and file access. Check the caller's permission to access the resolved file separately.\n\nStrip out directory information with PHP basename function"
+  },
+  {
+   "cwe": "CWE-22",
+   "chunk_id": "Symfony_Cheat_Sheet#014",
+   "doc": "Symfony_Cheat_Sheet",
+   "section": "Main Sections > Directory Traversal",
+   "text": "```\n// ...\n\n$storagePath = $this->getParameter('kernel.project_dir') . '/storage';\n$filePath = $storagePath . '/' . basename($filename);\n\n// ...\n```"
+  },
+  {
+   "cwe": "CWE-22",
+   "chunk_id": "XML_Security_Cheat_Sheet#018.2",
+   "doc": "XML_Security_Cheat_Sheet",
+   "section": "Dealing with invalid XML documents > Improper Data Validation > General Data Restrictions",
+   "text": "Software applications, databases, and programming languages normally store information within specific ranges. Whenever using an element or an attribute in locations where certain specific sizes matter (to avoid overflows or underflows), it would be logical to check whether the data length is considered valid. The following schema could constrain a name using a minimum and a maximum length to avoid unusual scenarios:"
+  },
+  {
+   "cwe": "CWE-22",
+   "chunk_id": "XML_Security_Cheat_Sheet#020",
+   "doc": "XML_Security_Cheat_Sheet",
+   "section": "Dealing with invalid XML documents > Improper Data Validation > General Data Restrictions",
+   "text": "```\n<xs:element name=\"denominator\">\n <xs:simpleType>\n  <xs:restriction base=\"xs:integer\">\n   <xs:assertion test=\"$value != 0\"/>\n  </xs:restriction>\n </xs:simpleType>\n</xs:element>\n```\n\nThe assertion guarantees that the denominator will not contain the value zero as a valid number and also allows negative numbers to be a valid denominator.\n\nOccurrences\n\nThe consequences of not defining a maximum number of occurrences could be worse than coping with the consequences of what may happen when receiving extreme numbers of items to be processed. Two attributes specify minimum and maximum limits: minOccurs and maxOccurs.\n\nThe default value for both the minOccurs and the maxOccurs attributes is 1, but certain elements may require other values. For instance, if a value is optional, it could contain a minOccurs of 0, and if there is no limit on the maximum amount, it could contain a maxOccurs of unbounded, as in the following example:\n\n```\n<xs:schema xmlns:xs=\"http://www.w3.org/2001/XMLSchema\">\n <xs:element name=\"operation\">\n  <xs:complexType>\n   <xs:sequence>\n    <xs:element name=\"buy\" maxOccurs=\"unbounded\">\n     <xs:complexType>\n      <xs:all>\n       <xs:element name=\"id\" type=\"xs:integer\"/>\n       <xs:element name=\"price\" type=\"xs:decimal\"/>\n       <xs:element name=\"quantity\" type=\"xs:integer\"/>\n      </xs:all>\n     </xs:complexType>\n    </xs:element>\n  </xs:complexType>\n </xs:element>\n</xs:schema>\n```\n\nThe previous schema includes a root element named operation, which can contain an unlimited (unbounded) amount of buy elements. This is a common finding, since developers do not normally want to restrict maximum numbers of occurrences. Applications using limitless occurrences should test what happens when they receive an extremely large amount of elements to be processed. Since computational resources are limited, the consequences should be analyzed and eventually a maximum number ought to be used instead of an unbounded value."
+  },
+  {
+   "cwe": "CWE-22",
+   "chunk_id": "XML_Security_Cheat_Sheet#020.2",
+   "doc": "XML_Security_Cheat_Sheet",
+   "section": "Dealing with invalid XML documents > Improper Data Validation > General Data Restrictions",
+   "text": "The previous schema includes a root element named operation, which can contain an unlimited (unbounded) amount of buy elements. This is a common finding, since developers do not normally want to restrict maximum numbers of occurrences. Applications using limitless occurrences should test what happens when they receive an extremely large amount of elements to be processed. Since computational resources are limited, the consequences should be analyzed and eventually a maximum number ought to be used instead of an unbounded value."
+  },
+  {
+   "cwe": "CWE-78",
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#017",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Operating System Commands > How to test for the issue",
+   "text": "During code review\n\nCheck if any command execute methods are called and in unvalidated user input are taken as data for that command.\n\nOut side of that, appending a semicolon to the end of a URL query parameter followed by an operating system command, will execute the command. %3B is URL encoded and decodes to semicolon. This is because the ; is interpreted as a command separator.\n\nExample: http://sensitive/something.php?dir=%3Bcat%20/etc/passwd\n\nIf the application responds with the output of the /etc/passwd file then you know the attack has been successful. Many web application scanners can be used to test for this attack as they inject variations of command injections and test the response.\n\nEqually Static Code Analysis tools check the data flow of untrusted user input into a web application and check if the data is then entered into a dangerous method which executes the user input as a command."
+  },
+  {
+   "cwe": "CWE-78",
+   "chunk_id": "Java_Security_Cheat_Sheet#011",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > Operating System > Symptom",
+   "text": "Injection of this type occur when the application uses untrusted user input to build an Operating System command using a String and execute it."
+  },
+  {
+   "cwe": "CWE-79",
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#007",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "3. Cross-Site Scripting (XSS) > Vulnerability: Cross-Site Scripting (XSS)",
+   "text": "If user input is not properly sanitized, attackers can inject malicious scripts into web pages, potentially stealing user data or performing unauthorized actions."
+  },
+  {
+   "cwe": "CWE-79",
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#008",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "3. Cross-Site Scripting (XSS) > Example: Cross-Site Scripting (XSS)",
+   "text": "```\nlet userInput = document.getElementById('input').value;\ndocument.getElementById('output').innerHTML = userInput; // No sanitization\n```"
+  },
+  {
+   "cwe": "CWE-79",
+   "chunk_id": "Browser_Extension_Vulnerabilities_Cheat_Sheet#009",
+   "doc": "Browser_Extension_Vulnerabilities_Cheat_Sheet",
+   "section": "3. Cross-Site Scripting (XSS) > Mitigation: Cross-Site Scripting (XSS)",
+   "text": "Implement Content Security Policy (CSP) to block inline scripts. Use libraries like DOMPurify to sanitize user input before displaying it. Avoid using innerHTML and instead use textContent to prevent execution of injected scripts."
+  },
+  {
+   "cwe": "CWE-79",
+   "chunk_id": "Cross_Site_Scripting_Prevention_Cheat_Sheet#001",
+   "doc": "Cross_Site_Scripting_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "text": "This cheat sheet helps developers prevent XSS vulnerabilities.\n\nCross-Site Scripting (XSS) is a misnomer. Originally this term was derived from early versions of the attack that were primarily focused on stealing data cross-site. Since then, the term has widened to include injection of basically any content. XSS attacks are serious and can lead to account impersonation, observing user behavior, loading external content, stealing sensitive data, and more.\n\nThis cheatsheet contains techniques to prevent or limit the impact of XSS. Since no single technique will solve XSS, using the right combination of defensive techniques will be necessary to prevent XSS."
+  },
+  {
+   "cwe": "CWE-79",
+   "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001.1",
+   "doc": "DOM_based_XSS_Prevention_Cheat_Sheet",
+   "section": "Introduction",
+   "text": "Commonly discussed, overlapping categories of XSS (Cross-Site Scripting) include:\n\nReflected or Stored\n\nDOM Based XSS.\n\nThe XSS Prevention Cheatsheet does an excellent job of addressing Reflected and Stored XSS. This cheatsheet addresses DOM (Document Object Model) based XSS and is an extension (and assumes comprehension) of the XSS Prevention Cheatsheet.\n\nStored and reflected describe how an attack payload reaches a victim; server-side and client-side describe where untrusted data is handled unsafely. Both stored and reflected XSS can occur on the client or server, including stored and reflected DOM-based XSS.\n\nFor server-side XSS, the server inserts untrusted data into a response without making it safe for its output context. DOM-based XSS arises from unsafe client-side processing. In either case, the injected script executes in the browser; choose controls for the actual data flow and output context.\n\nWhen a browser is rendering HTML and any other associated content like CSS or JavaScript, it identifies various rendering contexts for the different kinds of input and follows different rules for each context. A rendering context is associated with the parsing of HTML tags and their attributes.\n\nThe HTML parser of the rendering context dictates how data is presented and laid out on the page and can be further broken down into the standard contexts of HTML, HTML attribute, URL, and CSS."
+  },
+  {
+   "cwe": "CWE-79",
+   "chunk_id": "Web_Frontend_Security_Cheat_Sheet#002.2",
+   "doc": "Web_Frontend_Security_Cheat_Sheet",
+   "section": "Introduction > Client-Side (JavaScript) > Use innerHTML with extreme caution",
+   "text": "Sanitized HTML: For user-generated HTML (e.g., in rich text editors), sanitize with a library like DOMPurify before using innerHTML:"
+  },
+  {
+   "cwe": "CWE-89",
+   "chunk_id": "Django_REST_Framework_Cheat_Sheet#016",
+   "doc": "Django_REST_Framework_Cheat_Sheet",
+   "section": "OWASP API Security Top 10 (2019) > API8:2019 Injection > SQLi",
+   "text": "To prevent this problem, use parametrized queries. Be careful when using dangerous methods like raw(), extra() and custom SQL (via cursor.execute()). DO NOT add user input to dangerous methods (raw(), extra(), cursor.execute())."
+  },
+  {
+   "cwe": "CWE-89",
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#008.1",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > SQL Injection",
+   "text": "An SQL injection attack consists of insertion or \"injection\" of either a partial or complete SQL query via the data input or transmitted from the client (browser) to the web application.\n\nA successful SQL injection attack can read sensitive data from the database, modify database data (insert/update/delete), execute administration operations on the database (such as shutdown the DBMS), recover the content of a given file existing on the DBMS file system or write files into the file system, and, in some cases, issue commands to the operating system. SQL injection attacks are a type of injection attack, in which SQL commands are injected into data-plane input in order to affect the execution of predefined SQL commands.\n\nSQL Injection attacks can be divided into the following three classes:\n\nInband: data is extracted using the same channel that is used to inject the SQL code. This is the most straightforward kind of attack, in which the retrieved data is presented directly in the application web page.\n\nOut-of-band: data is retrieved using a different channel (e.g., an email with the results of the query is generated and sent to the tester).\n\nInferential or Blind: there is no actual transfer of data, but the tester is able to reconstruct the information by sending particular requests and observing the resulting behavior of the DB Server.\n\nHow to test for the issue During code review\n\nplease check for any queries to the database are not done via prepared statements.\n\nIf dynamic statements are being made please check if the data is sanitized before used as part of the statement.\n\nAuditors should always look for uses of sp_execute, execute or exec within SQL Server stored procedures. Similar audit guidelines are necessary for similar functions for other vendors."
+  },
+  {
+   "cwe": "CWE-89",
+   "chunk_id": "Injection_Prevention_Cheat_Sheet#011.1",
+   "doc": "Injection_Prevention_Cheat_Sheet",
+   "section": "Forms of Injection > Query languages > SQL Injection",
+   "text": "Various parts of SQL queries aren't legal locations for the use of bind variables, such as the names of tables or columns, and the sort order indicator (ASC or DESC). In such situations, input validation or query redesign is the most appropriate defense. For the names of tables or columns, ideally those values come from the code, and not from user parameters.\n\nBut if user parameter values are used to make different for table names and column names, then the parameter values should be mapped to the legal/expected table or column names to make sure unvalidated user input doesn't end up in the query. Please note, this is a symptom of poor design and a full rewrite should be considered if time allows.\n\nDefense Option 4: Escaping All User-Supplied Input\n\nThis technique should only be used as a last resort, when none of the above are feasible. Input validation is probably a better choice as this methodology is frail compared to other defenses and we cannot guarantee it will prevent all SQL Injection in all situations.\n\nThis technique is to escape user input before putting it in a query. It's usually only recommended to retrofit legacy code when implementing input validation isn't cost effective.\n\nExample code - Java Safe Java Prepared Statement Example\n\nThe following code example uses a PreparedStatement, Java's implementation of a parameterized query, to execute the same database query.\n\n```\n// This should REALLY be validated too\nString custname = request.getParameter(\"customerName\");\n// Perform input validation to detect attacks\nString query = \"SELECT account_balance FROM user_data WHERE user_name = ?\";\nPreparedStatement pstmt = connection.prepareStatement(query);\npstmt.setString(1, custname);\nResultSet results = pstmt.executeQuery();\n```"
+  },
+  {
+   "cwe": "CWE-89",
+   "chunk_id": "Java_Security_Cheat_Sheet#006",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > SQL > How to prevent",
+   "text": "Use Query Parameterization in order to prevent injection."
+  },
+  {
+   "cwe": "CWE-89",
+   "chunk_id": "Query_Parameterization_Cheat_Sheet#001",
+   "doc": "Query_Parameterization_Cheat_Sheet",
+   "section": "Introduction",
+   "text": "SQL Injection is one of the most dangerous web vulnerabilities. As of the OWASP Top 10:2025, it is categorized under A05:2025-Injection.\n\nIt represents a serious threat because SQL Injection allows evil attacker code to change the structure of a web application's SQL statement in a way that can steal data, modify data, or potentially facilitate command injection to the underlying OS.\n\nThis cheat sheet is a derivative work of the SQL Injection Prevention Cheat Sheet."
+  },
+  {
+   "cwe": "CWE-90",
+   "chunk_id": "DotNet_Security_Cheat_Sheet#022",
+   "doc": "DotNet_Security_Cheat_Sheet",
+   "section": ".NET General Guidance > A03 Injection > LDAP injection",
+   "text": "Almost any characters can be used in Distinguished Names. However, some must be escaped with the backslash \\ escape character. A table showing which characters that should be escaped for Active Directory can be found at the in the LDAP Injection Prevention Cheat Sheet.\n\nNote: The space character must be escaped only if it is the leading or trailing character in a component name, such as a Common Name. Embedded spaces should not be escaped.\n\nMore information can be found in the LDAP Injection Prevention Cheat Sheet."
+  },
+  {
+   "cwe": "CWE-326",
+   "chunk_id": "Authentication_Cheat_Sheet#005.1",
+   "doc": "Authentication_Cheat_Sheet",
+   "section": "Authentication General Guidelines > Implement Proper Password Strength Controls",
+   "text": "A key concern when using passwords for authentication is password strength. A \"strong\" password policy makes it difficult or even improbable for one to guess the password through either manual or automated means. The following characteristics define a strong password:\n\nPassword Length\n\nMinimum length for passwords should be enforced by the application.\n\nIf MFA is enabled passwords shorter than 8 characters are considered to be weak (NIST SP800-63B).\n\nIf MFA is not enabled passwords shorter than 15 characters are considered to be weak (NIST SP800-63B).\n\nMaximum password length should be at least 64 characters to allow passphrases (NIST SP800-63B). Note that certain implementations of hashing algorithms may cause long password denial of service.\n\nLonger passphrases are effective because they raise the number of guesses an attacker's dictionary or wordlist has to cover, not because of a precise entropy value: NIST notes that \"estimating entropy for user-chosen passwords is challenging\" and recommends length and blocklist checks (see below) over composition or entropy math (NIST SP800-63B, Strength of Passwords). Entropy estimates rely on assumptions about the search space and should be treated as illustrative rather than as absolute measures of password strength."
+  },
+  {
+   "cwe": "CWE-643",
+   "chunk_id": "Java_Security_Cheat_Sheet#015",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > XML: XPath Injection > How to prevent",
+   "text": "Use XPath Variable Resolver in order to prevent injection."
+  },
+  {
+   "cwe": "CWE-643",
+   "chunk_id": "Java_Security_Cheat_Sheet#016.2",
+   "doc": "Java_Security_Cheat_Sheet",
+   "section": "Specific Injection types > XML: XPath Injection > Example",
+   "text": "/* Apply expression on XML document */\nObject nodes = xPathExpression.evaluate(doc, XPathConstants.NODESET);\nNodeList nodesList = (NodeList) nodes;\nElement book = (Element)nodesList.item(0);\nvar containsRalls = book.getTextContent().contains(\"Ralls, Kim\");\n```"
+  }
+ ]
+}

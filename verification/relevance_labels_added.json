@@ -1,0 +1,60 @@
+{
+ "_meta": {
+  "grader": "Claude (AI assistant) in the team's planning chat, at Darren's request. Unreviewed by a person.",
+  "blind": "Graded from verification/relevance_to_grade.json, which lists cwe, chunk_id, doc, section and text only: no configuration, rank or score.",
+  "rubric": {
+   "2": "guidance about this weakness",
+   "1": "adjacent",
+   "0": "not relevant"
+  },
+  "date": "2026-11-09",
+  "calibration": [
+   "Followed the grades already in relevance_labels.json: on-topic descriptions, symptoms, introductions and examples of the weakness are 2 (e.g. Injection_Prevention#008, Java_Security#014, DOM_based_XSS#001); 'how to test' sections are 1 (Injection_Prevention#009, #010); the topic counts, not the platform (FastAPI#016 is 2).",
+   "A split piece takes its parent's grade only when it carries the same kind of content; a piece that on its own carries no guidance is graded on its own text."
+  ],
+  "notes": {
+   "CWE-78 Injection_Prevention_Cheat_Sheet#017": "1: a 'how to test' section, graded like Injection_Prevention#009/#010, although its first lines are a code-review check.",
+   "CWE-643 Java_Security_Cheat_Sheet#016.2": "1: the tail of the variable-resolver example; on its own it shows only the expression being evaluated, not the defence (the parent #016 is 2).",
+   "CWE-22 Symfony_Cheat_Sheet#014": "2: code-only, but it is the basename() fix the section describes.",
+   "CWE-326 Authentication_Cheat_Sheet#005.1": "0: password strength, not encryption strength (its parent #005 is 0)."
+  }
+ },
+ "CWE-22": {
+  "Denial_of_Service_Cheat_Sheet#010": 0,
+  "Symfony_Cheat_Sheet#013.1": 2,
+  "Symfony_Cheat_Sheet#013.2": 2,
+  "Symfony_Cheat_Sheet#014": 2,
+  "XML_Security_Cheat_Sheet#018.2": 0,
+  "XML_Security_Cheat_Sheet#020": 0,
+  "XML_Security_Cheat_Sheet#020.2": 0
+ },
+ "CWE-78": {
+  "Injection_Prevention_Cheat_Sheet#017": 1,
+  "Java_Security_Cheat_Sheet#011": 2
+ },
+ "CWE-79": {
+  "Browser_Extension_Vulnerabilities_Cheat_Sheet#007": 2,
+  "Browser_Extension_Vulnerabilities_Cheat_Sheet#008": 2,
+  "Browser_Extension_Vulnerabilities_Cheat_Sheet#009": 2,
+  "Cross_Site_Scripting_Prevention_Cheat_Sheet#001": 2,
+  "DOM_based_XSS_Prevention_Cheat_Sheet#001.1": 2,
+  "Web_Frontend_Security_Cheat_Sheet#002.2": 2
+ },
+ "CWE-89": {
+  "Django_REST_Framework_Cheat_Sheet#016": 2,
+  "Injection_Prevention_Cheat_Sheet#008.1": 2,
+  "Injection_Prevention_Cheat_Sheet#011.1": 2,
+  "Java_Security_Cheat_Sheet#006": 2,
+  "Query_Parameterization_Cheat_Sheet#001": 2
+ },
+ "CWE-90": {
+  "DotNet_Security_Cheat_Sheet#022": 2
+ },
+ "CWE-326": {
+  "Authentication_Cheat_Sheet#005.1": 0
+ },
+ "CWE-643": {
+  "Java_Security_Cheat_Sheet#015": 2,
+  "Java_Security_Cheat_Sheet#016.2": 1
+ }
+}

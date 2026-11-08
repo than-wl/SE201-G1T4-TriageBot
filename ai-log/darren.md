@@ -299,3 +299,41 @@ both set-ups (no model calls). TODO (Darren): own checks.
 ### What I kept or changed
 
 TODO (Darren)
+
+## 2026-11-09 — Step 4, item 2: free retrieval-quality check of the set-up rules
+
+- **Tool (model):** Claude Code (claude-opus-5-5); prompt written by Darren (PROMPT_03)
+- **Files:** verification/semantic_setup_check.py (new), tests/test_semantic_setup_check.py (new),
+  verification/relevance_to_grade.json (new), evidence/retrieval/semantic_setup_check.json (new),
+  evidence/retrieval/semantic_setup_check.md (new), EXPERIMENTS.md (step 4, "Retrieval-quality
+  check"), ai-log/darren.md
+- **Outcome:** Measured, no model calls (local embedder only). Part A, macro over the 9 scan
+  CWEs, original → improved: P@3 0.63 → 0.67, P@6 0.54 → 0.57, mean grade 1.33 → 1.44;
+  MITRE record in the pack 0 → 9 of 9; wrong-platform chunks in the pack 3 → 0; grade-2
+  characters in the pack 2,173 → 1,135 (the MITRE chunk is not graded and takes budget).
+  `+R5` matches `original` exactly, as expected. Part B: expected sheet in pack 9 of 10
+  (original) vs 10 of 10 (improved). CWE-79 "CSS" check: no chunk about CSS styling; three
+  mention CSS as an XSS context, all graded 2. Finding left as TODO for Darren.
+
+### What I asked for
+
+A free check of whether rules R1 to R5 made semantic search return better guidance, and
+whether it finds the right sheet for weaknesses outside the benchmark. Seven configurations
+(original, each rule alone, improved) through the same code as `retrieve()`. Part A: the 9
+scan CWEs, graded, search ranking and pack. Phase 1 lists the ungraded chunks blind (no
+configuration, rank or score); the assistant grades nothing; phase 2 merges the grades,
+refuses any missing grade and reports precision, pack contents and wrong-platform chunks.
+Part B: a fixed list of 10 CWEs outside the scan, each with a dedicated sheet. Provenance,
+offline tests, an EXPERIMENTS.md subsection with no finding. No model calls, no network,
+no commits; changes staged only.
+
+### How I checked it
+
+The assistant ran the offline suite: 351 tests before, 367 after (1 skipped). Phase 1 listed
+24 chunks; they were graded blind in a separate chat (`relevance_labels_added.json`, with
+its `_meta` block) and phase 2 was run on the merged labels with Hugging Face forced
+offline. TODO (Darren): own checks.
+
+### What I kept or changed
+
+TODO (Darren)

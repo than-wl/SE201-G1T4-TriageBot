@@ -404,6 +404,129 @@ retrieval only:
 - CWE-79's alternate terms include "CSS" (MITRE's old abbreviation for
   cross-site scripting). Check whether it pulls in chunks about CSS styling.
 
+#### Retrieval-quality check (free, no model calls)
+
+Did the set-up rules make semantic search return better guidance, and does it
+find the right guidance for weaknesses outside the benchmark? This uses only
+the local embedder. It does not measure verdict accuracy; that is the paid run.
+Each configuration runs through the same code as `retrieve()` and `--explain`:
+`original` is all five rules off (decision 21), `+R1` to `+R5` add one rule
+each, and `improved` is the `semantic` profile.
+
+- **Search ranking:** the top 6 searched chunks by cosine, ignoring the budget
+  (the MITRE chunk is attached by ID, never searched).
+- **Pack:** what `retrieve()` returns (4,000 characters, at most 6 chunks).
+- **Grades:** 2 = guidance about this weakness, 1 = adjacent, 0 = not relevant;
+  precision counts grade 2 only. The 129 original labels (CWE, chunk) were
+  extended by 24 chunks graded blind (`verification/relevance_labels_added.json`), listed by
+  `--phase list` without configuration, rank or score. The MITRE chunk is not
+  graded, so grade counts and grade-2 characters cover OWASP chunks only.
+- **Wrong platform:** chunks from sheets `scope.json` tags with a platform
+  other than Java, or excludes as retired or the attack catalogue. The rubric
+  grades topic, not platform (a FastAPI chunk about SQL injection is a 2), so
+  rule R3's effect shows in this column, not in precision.
+
+**Part A: the 9 scan CWEs, macro average** (wrong platform: total over the 9)
+
+| Configuration | P@3 | P@6 | Mean grade | MITRE in pack | OWASP chunks | Grade 2 | Grade ≥1 | Pack chars | Grade-2 chars | Wrong platform, search | Wrong platform, pack |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| `original` | 0.63 | 0.54 | 1.33 | 0 of 9 | 4.1 | 2.4 | 3.4 | 3,203 | 2,173 | 5 | 3 |
+| `+R1` | 0.70 | 0.69 | 1.59 | 0 of 9 | 4.2 | 3.2 | 4.0 | 3,281 | 2,598 | 8 | 6 |
+| `+R2` | 0.63 | 0.54 | 1.33 | 9 of 9 | 2.9 | 1.6 | 2.6 | 3,392 | 1,475 | 5 | 2 |
+| `+R3` | 0.56 | 0.48 | 1.24 | 0 of 9 | 4.2 | 2.2 | 3.4 | 3,208 | 1,958 | 0 | 0 |
+| `+R4` | 0.63 | 0.56 | 1.39 | 0 of 9 | 4.3 | 2.6 | 3.7 | 3,373 | 2,202 | 6 | 4 |
+| `+R5` | 0.63 | 0.54 | 1.33 | 0 of 9 | 4.1 | 2.4 | 3.4 | 3,203 | 2,173 | 5 | 3 |
+| `improved` | 0.67 | 0.57 | 1.44 | 9 of 9 | 3.1 | 1.8 | 2.9 | 3,172 | 1,135 | 0 | 0 |
+
+`+R5` returns exactly what `original` returns (all 9 CWEs have valid MITRE
+records), as expected.
+
+**Part A per CWE, original → improved**
+
+| CWE | P@3 | P@6 | Mean grade | MITRE chars | Grade-2 / OWASP chunks in pack | Pack chars | Grade-2 chars | Wrong platform, search / pack |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 22 | 0.67 → 0.00 | 0.50 → 0.00 | 1.33 → 0.50 | 0 → 1,290 | 2/3 → 0/3 | 3,357 → 3,969 | 1,928 → 0 | 3/2 → 0/0 |
+| 78 | 0.67 → 1.00 | 0.50 → 0.83 | 1.00 → 1.83 | 0 → 1,376 | 3/5 → 2/2 | 3,765 → 2,740 | 2,665 → 1,364 | 0/0 → 0/0 |
+| 79 | 0.33 → 1.00 | 0.33 → 1.00 | 0.83 → 2.00 | 0 → 1,458 | 2/6 → 5/5 | 2,061 → 3,776 | 1,361 → 2,318 | 1/1 → 0/0 |
+| 89 | 0.67 → 0.67 | 0.67 → 0.67 | 1.67 → 1.67 | 0 → 1,343 | 1/2 → 0/1 | 2,256 → 2,965 | 634 → 0 | 1/0 → 0/0 |
+| 90 | 1.00 → 1.00 | 1.00 → 1.00 | 2.00 → 2.00 | 0 → 1,444 | 3/3 → 2/2 | 3,731 → 3,976 | 3,731 → 2,532 | 0/0 → 0/0 |
+| 326 | 0.33 → 0.33 | 0.33 → 0.33 | 1.00 → 1.00 | 0 → 309 | 2/5 → 2/5 | 2,525 → 2,834 | 1,653 → 1,653 | 0/0 → 0/0 |
+| 328 | 1.00 → 1.00 | 0.50 → 0.50 | 1.33 → 1.33 | 0 → 1,468 | 3/3 → 1/1 | 3,881 → 3,256 | 3,881 → 1,788 | 0/0 → 0/0 |
+| 501 | 0.00 → 0.00 | 0.00 → 0.00 | 0.83 → 0.83 | 0 → 94 | 0/4 → 0/4 | 3,554 → 3,648 | 0 → 0 | 0/0 → 0/0 |
+| 643 | 1.00 → 1.00 | 1.00 → 0.83 | 2.00 → 1.83 | 0 → 564 | 6/6 → 4/5 | 3,700 → 1,383 | 3,700 → 559 | 0/0 → 0/0 |
+
+**CWE-79 "CSS" check:** no chunk about CSS styling appears under `+R1` or
+`improved`. Three CWE-79 chunks mention CSS, all as an XSS output context and
+all graded 2: `DOM_based_XSS_Prevention_Cheat_Sheet#001` (`+R1`) and its piece
+`#001.1` (`improved`), and `Java_Security_Cheat_Sheet#018`, which `original`
+also returns.
+
+**Part B: weaknesses outside the benchmark** (no grading needed). The list was
+fixed in advance: CWEs not in the scan for which the knowledge base has a sheet
+dedicated to that one weakness. All 10 have valid MITRE 5.0 records.
+
+**Expected sheet in pack: 9 of 10 (original) vs 10 of 10 (improved).**
+
+| CWE | Expected sheet | In the map? | Original: in pack (first rank; chunks from it) | Improved: in pack (first rank; chunks from it) |
+| --- | --- | --- | --- | --- |
+| 918 | `Server_Side_Request_Forgery_Prevention_Cheat_Sheet` | yes | no (6; 0 of 3) | yes (2; 1 of 2) |
+| 611 | `XML_External_Entity_Prevention_Cheat_Sheet` | yes | yes (2; 1 of 4) | yes (2; 3 of 5) |
+| 502 | `Deserialization_Cheat_Sheet` | no | yes (1; 4 of 6) | yes (1; 4 of 5) |
+| 352 | `Cross-Site_Request_Forgery_Prevention_Cheat_Sheet` | no | yes (1; 1 of 4) | yes (1; 1 of 3) |
+| 601 | `Unvalidated_Redirects_and_Forwards_Cheat_Sheet` | no | yes (1; 3 of 4) | yes (1; 4 of 4) |
+| 1336 | `Server_Side_Template_Injection_Prevention_Cheat_Sheet` | yes | yes (1; 4 of 4) | yes (1; 4 of 5) |
+| 915 | `Mass_Assignment_Cheat_Sheet` | yes | yes (4; 1 of 6) | yes (1; 3 of 4) |
+| 1021 | `Clickjacking_Defense_Cheat_Sheet` | no | yes (1; 3 of 4) | yes (1; 2 of 2) |
+| 434 | `File_Upload_Cheat_Sheet` | yes | yes (2; 5 of 6) | yes (1; 4 of 4) |
+| 943 | `NoSQL_Security_Cheat_Sheet` | no | yes (3; 1 of 4) | yes (1; 1 of 5) |
+
+None of these needed a hand-written entry; 5 of the 10 are not in
+`cwe_map.json` at all.
+
+**Rerun** (no model calls; the catalogue and vector store must be prepared):
+
+```bash
+python verification/semantic_setup_check.py --phase score
+```
+
+Full tables, every configuration per CWE, and provenance (catalogue, embedding
+model, `scope.json` and label-file hashes, git commit):
+`evidence/retrieval/semantic_setup_check.md` and `.json`.
+
+**Caveats**
+
+- The grades are AI-produced and unreviewed: the original set by Hong Yi's AI
+  run, the added set by Claude, done blind.
+- There is one grader per label.
+- There are only 9 CWEs in part A.
+- This measures topic relevance, not whether the guidance changes verdicts
+  (that is the paid run, item 3).
+
+**Finding:** overall search quality barely moves (P@6 0.54 → 0.57), but the
+rules pull in different directions, and the measure decides what you see.
+
+- *Alternate terms (R1) are the strongest single rule* (P@6 0.54 → 0.69). The
+  common names ("XSS", "OS command injection") are the words the sheets use:
+  CWE-79 goes from 2 to 5 on-topic passages in the pack.
+- *The platform rule (R3) lowers precision* (0.54 → 0.48), because the PHP and
+  Python passages it removes are on-topic. It is also the only rule that
+  removes wrong-platform advice (5 → 0 in search). The relevance grade is a
+  proxy: it cannot see that Laravel advice does not apply to Java. On that
+  measure alone, `+R1` would win while returning the most wrong-platform
+  passages (6 in the pack).
+- *The MITRE record (R2) costs budget.* Every CWE gets an authoritative
+  passage, but OWASP passages in the pack fall from 4.1 to 3.1 and grade-2
+  OWASP characters from 2,173 to 1,135. Combined with the filling rule, the
+  SQL injection pack is the MITRE record plus one "how to test" passage, and
+  the XPath pack shrinks to 1,383 characters.
+- *Beyond the benchmark, it scales.* For 10 weaknesses outside the scan, the
+  dedicated sheet reached the pack for 10 of 10 (9 of 10 before), with no
+  hand-written entries; 5 of the 10 have no row in the hand-made table.
+
+The set-up was not changed after seeing these results (design decisions 26
+and 28). Whether trading OWASP passages for applicability and coverage changes
+verdicts is what the paid run measures.
+
 ### Step 5: Does the verdict follow the code?
 
 - **Question:** when a case's code is changed so that its answer should flip

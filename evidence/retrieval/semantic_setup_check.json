@@ -1,0 +1,3605 @@
+{
+ "provenance": {
+  "date": "2026-11-08T16:34:49+00:00",
+  "git": {
+   "commit": "c0af72cdac06ef31f7343c8824ca017aa20e7d5c",
+   "dirty": false,
+   "dirty_paths": []
+  },
+  "cwe_catalogue_sha256": "bcda44c9abf61ff977f50c3c6649eea5a97a7b0626b0396c2c3ec4bfb973a3dc",
+  "cwe_catalogue_xml": "cwec_v5.0.xml",
+  "cwe_catalogue_xml_sha256": "47165a9593def89c69b9ef50c34d99ac68db55df8373613e85e9cc9ceecefb1d",
+  "embedding_model": "BAAI/bge-small-en-v1.5",
+  "kb_scope_sha256": "acfbe052644b6ca6103bddf36449f3c91c604c7c4dc8904f99b9043b07644dcf",
+  "relevance_labels_sha256": "7d304c17e7e321079e927f4142d85461b88b0ce0a153c142b3fd7807a0346364",
+  "relevance_labels_added_sha256": "4c74d5de43430abc7b547e3eb6f82ca41fa0a0804e2e6d50ce676f6e1c3197c9",
+  "top_k": 6,
+  "guidance_max_chars": 4000,
+  "search_depth": 6
+ },
+ "configurations": {
+  "original": {
+   "SEMANTIC_QUERY_ALT_TERMS": false,
+   "SEMANTIC_MITRE_GUIDANCE": false,
+   "MITRE_GUIDANCE_MAX_CHARS": 1500,
+   "SEMANTIC_KB_SCOPE": false,
+   "KB_TARGET_PLATFORM": "java",
+   "SEMANTIC_MAX_CHUNK_CHARS": 0,
+   "SEMANTIC_GROUNDING": "min_score"
+  },
+  "+R1": {
+   "SEMANTIC_QUERY_ALT_TERMS": true,
+   "SEMANTIC_MITRE_GUIDANCE": false,
+   "MITRE_GUIDANCE_MAX_CHARS": 1500,
+   "SEMANTIC_KB_SCOPE": false,
+   "KB_TARGET_PLATFORM": "java",
+   "SEMANTIC_MAX_CHUNK_CHARS": 0,
+   "SEMANTIC_GROUNDING": "min_score"
+  },
+  "+R2": {
+   "SEMANTIC_QUERY_ALT_TERMS": false,
+   "SEMANTIC_MITRE_GUIDANCE": true,
+   "MITRE_GUIDANCE_MAX_CHARS": 1500,
+   "SEMANTIC_KB_SCOPE": false,
+   "KB_TARGET_PLATFORM": "java",
+   "SEMANTIC_MAX_CHUNK_CHARS": 0,
+   "SEMANTIC_GROUNDING": "min_score"
+  },
+  "+R3": {
+   "SEMANTIC_QUERY_ALT_TERMS": false,
+   "SEMANTIC_MITRE_GUIDANCE": false,
+   "MITRE_GUIDANCE_MAX_CHARS": 1500,
+   "SEMANTIC_KB_SCOPE": true,
+   "KB_TARGET_PLATFORM": "java",
+   "SEMANTIC_MAX_CHUNK_CHARS": 0,
+   "SEMANTIC_GROUNDING": "min_score"
+  },
+  "+R4": {
+   "SEMANTIC_QUERY_ALT_TERMS": false,
+   "SEMANTIC_MITRE_GUIDANCE": false,
+   "MITRE_GUIDANCE_MAX_CHARS": 1500,
+   "SEMANTIC_KB_SCOPE": false,
+   "KB_TARGET_PLATFORM": "java",
+   "SEMANTIC_MAX_CHUNK_CHARS": 1800,
+   "SEMANTIC_GROUNDING": "min_score"
+  },
+  "+R5": {
+   "SEMANTIC_QUERY_ALT_TERMS": false,
+   "SEMANTIC_MITRE_GUIDANCE": false,
+   "MITRE_GUIDANCE_MAX_CHARS": 1500,
+   "SEMANTIC_KB_SCOPE": false,
+   "KB_TARGET_PLATFORM": "java",
+   "SEMANTIC_MAX_CHUNK_CHARS": 0,
+   "SEMANTIC_GROUNDING": "mitre_record"
+  },
+  "improved": {
+   "SEMANTIC_QUERY_ALT_TERMS": true,
+   "SEMANTIC_MITRE_GUIDANCE": true,
+   "MITRE_GUIDANCE_MAX_CHARS": 1500,
+   "SEMANTIC_KB_SCOPE": true,
+   "KB_TARGET_PLATFORM": "java",
+   "SEMANTIC_MAX_CHUNK_CHARS": 1800,
+   "SEMANTIC_GROUNDING": "mitre_record"
+  }
+ },
+ "part_a": {
+  "original": {
+   "per_cwe": {
+    "CWE-22": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "Laravel_Cheat_Sheet#019",
+       "Symfony_Cheat_Sheet#013",
+       "File_Upload_Cheat_Sheet#012",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#024"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       2,
+       1,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 2,
+      "grade_ge_1": 3,
+      "chars": 3357,
+      "grade_2_chars": 1928,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "Laravel_Cheat_Sheet#019"
+      ],
+      "grades": [
+       1,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 3,
+      "pack": 2
+     }
+    },
+    "CWE-78": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007",
+       "LLM_Prompt_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3765,
+      "grade_2_chars": 2665,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-79": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "GraphQL_Cheat_Sheet#007"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 2,
+      "grade_ge_1": 3,
+      "chars": 2061,
+      "grade_2_chars": 1361,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "GraphQL_Cheat_Sheet#007"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-89": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#011",
+       "Injection_Prevention_Cheat_Sheet#010",
+       "SQL_Injection_Prevention_Cheat_Sheet#019",
+       "FastAPI_Security_Cheat_Sheet#016"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       1,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 2,
+      "grade_2": 1,
+      "grade_ge_1": 2,
+      "chars": 2256,
+      "grade_2_chars": 634,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002"
+      ],
+      "grades": [
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 0
+     }
+    },
+    "CWE-90": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "LDAP_Injection_Prevention_Cheat_Sheet#004",
+       "LDAP_Injection_Prevention_Cheat_Sheet#011",
+       "LDAP_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3731,
+      "grade_2_chars": 3731,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-326": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 2,
+      "grade_ge_1": 4,
+      "chars": 2525,
+      "grade_2_chars": 1653,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-328": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011",
+       "Key_Management_Cheat_Sheet#005",
+       "Pinning_Cheat_Sheet#012",
+       "Security_Terminology_Cheat_Sheet#010"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3881,
+      "grade_2_chars": 3881,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-501": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013",
+       "Secure_Coding_with_AI_Cheat_Sheet#002",
+       "Secure_Cloud_Architecture_Cheat_Sheet#014"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 4,
+      "chars": 3554,
+      "grade_2_chars": 0,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-643": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 6,
+      "grade_ge_1": 6,
+      "chars": 3700,
+      "grade_2_chars": 3700,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    }
+   },
+   "macro": {
+    "search": {
+     "p_at_3": 0.6296296296296295,
+     "p_at_6": 0.537037037037037,
+     "mean_grade": 1.3333333333333333
+    },
+    "pack": {
+     "mitre": 0.0,
+     "mitre_chars": 0.0,
+     "owasp_chunks": 4.111111111111111,
+     "grade_2": 2.4444444444444446,
+     "grade_ge_1": 3.4444444444444446,
+     "chars": 3203.3333333333335,
+     "grade_2_chars": 2172.5555555555557
+    },
+    "wrong_platform": {
+     "search": 0.5555555555555556,
+     "pack": 0.3333333333333333
+    },
+    "wrong_platform_total": {
+     "search": 5,
+     "pack": 3
+    },
+    "mitre_present": 0,
+    "cwes": 9
+   }
+  },
+  "+R1": {
+   "per_cwe": {
+    "CWE-22": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "Laravel_Cheat_Sheet#019",
+       "Symfony_Cheat_Sheet#013",
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "File_Upload_Cheat_Sheet#012",
+       "Symfony_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       1,
+       2,
+       1,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 2,
+      "grade_2": 2,
+      "grade_ge_1": 2,
+      "chars": 2803,
+      "grade_2_chars": 2803,
+      "chunks": [
+       "Laravel_Cheat_Sheet#019",
+       "Symfony_Cheat_Sheet#013"
+      ],
+      "grades": [
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 4,
+      "pack": 2
+     }
+    },
+    "CWE-78": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "Injection_Prevention_Cheat_Sheet#018",
+       "DotNet_Security_Cheat_Sheet#021",
+       "Java_Security_Cheat_Sheet#011",
+       "OS_Command_Injection_Defense_Cheat_Sheet#004"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 6,
+      "grade_ge_1": 6,
+      "chars": 3454,
+      "grade_2_chars": 3454,
+      "chunks": [
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "Injection_Prevention_Cheat_Sheet#018",
+       "DotNet_Security_Cheat_Sheet#021",
+       "Java_Security_Cheat_Sheet#011",
+       "OS_Command_Injection_Defense_Cheat_Sheet#004"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-79": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.8333333333333334,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#007",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#008",
+       "Java_Security_Cheat_Sheet#018",
+       "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#009"
+      ],
+      "grades": [
+       0,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 5,
+      "grade_ge_1": 5,
+      "chars": 2913,
+      "grade_2_chars": 2813,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#007",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#008",
+       "Java_Security_Cheat_Sheet#018",
+       "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#009"
+      ],
+      "grades": [
+       0,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-89": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.8333333333333334,
+      "mean_grade": 1.8333333333333333,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Django_REST_Framework_Cheat_Sheet#016",
+       "Injection_Prevention_Cheat_Sheet#008",
+       "Query_Parameterization_Cheat_Sheet#001",
+       "Java_Security_Cheat_Sheet#006",
+       "SQL_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 2,
+      "grade_ge_1": 3,
+      "chars": 3659,
+      "grade_2_chars": 2037,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Django_REST_Framework_Cheat_Sheet#016",
+       "Injection_Prevention_Cheat_Sheet#008"
+      ],
+      "grades": [
+       1,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-90": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "DotNet_Security_Cheat_Sheet#022",
+       "LDAP_Injection_Prevention_Cheat_Sheet#004",
+       "LDAP_Injection_Prevention_Cheat_Sheet#011",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3052,
+      "grade_2_chars": 3052,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "DotNet_Security_Cheat_Sheet#022"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-326": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 2,
+      "grade_ge_1": 4,
+      "chars": 2525,
+      "grade_2_chars": 1653,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-328": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011",
+       "Key_Management_Cheat_Sheet#005",
+       "Pinning_Cheat_Sheet#012",
+       "Security_Terminology_Cheat_Sheet#010"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3881,
+      "grade_2_chars": 3881,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-501": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013",
+       "Secure_Coding_with_AI_Cheat_Sheet#002",
+       "Secure_Cloud_Architecture_Cheat_Sheet#014"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 4,
+      "chars": 3554,
+      "grade_2_chars": 0,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-643": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "Java_Security_Cheat_Sheet#014",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#015",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "Java_Security_Cheat_Sheet#016"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 6,
+      "grade_ge_1": 6,
+      "chars": 3692,
+      "grade_2_chars": 3692,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "Java_Security_Cheat_Sheet#014",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#015",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "Java_Security_Cheat_Sheet#016"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    }
+   },
+   "macro": {
+    "search": {
+     "p_at_3": 0.7037037037037037,
+     "p_at_6": 0.6851851851851852,
+     "mean_grade": 1.5925925925925926
+    },
+    "pack": {
+     "mitre": 0.0,
+     "mitre_chars": 0.0,
+     "owasp_chunks": 4.222222222222222,
+     "grade_2": 3.2222222222222223,
+     "grade_ge_1": 4.0,
+     "chars": 3281.4444444444443,
+     "grade_2_chars": 2598.3333333333335
+    },
+    "wrong_platform": {
+     "search": 0.8888888888888888,
+     "pack": 0.6666666666666666
+    },
+    "wrong_platform_total": {
+     "search": 8,
+     "pack": 6
+    },
+    "mitre_present": 0,
+    "cwes": 9
+   }
+  },
+  "+R2": {
+   "per_cwe": {
+    "CWE-22": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "Laravel_Cheat_Sheet#019",
+       "Symfony_Cheat_Sheet#013",
+       "File_Upload_Cheat_Sheet#012",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#024"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       2,
+       1,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1290,
+      "owasp_chunks": 2,
+      "grade_2": 1,
+      "grade_ge_1": 2,
+      "chars": 3712,
+      "grade_2_chars": 993,
+      "chunks": [
+       "MITRE-CWE-22",
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017"
+      ],
+      "grades": [
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 3,
+      "pack": 1
+     }
+    },
+    "CWE-78": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007",
+       "LLM_Prompt_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1376,
+      "owasp_chunks": 2,
+      "grade_2": 2,
+      "grade_ge_1": 2,
+      "chars": 3532,
+      "grade_2_chars": 2156,
+      "chunks": [
+       "MITRE-CWE-78",
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001"
+      ],
+      "grades": [
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-79": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "GraphQL_Cheat_Sheet#007"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1458,
+      "owasp_chunks": 5,
+      "grade_2": 2,
+      "grade_ge_1": 3,
+      "chars": 3243,
+      "grade_2_chars": 1361,
+      "chunks": [
+       "MITRE-CWE-79",
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-89": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#011",
+       "Injection_Prevention_Cheat_Sheet#010",
+       "SQL_Injection_Prevention_Cheat_Sheet#019",
+       "FastAPI_Security_Cheat_Sheet#016"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       1,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1343,
+      "owasp_chunks": 2,
+      "grade_2": 1,
+      "grade_ge_1": 2,
+      "chars": 3599,
+      "grade_2_chars": 634,
+      "chunks": [
+       "MITRE-CWE-89",
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002"
+      ],
+      "grades": [
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 0
+     }
+    },
+    "CWE-90": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "LDAP_Injection_Prevention_Cheat_Sheet#004",
+       "LDAP_Injection_Prevention_Cheat_Sheet#011",
+       "LDAP_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1444,
+      "owasp_chunks": 2,
+      "grade_2": 2,
+      "grade_ge_1": 2,
+      "chars": 3860,
+      "grade_2_chars": 2416,
+      "chunks": [
+       "MITRE-CWE-90",
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003"
+      ],
+      "grades": [
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-326": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 309,
+      "owasp_chunks": 5,
+      "grade_2": 2,
+      "grade_ge_1": 4,
+      "chars": 2834,
+      "grade_2_chars": 1653,
+      "chunks": [
+       "MITRE-CWE-326",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-328": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011",
+       "Key_Management_Cheat_Sheet#005",
+       "Pinning_Cheat_Sheet#012",
+       "Security_Terminology_Cheat_Sheet#010"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1468,
+      "owasp_chunks": 1,
+      "grade_2": 1,
+      "grade_ge_1": 1,
+      "chars": 3256,
+      "grade_2_chars": 1788,
+      "chunks": [
+       "MITRE-CWE-328",
+       "Password_Storage_Cheat_Sheet#016"
+      ],
+      "grades": [
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-501": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013",
+       "Secure_Coding_with_AI_Cheat_Sheet#002",
+       "Secure_Cloud_Architecture_Cheat_Sheet#014"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 94,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 4,
+      "chars": 3648,
+      "grade_2_chars": 0,
+      "chunks": [
+       "MITRE-CWE-501",
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-643": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 564,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 2840,
+      "grade_2_chars": 2276,
+      "chunks": [
+       "MITRE-CWE-643",
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    }
+   },
+   "macro": {
+    "search": {
+     "p_at_3": 0.6296296296296295,
+     "p_at_6": 0.537037037037037,
+     "mean_grade": 1.3333333333333333
+    },
+    "pack": {
+     "mitre": 1.0,
+     "mitre_chars": 1038.4444444444443,
+     "owasp_chunks": 2.888888888888889,
+     "grade_2": 1.5555555555555556,
+     "grade_ge_1": 2.5555555555555554,
+     "chars": 3391.5555555555557,
+     "grade_2_chars": 1475.2222222222222
+    },
+    "wrong_platform": {
+     "search": 0.5555555555555556,
+     "pack": 0.2222222222222222
+    },
+    "wrong_platform_total": {
+     "search": 5,
+     "pack": 2
+    },
+    "mitre_present": 9,
+    "cwes": 9
+   }
+  },
+  "+R3": {
+   "per_cwe": {
+    "CWE-22": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.5,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "File_Upload_Cheat_Sheet#012",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#024",
+       "File_Upload_Cheat_Sheet#008",
+       "XML_Security_Cheat_Sheet#020",
+       "Denial_of_Service_Cheat_Sheet#010"
+      ],
+      "grades": [
+       1,
+       1,
+       0,
+       1,
+       0,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 3,
+      "chars": 3003,
+      "grade_2_chars": 0,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "File_Upload_Cheat_Sheet#012",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#024",
+       "File_Upload_Cheat_Sheet#008"
+      ],
+      "grades": [
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-78": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007",
+       "LLM_Prompt_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3765,
+      "grade_2_chars": 2665,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-79": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "GraphQL_Cheat_Sheet#007",
+       "Input_Validation_Cheat_Sheet#006"
+      ],
+      "grades": [
+       1,
+       2,
+       0,
+       2,
+       0,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 2,
+      "grade_ge_1": 3,
+      "chars": 2461,
+      "grade_2_chars": 1361,
+      "chunks": [
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "GraphQL_Cheat_Sheet#007",
+       "Input_Validation_Cheat_Sheet#006"
+      ],
+      "grades": [
+       1,
+       2,
+       0,
+       2,
+       0,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-89": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#011",
+       "Injection_Prevention_Cheat_Sheet#010",
+       "SQL_Injection_Prevention_Cheat_Sheet#019",
+       "SQL_Injection_Prevention_Cheat_Sheet#026"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       1,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 2,
+      "grade_2": 1,
+      "grade_ge_1": 2,
+      "chars": 2256,
+      "grade_2_chars": 634,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002"
+      ],
+      "grades": [
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-90": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "LDAP_Injection_Prevention_Cheat_Sheet#004",
+       "LDAP_Injection_Prevention_Cheat_Sheet#011",
+       "LDAP_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3731,
+      "grade_2_chars": 3731,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-326": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 2,
+      "grade_ge_1": 4,
+      "chars": 2525,
+      "grade_2_chars": 1653,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-328": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011",
+       "Key_Management_Cheat_Sheet#005",
+       "Pinning_Cheat_Sheet#012",
+       "Security_Terminology_Cheat_Sheet#010"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3881,
+      "grade_2_chars": 3881,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-501": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013",
+       "Secure_Coding_with_AI_Cheat_Sheet#002",
+       "Secure_Cloud_Architecture_Cheat_Sheet#014"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 4,
+      "chars": 3554,
+      "grade_2_chars": 0,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-643": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 6,
+      "grade_ge_1": 6,
+      "chars": 3700,
+      "grade_2_chars": 3700,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    }
+   },
+   "macro": {
+    "search": {
+     "p_at_3": 0.5555555555555556,
+     "p_at_6": 0.48148148148148145,
+     "mean_grade": 1.2407407407407407
+    },
+    "pack": {
+     "mitre": 0.0,
+     "mitre_chars": 0.0,
+     "owasp_chunks": 4.222222222222222,
+     "grade_2": 2.2222222222222223,
+     "grade_ge_1": 3.4444444444444446,
+     "chars": 3208.4444444444443,
+     "grade_2_chars": 1958.3333333333333
+    },
+    "wrong_platform": {
+     "search": 0.0,
+     "pack": 0.0
+    },
+    "wrong_platform_total": {
+     "search": 0,
+     "pack": 0
+    },
+    "mitre_present": 0,
+    "cwes": 9
+   }
+  },
+  "+R4": {
+   "per_cwe": {
+    "CWE-22": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "Laravel_Cheat_Sheet#019",
+       "Symfony_Cheat_Sheet#013.2",
+       "File_Upload_Cheat_Sheet#012",
+       "Symfony_Cheat_Sheet#013.1"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       2,
+       1,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 4,
+      "grade_2": 3,
+      "grade_ge_1": 4,
+      "chars": 3618,
+      "grade_2_chars": 2189,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "Laravel_Cheat_Sheet#019",
+       "Symfony_Cheat_Sheet#013.2"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 4,
+      "pack": 3
+     }
+    },
+    "CWE-78": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007",
+       "LLM_Prompt_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3765,
+      "grade_2_chars": 2665,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-79": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.5,
+      "mean_grade": 1.1666666666666667,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "Web_Frontend_Security_Cheat_Sheet#002.2"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 3,
+      "grade_ge_1": 4,
+      "chars": 1917,
+      "grade_2_chars": 1493,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "Web_Frontend_Security_Cheat_Sheet#002.2"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-89": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#011.1",
+       "Injection_Prevention_Cheat_Sheet#010",
+       "SQL_Injection_Prevention_Cheat_Sheet#019",
+       "FastAPI_Security_Cheat_Sheet#016"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       1,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 2,
+      "grade_2": 1,
+      "grade_ge_1": 2,
+      "chars": 2256,
+      "grade_2_chars": 634,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002"
+      ],
+      "grades": [
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 0
+     }
+    },
+    "CWE-90": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "LDAP_Injection_Prevention_Cheat_Sheet#004",
+       "LDAP_Injection_Prevention_Cheat_Sheet#011",
+       "LDAP_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3731,
+      "grade_2_chars": 3731,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-326": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005.1"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 2,
+      "grade_ge_1": 4,
+      "chars": 3805,
+      "grade_2_chars": 1653,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005.1"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-328": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011",
+       "Key_Management_Cheat_Sheet#005",
+       "Pinning_Cheat_Sheet#012",
+       "Security_Terminology_Cheat_Sheet#010"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3881,
+      "grade_2_chars": 3881,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-501": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013",
+       "Secure_Coding_with_AI_Cheat_Sheet#002",
+       "Secure_Cloud_Architecture_Cheat_Sheet#014"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 4,
+      "chars": 3554,
+      "grade_2_chars": 0,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-643": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.8333333333333334,
+      "mean_grade": 1.8333333333333333,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#016.2"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 5,
+      "grade_ge_1": 6,
+      "chars": 3831,
+      "grade_2_chars": 3571,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#016.2"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    }
+   },
+   "macro": {
+    "search": {
+     "p_at_3": 0.6296296296296295,
+     "p_at_6": 0.5555555555555556,
+     "mean_grade": 1.3888888888888888
+    },
+    "pack": {
+     "mitre": 0.0,
+     "mitre_chars": 0.0,
+     "owasp_chunks": 4.333333333333333,
+     "grade_2": 2.5555555555555554,
+     "grade_ge_1": 3.6666666666666665,
+     "chars": 3373.1111111111113,
+     "grade_2_chars": 2201.8888888888887
+    },
+    "wrong_platform": {
+     "search": 0.6666666666666666,
+     "pack": 0.4444444444444444
+    },
+    "wrong_platform_total": {
+     "search": 6,
+     "pack": 4
+    },
+    "mitre_present": 0,
+    "cwes": 9
+   }
+  },
+  "+R5": {
+   "per_cwe": {
+    "CWE-22": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "Laravel_Cheat_Sheet#019",
+       "Symfony_Cheat_Sheet#013",
+       "File_Upload_Cheat_Sheet#012",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#024"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       2,
+       1,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 2,
+      "grade_ge_1": 3,
+      "chars": 3357,
+      "grade_2_chars": 1928,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "Laravel_Cheat_Sheet#017",
+       "Laravel_Cheat_Sheet#019"
+      ],
+      "grades": [
+       1,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 3,
+      "pack": 2
+     }
+    },
+    "CWE-78": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.5,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007",
+       "LLM_Prompt_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3765,
+      "grade_2_chars": 2665,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#018",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Input_Validation_Cheat_Sheet#006",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "XML_Security_Cheat_Sheet#007"
+      ],
+      "grades": [
+       2,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-79": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "GraphQL_Cheat_Sheet#007"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 2,
+      "grade_ge_1": 3,
+      "chars": 2061,
+      "grade_2_chars": 1361,
+      "chunks": [
+       "XSS_Filter_Evasion_Cheat_Sheet#105",
+       "Input_Validation_Cheat_Sheet#008",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#012",
+       "Server_Side_Template_Injection_Prevention_Cheat_Sheet#010",
+       "Java_Security_Cheat_Sheet#018",
+       "GraphQL_Cheat_Sheet#007"
+      ],
+      "grades": [
+       0,
+       1,
+       2,
+       0,
+       2,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 1
+     }
+    },
+    "CWE-89": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#011",
+       "Injection_Prevention_Cheat_Sheet#010",
+       "SQL_Injection_Prevention_Cheat_Sheet#019",
+       "FastAPI_Security_Cheat_Sheet#016"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       1,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 2,
+      "grade_2": 1,
+      "grade_ge_1": 2,
+      "chars": 2256,
+      "grade_2_chars": 634,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Query_Parameterization_Cheat_Sheet#002"
+      ],
+      "grades": [
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 1,
+      "pack": 0
+     }
+    },
+    "CWE-90": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "LDAP_Injection_Prevention_Cheat_Sheet#004",
+       "LDAP_Injection_Prevention_Cheat_Sheet#011",
+       "LDAP_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3731,
+      "grade_2_chars": 3731,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-326": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 5,
+      "grade_2": 2,
+      "grade_ge_1": 4,
+      "chars": 2525,
+      "grade_2_chars": 1653,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-328": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011",
+       "Key_Management_Cheat_Sheet#005",
+       "Pinning_Cheat_Sheet#012",
+       "Security_Terminology_Cheat_Sheet#010"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 3,
+      "grade_2": 3,
+      "grade_ge_1": 3,
+      "chars": 3881,
+      "grade_2_chars": 3881,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011"
+      ],
+      "grades": [
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-501": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013",
+       "Secure_Coding_with_AI_Cheat_Sheet#002",
+       "Secure_Cloud_Architecture_Cheat_Sheet#014"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 4,
+      "chars": 3554,
+      "grade_2_chars": 0,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-643": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": false,
+      "mitre_chars": 0,
+      "owasp_chunks": 6,
+      "grade_2": 6,
+      "grade_ge_1": 6,
+      "chars": 3700,
+      "grade_2_chars": 3700,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "XPath_Injection_Prevention_Cheat_Sheet#003",
+       "XPath_Injection_Prevention_Cheat_Sheet#004",
+       "XPath_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#014"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    }
+   },
+   "macro": {
+    "search": {
+     "p_at_3": 0.6296296296296295,
+     "p_at_6": 0.537037037037037,
+     "mean_grade": 1.3333333333333333
+    },
+    "pack": {
+     "mitre": 0.0,
+     "mitre_chars": 0.0,
+     "owasp_chunks": 4.111111111111111,
+     "grade_2": 2.4444444444444446,
+     "grade_ge_1": 3.4444444444444446,
+     "chars": 3203.3333333333335,
+     "grade_2_chars": 2172.5555555555557
+    },
+    "wrong_platform": {
+     "search": 0.5555555555555556,
+     "pack": 0.3333333333333333
+    },
+    "wrong_platform_total": {
+     "search": 5,
+     "pack": 3
+    },
+    "mitre_present": 0,
+    "cwes": 9
+   }
+  },
+  "improved": {
+   "per_cwe": {
+    "CWE-22": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.5,
+      "chunks": [
+       "File_Upload_Cheat_Sheet#011",
+       "File_Upload_Cheat_Sheet#012",
+       "XML_Security_Cheat_Sheet#018.2",
+       "XML_Security_Cheat_Sheet#020.2",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#024",
+       "File_Upload_Cheat_Sheet#008"
+      ],
+      "grades": [
+       1,
+       1,
+       0,
+       0,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1290,
+      "owasp_chunks": 3,
+      "grade_2": 0,
+      "grade_ge_1": 2,
+      "chars": 3969,
+      "grade_2_chars": 0,
+      "chunks": [
+       "MITRE-CWE-22",
+       "File_Upload_Cheat_Sheet#011",
+       "File_Upload_Cheat_Sheet#012",
+       "XML_Security_Cheat_Sheet#018.2"
+      ],
+      "grades": [
+       1,
+       1,
+       0
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-78": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.8333333333333334,
+      "mean_grade": 1.8333333333333333,
+      "chunks": [
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Injection_Prevention_Cheat_Sheet#016",
+       "Injection_Prevention_Cheat_Sheet#018",
+       "Java_Security_Cheat_Sheet#011",
+       "OS_Command_Injection_Defense_Cheat_Sheet#004",
+       "Injection_Prevention_Cheat_Sheet#017"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1376,
+      "owasp_chunks": 2,
+      "grade_2": 2,
+      "grade_ge_1": 2,
+      "chars": 2740,
+      "grade_2_chars": 1364,
+      "chunks": [
+       "MITRE-CWE-78",
+       "OS_Command_Injection_Defense_Cheat_Sheet#001",
+       "Injection_Prevention_Cheat_Sheet#016"
+      ],
+      "grades": [
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-79": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#007",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#008",
+       "DOM_based_XSS_Prevention_Cheat_Sheet#001.1",
+       "Java_Security_Cheat_Sheet#018",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#009",
+       "Cross_Site_Scripting_Prevention_Cheat_Sheet#001"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1458,
+      "owasp_chunks": 5,
+      "grade_2": 5,
+      "grade_ge_1": 5,
+      "chars": 3776,
+      "grade_2_chars": 2318,
+      "chunks": [
+       "MITRE-CWE-79",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#007",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#008",
+       "DOM_based_XSS_Prevention_Cheat_Sheet#001.1",
+       "Java_Security_Cheat_Sheet#018",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#009"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-89": {
+     "search": {
+      "p_at_3": 0.6666666666666666,
+      "p_at_6": 0.6666666666666666,
+      "mean_grade": 1.6666666666666667,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#009",
+       "Injection_Prevention_Cheat_Sheet#008.1",
+       "Query_Parameterization_Cheat_Sheet#001",
+       "Java_Security_Cheat_Sheet#006",
+       "SQL_Injection_Prevention_Cheat_Sheet#002",
+       "Injection_Prevention_Cheat_Sheet#010"
+      ],
+      "grades": [
+       1,
+       2,
+       2,
+       2,
+       2,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1343,
+      "owasp_chunks": 1,
+      "grade_2": 0,
+      "grade_ge_1": 1,
+      "chars": 2965,
+      "grade_2_chars": 0,
+      "chunks": [
+       "MITRE-CWE-89",
+       "Injection_Prevention_Cheat_Sheet#009"
+      ],
+      "grades": [
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-90": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 1.0,
+      "mean_grade": 2.0,
+      "chunks": [
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001",
+       "LDAP_Injection_Prevention_Cheat_Sheet#004",
+       "LDAP_Injection_Prevention_Cheat_Sheet#011",
+       "LDAP_Injection_Prevention_Cheat_Sheet#003",
+       "LDAP_Injection_Prevention_Cheat_Sheet#002"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       2,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1444,
+      "owasp_chunks": 2,
+      "grade_2": 2,
+      "grade_ge_1": 2,
+      "chars": 3976,
+      "grade_2_chars": 2532,
+      "chunks": [
+       "MITRE-CWE-90",
+       "Injection_Prevention_Cheat_Sheet#013",
+       "LDAP_Injection_Prevention_Cheat_Sheet#001"
+      ],
+      "grades": [
+       2,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-326": {
+     "search": {
+      "p_at_3": 0.3333333333333333,
+      "p_at_6": 0.3333333333333333,
+      "mean_grade": 1.0,
+      "chunks": [
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002",
+       "Authentication_Cheat_Sheet#005.1"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2,
+       0
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 309,
+      "owasp_chunks": 5,
+      "grade_2": 2,
+      "grade_ge_1": 4,
+      "chars": 2834,
+      "grade_2_chars": 1653,
+      "chunks": [
+       "MITRE-CWE-326",
+       "Browser_Extension_Vulnerabilities_Cheat_Sheet#025",
+       "Web_Service_Security_Cheat_Sheet#007",
+       "Mobile_Application_Security_Cheat_Sheet#014",
+       "Cryptographic_Storage_Cheat_Sheet#012",
+       "User_Privacy_Protection_Cheat_Sheet#002"
+      ],
+      "grades": [
+       0,
+       2,
+       1,
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-328": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.5,
+      "mean_grade": 1.3333333333333333,
+      "chunks": [
+       "Password_Storage_Cheat_Sheet#016",
+       "Password_Storage_Cheat_Sheet#003",
+       "Password_Storage_Cheat_Sheet#011",
+       "Key_Management_Cheat_Sheet#005",
+       "Pinning_Cheat_Sheet#012",
+       "Security_Terminology_Cheat_Sheet#010"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 1468,
+      "owasp_chunks": 1,
+      "grade_2": 1,
+      "grade_ge_1": 1,
+      "chars": 3256,
+      "grade_2_chars": 1788,
+      "chunks": [
+       "MITRE-CWE-328",
+       "Password_Storage_Cheat_Sheet#016"
+      ],
+      "grades": [
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-501": {
+     "search": {
+      "p_at_3": 0.0,
+      "p_at_6": 0.0,
+      "mean_grade": 0.8333333333333334,
+      "chunks": [
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013",
+       "Secure_Coding_with_AI_Cheat_Sheet#002",
+       "Secure_Cloud_Architecture_Cheat_Sheet#014"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1,
+       0,
+       1
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 94,
+      "owasp_chunks": 4,
+      "grade_2": 0,
+      "grade_ge_1": 4,
+      "chars": 3648,
+      "grade_2_chars": 0,
+      "chunks": [
+       "MITRE-CWE-501",
+       "Secure_Cloud_Architecture_Cheat_Sheet#012",
+       "Secure_Cloud_Architecture_Cheat_Sheet#013",
+       "Microservices_based_Security_Arch_Doc_Cheat_Sheet#017",
+       "Secure_Code_Review_Cheat_Sheet#013"
+      ],
+      "grades": [
+       1,
+       1,
+       1,
+       1
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    },
+    "CWE-643": {
+     "search": {
+      "p_at_3": 1.0,
+      "p_at_6": 0.8333333333333334,
+      "mean_grade": 1.8333333333333333,
+      "chunks": [
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "Java_Security_Cheat_Sheet#014",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#016.2",
+       "Java_Security_Cheat_Sheet#015",
+       "XPath_Injection_Prevention_Cheat_Sheet#004"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       2,
+       2
+      ]
+     },
+     "pack": {
+      "mitre": true,
+      "mitre_chars": 564,
+      "owasp_chunks": 5,
+      "grade_2": 4,
+      "grade_ge_1": 5,
+      "chars": 1383,
+      "grade_2_chars": 559,
+      "chunks": [
+       "MITRE-CWE-643",
+       "XPath_Injection_Prevention_Cheat_Sheet#001",
+       "Java_Security_Cheat_Sheet#014",
+       "Injection_Prevention_Cheat_Sheet#014",
+       "Java_Security_Cheat_Sheet#016.2",
+       "Java_Security_Cheat_Sheet#015"
+      ],
+      "grades": [
+       2,
+       2,
+       2,
+       1,
+       2
+      ]
+     },
+     "wrong_platform": {
+      "search": 0,
+      "pack": 0
+     }
+    }
+   },
+   "macro": {
+    "search": {
+     "p_at_3": 0.6666666666666666,
+     "p_at_6": 0.5740740740740741,
+     "mean_grade": 1.4444444444444444
+    },
+    "pack": {
+     "mitre": 1.0,
+     "mitre_chars": 1038.4444444444443,
+     "owasp_chunks": 3.111111111111111,
+     "grade_2": 1.7777777777777777,
+     "grade_ge_1": 2.888888888888889,
+     "chars": 3171.8888888888887,
+     "grade_2_chars": 1134.888888888889
+    },
+    "wrong_platform": {
+     "search": 0.0,
+     "pack": 0.0
+    },
+    "wrong_platform_total": {
+     "search": 0,
+     "pack": 0
+    },
+    "mitre_present": 9,
+    "cwes": 9
+   }
+  }
+ },
+ "plus_r5_matches_original": true,
+ "css_check": [
+  {
+   "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001",
+   "section": "Introduction",
+   "grade": 2,
+   "in_original": false,
+   "excerpt": "... ls for the actual data flow and output context. When a browser is rendering HTML and any other associated content like CSS or JavaScript, it identifies various rendering contexts for the different kinds of input and follows different rules fo ...",
+   "seen_in": [
+    "+R1 ranking",
+    "+R1 pack"
+   ]
+  },
+  {
+   "chunk_id": "DOM_based_XSS_Prevention_Cheat_Sheet#001.1",
+   "section": "Introduction",
+   "grade": 2,
+   "in_original": false,
+   "excerpt": "... ls for the actual data flow and output context. When a browser is rendering HTML and any other associated content like CSS or JavaScript, it identifies various rendering contexts for the different kinds of input and follows different rules fo ...",
+   "seen_in": [
+    "improved ranking",
+    "improved pack"
+   ]
+  },
+  {
+   "chunk_id": "Java_Security_Cheat_Sheet#018",
+   "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+   "grade": 2,
+   "in_original": true,
+   "excerpt": "... rules; it does not replace these XSS controls. See the XSS Prevention Cheat Sheet for HTML, attribute, JavaScript, and CSS context requirements.",
+   "seen_in": [
+    "+R1 ranking",
+    "+R1 pack",
+    "improved ranking",
+    "improved pack"
+   ]
+  }
+ ],
+ "part_b": [
+  {
+   "cwe": "CWE-918",
+   "expected_sheet": "Server_Side_Request_Forgery_Prevention_Cheat_Sheet",
+   "in_cwe_map": true,
+   "name": "Server-Side Request Forgery",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": false,
+    "first_rank": 6,
+    "pack_chunks_from_sheet": 0,
+    "pack_owasp_chunks": 3,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 2,
+    "pack_chunks_from_sheet": 1,
+    "pack_owasp_chunks": 2,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-611",
+   "expected_sheet": "XML_External_Entity_Prevention_Cheat_Sheet",
+   "in_cwe_map": true,
+   "name": "Improper Restriction of XML External Entity Reference",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 2,
+    "pack_chunks_from_sheet": 1,
+    "pack_owasp_chunks": 4,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 2,
+    "pack_chunks_from_sheet": 3,
+    "pack_owasp_chunks": 5,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-502",
+   "expected_sheet": "Deserialization_Cheat_Sheet",
+   "in_cwe_map": false,
+   "name": "Deserialization of Untrusted Data",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 4,
+    "pack_owasp_chunks": 6,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 4,
+    "pack_owasp_chunks": 5,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-352",
+   "expected_sheet": "Cross-Site_Request_Forgery_Prevention_Cheat_Sheet",
+   "in_cwe_map": false,
+   "name": "Cross-Site Request Forgery",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 1,
+    "pack_owasp_chunks": 4,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 1,
+    "pack_owasp_chunks": 3,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-601",
+   "expected_sheet": "Unvalidated_Redirects_and_Forwards_Cheat_Sheet",
+   "in_cwe_map": false,
+   "name": "URL Redirection to Untrusted Site",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 3,
+    "pack_owasp_chunks": 4,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 4,
+    "pack_owasp_chunks": 4,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-1336",
+   "expected_sheet": "Server_Side_Template_Injection_Prevention_Cheat_Sheet",
+   "in_cwe_map": true,
+   "name": "Improper Neutralization of Special Elements Used in a Template Engine",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 4,
+    "pack_owasp_chunks": 4,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 4,
+    "pack_owasp_chunks": 5,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-915",
+   "expected_sheet": "Mass_Assignment_Cheat_Sheet",
+   "in_cwe_map": true,
+   "name": "Improperly Controlled Modification of Dynamically-Determined Object Attributes",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 4,
+    "pack_chunks_from_sheet": 1,
+    "pack_owasp_chunks": 6,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 3,
+    "pack_owasp_chunks": 4,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-1021",
+   "expected_sheet": "Clickjacking_Defense_Cheat_Sheet",
+   "in_cwe_map": false,
+   "name": "Improper Restriction of Rendered UI Layers or Frames",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 3,
+    "pack_owasp_chunks": 4,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 2,
+    "pack_owasp_chunks": 2,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-434",
+   "expected_sheet": "File_Upload_Cheat_Sheet",
+   "in_cwe_map": true,
+   "name": "Unrestricted Upload of File with Dangerous Type",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 2,
+    "pack_chunks_from_sheet": 5,
+    "pack_owasp_chunks": 6,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 4,
+    "pack_owasp_chunks": 4,
+    "mitre": true
+   }
+  },
+  {
+   "cwe": "CWE-943",
+   "expected_sheet": "NoSQL_Security_Cheat_Sheet",
+   "in_cwe_map": false,
+   "name": "Improper Neutralization of Special Elements in Data Query Logic",
+   "original": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 3,
+    "pack_chunks_from_sheet": 1,
+    "pack_owasp_chunks": 4,
+    "mitre": false
+   },
+   "improved": {
+    "grounded": true,
+    "reason": null,
+    "sheet_in_pack": true,
+    "first_rank": 1,
+    "pack_chunks_from_sheet": 1,
+    "pack_owasp_chunks": 5,
+    "mitre": true
+   }
+  }
+ ],
+ "part_b_headline": {
+  "original": 9,
+  "improved": 10
+ }
+}
