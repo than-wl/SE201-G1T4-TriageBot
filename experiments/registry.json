@@ -115,9 +115,31 @@
       "id": "6",
       "title": "Headline result",
       "question": "How well does the final system do on cases it has never seen?",
-      "changes": "Nothing is changed: the final profile, single agent and council, run once after the code freeze.",
+      "changes": "Nothing is changed: the final version (the semantic profile, design decision 29), single agent and council, run once on the unseen final test after the code freeze.",
       "case_set": "final-test",
-      "planned": "later task: run once after the code freeze, with the profile chosen by steps 1 to 4"
+      "before": {
+        "profile": "semantic",
+        "modes": [
+          "single"
+        ]
+      },
+      "after": {
+        "profile": "semantic",
+        "modes": [
+          "council"
+        ]
+      },
+      "side_labels": {
+        "before": "Single",
+        "after": "Council"
+      },
+      "per_cwe": true,
+      "cost_per_case": {
+        "single": 0.0043,
+        "council": 0.0146
+      },
+      "cost_note": "From the recorded per-case costs on the comparison set: council US$1.3955 / 96 cases in 4-after (semantic profile); single agent US$0.4146 / 96 in 1b-before (the evidence profile, the same evidence; step 4 ran the council only). For 120 cases: about US$0.52 single + US$1.75 council.",
+      "rule": "The final test is run once. `experiment run 6` refuses a working tree with uncommitted changes to tracked files (the run records the commit it ran on) and refuses a fresh run once a run has results; an interrupted run resumes. Starting over needs --i-know-this-reruns-the-final-test."
     }
   ]
 }

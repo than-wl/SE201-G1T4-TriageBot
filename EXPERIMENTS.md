@@ -90,9 +90,13 @@ hand-written entries, and 5 of the 10 have no row in the old table. It also
 showed that a relevance score is a proxy: the set-up that scored best on it
 returned the most wrong-language advice.
 
-**Next:** step 5 rebuilds the mutation test; step 6 runs the
-final version once on the unseen final test, and reports the whole system next
-to Semgrep alone to show how far Semgrep's recall limits it.
+Semantic retrieval is therefore the default and the final version (design
+decision 29).
+
+**Next:** step 5 rebuilds the mutation test; step 6 (runnable, not run yet)
+runs the final version once on the unseen final test, and
+`verification/whole_system.py` reports the whole system next to Semgrep alone
+to show how far Semgrep's recall limits it.
 
 ## Why we split the cases
 
@@ -158,7 +162,9 @@ What each setting means:
 - **Guidance retrieval:** `map` picks OWASP cheat-sheet sections through a
   hand-made table from weakness (CWE) to cheat sheet. `semantic` ranks
   sections by meaning against the official MITRE description of the alert's
-  weakness (design decision 21).
+  weakness (design decision 21). Outside experiments, `semantic` with the
+  improved set-up is the default (design decision 29); every profile sets its
+  own retrieval, so the default does not change any profile.
 - **Semantic set-up:** five rules that decide how semantic retrieval builds
   the guidance (design decision 28; see
   [step 4](#semantic-retrieval-set-up-fixed-before-measuring)). The `semantic`
@@ -215,11 +221,12 @@ marked as a false alarm. Costs are the provider's reported cost in US dollars.
 | 3 | Does a reasoning worksheet with a consistency check help? | step 2 | `worksheet` profile, council | comparison |
 | 4 | Does semantic retrieval hold up? | step 2 (the worksheet was dropped after step 3) | `semantic` profile, council | comparison |
 | 5 | Does the verdict follow the code? | rebuilt mutation test (later task) | | mutation |
-| 6 | Headline result | final profile, single agent and council, run once (later task) | | final test |
+| 6 | Headline result | `semantic` profile, single agent (run once) | `semantic` profile, council (run once) | final test |
 
 Cost estimates use US$0.004 per case for the single agent and US$0.016 per
-case for the council (`config.EXPERIMENT_COST_PER_CASE`). The real spend is
-recorded in each run manifest.
+case for the council (`config.EXPERIMENT_COST_PER_CASE`), except step 6, which
+uses the per-case costs recorded in steps 1b and 4. The real spend is recorded
+in each run manifest.
 
 ### Step 1: Does a council beat one agent?
 
@@ -335,6 +342,16 @@ for each.
   and covering any CWE MITRE knows. Failed model calls rose from 1 to 4 of 288
   (a parse failure, a cut-off answer and an HTTP 400 among them); only one
   changed an outcome. Too few to call a trend; watched in step 6.
+
+  The hand-made table has rows for 6 of the 9 CWE numbers in the recorded scan;
+  adding rows would fix this scan, but every new CWE needs a new row, which is
+  the maintenance cost semantic retrieval removes.
+- **Decision:** semantic retrieval with this set-up is now the default and the
+  final version (design decision 29). The map remains available as
+  `RETRIEVAL_MODE = "map"` and in the step 1 to 3 profiles.
+- **Dropped for time:** the planned guidance-off run ("does guidance matter at
+  all?": the same council with no retrieved guidance) was not run. It is listed
+  under [Future work](#future-work).
 
 #### The step 4 rule, agreed in advance
 
@@ -570,14 +587,57 @@ verdicts is what the paid run measures.
 ### Step 6: Headline result
 
 - **Question:** how well does the final system do on cases it has never seen?
-- **Run:** the final profile chosen by steps 1 to 4, single agent and council,
-  run once after the code freeze; nothing is changed after it.
-- **Case set:** final test (120 cases).
-- **Cost estimate:** 480 calls, about US$2.40.
-- **Status:** not run yet (planned; runnable in a later task).
-- **Commands:** `python -m triagebot experiment show 6` lists it as planned.
+- **Run:** the final version, the `semantic` profile (design decision 29), with
+  the single agent (run `6-before`) and the council (run `6-after`), run once
+  after the code freeze; nothing is changed after it. `experiment show 6` puts
+  them side by side (columns "Single B", "Council C", "Council D") and adds a
+  table per weakness (CWE).
+- **Case set:** final test (120 cases: 30 per type, 15 real and 15 safe).
+- **Cost estimate:** 480 calls (120 single + 360 council), about US$2.27:
+  US$0.52 single + US$1.75 council. Taken from the recorded per-case costs on
+  the comparison set: the council's US$1.3955 for 96 cases in `4-after`, and
+  the single agent's US$0.4146 for 96 cases in `1b-before` (the same evidence;
+  step 4 ran the council only). The registry holds them as `cost_per_case`
+  (US$0.0043 and US$0.0146).
+- **Status:** runnable; not run yet.
+- **Two guards** protect the final test, which is run once. They apply to any
+  step whose case set is the final test, before any question or model call:
+  1. *A dirty tree is refused.* With uncommitted changes to tracked files,
+     `experiment run 6` stops: commit first, because the final test records
+     the commit it ran on.
+  2. *A second run is refused.* Once a run has results, a fresh run does not
+     start. Resuming an interrupted run still works (it is the same run), and
+     so does extending a `--limit` run. Starting over needs
+     `--i-know-this-reruns-the-final-test`; the old results are then moved to
+     `<run>-superseded-<time>/`, not deleted.
+- **Commands:**
+  - run (paid, asks first; commit first): `python -m triagebot experiment run 6`
+  - show: `python -m triagebot experiment show 6`
+  - replay: `python -m triagebot experiment replay 6`
+- **Whole system vs Semgrep alone** (free, after the run):
+  `python verification/whole_system.py --mode council` and
+  `python verification/whole_system.py --mode single`. The script reads the
+  recorded scan, the answer key and the finished run's evaluation, and makes
+  no model calls. Semgrep alone, over the whole benchmark for the four types
+  (CWE-matched): 668 real vulnerabilities with a matching alert, 453 safe cases
+  with one, 109 real vulnerabilities with none, so precision 59.6%, recall
+  86.0%, F1 70.4%. The whole system is a projection: for each type, the final
+  test's share of real cases kept (a case sent to a human counts as kept) and
+  share of safe cases removed are applied to Semgrep's counts. Kept real =
+  TP × keep rate; kept safe = FP × (1 − removal rate); missed = FN + TP ×
+  (1 − keep rate). Recall can only fall: TriageBot never sees what Semgrep
+  missed (FN), so Semgrep's recall is its ceiling. Output:
+  `evidence/whole_system/<run>.json` and `.md`. Before step 6 has run, the
+  script prints Semgrep alone and says to run step 6 first.
 - **Result:** _to be filled in after the run._
 - **Finding:** _to be filled in after the run._
+
+## Future work
+
+- **Does guidance matter at all?** The same council with no retrieved guidance,
+  on the comparison set. Planned for step 4 and dropped for time. It would show
+  how much of the accuracy comes from the guidance and how much from the code
+  the AI is shown.
 
 ## What we removed and why
 

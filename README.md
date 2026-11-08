@@ -89,7 +89,18 @@ cd SE201-G1T4-TriageBot
 
 The last line installs everything, including Semgrep 1.178.0 for optional re-scans. The prompt now starts with `(.venv)`. Activate it again in every new terminal. From here on, `python` means the venv's Python on every platform.
 
-**4. Run TriageBot**
+**4. Prepare the guidance retrieval (once)**
+
+TriageBot finds its guidance by semantic search, anchored on the official MITRE description of each alert's weakness (design decision 29). Two one-time steps prepare it. Both run locally and make no model calls:
+
+```bash
+python -m triagebot.nodes.context.cwe_catalogue   # downloads the MITRE CWE catalogue (SHA-256 pinned)
+python -m triagebot.nodes.context.vector_store    # downloads the embedding model, builds the local vector store
+```
+
+The second takes a few minutes on CPU the first time. Both write only to the git-ignored `Context/tmp/`. The scanner baseline (option 1) does not need them; triage, evaluation and experiment runs stop with these two commands if either is missing.
+
+**5. Run TriageBot**
 
 ```bash
 python -m triagebot
@@ -126,6 +137,7 @@ python -m triagebot experiment list
 python -m triagebot experiment show STEP
 python -m triagebot experiment replay STEP [--answer-key PATH]
 python -m triagebot experiment run STEP [--side before|after] [--repeat N] [--limit N] [--answer-key PATH]
+                                       [--i-know-this-reruns-the-final-test]
 ```
 
 - `check`: the setup check (Python version, virtual environment, rich, the Benchmark folder and its commit, the scan, Semgrep, the experiment case sets) with OK / MISSING / WARNING and the command that fixes each problem, shown for your OS. Exit code 1 while something required is missing; `--no-fail` always exits 0 (used by CI, where the Benchmark is never cloned).
@@ -138,7 +150,7 @@ python -m triagebot experiment run STEP [--side before|after] [--repeat N] [--li
 - `experiment`: menu option 4 ([EXPERIMENTS.md](EXPERIMENTS.md)).
   - `list` shows every step, its question and whether saved runs exist; `show STEP` prints the before/after table from the saved evaluation files. Both are offline and need no API key and no answer key.
   - `replay STEP` re-scores the saved outputs against the answer key, makes no model calls, and confirms the numbers match the saved evaluation (exit code 1 if they do not).
-  - `run STEP` is a **paid** run. Before any call it prints the case set, profile, modes, number of calls and the estimated cost, and asks for confirmation. It saves after every case to `evidence/experiments/<step>-<side>[-repeat-N]/`, so an interrupted run resumes without repeating finished cases. `--side` runs one side, `--repeat 2` is the second identical council run of step 1, and `--limit N` runs only the first N cases (a smoke test).
+  - `run STEP` is a **paid** run. Before any call it prints the case set, profile, modes, number of calls and the estimated cost, and asks for confirmation. It saves after every case to `evidence/experiments/<step>-<side>[-repeat-N]/`, so an interrupted run resumes without repeating finished cases. `--side` runs one side, `--repeat 2` is the second identical council run of step 1, and `--limit N` runs only the first N cases (a smoke test). Step 6 runs the final test, which is run once: it refuses to start with uncommitted changes to tracked files (commit first; the run records its commit) and refuses a fresh run once it has results. An interrupted run resumes; starting over needs `--i-know-this-reruns-the-final-test`, which moves the old results aside.
 - The frozen case sets the experiments use are built with `python -m triagebot.nodes.ingest.eval_sets build` (no model calls; see [data/samples/README.md](data/samples/README.md)).
 
 ## 5. How it works
@@ -382,12 +394,14 @@ are in [RESPONSIBLE_AI_RISK_ASSESSMENT.md](RESPONSIBLE_AI_RISK_ASSESSMENT.md).
 | Bradley | Evaluation harness, checkpoint report |
 | Wei Lin | Repository setup, integration, submission |
 
-## Optional semantic guidance retrieval
+## Semantic guidance retrieval
 
-The default guidance ranker is the curated CWE-to-cheat-sheet map. A second mode,
-`RETRIEVAL_MODE = "semantic"` in `triagebot/config.py`, ranks cheat-sheet chunks
-against the official MITRE text of the scanner's CWE. It is opt-in until the team has
-reviewed the dev-split comparison (design decision 21).
+The default guidance ranker is semantic retrieval (design decision 29): it looks up the
+scanner's CWE in the official MITRE catalogue, puts that record first, and ranks the OWASP
+cheat-sheet chunks by similarity to it, with the five set-up rules step 4 measured (design
+decision 28; [EXPERIMENTS.md](EXPERIMENTS.md#semantic-retrieval-set-up-fixed-before-measuring)).
+The curated CWE-to-cheat-sheet map is still available as `RETRIEVAL_MODE = "map"` in
+`triagebot/config.py`, and experiment steps 1 to 3 use it.
 
 ```bash
 pip install -r requirements.txt                              # includes fastembed
@@ -399,9 +413,7 @@ python -m triagebot.nodes.context.retrieval --explain CWE-89 # what one CWE gets
 The catalogue is written under the git-ignored `Context/tmp/cwe/`, and the knowledge-base
 vector store is a SQLite file at `Context/tmp/kb_vectors.sqlite`. Preparing the store
 embeds the whole knowledge base (a few minutes on CPU); later runs embed only what changed.
-The semantic set-up used by experiment step 4 is fixed by five rules (design decision 28;
-[EXPERIMENTS.md](EXPERIMENTS.md#semantic-retrieval-set-up-fixed-before-measuring)). Alerts
-with no CWE, or an unknown or deprecated CWE, are sent to human review in either mode.
+Alerts with no CWE, or an unknown or deprecated CWE, are sent to human review in either mode.
 
 ## Third-party content
 

@@ -189,6 +189,40 @@ class ProfileTest(unittest.TestCase):
                 self.assertEqual(config.RETRIEVAL_MODE, "semantic")
         self.assertEqual(profiles.missing_prerequisites("base"), [])
 
+    def test_every_profile_pins_its_retrieval_settings(self):
+        # Decision 29 changed the config defaults; no profile may depend on them.
+        for name, settings in profiles.PROFILES.items():
+            with self.subTest(profile=name):
+                self.assertEqual(set(profiles.SETTINGS) - set(settings), set())   # incl. RETRIEVAL_MODE
+                if settings["RETRIEVAL_MODE"] == "semantic":
+                    self.assertEqual(set(profiles.SEMANTIC_SETTINGS) - set(settings), set())
+                    self.assertEqual({k: settings[k] for k in profiles.SEMANTIC_SETTINGS},
+                                     profiles.SEMANTIC_SETUPS["improved"])
+                else:
+                    self.assertEqual(settings["RETRIEVAL_MODE"], "map")
+        defaults = [{"RETRIEVAL_MODE": mode, **profiles.SEMANTIC_SETUPS[setup]}
+                    for mode in ("map", "semantic") for setup in ("original", "improved")]
+        for name in profiles.PROFILES:
+            seen = []
+            for default in defaults:
+                with profiles.applied(default), profiles.use_profile(name, check_ready=False):
+                    seen.append((profiles.provenance(),
+                                 profiles.retrieval_provenance(profiles.current_settings()),
+                                 KnowledgeBase(mode=None).mode))
+            with self.subTest(profile=name):
+                self.assertTrue(all(s == seen[0] for s in seen), name)
+                self.assertEqual(seen[0][0]["settings"], profiles.PROFILES[name])
+
+    def test_the_final_version_is_the_config_default(self):
+        # A normal run (no profile) and the final version (the semantic profile) cannot drift
+        # apart: every setting the semantic profile pins equals its config default.
+        semantic = profiles.PROFILES["semantic"]
+        differ = {key: (value, getattr(config, key)) for key, value in semantic.items()
+                  if getattr(config, key) != value}
+        self.assertEqual(differ, {})
+        self.assertIsNone(config.ACTIVE_PROFILE)
+        self.assertEqual(profiles.current_settings(), semantic)
+
     def test_provenance_names_the_profile_and_its_settings(self):
         self.assertEqual(profiles.provenance(), {"name": None, "settings": self.defaults})
         with profiles.use_profile("evidence", check_ready=False):

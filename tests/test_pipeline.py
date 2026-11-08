@@ -4,8 +4,9 @@ from pathlib import Path
 import json
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from triagebot import pipeline
+from triagebot import config, pipeline
 
 
 ALERT = {
@@ -85,6 +86,7 @@ class PipelineTest(unittest.TestCase):
         self.assertTrue(run["validated"]["validated"])
         self.assertEqual(run["validated"]["usage"]["cost"], 0.001)
 
+    @patch.object(config, "REVIEW_WORKSHEET_ENABLED", True)   # explicit: the default is off
     def test_single_agent_repairs_a_verdict_that_conflicts_with_its_analysis(self):
         contradictory = {
             "verdict": "false_positive",
@@ -271,6 +273,7 @@ class PipelineTest(unittest.TestCase):
         self.assertTrue(run["validated"]["validated"])
         self.assertEqual(run["validated"]["verdict"], "false_positive")
 
+    @patch.object(config, "REVIEW_WORKSHEET_ENABLED", True)   # explicit: the default is off
     def test_council_repairs_a_verdict_that_conflicts_with_its_analysis(self):
         base = {
             "verdict": "human_review", "explanation": "More evidence is needed.",
@@ -301,6 +304,7 @@ class PipelineTest(unittest.TestCase):
         self.assertEqual(run["validated"]["verdict"], "true_positive")
         self.assertEqual(run["review"]["usage"]["cost"], 0.004)
 
+    @patch.object(config, "REVIEW_WORKSHEET_ENABLED", True)   # explicit: the default is off
     def test_council_escalates_when_one_repair_is_still_inconsistent(self):
         base = {
             "verdict": "human_review", "explanation": "More evidence is needed.",

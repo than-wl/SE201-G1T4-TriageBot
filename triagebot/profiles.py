@@ -17,7 +17,11 @@ for one run, then restores what was there before:
 
 The semantic set-up is fixed before step 4 is measured (design decision 28). The
 `semantic` profile turns on all five rules; the other profiles use map retrieval,
-which ignores them. SEMANTIC_SETUPS names the two set-ups `--explain` compares:
+which ignores them. Since decision 29 the config defaults equal every setting of
+the `semantic` profile (the worksheet default is off, decision 27), so a normal run
+(outside an experiment) is the final version. Every profile sets RETRIEVAL_MODE itself, and
+the `semantic` profile sets all five rules, so the defaults cannot change a profile.
+SEMANTIC_SETUPS names the two set-ups `--explain` compares:
 
 | Switch                               | original (decision 21) | improved (`semantic`) |
 | ------------------------------------ | ---------------------- | --------------------- |
@@ -43,8 +47,10 @@ import sqlite3
 from triagebot import config
 
 # The semantic set-up rules (R1 to R5) and their parameters. "original" is the
-# decision 21 set-up (all off, the config defaults); "improved" is what the
-# semantic profile runs.
+# decision 21 set-up (all off); "improved" is what the semantic profile runs and,
+# since decision 29, the config defaults. Code that needs the original set-up
+# (--explain --setup original, verification/semantic_setup_check.py) applies it from
+# here explicitly and never relies on the config defaults.
 SEMANTIC_SETUPS = {
     "original": {
         "SEMANTIC_QUERY_ALT_TERMS": False,
@@ -185,7 +191,15 @@ def _vector_store_ready(path) -> bool:
 
 def missing_prerequisites(name: str) -> list[str]:
     """What must be prepared before a run under this profile (empty when ready)."""
-    if get(name)["RETRIEVAL_MODE"] != "semantic":
+    return missing_retrieval_prerequisites(get(name)["RETRIEVAL_MODE"])
+
+
+def missing_retrieval_prerequisites(mode: str | None = None) -> list[str]:
+    """What semantic retrieval still needs prepared (empty when ready, or for map mode).
+
+    ``mode`` defaults to the live config.RETRIEVAL_MODE.
+    """
+    if (mode or config.RETRIEVAL_MODE) != "semantic":
         return []
     missing = []
     if not Path(config.CWE_CATALOGUE_XML).is_file():
@@ -200,6 +214,29 @@ def require_ready(name: str) -> None:
     missing = missing_prerequisites(name)
     if missing:
         raise ProfileError(f"profile {name!r} cannot run yet: " + "; ".join(missing))
+
+
+PREPARE_STEPS = (
+    f"{CATALOGUE_COMMAND}   (downloads the MITRE CWE catalogue, SHA-256 checked)",
+    f"{VECTOR_STORE_COMMAND}   (downloads the embedding model and builds the local vector store)",
+)
+
+
+def require_retrieval_ready() -> None:
+    """For a normal run (outside an experiment): stop before any model call while the
+    current retrieval mode is semantic and either prepare step is missing.
+
+    The message says what is missing and names both one-time prepare steps (local,
+    no model calls), and how to use the map instead.
+    """
+    missing = missing_retrieval_prerequisites()
+    if missing:
+        raise ProfileError(
+            "semantic retrieval (the default) is not prepared: " + "; ".join(missing)
+            + ". One-time set-up, local and with no model calls: "
+            + "; then ".join(PREPARE_STEPS)
+            + ". To use the hand-made CWE table instead, set RETRIEVAL_MODE = \"map\" in "
+              "triagebot/config.py.")
 
 
 @contextmanager

@@ -137,7 +137,7 @@ def _fresh_kb(kb):
         return KnowledgeBase()
     if not isinstance(kb, KnowledgeBase):
         raise ValueError("Durable runs require the file-backed KnowledgeBase")
-    return KnowledgeBase(kb.kb_dir)
+    return KnowledgeBase(kb.kb_dir, mode=kb.mode)     # keep the caller's retrieval mode
 
 
 def _provenance(alert, kb, benchmark_root, model):

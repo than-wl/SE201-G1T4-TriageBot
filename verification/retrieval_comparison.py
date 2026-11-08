@@ -90,7 +90,7 @@ def relevant_share(chunks):
 
 
 def main():
-    kb = KnowledgeBase()
+    kb = KnowledgeBase(mode="map")   # the keyword baseline is the map (it was the default when measured)
     alerts = json.loads((config.CHECKPOINT_OUT / "selected_alerts.json").read_text(encoding="utf-8"))["alerts"]
     alerts = [a for a in alerts if a["cwe"] == CWE]
     pool = [c for doc in kb.cwe_map[CWE] for c in kb._doc_chunks(doc)]

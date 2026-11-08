@@ -12,28 +12,33 @@ KB_DIR = Path(__file__).resolve().parent / "nodes" / "context" / "kb"
 RETRIEVAL_TOP_K = 6            # guidance chunks returned per payload
 GUIDANCE_MAX_CHARS = 4000      # ~1000-token guidance budget per payload
 
-# "map": the curated CWE -> cheat-sheet gate (the default until the dev-split
-#        measurement is reviewed). "semantic": embed the MITRE text for the
-#        alert's CWE and rank every cheat-sheet chunk by cosine similarity.
-RETRIEVAL_MODE = "map"
+# "semantic" (the default, design decision 29): look up the alert's CWE in the MITRE
+#        catalogue, attach its record, and rank the cheat-sheet chunks by similarity to it.
+#        Needs two one-time, local prepare steps (README, Quick start); a normal run stops
+#        and names both while either is missing.
+# "map": the curated CWE -> cheat-sheet table (steps 1 to 3; the base, evidence and
+#        worksheet profiles set it explicitly).
+RETRIEVAL_MODE = "semantic"
 # Used only when SEMANTIC_GROUNDING = "min_score" (the decision 21 set-up). It is NOT a
 # relevance gate: at 0.0 every chunk passes, and cosine scores of relevant and irrelevant
 # chunks overlap here, so no threshold separates them (decision 21, decision 28).
 SEMANTIC_MIN_SCORE = 0.0
 SEMANTIC_QUERY_MAX_CHARS = 1000  # cap on the CWE text used as the query
 
-# The semantic set-up rules (EXPERIMENTS.md step 4, design decision 28). Read at call
-# time. All off (the defaults) reproduces the decision 21 set-up exactly; the
-# "semantic" profile (triagebot/profiles.py) turns all five on. Map mode ignores them.
-SEMANTIC_QUERY_ALT_TERMS = False   # R1: add MITRE Alternate_Terms ("XSS", "path traversal") to the query
-SEMANTIC_MITRE_GUIDANCE = False    # R2: attach the MITRE record (by CWE ID, never searched) as the first chunk
+# The semantic set-up rules (EXPERIMENTS.md step 4, design decisions 28 and 29). Read at
+# call time. The defaults are the improved set-up step 4 measured, the same as the
+# "semantic" profile (triagebot/profiles.py). The decision 21 set-up (all five off) is
+# profiles.SEMANTIC_SETUPS["original"]; anything that needs it sets it explicitly.
+# Map mode ignores them.
+SEMANTIC_QUERY_ALT_TERMS = True    # R1: add MITRE Alternate_Terms ("XSS", "path traversal") to the query
+SEMANTIC_MITRE_GUIDANCE = True     # R2: attach the MITRE record (by CWE ID, never searched) as the first chunk
 MITRE_GUIDANCE_MAX_CHARS = 1500    #     its cap; it shares GUIDANCE_MAX_CHARS with the OWASP chunks
-SEMANTIC_KB_SCOPE = False          # R3: search only the sheets kb/scope.json keeps for KB_TARGET_PLATFORM
+SEMANTIC_KB_SCOPE = True           # R3: search only the sheets kb/scope.json keeps for KB_TARGET_PLATFORM
 KB_TARGET_PLATFORM = "java"        #     platform of the code being scanned (the OWASP Benchmark is Java)
 KB_SCOPE_FILE = KB_DIR / "scope.json"
-SEMANTIC_MAX_CHUNK_CHARS = 0       # R4: split chunks longer than this at load time; 0 = off (profile: 1800)
-SEMANTIC_GROUNDING = "min_score"   # R5: "mitre_record" (grounded iff the CWE has a valid MITRE record)
-                                   #     or "min_score" (a chunk clears SEMANTIC_MIN_SCORE; the original)
+SEMANTIC_MAX_CHUNK_CHARS = 1800    # R4: split chunks longer than this at load time; 0 = off (original)
+SEMANTIC_GROUNDING = "mitre_record"  # R5: "mitre_record" (grounded iff the CWE has a valid MITRE record)
+                                     #     or "min_score" (a chunk clears SEMANTIC_MIN_SCORE; the original)
 EMBEDDING_MODEL = "BAAI/bge-small-en-v1.5"   # local ONNX model via fastembed; no server
 EMBEDDING_QUERY_PREFIX = "Represent this sentence for searching relevant passages: "
 
@@ -144,8 +149,9 @@ REVIEW_MAX_TOKENS = 2000       # the answer itself is ~400-600 tokens, but the m
 REVIEW_TEMPERATURE = 0.0       # recorded runs must be reproducible
 # Reasoning worksheet: ask for the structured "analysis" object (and require it in
 # the strict JSON schema), then repair a verdict that contradicts it. Read at call
-# time, so a profile (triagebot/profiles.py) can switch it off.
-REVIEW_WORKSHEET_ENABLED = True
+# time, so a profile (triagebot/profiles.py) can switch it on. Off by default: the
+# final version runs without it (design decision 27); the "worksheet" profile turns it on.
+REVIEW_WORKSHEET_ENABLED = False
 
 # --- experiments (EXPERIMENTS.md) ------------------------------------------
 # The profile applied by profiles.use_profile(); None outside an experiment.

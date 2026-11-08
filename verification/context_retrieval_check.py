@@ -26,7 +26,7 @@ def main(argv=None):
         raise SystemExit("Set BENCHMARK_ROOT or pass --benchmark-root")
 
     alerts = json.loads(args.sample.read_text(encoding="utf-8"))["alerts"]
-    kb = KnowledgeBase()
+    kb = KnowledgeBase(mode="map")   # measures source context; the map needs no prepare step
     rows = []
     for alert in alerts:
         payload = build_payload(alert, kb, args.benchmark_root)

@@ -6,10 +6,12 @@ import os
 from unittest.mock import patch
 import unittest
 
+from triagebot import config
 from triagebot.llm.openrouter import OpenRouterCaller
 
 
 class StructuredOutput(unittest.TestCase):
+    @patch.object(config, "REVIEW_WORKSHEET_ENABLED", True)   # explicit: the default is off
     def test_request_requires_strict_supported_json(self):
         captured = {}
         response = {"model": "fixture", "choices": [{"message": {"content": json.dumps({

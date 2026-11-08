@@ -14,7 +14,7 @@ from unittest.mock import patch
 import numpy as np
 
 from semantic_fixture import CATALOGUE   # the small MITRE catalogue, shared with test_semantic_setup
-from triagebot import config
+from triagebot import config, profiles
 from triagebot.execution import validation_case
 from triagebot.nodes.context.cwe_catalogue import CweCatalogue, install
 from triagebot.nodes.context.retrieval import KnowledgeBase
@@ -68,6 +68,12 @@ class SemanticRetrievalTest(unittest.TestCase):
              "url": "https://example.test/hash"}]}), encoding="utf-8")
         self.catalogue = CweCatalogue(self._write(root / "cwec.xml", CATALOGUE))
         self.embedder = KeywordEmbedder()
+        # These tests pin decision 21's behaviour (the MITRE text as the query, the score
+        # threshold), so they set the original set-up explicitly; the config defaults are
+        # the improved set-up since decision 29.
+        original = profiles.applied(profiles.SEMANTIC_SETUPS["original"])
+        original.__enter__()
+        self.addCleanup(original.__exit__, None, None, None)
 
     @staticmethod
     def _write(path, text):

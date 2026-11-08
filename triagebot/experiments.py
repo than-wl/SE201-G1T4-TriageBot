@@ -23,6 +23,12 @@ outputs against the answer key and makes no model calls.
 
 The answer key is read only in finalize() and replay(), after the model calls,
 and only evaluation-side files (evaluation*.json, report.md) carry scores.
+
+A step whose case set is the final test (step 6) is run once. final_test_guard()
+refuses to start it on a working tree with uncommitted changes to tracked files
+(the run records the commit it ran on), and refuses a fresh run once a run has
+results; resuming an interrupted run is allowed (it is the same run). Starting
+over needs RERUN_FLAG, and the old results are moved aside, not deleted.
 """
 
 from datetime import datetime, timezone
@@ -35,6 +41,9 @@ from triagebot import config, profiles
 from triagebot.nodes.ingest import eval_sets
 
 MODES = ("single", "council")
+FINAL_TEST = "final-test"
+RERUN_FLAG = "--i-know-this-reruns-the-final-test"
+SUPERSEDED = "superseded"          # <run>-superseded-<UTC time>/: results moved aside by a rerun
 CONFIGURATIONS = {"single": ("B-single-agent",), "council": ("C-council", "D-validated-council")}
 RESULTS_LOG = "results.jsonl"
 MANIFEST = "run_manifest.json"
@@ -55,6 +64,13 @@ METRICS = (
     ("Mean latency (s)", "usage.latency_mean_seconds", "float"),
     ("Total cost (US$)", "usage.cost_total", "money"),
     ("Prompt tokens", "usage.prompt_tokens_total", "int"),
+)
+# The per-CWE table (steps with "per_cwe": true in the registry, such as step 6).
+CWE_METRICS = (
+    ("F1", "f1", "pct"),
+    ("Real vulnerabilities dismissed", "genuine_dismissed", "of_genuine"),
+    ("False alarms removed", "fp_removed", "of_fp"),
+    ("Sent to a human", "human_review", "of_all"),
 )
 
 
@@ -225,14 +241,21 @@ def _requested_model() -> str:
 
 # --- planning -------------------------------------------------------------------------------
 
+def cost_per_case(step) -> dict[str, float]:
+    """US$ per case by mode: the step's own estimate (registry "cost_per_case") if it has
+    one, else config.EXPERIMENT_COST_PER_CASE."""
+    return {**config.EXPERIMENT_COST_PER_CASE, **step.get("cost_per_case", {})}
+
+
 def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=None,
-         registry=None) -> list[dict]:
+         registry=None, fresh=False) -> list[dict]:
     """What a paid run would do, per side, without calling a model.
 
     Each plan holds the case set and its fingerprint, the profile and its
     settings, the modes, the cases still to run (finished cases in an
     existing results.jsonl are skipped), the number of calls and the estimated
-    cost from config.EXPERIMENT_COST_PER_CASE.
+    cost from cost_per_case(). ``fresh`` plans a start from nothing, ignoring
+    any existing run folder (a final-test rerun moves it aside before running).
     """
     step = get_step(step_id, registry)
     if step.get("planned"):
@@ -263,7 +286,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
         modes = list(spec["modes"])
         model = _requested_model()
         existing = folder / MANIFEST
-        if existing.is_file():
+        if existing.is_file() and not fresh:
             old = _read_json(existing)
             changed = [label for label, a, b in (
                 ("profile", old["profile"]["settings"], settings),
@@ -280,10 +303,11 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
                 raise ExperimentError(
                     f"{name} already covers {len(old['case_set']['cases'])} cases; a smaller "
                     f"--limit would replace its results (raise or omit --limit)")
-        done = _completed(folder, modes)
+        done = {} if fresh else _completed(folder, modes)
         remaining = [a for a in selected if a["case_id"] not in done]
         worksheet = settings["REVIEW_WORKSHEET_ENABLED"]
         per_case = sum(config.EXPERIMENT_CALLS_PER_CASE[m] for m in modes)
+        costs = {m: cost_per_case(step)[m] for m in modes}
         plans.append({
             "step": step, "side": name_side, "repeat": repeat, "name": name, "dir": folder,
             "profile": spec["profile"], "settings": settings, "retrieval": retrieval,
@@ -293,10 +317,81 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
             "remaining": remaining, "already_saved": len(selected) - len(remaining),
             "calls": len(remaining) * per_case,
             "max_repair_calls": len(remaining) * len(modes) if worksheet else 0,
-            "estimated_cost": round(len(remaining) * sum(
-                config.EXPERIMENT_COST_PER_CASE[m] for m in modes), 4),
+            "cost_per_case": costs,
+            "estimated_cost": round(len(remaining) * sum(costs.values()), 4),
         })
     return plans
+
+
+# --- the final test is run once (step 6) -----------------------------------------------------
+
+def is_final_test(step) -> bool:
+    return step.get("case_set") == FINAL_TEST
+
+
+def final_test_guard(plans, rerun=False, git=None) -> list[dict]:
+    """Refuse to start a final-test run that must not start; return the runs a rerun replaces.
+
+    Applies to every step whose case set is the final test (other steps pass
+    through, but ``rerun`` is refused for them):
+
+    1. The working tree must have no uncommitted changes to tracked files
+       (git_state()), because the run records the commit it ran on.
+    2. A run that already has results (complete over the whole case set) is not
+       started again unless ``rerun`` (RERUN_FLAG). An unfinished run resumes
+       without the flag: it is the same run.
+
+    Returns [{"name", "dir", "state", "cases_saved"}] for the existing runs that
+    start_over() would move aside (only with ``rerun``). Raises ExperimentError.
+    """
+    if not plans:
+        return []
+    step = plans[0]["step"]
+    if not is_final_test(step):
+        if rerun:
+            raise ExperimentError(f"{RERUN_FLAG} applies only to a step whose case set is "
+                                  f"{FINAL_TEST}; step {step['id']} uses {step['case_set']}")
+        return []
+    git = git if git is not None else git_state()
+    if git.get("commit") is None:
+        raise ExperimentError(
+            f"step {step['id']} runs the final test, which records the commit it ran on, but the "
+            "Git commit could not be read; run it from a Git checkout of this repository")
+    if git.get("dirty"):
+        paths = git.get("dirty_paths") or []
+        shown = ", ".join(paths[:10]) + (f" and {len(paths) - 10} more" if len(paths) > 10 else "")
+        raise ExperimentError(
+            f"step {step['id']} runs the final test, which records the commit it ran on: commit "
+            f"first. Uncommitted changes to tracked files: {shown}")
+    existing = []
+    for plan_ in plans:
+        status = run_status(plan_["name"], Path(plan_["dir"]).parent)
+        if status["state"] == "none":
+            continue
+        full = status["state"] == "complete" and status["cases_total"] == status["cases_in_set"]
+        if full and not rerun:
+            raise ExperimentError(
+                f"{plan_['name']} already has results on the final test, which is run once. "
+                f"To start it again from nothing, pass {RERUN_FLAG} (the old results are moved "
+                f"to {plan_['name']}-{SUPERSEDED}-<time>/, not deleted)")
+        if rerun:
+            existing.append({"name": plan_["name"], "dir": Path(plan_["dir"]),
+                             "state": status["state"], "cases_saved": status["cases_saved"]})
+    return existing
+
+
+def start_over(existing, now=None) -> list[Path]:
+    """Move each existing run folder to <run>-superseded-<UTC time>/ (kept, not deleted)."""
+    stamp = (now or datetime.now(timezone.utc)).strftime("%Y%m%dT%H%M%SZ")
+    moved = []
+    for run in existing:
+        folder = Path(run["dir"])
+        target = folder.with_name(f"{folder.name}-{SUPERSEDED}-{stamp}")
+        if target.exists():
+            raise ExperimentError(f"{target} already exists; nothing was moved")
+        folder.rename(target)
+        moved.append(target)
+    return moved
 
 
 # --- running (paid) -------------------------------------------------------------------------
@@ -510,19 +605,24 @@ CONFIG_LEGEND = "B = single agent; C = council, raw; D = council after determini
 def show_table(step_id, out_root=None, registry=None) -> dict:
     """The before/after table for one step from saved evaluation files (no key needed).
 
-    Returns {"step", "headers", "rows", "legend", "notes", "missing"}. A column
-    is one configuration of one saved run, headed by its side and letter (for
-    example "After C"); the legend names the run behind each side. Where a side
-    has two identical runs, one more column per configuration ("Noise C") shows
-    run 2 minus run 1: the noise between identical runs.
+    Returns {"step", "headers", "rows", "legend", "notes", "missing", "by_cwe"}.
+    A column is one configuration of one saved run, headed by its side and letter
+    (for example "After C"; a step may name its sides in the registry,
+    "side_labels", as step 6 does: "Single B", "Council C"); the legend names the
+    run behind each side. Where a side has two identical runs, one more column per
+    configuration ("Noise C") shows run 2 minus run 1: the noise between identical
+    runs. For a step with "per_cwe": true, by_cwe is {"headers", "rows"}: the same
+    columns per weakness, from evaluation_by_cwe.json; otherwise None.
     """
     step = get_step(step_id, registry)
     out_root = Path(out_root or config.EXPERIMENTS_OUT)
     runs = runs_for(step)
     columns, notes, missing, loaded, legend = [], [], [], {}, []
+    by_cwe_columns = []
+    side_labels = step.get("side_labels", {})
     for side in ("before", "after"):
         for number, name in enumerate(runs[side], 1):
-            side_label = side.capitalize() + (f" #{number}" if number > 1 else "")
+            side_label = side_labels.get(side, side.capitalize()) + (f" #{number}" if number > 1 else "")
             status = run_status(name, out_root)
             if status["state"] == "none":
                 missing.append(name)
@@ -544,6 +644,12 @@ def show_table(step_id, out_root=None, registry=None) -> dict:
                           f"{' and '.join(manifest['modes'])}{reused})")
             for config_name in manifest["configurations"]:
                 columns.append((f"{side_label} {_letter(config_name)}", loaded[name][config_name]))
+            if step.get("per_cwe"):
+                per_cwe = _read_json(folder / EVALUATION_BY_CWE)["by_cwe"]
+                for config_name in manifest["configurations"]:
+                    by_cwe_columns.append((f"{side_label} {_letter(config_name)}", {
+                        cwe: next(r for r in entry["configurations"] if r["configuration"] == config_name)
+                        for cwe, entry in per_cwe.items()}))
     noise = []
     for side in ("before", "after"):
         names = [n for n in runs[side] if n in loaded]
@@ -563,13 +669,25 @@ def show_table(step_id, out_root=None, registry=None) -> dict:
         cells = [_format(_value(row, key), kind, row) for _, row in columns]
         cells += [_difference(_value(a, key), _value(b, key), kind) for _, a, b in noise]
         rows.append([label] + cells)
+    by_cwe = None
+    if by_cwe_columns:
+        cwes = sorted({cwe for _, per in by_cwe_columns for cwe in per},
+                      key=lambda c: int(c.split("-")[1]) if c.split("-")[-1].isdigit() else 0)
+        cwe_rows = []
+        for cwe in cwes:
+            for label, key, kind in CWE_METRICS:
+                cwe_rows.append([cwe, label] + [
+                    _format(_value(per[cwe], key), kind, per[cwe]) if cwe in per else "–"
+                    for _, per in by_cwe_columns])
+        by_cwe = {"headers": ["CWE", "Measure"] + [label for label, _ in by_cwe_columns],
+                  "rows": cwe_rows}
     return {"step": step, "headers": headers, "rows": rows if columns else [],
-            "legend": legend, "notes": notes, "missing": missing}
+            "legend": legend, "notes": notes, "missing": missing, "by_cwe": by_cwe}
 
 
-def markdown_table(table) -> str:
+def markdown_table(table, text_columns=1) -> str:
     lines = ["| " + " | ".join(table["headers"]) + " |",
-             "| --- |" + " ---: |" * (len(table["headers"]) - 1)]
+             "|" + " --- |" * text_columns + " ---: |" * (len(table["headers"]) - text_columns)]
     lines += ["| " + " | ".join(row) + " |" for row in table["rows"]]
     return "\n".join(lines)
 
@@ -645,13 +763,21 @@ def report_markdown(folder) -> str:
         f"- Show the before/after table (free, offline): `{commands(step_id)['show']}`",
         f"- Re-score the saved outputs (free, needs the Benchmark answer key): "
         f"`{commands(step_id)['replay']}`",
-        f"- Re-run (paid, asks first): delete this folder, then "
-        f"`{commands(step_id)['run']} --side {side}"
-        + (f" --repeat {manifest['repeat']}" if manifest["repeat"] > 1 else "")
-        + (f" --limit {case_set['limit']}" if case_set["limit"] else "") + "`",
+        _rerun_line(step_id, side, manifest, case_set),
         "",
     ]
     return "\n".join(lines)
+
+
+def _rerun_line(step_id, side, manifest, case_set) -> str:
+    command = (f"{commands(step_id)['run']} --side {side}"
+               + (f" --repeat {manifest['repeat']}" if manifest["repeat"] > 1 else "")
+               + (f" --limit {case_set['limit']}" if case_set["limit"] else ""))
+    if case_set["name"] == FINAL_TEST:
+        return (f"- Re-run (paid, asks first; the final test is run once, so only on purpose): "
+                f"`{command} {RERUN_FLAG}`, which moves this folder to "
+                f"`{manifest['run']}-{SUPERSEDED}-<time>/`")
+    return f"- Re-run (paid, asks first): delete this folder, then `{command}`"
 
 
 # --- replay (free, needs the answer key) ------------------------------------------------------

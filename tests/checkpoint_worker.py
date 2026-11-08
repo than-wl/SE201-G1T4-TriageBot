@@ -15,6 +15,7 @@ _LOG_LOCK = threading.Lock()
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+from triagebot import config
 from triagebot.checkpoints import (
     _database, _execution_lock, _record, create_council_run,
     inspect_council_run, resume_council_run,
@@ -26,7 +27,9 @@ from triagebot.nodes.context.retrieval import KnowledgeBase
 def main():
     action, db, root, thread_id, log = sys.argv[1:]
     root = Path(root)
-    kb = KnowledgeBase(root / "kb")
+    config.RETRIEVAL_MODE = "map"     # explicit, as in test_checkpoints: the default is semantic
+    config.REVIEW_WORKSHEET_ENABLED = True   # explicit: the repair node is tested; the default is off
+    kb = KnowledgeBase(root / "kb", mode="map")
 
     class Caller:
         last_call = None

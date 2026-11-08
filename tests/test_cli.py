@@ -709,6 +709,10 @@ class ExportSvg(TempDir):
 class PipelineCommands(TempDir):
     def setUp(self):
         super().setUp()
+        # Explicit: the default retrieval is semantic, which needs two prepare steps.
+        patcher = mock.patch.object(cli.config, "RETRIEVAL_MODE", "map")
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.sample = self.tmp / "selected_alerts.json"
         self.alert = {
             "case_id": "BenchmarkTest00001", "file": "src/main/java/Test.java",
@@ -747,6 +751,42 @@ class PipelineCommands(TempDir):
         report = json.loads((self.out / "evaluation.json").read_text(encoding="utf-8"))
         self.assertEqual(report["sample_size"], 1)
         self.assertIn("B-single-agent", printed)
+
+    def test_normal_runs_stop_until_semantic_retrieval_is_prepared(self):
+        # Decision 29: the default is semantic retrieval; a normal run names both prepare steps.
+        missing = {"CWE_CATALOGUE_XML": self.tmp / "none.xml", "KB_VECTOR_DB": self.tmp / "none.sqlite"}
+        commands = (["triage", "--case", "BenchmarkTest00001", "--sample", str(self.sample),
+                     "--out", str(self.out)],
+                    ["evaluate", "--sample", str(self.sample), "--out", str(self.out)],
+                    ["council-start", "--case", "BenchmarkTest00001", "--sample", str(self.sample),
+                     "--db", str(self.tmp / "db.sqlite"), "--out", str(self.out)],
+                    ["council-resume", "--thread-id", "x", "--db", str(self.tmp / "db.sqlite")])
+        for argv in commands:
+            with self.subTest(command=argv[0]), \
+                    mock.patch.multiple(cli.config, RETRIEVAL_MODE="semantic", ANSWER_KEY=ANSWER_KEY,
+                                        **missing), \
+                    mock.patch.object(cli.pipeline, "triage") as triage, \
+                    mock.patch.object(cli.pipeline, "run_sample") as run_sample:
+                code, _, errors = capture(cli.main, argv)
+                self.assertEqual(code, 1)
+                flat = " ".join(errors.split())
+                self.assertIn(cli.profiles.CATALOGUE_COMMAND, flat)
+                self.assertIn(cli.profiles.VECTOR_STORE_COMMAND, flat)
+                self.assertIn("MITRE CWE catalogue is missing", flat)
+                self.assertIn('RETRIEVAL_MODE = "map"', flat)
+                triage.assert_not_called()
+                run_sample.assert_not_called()
+        self.assertFalse((self.tmp / "none.sqlite").exists())        # nothing was embedded
+        # Only the vector store missing: both prepare steps are still named.
+        self.tmp.joinpath("none.xml").write_text("<catalogue/>", encoding="utf-8")
+        with mock.patch.multiple(cli.config, RETRIEVAL_MODE="semantic", **missing):
+            code, _, errors = capture(cli.main, commands[0])
+        flat = " ".join(errors.split())
+        self.assertEqual(code, 1)
+        self.assertNotIn("catalogue is missing", flat)
+        self.assertIn("vector store is missing", flat)
+        self.assertIn(cli.profiles.CATALOGUE_COMMAND, flat)
+        self.assertIn(cli.profiles.VECTOR_STORE_COMMAND, flat)
 
     def test_evaluate_rejects_unknown_mode(self):
         with self.assertRaises(SystemExit) as raised:

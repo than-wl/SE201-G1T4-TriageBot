@@ -25,6 +25,7 @@ Non-interactive subcommands (same functions as the menu options):
     python -m triagebot experiment show STEP
     python -m triagebot experiment replay STEP [--answer-key PATH]
     python -m triagebot experiment run STEP [--side before|after] [--repeat N] [--limit N]
+                                       [--i-know-this-reruns-the-final-test]
 
 baseline: runs the ingest stage (triagebot.nodes.ingest.run.build), writes
 the same files to --out (default Context/tmp/checkpoint/), and shows the
@@ -45,7 +46,9 @@ experiment: the steps in EXPERIMENTS.md (triagebot/experiments.py). list and
 show are offline and need no API key or answer key; replay re-scores saved
 outputs against the answer key without model calls; run prints the cost
 estimate and asks before any paid call, saving after every case so an
-interrupted run resumes.
+interrupted run resumes. A step on the final test (step 6) is run once: run
+refuses uncommitted changes to tracked files, and refuses to start it again
+once it has results unless --i-know-this-reruns-the-final-test is given.
 
 check: prints the setup table; exit code 1 while a required item is MISSING
 (0 with --no-fail, for CI, where the Benchmark is never cloned).
@@ -512,10 +515,22 @@ def _sample_alerts(path):
     return alerts
 
 
+def _retrieval_not_ready():
+    """None when retrieval is ready; else the message naming the prepare steps (decision 29)."""
+    try:
+        profiles.require_retrieval_ready()
+    except profiles.ProfileError as error:
+        return str(error)
+    return None
+
+
 def triage_one(case=None, mode="single", sample=None, out=None) -> int:
     """Menu option 2 / `triage`: one saved alert through the pipeline."""
     sample = Path(sample or config.CHECKPOINT_OUT / "selected_alerts.json")
     out = Path(out or config.CHECKPOINT_OUT)
+    not_ready = _retrieval_not_ready()
+    if not_ready:
+        return _fail(not_ready)
     try:
         alerts = _sample_alerts(sample)
         matches = [alert for alert in alerts if alert.get("case_id") == case]
@@ -541,6 +556,9 @@ def evaluate_sample(sample=None, modes=REVIEW_MODES, out=None, answer_key=None) 
     answer_key = Path(answer_key or config.ANSWER_KEY or "")
     if not answer_key.is_file():
         return _fail(f"answer key not found: {answer_key}")
+    not_ready = _retrieval_not_ready()
+    if not_ready:
+        return _fail(not_ready)
     try:
         alerts = _sample_alerts(sample)
         configurations = pipeline.run_sample(alerts, tuple(modes), out)
@@ -572,6 +590,9 @@ def council_start(case, sample=None, db=None, out=None, benchmark_root=None):
     """Explicitly start a NEW paid council session and print its ID first."""
     from triagebot.checkpoints import create_council_run, resume_council_run
     import sqlite3
+    not_ready = _retrieval_not_ready()
+    if not_ready:
+        return _fail(not_ready)
     try:
         alerts = _sample_alerts(Path(sample or config.CHECKPOINT_OUT / "selected_alerts.json"))
         matches = [alert for alert in alerts if alert.get("case_id") == case]
@@ -606,6 +627,9 @@ def council_resume(thread_id, db=None, out=None, benchmark_root=None, allow_repl
     """Resume SAME thread; acknowledge possible duplicate charges after a crash."""
     from triagebot.checkpoints import resume_council_run
     import sqlite3
+    not_ready = _retrieval_not_ready()
+    if not_ready:
+        return _fail(not_ready)
     try:
         result = resume_council_run(thread_id, db, allow_replay=allow_replay,
                                     benchmark_root=benchmark_root)
@@ -666,6 +690,16 @@ def experiment_show(step_id) -> int:
         for line in data["legend"]:
             console.print(line, style="dim", markup=False)
         console.print("Precision, recall and F1 count a case sent to a human as kept.", style="dim")
+        if data.get("by_cwe"):
+            console.print()
+            console.print(Text("By weakness (CWE)", style="bold"))
+            cwe_table = Table(box=box.SIMPLE_HEAD)
+            for number, header in enumerate(data["by_cwe"]["headers"]):
+                cwe_table.add_column(header, justify="left" if number < 2 else "right",
+                                     no_wrap=number < 2)
+            for row in data["by_cwe"]["rows"]:
+                cwe_table.add_row(*row)
+            console.print(cwe_table)
     for note in data["notes"]:
         console.print(note, markup=False)
     for name in data["missing"]:
@@ -721,7 +755,7 @@ def _show_plan(plan) -> None:
     scope = (f"first {len(plan['alerts'])} of {plan['cases_in_set']}, --limit {plan['limit']}"
              if plan["limit"] else f"all {plan['cases_in_set']}")
     per_case = " + ".join(f"{config.EXPERIMENT_CALLS_PER_CASE[m]} {m}" for m in plan["modes"])
-    cost = " + ".join(f"US${config.EXPERIMENT_COST_PER_CASE[m]}" for m in plan["modes"])
+    cost = " + ".join(f"US${plan['cost_per_case'][m]}" for m in plan["modes"])
     repairs = (f", plus up to {plan['max_repair_calls']} consistency repairs"
                if plan["max_repair_calls"] else "")
     for label, value in (
@@ -740,10 +774,16 @@ def _show_plan(plan) -> None:
 
 
 def experiment_run(step_id, side=None, repeat=1, limit=None, answer_key=None,
-                   caller_factory=None, benchmark_root=None) -> int:
-    """`experiment run`: a PAID run, after showing the estimate and asking for confirmation."""
+                   caller_factory=None, benchmark_root=None, rerun_final_test=False) -> int:
+    """`experiment run`: a PAID run, after showing the estimate and asking for confirmation.
+
+    A final-test step (step 6) must pass experiments.final_test_guard() first: no
+    uncommitted changes to tracked files, and no fresh start once it has results
+    unless rerun_final_test (--i-know-this-reruns-the-final-test). Resuming is allowed.
+    """
     try:
-        plans = experiments.plan(step_id, side, repeat, limit)
+        plans = experiments.plan(step_id, side, repeat, limit, fresh=rerun_final_test)
+        replaced = experiments.final_test_guard(plans, rerun_final_test)
         for plan in plans:
             profiles.require_ready(plan["profile"])
     except EXPERIMENT_ERRORS as error:
@@ -757,6 +797,10 @@ def experiment_run(step_id, side=None, repeat=1, limit=None, answer_key=None,
 
     for plan in plans:
         _show_plan(plan)
+    for run in replaced:
+        console.print(f"[yellow]Starting over:[/] {run['name']} ({run['cases_saved']} cases saved) is "
+                      f"moved to {run['name']}-{experiments.SUPERSEDED}-<time>/ (kept, not deleted) "
+                      "once you confirm.")
     calls = sum(plan["calls"] for plan in plans)
     cost = sum(plan["estimated_cost"] for plan in plans)
     console.print()
@@ -771,6 +815,12 @@ def experiment_run(step_id, side=None, repeat=1, limit=None, answer_key=None,
             return 0
         if caller_factory is None and not _has_api_key():
             return _fail("OPENROUTER_API_KEY not set (environment or repo-root .env); no calls made")
+    if replaced:
+        try:
+            for target in experiments.start_over(replaced):
+                console.print(f"Moved the old results to {check.rel_path(target)}/", markup=False)
+        except (experiments.ExperimentError, OSError) as error:
+            return _fail(str(error))
 
     def progress(done, total, case_id):
         console.print(f"  [{done}/{total}] {case_id} saved", markup=False)
@@ -1028,6 +1078,9 @@ def parser() -> argparse.ArgumentParser:
                       help="which identical run this is (step 1's second council run: --repeat 2)")
     xrun.add_argument("--limit", type=int, help="run only the first N cases (smoke test)")
     xrun.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
+    xrun.add_argument(experiments.RERUN_FLAG, dest="rerun_final_test", action="store_true",
+                      help="start a final-test step (step 6) again from nothing although it already "
+                           "has results; the old results are moved aside, not deleted")
     return p
 
 
@@ -1054,7 +1107,8 @@ def main(argv=None) -> int:
             return experiment_show(args.step)
         if args.experiment_command == "replay":
             return experiment_replay(args.step, args.answer_key)
-        return experiment_run(args.step, args.side, args.repeat, args.limit, args.answer_key)
+        return experiment_run(args.step, args.side, args.repeat, args.limit, args.answer_key,
+                              rerun_final_test=args.rerun_final_test)
     return menu()
 
 

@@ -9,6 +9,7 @@ import hashlib
 import io
 import json
 import re
+import sys
 import tempfile
 import unittest
 from contextlib import redirect_stderr
@@ -56,32 +57,55 @@ class FixtureTest(unittest.TestCase):
 
 
 class RegressionTest(FixtureTest):
-    def test_config_defaults_are_the_original_set_up(self):
-        self.assertEqual({k: getattr(config, k) for k in ORIGINAL}, ORIGINAL)
-        self.assertEqual(config.RETRIEVAL_MODE, "map")
+    def test_config_defaults_are_the_improved_set_up(self):
+        # Decision 29: semantic retrieval with the set-up step 4 measured is the default.
+        self.assertEqual({k: getattr(config, k) for k in IMPROVED}, IMPROVED)
+        self.assertEqual(config.RETRIEVAL_MODE, "semantic")
         self.assertEqual(config.SEMANTIC_MIN_SCORE, 0.0)
+        self.assertEqual({k: v for k, v in profiles.PROFILES["semantic"].items() if k in IMPROVED},
+                         IMPROVED)
 
     def test_all_flags_off_returns_exactly_what_it_returned_before(self):
         # Recorded from the decision 21 code on this fixture before the rules were added.
+        # The original set-up is set explicitly: the config defaults are the improved one.
         expected = {
             "CWE-89": ["Django_Sheet#001", "SQL_Sheet#001", "SQL_Sheet#002", "Evasion_Sheet#001",
                        "Old_Sheet#001", "Big_Sheet#001"],
             "CWE-916": ["Hash_Sheet#001", "common#001", "Java_Sheet#001", "Django_Sheet#001",
                         "SQL_Sheet#001", "SQL_Sheet#002"],
         }
-        for setup in (None, ORIGINAL):             # the config defaults, and the named set-up
-            for cwe, chunk_ids in expected.items():
-                with self.subTest(setup=setup is not None, cwe=cwe):
-                    result = self.retrieve(cwe, setup)
-                    self.assertEqual(result["source"], "OWASP Cheat Sheet Series")
-                    self.assertTrue(result["cwe_matched"])
-                    self.assertEqual(ids(result["chunks"]), chunk_ids)
+        for cwe, chunk_ids in expected.items():
+            with self.subTest(cwe=cwe):
+                result = self.retrieve(cwe, ORIGINAL)
+                self.assertEqual(result["source"], "OWASP Cheat Sheet Series")
+                self.assertTrue(result["cwe_matched"])
+                self.assertEqual(ids(result["chunks"]), chunk_ids)
         self.assertEqual(self.embedder.queries[:2], [
             "SQL Injection. Input reaches an SQL command without neutralisation.",
             "Hashing Too Weakly. Password hash is computed with a weak hash function."])
         for cwe in ("CWE-1", "CWE-404", ""):
             self.assertEqual(self.retrieve(cwe, ORIGINAL),
                              {"source": "OWASP Cheat Sheet Series", "cwe_matched": False, "chunks": []})
+
+    def test_the_original_set_up_set_explicitly_does_not_depend_on_the_defaults(self):
+        # --explain --setup original and semantic_setup_check apply SEMANTIC_SETUPS["original"]
+        # themselves, so they give the same output whatever the config defaults are.
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "verification"))
+        import semantic_setup_check as setup_check
+
+        self.assertEqual(setup_check.configurations()["original"], ORIGINAL)
+        self.assertEqual(setup_check.configurations()["improved"], IMPROVED)
+        outputs = []
+        for defaults in (ORIGINAL, IMPROVED):
+            with profiles.applied(defaults):
+                kb = self.kb()
+                outputs.append((retrieval.explain("CWE-89", "original", kb=kb),
+                                [c["chunk_id"] for c in setup_check.collect(kb, "CWE-89", ORIGINAL)["pack"]]))
+        self.assertEqual(outputs[0], outputs[1])
+        self.assertIn("original set-up", outputs[0][0])
+        self.assertIn("MITRE chunk: not attached (R2 off)", outputs[0][0])
+        self.assertEqual(outputs[0][1], ["Django_Sheet#001", "SQL_Sheet#001", "SQL_Sheet#002",
+                                         "Evasion_Sheet#001", "Old_Sheet#001", "Big_Sheet#001"])
 
     def test_map_mode_is_unaffected_by_the_new_flags(self):
         (self.kb_dir / "cwe_map.json").write_text(json.dumps({"CWE-89": ["SQL_Sheet", "Big_Sheet"]}),
@@ -353,11 +377,12 @@ class SplitTest(unittest.TestCase):              # R4
 class SplitRetrievalTest(FixtureTest):
     def test_the_store_holds_chunks_and_pieces_and_each_set_up_searches_its_own(self):
         kb = self.kb()
-        store_ids, _ = kb._semantic_index()            # config defaults: splitting off
-        self.assertIn("Big_Sheet#001", store_ids)
-        self.assertIn("Big_Sheet#001.1", store_ids)    # prepared for the improved set-up
-        self.assertIn("Big_Sheet#001", kb._search_pool())
-        self.assertNotIn("Big_Sheet#001.1", kb._search_pool())
+        with profiles.applied(ORIGINAL):               # the original set-up: splitting off
+            store_ids, _ = kb._semantic_index()
+            self.assertIn("Big_Sheet#001", store_ids)
+            self.assertIn("Big_Sheet#001.1", store_ids)    # prepared for the improved set-up
+            self.assertIn("Big_Sheet#001", kb._search_pool())
+            self.assertNotIn("Big_Sheet#001.1", kb._search_pool())
         with profiles.applied(IMPROVED):
             self.assertNotIn("Big_Sheet#001", kb._search_pool())
             self.assertIn("Big_Sheet#001.1", kb._search_pool())
@@ -366,8 +391,9 @@ class SplitRetrievalTest(FixtureTest):
         self.assertNotIn("Big_Sheet#001", ids(result["chunks"]))
 
     def test_switching_set_ups_does_not_re_embed(self):
-        kb = self.kb(vector_db=self.root / "vectors.sqlite")
-        kb.retrieve(alert("CWE-89"))
+        with profiles.applied(ORIGINAL):
+            kb = self.kb(vector_db=self.root / "vectors.sqlite")
+            kb.retrieve(alert("CWE-89"))
         embedded = len(self.embedder.embedded)
         with profiles.applied(IMPROVED):
             self.kb(vector_db=self.root / "vectors.sqlite").retrieve(alert("CWE-89"))
@@ -413,10 +439,11 @@ class ProfileTest(unittest.TestCase):
             self.assertFalse(set(IMPROVED) & set(profiles.PROFILES[name]), name)
 
     def test_use_profile_restores_the_semantic_switches(self):
-        with profiles.use_profile("semantic", check_ready=False):
-            self.assertTrue(config.SEMANTIC_KB_SCOPE)
-            self.assertEqual(profiles.provenance()["settings"], profiles.PROFILES["semantic"])
-        self.assertEqual({k: getattr(config, k) for k in ORIGINAL}, ORIGINAL)
+        with profiles.applied(ORIGINAL):        # differs from the profile, so a restore shows
+            with profiles.use_profile("semantic", check_ready=False):
+                self.assertTrue(config.SEMANTIC_KB_SCOPE)
+                self.assertEqual(profiles.provenance()["settings"], profiles.PROFILES["semantic"])
+            self.assertEqual({k: getattr(config, k) for k in ORIGINAL}, ORIGINAL)
 
     def test_retrieval_provenance_records_the_scope_hash(self):
         record = profiles.retrieval_provenance(profiles.PROFILES["semantic"])
@@ -489,14 +516,15 @@ class PromptHeaderTest(unittest.TestCase):
 
 class ExplainTest(FixtureTest):
     def test_improved_set_up(self):
-        text = retrieval.explain("CWE-89", "improved", kb=self.kb())
+        with profiles.applied(ORIGINAL):        # differs from "improved", so a restore shows
+            text = retrieval.explain("CWE-89", "improved", kb=self.kb())
+            self.assertEqual({k: getattr(config, k) for k in ORIGINAL}, ORIGINAL)   # restored
         for line in ("improved set-up", "Also known as: SQLi, SQL injection.",
                      "Grounded: yes", "has a valid, non-deprecated MITRE record",
                      "MITRE chunk (MITRE-CWE-89", "Big_Sheet#001.1",
                      "Next 5 results that did not fit:"):
             self.assertIn(line, text)
         self.assertNotIn("Django_Sheet#001", text)
-        self.assertEqual({k: getattr(config, k) for k in ORIGINAL}, ORIGINAL)   # restored
 
     def test_original_set_up(self):
         text = retrieval.explain("CWE-89", "original", kb=self.kb())

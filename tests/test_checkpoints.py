@@ -65,7 +65,13 @@ class CheckpointTest(unittest.TestCase):
             "chunk_id": "SQL#1", "doc": "SQL", "section": "Safe queries",
             "text": "Use query parameter binding", "url": "https://example.test/guidance",
         }]}))
-        self.kb = KnowledgeBase(kb)
+        # These fixtures use the map (the default is semantic, which needs prepare steps) and
+        # the worksheet (its repair node is tested here; the default is off). The provenance
+        # records both settings, so set them in config too (the worker does the same).
+        self.kb = KnowledgeBase(kb, mode="map")
+        patcher = patch.multiple(config, RETRIEVAL_MODE="map", REVIEW_WORKSHEET_ENABLED=True)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.factory = FixtureFactory()
 
     def create(self, alert=None, db=None):
@@ -75,7 +81,7 @@ class CheckpointTest(unittest.TestCase):
         )
 
     def resume(self, tid, **kwargs):
-        opts = dict(kb=KnowledgeBase(self.root / "kb"), benchmark_root=self.root,
+        opts = dict(kb=KnowledgeBase(self.root / "kb", mode="map"), benchmark_root=self.root,
                     model="fixture-model", caller_factory=self.factory, allow_replay=True)
         opts.update(kwargs)
         return resume_council_run(tid, self.db, **opts)

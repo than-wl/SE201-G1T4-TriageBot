@@ -612,7 +612,9 @@ measured gain.
 
 **Consequence.** The `worksheet` profile and its runs stay, so step 3 remains
 replayable. The worksheet code stays behind its switch (`REVIEW_WORKSHEET_ENABLED`)
-and can be turned back on if a later evaluation shows a need.
+and can be turned back on if a later evaluation shows a need. The config default
+is now off (`REVIEW_WORKSHEET_ENABLED = False`), so a normal run matches the final
+version; only the `worksheet` profile turns it on, and every profile sets it.
 
 ## 28. The semantic retrieval set-up is fixed before step 4 is measured
 
@@ -664,8 +666,9 @@ exactly; the `semantic` profile turns all five on.
 
 **Consequence.**
 
-- The default `RETRIEVAL_MODE` stays `"map"` until step 4 is measured. Map
-  retrieval, `cwe_map.json` and the KB JSON files are unchanged, and map mode
+- The default `RETRIEVAL_MODE` stayed `"map"` until step 4 was measured; since
+  then semantic retrieval with these five rules on is the default (decision 29).
+  Map retrieval, `cwe_map.json` and the KB JSON files are unchanged, and map mode
   ignores the new switches.
 - The vector store holds every chunk plus the split pieces, so `python -m
   triagebot.nodes.context.vector_store` prepares both set-ups and switching
@@ -688,3 +691,48 @@ exactly; the `semantic` profile turns all five on.
 - These rules were set without looking at any comparison-set or final-test
   case. Any further change to the set-up follows decision 26: exploration
   cases only, then one measurement.
+
+## 29. Semantic retrieval is the default
+
+**Decision.** Semantic retrieval with the improved set-up (decision 28, rules R1
+to R5 on) is the default and the final version. In `config.py`,
+`RETRIEVAL_MODE = "semantic"`, and the five set-up switches default to the
+values the `semantic` profile uses and step 4 measured:
+`SEMANTIC_QUERY_ALT_TERMS = True`, `SEMANTIC_MITRE_GUIDANCE = True`,
+`SEMANTIC_KB_SCOPE = True` with `KB_TARGET_PLATFORM = "java"`,
+`SEMANTIC_MAX_CHUNK_CHARS = 1800` and `SEMANTIC_GROUNDING = "mitre_record"`.
+Changing only the mode would have made the default decision 21's original
+set-up, which is not what was measured. Step 6 runs this version on the final
+test.
+
+**Why.** Step 4 held accuracy within the noise floor (council F1 96.0% → 95.0%,
+one case of 96; EXPERIMENTS.md, step 4), which by the rule agreed in advance
+(decision 26) counts as holding. It also covers any CWE MITRE knows without a
+hand-written row: for 10 weaknesses outside the benchmark the right sheet
+reached the guidance in all 10, and 5 of them have no row in the hand-made
+table.
+
+**Consequence.**
+
+- Anyone running TriageBot needs two one-time prepare steps, local and with no
+  model calls: `python -m triagebot.nodes.context.cwe_catalogue` (the MITRE
+  catalogue, SHA-256 pinned) and `python -m triagebot.nodes.context.vector_store`
+  (downloads the embedding model and builds the local vector store). They are in
+  the README quick start. A normal run (`triage`, `evaluate`, `council-start`,
+  `council-resume`, menu options 2 and 3) stops before any model call, naming
+  both, while either is missing; before this change a missing vector store was
+  built silently on first use.
+- The map remains available as `RETRIEVAL_MODE = "map"` and in the profiles of
+  steps 1 to 3 (`base`, `evidence`, `worksheet`), which set it explicitly. Every
+  profile sets every setting that matters, so the new defaults change no profile,
+  and replaying steps 1 to 4 gives identical results.
+- The original set-up stays reproducible: `--explain --setup original`,
+  `verification/semantic_setup_check.py` and the regression test for "all five
+  rules off" set `profiles.SEMANTIC_SETUPS["original"]` explicitly and never rely
+  on the config defaults. Offline tests that relied on the map being the default
+  now set it, and no test loads the embedding model or needs the catalogue.
+- This replaces the default named in decisions 21 ("default still map") and 24
+  ("the config defaults equal the `worksheet` profile"), which describe the
+  state before step 4. The worksheet default is off as well (decision 27), so
+  every setting the `semantic` profile sets equals its config default; a test
+  keeps a normal run and the final version from drifting apart.
