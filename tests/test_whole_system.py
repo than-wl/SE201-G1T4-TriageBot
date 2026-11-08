@@ -3,6 +3,7 @@
 A tiny hand-made benchmark and run evaluation; no model calls, no real scan or
 answer key, and no catalogue or embedder.
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from contextlib import redirect_stdout
 import io
 import json

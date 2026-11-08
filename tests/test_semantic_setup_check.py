@@ -4,6 +4,7 @@ Offline: the fake keyword embedder, small MITRE catalogue and small knowledge ba
 tests/semantic_fixture.py, written to a temporary folder. No real model, catalogue or
 vector store is read.
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 import json
 import sys
 import tempfile

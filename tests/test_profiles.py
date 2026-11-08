@@ -5,6 +5,7 @@ sent to OpenRouter and the evidence block match the profile table in
 EXPERIMENTS.md. Model calls use canned fixture callers; the OpenRouter
 request is captured with a patched urlopen, so nothing leaves the machine.
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from io import BytesIO
 import json
 import os

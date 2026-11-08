@@ -93,7 +93,8 @@ returned the most wrong-language advice.
 Semantic retrieval is therefore the default and the final version (design
 decision 29).
 
-**Next:** step 5 rebuilds the mutation test; step 6 (runnable, not run yet)
+**Next:** step 5, the rebuilt mutation test (runnable, not run yet), checks
+that verdicts follow the code; step 6 (runnable, not run yet)
 runs the final version once on the unseen final test, and
 `verification/whole_system.py` reports the whole system next to Semgrep alone
 to show how far Semgrep's recall limits it.
@@ -121,13 +122,16 @@ real vulnerabilities and half safe code. The files and their build rules are in
 | `comparison` | development | 96 | CWE-22, 78, 79, 89: 24 each (12 real, 12 safe) | Excludes every pilot case | `311c5e73b3e9…` |
 | `final-test` | test | 120 | CWE-22, 78, 79, 89: 30 each (15 real, 15 safe) | Excludes every retired case | `3182ce45723d…` |
 | retired | both | 407 | Case IDs only | Every case used by an earlier run | — |
-| mutation | — | — | — | Planned (step 5, later task) | — |
+| `mutation` | development | 22 pairs | CWE-22: 2 real→safe, 3 safe→real; CWE-78: 3+3; CWE-79: 3+3; CWE-89: 3+2 | Step 5: one constant condition decides the answer; excludes pilot, comparison and retired cases ([step 5](#step-5-does-the-verdict-follow-the-code)) | `bbaee0f17903…` |
 
 - The **exploration set** is the pilot plus any other development case. This
   is where we read failures and try ideas.
 - The **comparison set** is frozen and only measured, never tuned on.
 - The **final test** is run once, after the code freeze.
 - **Retired** cases were used by earlier runs and are kept only as a record.
+- The **mutation set** pairs each original with its one-character mutant. It
+  holds no labels; the evaluation side takes each original's answer from the
+  answer key and each mutant's as its flip.
 
 Full fingerprints are in each `data/samples/<set>.manifest.json` and in
 [data/samples/README.md](data/samples/README.md). A run refuses to start if its
@@ -220,12 +224,12 @@ marked as a false alarm. Costs are the provider's reported cost in US dollars.
 | 2 | Does showing the AI more of the code help? | step 1 council | `evidence` profile, council | comparison |
 | 3 | Does a reasoning worksheet with a consistency check help? | step 2 | `worksheet` profile, council | comparison |
 | 4 | Does semantic retrieval hold up? | step 2 (the worksheet was dropped after step 3) | `semantic` profile, council | comparison |
-| 5 | Does the verdict follow the code? | rebuilt mutation test (later task) | | mutation |
+| 5 | Does the verdict follow the code? | `semantic` profile, single agent and council, on the originals | the same, on their mutants | mutation |
 | 6 | Headline result | `semantic` profile, single agent (run once) | `semantic` profile, council (run once) | final test |
 
 Cost estimates use US$0.004 per case for the single agent and US$0.016 per
-case for the council (`config.EXPERIMENT_COST_PER_CASE`), except step 6, which
-uses the per-case costs recorded in steps 1b and 4. The real spend is recorded
+case for the council (`config.EXPERIMENT_COST_PER_CASE`), except steps 5 and 6,
+which use the per-case costs recorded in steps 1b and 4. The real spend is recorded
 in each run manifest.
 
 ### Step 1: Does a council beat one agent?
@@ -574,13 +578,94 @@ verdicts is what the paid run measures.
 
 ### Step 5: Does the verdict follow the code?
 
-- **Question:** when a case's code is changed so that its answer should flip
+- **Question:** when a case's code is changed so that its right answer flips
   (safe becomes vulnerable, or the reverse), does TriageBot's verdict flip too?
-- **Before / after:** a rebuilt mutation test; built in a later task.
-- **Case set:** mutation (planned).
-- **Cost estimate:** set when the mutation set is built.
-- **Status:** not run yet (planned; not runnable until the mutation set exists).
-- **Commands:** `python -m triagebot experiment show 5` lists it as planned.
+  A reviewer that reads the code should follow the change; one that answers
+  from surface cues (the file name, the sink, the guidance) will not.
+- **What was wrong before.** The old test (`verification/mutation_check.py`,
+  kept as a record) could not answer this:
+  1. *Different baselines.* The originals were not judged the same way for
+     each reviewer: the council's "original" results came from a version of the
+     script that did not support council mode.
+  2. *Missing related code.* Each case ran from a temporary folder holding only
+     the mutated file, so the related source the `evidence` profile reads
+     (helper classes, scripts) was missing. Mutants were judged on less evidence
+     than real runs.
+  3. *Too few cases, one direction only.* Five hand-picked cases, all safe
+     becoming vulnerable.
+- **The pattern.** Many Benchmark cases decide their answer with one constant
+  condition, for example
+  `bar = (7 * 42) - num > 200 ? "This should never happen" : param;`, where
+  `num` is a constant set a few lines above. If the condition is true, `bar` is
+  the constant (safe); if false, it is the user input (vulnerable). The mutation
+  swaps `>` for `<` in that one expression and changes nothing else. It is the
+  same length, so no line number moves, and it flips which branch runs, so the
+  right verdict flips. `BenchmarkTest01983`, which the council dismissed in
+  step 4, is this pattern (it is a comparison case, so it is not in this set).
+- **Eligibility** (all must hold; `triagebot/nodes/ingest/mutation_set.py`):
+  - the case is in the development half and not in the pilot, the comparison
+    set or the retired list (so never in the final test);
+  - its type is CWE-22, 78, 79 or 89, with a CWE-matching Semgrep alert in the
+    recorded scan (the same alert rule as the other sets);
+  - its file, with comments stripped, holds exactly one ternary of the form
+    `(<int> * <int>) <+|-> num > 200 ? "<string>" : <identifier>` and exactly
+    one `int num = <int>;`, declared before it;
+  - *the flip proof:* evaluated in Python with the file's own constants, the
+    condition really flips and is not tied at exactly 200 (at 200, neither `>`
+    nor `<` holds, so nothing would flip);
+  - *the condition decides the answer* (checked against the answer key, on the
+    evaluation side only): real cases whose condition is false, so the input
+    flows through, and safe cases whose condition is true, so the constant is
+    used. Cases whose label does not match the branch are left out: they are
+    safe or vulnerable for another reason, and flipping the branch would not
+    flip the answer.
+- **Selection:** 3 per direction (real → safe, safe → real) per type, drawn
+  with seed 201: 24 pairs planned. Two strata have only 2 eligible cases
+  (CWE-22 real → safe, CWE-89 safe → real), so the set has **22 pairs**; the
+  rules were not widened. See [the case sets](#the-case-sets).
+- **Same evidence for both.** Before: the 22 originals, from the Benchmark
+  checkout. After: the 22 mutants, each from its own *overlay root*: a copy of
+  the checkout's `src/main/java` and `src/main/resources` (the trees the
+  evidence code reads) with only the mutated file replaced, built under
+  `Context/tmp/mutation-overlay/` (git-ignored, about 18 MB per case) before
+  any call. Related source, helpers and scripts resolve exactly as in normal
+  runs. A test builds the evidence pack of an original and its mutant and
+  checks that they differ only on the mutated line. The same check on all 22
+  real pairs (free) found the mutated line and its `int num` in every pack.
+  Comments are stripped (`strip_comments`), so giveaway comments such as
+  "assigns param to bar on false condition" never reach the AI; nothing that
+  exists only in a comment reached any of the 22 prompts. The string literals
+  stay, because they are code: a real → safe mutant uses the constant
+  `"This should never happen"`.
+- **Both sides:** the final version (the `semantic` profile), single agent and
+  council, on one commit. `experiment run 5` refuses uncommitted changes to
+  tracked files, and a commit other than the one a saved step 5 run recorded.
+  Each case's record holds the SHA-256 of the file it was judged on.
+- **Scoring** (as in Week 10). A pair counts only if the reviewer got the
+  original right (the precondition). Then the mutant is
+  - *killed* if its verdict is the flipped right answer;
+  - *survived* if its verdict is unchanged;
+  - *escalated* if it was sent to a human (reported separately; not a kill).
+
+  Mutation score = killed / pairs that meet the precondition, per
+  configuration (B single agent, C council, D validated council) and per
+  direction. Pairs excluded because the original was wrong are reported too.
+  The after side's own table scores the mutants against the flipped answers;
+  the mutation score is in `5-after/mutation_score.json` and in
+  `experiment show 5`.
+- **Cost estimate:** 4 runs of 22 cases (both sides, both modes), 176 calls
+  (88 per side: 22 single + 66 council), about US$0.83, from the per-case
+  costs recorded for step 6 (US$0.0043 single, US$0.0146 council; registry
+  `cost_per_case`).
+- **Status:** runnable; not run yet.
+- **Commands:**
+  - rebuild the set (free; needs the Benchmark):
+    `python -m triagebot.nodes.ingest.eval_sets mutation`
+  - build the overlay roots (free; `run` also does it):
+    `python -m triagebot.mutants build` (and `clean` to remove them)
+  - run (paid, asks first; commit first): `python -m triagebot experiment run 5`
+  - show: `python -m triagebot experiment show 5`
+  - replay: `python -m triagebot experiment replay 5`
 - **Result:** _to be filled in after the run._
 - **Finding:** _to be filled in after the run._
 

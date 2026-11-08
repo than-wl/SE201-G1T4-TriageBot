@@ -736,3 +736,71 @@ table.
   state before step 4. The worksheet default is off as well (decision 27), so
   every setting the `semantic` profile sets equals its config default; a test
   keeps a normal run and the final version from drifting apart.
+
+## 30. The mutation test is rebuilt
+
+**Decision.** Step 5 ("Does the verdict follow the code?") is rebuilt on a
+frozen mutation set, `data/samples/mutation.json`, built by a deterministic
+script (`python -m triagebot.nodes.ingest.eval_sets mutation`). Each pair is a
+Benchmark case whose answer is decided by one constant condition,
+`(<int> * <int>) <+|-> num > 200 ? "<string>" : <identifier>`, and its mutant,
+which swaps `>` for `<` in that expression and changes nothing else. A case
+counts only if it is a development case outside the pilot, comparison and
+retired lists, of type CWE-22, 78, 79 or 89 with a CWE-matching alert, holds
+exactly one such ternary and one `int num = <int>;`, passes the flip proof
+(evaluated with its own constants, the condition flips and is not tied at 200),
+and its label matches the branch. Three pairs per direction per type are drawn
+with seed 201; two strata have only two eligible cases, so the set has 22
+pairs, not 24. Both sides run the final version (the `semantic` profile),
+single agent and council, on one commit. The mutants run from overlay roots
+and are scored against the flipped answers. The result is a mutation score per
+configuration and direction. The old `verification/mutation_check.py` is kept
+as a record and marked superseded.
+
+**Why.** The old test could not show whether verdicts follow the code. Its
+baselines differed between reviewers (the council's "original" results came
+from a script version without council mode). It ran each case from a folder
+holding only the mutated file, so mutants lost the related source the
+`evidence` profile reads. And it used five hand-picked cases, all in one
+direction (safe to vulnerable). Here, the eligibility rule is written down and
+applied by code, so the cases are not chosen by hand, and both directions are
+measured. Keeping only cases whose label matches the branch means flipping the
+branch really flips the right answer. The overlay root (a copy of
+`src/main/java` and `src/main/resources` with only the mutated file replaced)
+gives a mutant exactly the evidence its original gets: a test checks that the
+two evidence packs differ only on the mutated line. A pair counts only when the
+original was judged right, so a mutant "flip" is not credited to a reviewer
+that was already wrong. An escalation is reported apart, because sending a
+case to a human is not following the code.
+
+**Consequence.**
+
+- `mutation.json` holds no labels. The evaluation side computes the expected
+  answers: the original's from the answer key, and the mutant's as its flip.
+  Only development-half source files are read, after the split filter, so no
+  final-test case is opened.
+- `experiment run 5` builds the overlay roots under
+  `Context/tmp/mutation-overlay/` (git-ignored, about 18 MB per case) before
+  any model call. The Benchmark checkout is only read: files are copied, never
+  linked. Each case's record holds the SHA-256 of the file it was judged on.
+- Both sides run on one commit: the run refuses uncommitted changes to tracked
+  files, and a commit other than the one a saved step 5 run recorded.
+- Comments never reach the AI (`strip_comments`); on the 22 real pairs, no text
+  that exists only in a comment reached a prompt. String literals are code and
+  stay: a real-to-safe mutant uses the constant `"This should never happen"`,
+  a cue that points the wrong way. This is a property of the Benchmark and is
+  reported, not removed.
+- The cost is 176 calls, about US$0.83 (the per-case costs of step 6), for 22
+  pairs.
+- **Also fixed: tests never touch the real vector store.** On 8 Nov the
+  checkpoint tests synced `Context/tmp/kb_vectors.sqlite` with their one-chunk
+  fixture knowledge base (`SQL#1`), leaving 1 row. Once semantic retrieval
+  became the default (decision 29), `KnowledgeBase(<fixture folder>)` with no
+  embedder used the real store, and `checkpoints._fresh_kb` dropped the
+  caller's mode on resume. Three changes stop it happening again. The real
+  store is now used only for the committed knowledge base; any other folder
+  gets an in-memory store unless a path is given. Every test module imports
+  `tests/isolated_store.py`, which points `config.KB_VECTOR_DB` at a temporary
+  file. And `VectorStore.sync()` refuses a sync that would delete more than
+  half of the stored rows unless `allow_large_delete=True`, which only the
+  prepare command passes.

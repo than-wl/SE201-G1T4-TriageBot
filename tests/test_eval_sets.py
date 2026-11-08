@@ -3,6 +3,7 @@
 The builder runs on the small ingest fixtures with rules sized to them; the
 committed data/samples/ files are checked for label-freedom and fingerprints.
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 import json
 from pathlib import Path
 import tempfile

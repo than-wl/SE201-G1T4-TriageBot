@@ -1,5 +1,6 @@
 """Offline contract tests for the paid OpenRouter boundary."""
 
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from io import BytesIO
 import json
 import os

@@ -4,6 +4,10 @@ One row per chunk, holding the chunk fields and its unit vector as a float32 BLO
 sync() makes the table match the chunks on disk: it embeds only chunks that are
 new or whose text or embedding model changed, and deletes rows for removed
 chunks. So adding a document later means chunking it and calling sync() again.
+A sync that would delete more than half of the stored rows is refused
+(LargeDeleteError) unless allow_large_delete=True, which only prepare() passes:
+on 8 Nov a test synced the real store with a one-chunk fixture knowledge base and
+left it with 1 row (design decision 30).
 
 Search is exact cosine similarity over the loaded matrix (numpy). The table does
 not depend on how search is done, so an index can be added later without
@@ -43,6 +47,10 @@ def _fingerprint(chunk: dict, model: str) -> str:
     return hashlib.sha256(json.dumps([model, chunk_text(chunk)]).encode()).hexdigest()
 
 
+class LargeDeleteError(RuntimeError):
+    """A sync would delete more than half of the stored rows (see sync())."""
+
+
 class VectorStore:
     """Open one SQLite file (or ":memory:") holding the KB chunks and their vectors."""
 
@@ -58,8 +66,13 @@ class VectorStore:
     def close(self) -> None:
         self._conn.close()
 
-    def sync(self, chunks: list[dict], embedder) -> int:
-        """Make the table match ``chunks``; return how many chunks were (re-)embedded."""
+    def sync(self, chunks: list[dict], embedder, allow_large_delete: bool = False) -> int:
+        """Make the table match ``chunks``; return how many chunks were (re-)embedded.
+
+        Refuses, changing nothing, when the chunks would delete more than half of the
+        stored rows, unless ``allow_large_delete`` (the prepare command): a sync against
+        the wrong knowledge base must not empty a store that takes minutes to rebuild.
+        """
         ids = [c["chunk_id"] for c in chunks]
         if len(set(ids)) != len(ids):
             raise ValueError("duplicate chunk_id in the knowledge base")
@@ -67,6 +80,12 @@ class VectorStore:
         wanted = {c["chunk_id"]: _fingerprint(c, self.model) for c in chunks}
 
         stale = [cid for cid in stored if cid not in wanted]
+        if not allow_large_delete and 2 * len(stale) > len(stored):
+            raise LargeDeleteError(
+                f"refusing to sync {self.path}: the {len(chunks)} chunk(s) given would delete "
+                f"{len(stale)} of its {len(stored)} rows (more than half). This usually means the "
+                "wrong knowledge base; to rebuild the store on purpose, run "
+                "python -m triagebot.nodes.context.vector_store")
         todo = [c for c in chunks if stored.get(c["chunk_id"]) != wanted[c["chunk_id"]]]
         if todo:
             vectors = embedder.embed_documents([chunk_text(c) for c in todo])
@@ -107,7 +126,7 @@ def prepare(path=None) -> int:
     from triagebot.nodes.context.retrieval import KnowledgeBase
 
     kb = KnowledgeBase(mode="semantic", vector_db=path)
-    ids, _ = kb._semantic_index()
+    ids, _ = kb._semantic_index(allow_large_delete=True)     # the one deliberate rebuild
     return len(ids)
 
 

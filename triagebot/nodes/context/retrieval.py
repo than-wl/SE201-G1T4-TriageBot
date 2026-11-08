@@ -83,10 +83,13 @@ class KnowledgeBase:
         self._docs: dict[str, list[dict]] = {}
         self._embedder = embedder
         self._catalogue = catalogue
-        # Default: the file-backed store. An injected embedder (tests, measurement
-        # with a fake) gets a throwaway in-memory store unless a path is given.
+        # Default: the file-backed store, which is derived from the committed KB only. An
+        # injected embedder (tests, measurement with a fake) or any other KB folder (a test
+        # fixture) gets a throwaway in-memory store unless a path is given: syncing the real
+        # store against another KB deletes its rows (the 8 Nov wipe, design decision 30).
+        committed_kb = self.kb_dir.resolve() == Path(KB_DIR).resolve()
         self._vector_db = vector_db if vector_db is not None else (
-            config.KB_VECTOR_DB if embedder is None else ":memory:")
+            config.KB_VECTOR_DB if embedder is None and committed_kb else ":memory:")
         self._index: tuple[list[str], object] | None = None
         self._index_cap: int | None = None
         self._by_id: dict[str, dict] = {}
@@ -269,18 +272,20 @@ class KnowledgeBase:
                 rows.extend(split_chunk(chunk, cap))
         return rows
 
-    def _semantic_index(self) -> tuple[list[str], object]:
+    def _semantic_index(self, allow_large_delete: bool = False) -> tuple[list[str], object]:
         """Sync the store with the KB (embedding only new or changed chunks), then load it.
 
         The store also holds the R4 pieces at the current cap, or at the semantic
         profile's cap while splitting is off, so preparing the store once covers both
-        set-ups.
+        set-ups. A sync that would delete more than half of the stored rows is
+        refused (VectorStore.sync) unless ``allow_large_delete`` (the prepare command).
         """
         cap = config.SEMANTIC_MAX_CHUNK_CHARS or improved_chunk_cap()
         if self._index is None or self._index_cap != cap:
             store = VectorStore(self._vector_db)
             try:
-                store.sync(self._store_chunks(cap), self._get_embedder())
+                store.sync(self._store_chunks(cap), self._get_embedder(),
+                           allow_large_delete=allow_large_delete)
                 chunks, matrix = store.load()
             finally:
                 store.close()

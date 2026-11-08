@@ -29,6 +29,15 @@ refuses to start it on a working tree with uncommitted changes to tracked files
 (the run records the commit it ran on), and refuses a fresh run once a run has
 results; resuming an interrupted run is allowed (it is the same run). Starting
 over needs RERUN_FLAG, and the old results are moved aside, not deleted.
+
+The mutation test (step 5, "scoring": "mutation" in the registry) runs its after
+side ("source": "mutant") from one overlay root per case (triagebot/mutants.py)
+and scores it against the flipped answers ("labels": "flipped"). Once both sides
+are finished, finalize() also writes <step>-after/mutation_score.json: killed,
+survived and escalated pairs and the mutation score per configuration and
+direction. Its sides must run on one commit ("same_commit": true):
+same_commit_guard() refuses a dirty tree, or a commit other than the one a saved
+run of the step recorded.
 """
 
 from datetime import datetime, timezone
@@ -38,7 +47,7 @@ from pathlib import Path
 import subprocess
 
 from triagebot import config, profiles
-from triagebot.nodes.ingest import eval_sets
+from triagebot.nodes.ingest import eval_sets, mutation_set
 
 MODES = ("single", "council")
 FINAL_TEST = "final-test"
@@ -50,6 +59,9 @@ MANIFEST = "run_manifest.json"
 EVALUATION = "evaluation.json"
 EVALUATION_BY_CWE = "evaluation_by_cwe.json"
 REPORT = "report.md"
+MUTATION_SCORE = "mutation_score.json"       # step 5: in the after side's folder
+SOURCES = ("benchmark", "mutant")            # where a side reads the case's code from
+FLIPPED = "flipped"                          # a side scored against the flipped answers
 FAILED_CALL_PREFIX = "Model call failed"     # report.failure() explanation
 
 # (label, key, kind) for the before/after table; kind formats the value.
@@ -90,7 +102,16 @@ def load_registry(path=None) -> list[dict]:
                 profiles.get(spec["profile"])
                 if not spec["modes"] or set(spec["modes"]) - set(MODES):
                     raise ExperimentError(f"step {step['id']} {side}: bad modes {spec['modes']}")
+                if spec.get("source", "benchmark") not in SOURCES:
+                    raise ExperimentError(f"step {step['id']} {side}: bad source {spec['source']!r}")
+                if (spec.get("source") == "mutant") != (spec.get("labels") == FLIPPED):
+                    raise ExperimentError(f"step {step['id']} {side}: a mutant side is scored "
+                                          f"against the flipped answers, and only a mutant side")
     return steps
+
+
+def is_mutation_step(step) -> bool:
+    return step.get("scoring") == "mutation"
 
 
 def get_step(step_id, registry=None) -> dict:
@@ -285,6 +306,12 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
         retrieval = profiles.retrieval_provenance(settings)
         modes = list(spec["modes"])
         model = _requested_model()
+        source = spec.get("source", "benchmark")
+        labels = spec.get("labels", "answer key")
+        if source == "mutant":
+            mutations = mutation_set.load_mutations(samples_dir)
+            if sorted(mutations) != sorted(a["case_id"] for a in alerts):
+                raise ExperimentError(f"step {step['id']}: the mutations do not match the case set")
         existing = folder / MANIFEST
         if existing.is_file() and not fresh:
             old = _read_json(existing)
@@ -294,6 +321,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
                 ("retrieval set-up", old.get("retrieval"), retrieval),
                 ("case set", old["case_set"]["sha256"], set_manifest["sample"]["sha256"]),
                 ("modes", old["modes"], modes),
+                ("source", old.get("source", {}).get("kind", "benchmark"), source),
                 ("model", old["model"]["requested"], model)) if a != b]
             if changed:
                 raise ExperimentError(
@@ -311,7 +339,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
         plans.append({
             "step": step, "side": name_side, "repeat": repeat, "name": name, "dir": folder,
             "profile": spec["profile"], "settings": settings, "retrieval": retrieval,
-            "modes": modes, "model": model,
+            "modes": modes, "model": model, "source": source, "labels": labels,
             "case_set": step["case_set"], "case_set_sha256": set_manifest["sample"]["sha256"],
             "cases_in_set": len(alerts), "limit": limit, "alerts": selected,
             "remaining": remaining, "already_saved": len(selected) - len(remaining),
@@ -380,6 +408,45 @@ def final_test_guard(plans, rerun=False, git=None) -> list[dict]:
     return existing
 
 
+def same_commit_guard(plans, git=None) -> None:
+    """For a step with "same_commit": true (step 5): refuse unless every side runs on one commit.
+
+    The working tree must have no uncommitted changes to tracked files, and every
+    saved run of the step (either side, any session) must have recorded the current
+    commit. Raises ExperimentError; other steps pass through.
+    """
+    if not plans or not plans[0]["step"].get("same_commit"):
+        return
+    step = plans[0]["step"]
+    git = git if git is not None else git_state()
+    if git.get("commit") is None:
+        raise ExperimentError(f"step {step['id']} runs both sides on one commit, but the Git "
+                              "commit could not be read; run it from a Git checkout of this repository")
+    if git.get("dirty"):
+        paths = git.get("dirty_paths") or []
+        shown = ", ".join(paths[:10]) + (f" and {len(paths) - 10} more" if len(paths) > 10 else "")
+        raise ExperimentError(f"step {step['id']} runs both sides on one commit: commit first. "
+                              f"Uncommitted changes to tracked files: {shown}")
+    out_root = Path(plans[0]["dir"]).parent
+    for side, names in runs_for(step).items():
+        if "reuse" in step[side]:
+            continue
+        for name in names:
+            path = out_root / name / MANIFEST
+            if not path.is_file():
+                continue
+            manifest = _read_json(path)
+            commits = {s.get("git_commit") for s in manifest.get("sessions", [])}
+            commits.add((manifest.get("git") or {}).get("commit"))
+            other = sorted(c for c in commits if c != git["commit"])
+            if other:
+                raise ExperimentError(
+                    f"step {step['id']} runs both sides on one commit, but {name} was run on "
+                    f"{', '.join((c or 'an unknown commit')[:12] for c in other)}, not "
+                    f"{git['commit'][:12]}; check out that commit, or delete "
+                    f"{eval_sets.repo_path(out_root / name)}/ to run it again here")
+
+
 def start_over(existing, now=None) -> list[Path]:
     """Move each existing run folder to <run>-superseded-<UTC time>/ (kept, not deleted)."""
     stamp = (now or datetime.now(timezone.utc)).strftime("%Y%m%dT%H%M%SZ")
@@ -417,6 +484,7 @@ def _start_manifest(plan_, git) -> dict:
             "configurations": [c for m in plan_["modes"] for c in CONFIGURATIONS[m]],
             "model": {"requested": plan_["model"], "reported": []},
             **({"retrieval": plan_["retrieval"]} if plan_.get("retrieval") else {}),
+            **(_source_provenance(plan_) if is_mutation_step(step) else {}),
             "temperature": config.REVIEW_TEMPERATURE,
             "max_tokens": config.REVIEW_MAX_TOKENS,
             "benchmark_commit": config.BENCHMARK_COMMIT,
@@ -434,8 +502,23 @@ def _start_manifest(plan_, git) -> dict:
     return manifest
 
 
-def _case_record(alert, modes, triage, caller_factory, kb, benchmark_root) -> dict:
+def _source_provenance(plan_) -> dict:
+    """Where a mutation-step side read its code from, and how it is scored."""
+    from triagebot import mutants
+
+    if plan_["source"] == "mutant":
+        source = {"kind": "mutant", "overlay_dir": eval_sets.repo_path(mutants.overlay_dir()),
+                  "trees": list(mutants.OVERLAY_TREES),
+                  "note": "one overlay root per case: the Benchmark source with only the mutated file replaced"}
+    else:
+        source = {"kind": "benchmark", "note": "the Benchmark checkout, unchanged"}
+    return {"source": source, "labels": plan_["labels"]}
+
+
+def _case_record(alert, modes, triage, caller_factory, kb, benchmark_root, record_source=False) -> dict:
     record = {"case_id": alert["case_id"]}
+    if record_source:                   # the exact file this case was judged on (LF SHA-256)
+        record["source_sha256"] = eval_sets.file_sha256(Path(benchmark_root) / alert["file"])
     for mode in modes:
         run = triage(alert, mode, caller_factory, kb, benchmark_root)
         entry = {"review": run["review"], "role_reports": run["role_reports"]}
@@ -456,6 +539,19 @@ def execute(plan_, answer_key, caller_factory=None, benchmark_root=None, progres
     from triagebot.nodes.context.retrieval import KnowledgeBase
 
     folder = Path(plan_["dir"])
+    mutation = is_mutation_step(plan_["step"])
+    roots = {}
+    if mutation:
+        root = benchmark_root or config.BENCHMARK_ROOT
+        if not root or not Path(root).is_dir():
+            raise ExperimentError("OWASP Benchmark source not found; set BENCHMARK_ROOT")
+        roots = {a["case_id"]: root for a in plan_["remaining"]}
+        if plan_["source"] == "mutant":           # built before any model call
+            from triagebot import mutants
+
+            mutations = mutation_set.load_mutations()
+            roots = mutants.ensure_overlays(
+                {c: mutations[c] for c in roots}, root)
     folder.mkdir(parents=True, exist_ok=True)
     _trim_log(folder)
     _start_manifest(plan_, git_state())
@@ -464,7 +560,9 @@ def execute(plan_, answer_key, caller_factory=None, benchmark_root=None, progres
         kb = KnowledgeBase()           # created inside the profile: it reads RETRIEVAL_MODE
         total = len(plan_["remaining"])
         for number, alert in enumerate(plan_["remaining"], 1):
-            record = _case_record(alert, plan_["modes"], pipeline.triage, factory, kb, benchmark_root)
+            case_root = str(roots[alert["case_id"]]) if mutation else benchmark_root
+            record = _case_record(alert, plan_["modes"], pipeline.triage, factory, kb, case_root,
+                                  record_source=mutation)
             _append(folder, record)
             if progress:
                 progress(number, total, alert["case_id"])
@@ -516,12 +614,24 @@ def _totals(folder, manifest) -> dict:
             "models": sorted(models)}
 
 
-def score(case_ids, answer_key_path, configurations) -> tuple[dict, dict]:
-    """(evaluation, evaluation_by_cwe) for saved configurations; reads the answer key."""
+def _answer_key(answer_key_path, flip_cases=()) -> dict:
+    """The answer key, with the label of each case in ``flip_cases`` flipped (step 5 mutants)."""
     from triagebot.nodes.ingest.answer_key import load_answer_key
-    from triagebot.nodes.score import evaluate as scoring, final_report
 
     key = load_answer_key(answer_key_path)
+    for case_id in flip_cases:
+        key[case_id] = {**key[case_id], "vulnerable": not key[case_id]["vulnerable"]}
+    return key
+
+
+def score(case_ids, answer_key_path, configurations, flip=False) -> tuple[dict, dict]:
+    """(evaluation, evaluation_by_cwe) for saved configurations; reads the answer key.
+
+    ``flip``: score against the flipped answers (the mutants of step 5).
+    """
+    from triagebot.nodes.score import evaluate as scoring, final_report
+
+    key = _answer_key(answer_key_path, case_ids if flip else ())
     labels = {case_id: entry["vulnerable"] for case_id, entry in key.items()}
     configs = {name: (data["results"], data.get("model")) for name, data in configurations.items()}
     return (scoring.evaluate(case_ids, labels, configs),
@@ -535,7 +645,8 @@ def finalize(folder, answer_key) -> dict:
     configurations = configurations_from_log(folder, manifest)
     for name, data in configurations.items():
         _write_json(folder / f"{name}.json", data)
-    evaluation, by_cwe = score(manifest["case_set"]["cases"], answer_key, configurations)
+    evaluation, by_cwe = score(manifest["case_set"]["cases"], answer_key, configurations,
+                               flip=manifest.get("labels") == FLIPPED)
     _write_json(folder / EVALUATION, evaluation)
     _write_json(folder / EVALUATION_BY_CWE, by_cwe)
     totals = _totals(folder, manifest)
@@ -547,7 +658,71 @@ def finalize(folder, answer_key) -> dict:
     _write_json(folder / MANIFEST, manifest)
     with (folder / REPORT).open("w", encoding="utf-8", newline="\n") as stream:
         stream.write(report_markdown(folder))
+    try:
+        step = get_step(manifest["step"])
+    except (ExperimentError, OSError):
+        step = {}
+    if is_mutation_step(step):
+        write_mutation_score(step, answer_key, folder.parent)
     return manifest
+
+
+# --- the mutation score (step 5, evaluation side) ---------------------------------------------
+
+def mutation_score(step, answer_key, out_root=None) -> dict | None:
+    """killed / survived / escalated per configuration and direction, from both sides' saved
+    outputs; None until both sides are finished over the same cases."""
+    from triagebot import mutants
+
+    out_root = Path(out_root or config.EXPERIMENTS_OUT)
+    runs = runs_for(step)
+    names = {side: runs[side][0] for side in ("before", "after")}
+    if any(run_status(name, out_root)["state"] != "complete" for name in names.values()):
+        return None
+    manifests = {side: _read_json(out_root / name / MANIFEST) for side, name in names.items()}
+    cases = manifests["before"]["case_set"]["cases"]
+    if sorted(cases) != sorted(manifests["after"]["case_set"]["cases"]):
+        return None                     # a --limit smoke test on one side only
+    outputs = {side: {c: _read_json(out_root / names[side] / f"{c}.json")["results"]
+                      for c in manifests[side]["configurations"]} for side in names}
+    key = _answer_key(answer_key)
+    labels = {case_id: key[case_id]["vulnerable"] for case_id in cases}
+    result = mutants.score_pairs(cases, labels, outputs["before"], outputs["after"])
+    commits = {side: (m.get("git") or {}).get("commit") for side, m in manifests.items()}
+    return {"step": step["id"], "before": names["before"], "after": names["after"],
+            "cases": len(cases), "case_set_sha256": manifests["before"]["case_set"]["sha256"],
+            "commits": commits, "same_commit": len(set(commits.values())) == 1, **result}
+
+
+def write_mutation_score(step, answer_key, out_root=None) -> dict | None:
+    out_root = Path(out_root or config.EXPERIMENTS_OUT)
+    result = mutation_score(step, answer_key, out_root)
+    if result is not None:
+        _write_json(out_root / result["after"] / MUTATION_SCORE, result)
+    return result
+
+
+MUTATION_ROWS = (("Pairs", "pairs"), ("Original right (precondition met)", "precondition_met"),
+                 ("Excluded: original wrong", "excluded_original_wrong"), ("Killed", "killed"),
+                 ("Survived (verdict unchanged)", "survived"), ("Escalated to a human", "escalated"))
+
+
+def mutation_table(step, out_root=None) -> dict | None:
+    """{"headers", "rows"} from the saved mutation_score.json (offline), or None."""
+    out_root = Path(out_root or config.EXPERIMENTS_OUT)
+    path = out_root / runs_for(step)["after"][0] / MUTATION_SCORE
+    if not path.is_file():
+        return None
+    configs = _read_json(path)["configurations"]
+    groups = (("overall", "All"), ("real_to_safe", "real→safe"), ("safe_to_real", "safe→real"))
+    headers = ["Measure"] + [f"{_letter(name)} {label}" for name in configs for _, label in groups]
+    rows = [[label] + [str(configs[name][group][key]) for name in configs for group, _ in groups]
+            for label, key in MUTATION_ROWS]
+    rows.append(["Mutation score (killed / precondition met)"] + [
+        "–" if configs[name][group]["mutation_score"] is None
+        else f"{configs[name][group]['mutation_score']:.1%}"
+        for name in configs for group, _ in groups])
+    return {"headers": headers, "rows": rows}
 
 
 # --- showing (free, offline) ------------------------------------------------------------------
@@ -663,6 +838,9 @@ def show_table(step_id, out_root=None, registry=None) -> dict:
                                   loaded[first][config_name], loaded[second][config_name]))
     if columns:
         legend.append(CONFIG_LEGEND)
+        if is_mutation_step(step):
+            legend.append("Before: the original cases, scored against the answer key. After: their "
+                          "mutants, scored against the flipped answers.")
     headers = ["Measure"] + [label for label, _ in columns] + [label for label, _, _ in noise]
     rows = []
     for label, key, kind in METRICS:
@@ -682,7 +860,8 @@ def show_table(step_id, out_root=None, registry=None) -> dict:
         by_cwe = {"headers": ["CWE", "Measure"] + [label for label, _ in by_cwe_columns],
                   "rows": cwe_rows}
     return {"step": step, "headers": headers, "rows": rows if columns else [],
-            "legend": legend, "notes": notes, "missing": missing, "by_cwe": by_cwe}
+            "legend": legend, "notes": notes, "missing": missing, "by_cwe": by_cwe,
+            "mutation": mutation_table(step, out_root) if is_mutation_step(step) else None}
 
 
 def markdown_table(table, text_columns=1) -> str:
@@ -748,6 +927,10 @@ def report_markdown(folder) -> str:
         "",
         f"Case set `{case_set['name']}` ({scope}), SHA-256 `{case_set['sha256'][:12]}`. "
         "Precision, recall and F1 count a case sent to a human as kept.",
+        *(["", "Code: each mutant was read from its own overlay root (the Benchmark source with "
+               "only the mutated file replaced) and scored against the flipped answers; the "
+               "mutation score is in the after side's mutation_score.json."]
+          if manifest.get("labels") == FLIPPED else []),
         "",
         markdown_table(table),
         "",
@@ -803,12 +986,18 @@ def replay(step_id, answer_key, out_root=None, samples_dir=None, registry=None) 
             saved = {c: _read_json(folder / f"{c}.json") for c in manifest["configurations"]}
             rebuilt = configurations_from_log(folder, manifest)
             _, set_manifest = eval_sets.load_set(manifest["case_set"]["name"], samples_dir)
-            evaluation, by_cwe = score(manifest["case_set"]["cases"], answer_key, saved)
+            evaluation, by_cwe = score(manifest["case_set"]["cases"], answer_key, saved,
+                                       flip=manifest.get("labels") == FLIPPED)
             checks = {
                 "case set fingerprint": set_manifest["sample"]["sha256"] == manifest["case_set"]["sha256"],
                 "saved outputs match results.jsonl": _normal(saved) == _normal(rebuilt),
                 "evaluation.json": _normal(evaluation) == _read_json(folder / EVALUATION),
                 "evaluation_by_cwe.json": _normal(by_cwe) == _read_json(folder / EVALUATION_BY_CWE),
             }
+            if is_mutation_step(step) and side == "after":
+                expected = mutation_score(step, answer_key, out_root)
+                path = folder / MUTATION_SCORE
+                if expected is not None:
+                    checks[MUTATION_SCORE] = path.is_file() and _normal(expected) == _read_json(path)
             results.append({"run": name, "checks": checks, "matches": all(checks.values())})
     return results

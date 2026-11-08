@@ -15,6 +15,7 @@ _LOG_LOCK = threading.Lock()
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from triagebot import config
 from triagebot.checkpoints import (
     _database, _execution_lock, _record, create_council_run,
