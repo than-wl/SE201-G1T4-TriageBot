@@ -1,0 +1,622 @@
+{
+  "configurations": [
+    {
+      "configuration": "A-scanner-only",
+      "evaluated_findings": 96,
+      "f1": 0.6667,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00308",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00343",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00743",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00862",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00999",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01001",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01054",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01089",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01193",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01233",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01255",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01392",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01595",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01692",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01747",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01752",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01780",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01794",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01880",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01885",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01937",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01939",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01990",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02026",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02098",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02107",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02135",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02156",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02231",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02271",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02285",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02331",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02340",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02467",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02470",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02482",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02484",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02491",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02495",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02558",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02594",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02601",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02610",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02640",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02648",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02668",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02669",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02699",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 48,
+      "fp_removed": 0,
+      "fp_removed_rate": 0.0,
+      "fp_retained": 48,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 0,
+      "genuine_in_sample": 48,
+      "genuine_retained": 48,
+      "genuine_retained_rate": 1.0,
+      "human_review": 0,
+      "human_review_rate": 0.0,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": null,
+      "precision": 0.5,
+      "recall": 1.0,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 0,
+        "completion_tokens_total": null,
+        "cost_reported": 0,
+        "cost_total": null,
+        "latency_max_seconds": null,
+        "latency_mean_seconds": null,
+        "latency_reported": 0,
+        "prompt_tokens_reported": 0,
+        "prompt_tokens_total": null
+      }
+    },
+    {
+      "configuration": "C-council",
+      "evaluated_findings": 96,
+      "f1": 0.96,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest01396",
+          "expected": "true_positive",
+          "explanation": "Request parameter input is transformed via thing.doSomething(param) before being concatenated into an SQL INSERT statement. Because the concrete implementation of ThingInterface returned by ThingFactory is not provided in the evidence, it is impossible to determine whether the input is safely sanitized, encoded, or passed through unchanged.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01752",
+          "expected": "false_positive",
+          "explanation": "Untrusted user input is retrieved via SeparateClassRequest and passed through Test.doSomething, where it is stored in and retrieved from a HashMap without validation or sanitization. The value is then concatenated directly to construct fileName and opened via java.io.FileInputStream, permitting path traversal attacks.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01794",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via SeparateClassRequest is returned by Test.doSomething because (500 / 42) + 196 evaluates to 207 (> 200). On non-Windows platforms, this unsanitized value is directly concatenated into a shell command line executed via 'sh -c', resulting in command injection when passed to Runtime.exec.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02429",
+          "expected": "true_positive",
+          "explanation": "The HTTP request parameter is passed to doSomething(), which delegates execution to a ThingInterface instance dynamically loaded by ThingFactory. Because the implementations of ThingInterface (such as Thing1 and Thing2) and the configuration thing.properties are omitted from the evidence, it cannot be determined whether the parameter is sanitized, neutralized, or passed through unmodified to the OS command execution in Runtime.exec().",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02517",
+          "expected": "true_positive",
+          "explanation": "User input from request.getParameterValues is processed by thing.doSomething and passed into argsEnv for Runtime.getRuntime().exec(). Because the concrete implementation of ThingInterface loaded dynamically by ThingFactory is not provided in the evidence, it is impossible to determine whether the input is sanitized or safe.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02668",
+          "expected": "false_positive",
+          "explanation": "Model call failed; no verdict can be trusted: unparseable model answer (not a JSON object)",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02699",
+          "expected": "false_positive",
+          "explanation": "In doSomething, the condition (7 * 42) - 106 > 200 evaluates to 188 > 200, which is false, returning the tainted user input stored in param. This input is concatenated directly into a shell command string passed to ProcessBuilder via cmd.exe /c or sh -c, enabling command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 1,
+      "fp_in_sample": 48,
+      "fp_removed": 44,
+      "fp_removed_rate": 0.9167,
+      "fp_retained": 3,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 3,
+      "genuine_in_sample": 48,
+      "genuine_retained": 45,
+      "genuine_retained_rate": 0.9375,
+      "human_review": 4,
+      "human_review_rate": 0.0417,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 0.9231,
+      "recall": 1.0,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 96,
+        "completion_tokens_total": 138184,
+        "cost_reported": 96,
+        "cost_total": 1.370113,
+        "latency_max_seconds": 30.647,
+        "latency_mean_seconds": 20.908,
+        "latency_reported": 96,
+        "prompt_tokens_reported": 96,
+        "prompt_tokens_total": 1135897
+      }
+    },
+    {
+      "configuration": "D-validated-council",
+      "evaluated_findings": 96,
+      "f1": 0.96,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest01396",
+          "expected": "true_positive",
+          "explanation": "Request parameter input is transformed via thing.doSomething(param) before being concatenated into an SQL INSERT statement. Because the concrete implementation of ThingInterface returned by ThingFactory is not provided in the evidence, it is impossible to determine whether the input is safely sanitized, encoded, or passed through unchanged.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01752",
+          "expected": "false_positive",
+          "explanation": "Untrusted user input is retrieved via SeparateClassRequest and passed through Test.doSomething, where it is stored in and retrieved from a HashMap without validation or sanitization. The value is then concatenated directly to construct fileName and opened via java.io.FileInputStream, permitting path traversal attacks.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01794",
+          "expected": "false_positive",
+          "explanation": "Untrusted input obtained via SeparateClassRequest is returned by Test.doSomething because (500 / 42) + 196 evaluates to 207 (> 200). On non-Windows platforms, this unsanitized value is directly concatenated into a shell command line executed via 'sh -c', resulting in command injection when passed to Runtime.exec.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02429",
+          "expected": "true_positive",
+          "explanation": "The HTTP request parameter is passed to doSomething(), which delegates execution to a ThingInterface instance dynamically loaded by ThingFactory. Because the implementations of ThingInterface (such as Thing1 and Thing2) and the configuration thing.properties are omitted from the evidence, it cannot be determined whether the parameter is sanitized, neutralized, or passed through unmodified to the OS command execution in Runtime.exec().",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02517",
+          "expected": "true_positive",
+          "explanation": "User input from request.getParameterValues is processed by thing.doSomething and passed into argsEnv for Runtime.getRuntime().exec(). Because the concrete implementation of ThingInterface loaded dynamically by ThingFactory is not provided in the evidence, it is impossible to determine whether the input is sanitized or safe.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02668",
+          "expected": "false_positive",
+          "explanation": "Validation failed; human review required.",
+          "outcome": "fp_human_review",
+          "reasons": [
+            "Missing citations"
+          ],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02699",
+          "expected": "false_positive",
+          "explanation": "In doSomething, the condition (7 * 42) - 106 > 200 evaluates to 188 > 200, which is false, returning the tainted user input stored in param. This input is concatenated directly into a shell command string passed to ProcessBuilder via cmd.exe /c or sh -c, enabling command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 1,
+      "fp_in_sample": 48,
+      "fp_removed": 44,
+      "fp_removed_rate": 0.9167,
+      "fp_retained": 3,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 3,
+      "genuine_in_sample": 48,
+      "genuine_retained": 45,
+      "genuine_retained_rate": 0.9375,
+      "human_review": 4,
+      "human_review_rate": 0.0417,
+      "invalid_output_rate": 0.0104,
+      "invalid_outputs": 1,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 0.9231,
+      "recall": 1.0,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 96,
+        "completion_tokens_total": 138184,
+        "cost_reported": 96,
+        "cost_total": 1.370113,
+        "latency_max_seconds": 30.647,
+        "latency_mean_seconds": 20.908,
+        "latency_reported": 96,
+        "prompt_tokens_reported": 96,
+        "prompt_tokens_total": 1135897
+      }
+    }
+  ],
+  "note": "Initial checkpoint sample, not a general accuracy estimate.",
+  "same_case_coverage": true,
+  "sample_size": 96
+}

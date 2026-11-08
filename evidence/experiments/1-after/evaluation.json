@@ -1,0 +1,1100 @@
+{
+  "configurations": [
+    {
+      "configuration": "A-scanner-only",
+      "evaluated_findings": 96,
+      "f1": 0.6667,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00308",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00343",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00743",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00862",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest00999",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01001",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01054",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01089",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01193",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01233",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01255",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01392",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01595",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01692",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01747",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01752",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01780",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01794",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01880",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01885",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01937",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01939",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01990",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02026",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02098",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02107",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02135",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02156",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02231",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02271",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02285",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02331",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02340",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02467",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02470",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02482",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02484",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02491",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02495",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02558",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02594",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02601",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02610",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02640",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02648",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02668",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02669",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02699",
+          "expected": "false_positive",
+          "explanation": null,
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 0,
+      "fp_in_sample": 48,
+      "fp_removed": 0,
+      "fp_removed_rate": 0.0,
+      "fp_retained": 48,
+      "genuine_dismissed": 0,
+      "genuine_dismissed_rate": 0.0,
+      "genuine_human_review": 0,
+      "genuine_in_sample": 48,
+      "genuine_retained": 48,
+      "genuine_retained_rate": 1.0,
+      "human_review": 0,
+      "human_review_rate": 0.0,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": null,
+      "precision": 0.5,
+      "recall": 1.0,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 0,
+        "completion_tokens_total": null,
+        "cost_reported": 0,
+        "cost_total": null,
+        "latency_max_seconds": null,
+        "latency_mean_seconds": null,
+        "latency_reported": 0,
+        "prompt_tokens_reported": 0,
+        "prompt_tokens_total": null
+      }
+    },
+    {
+      "configuration": "C-council",
+      "evaluated_findings": 96,
+      "f1": 0.8288,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00159",
+          "expected": "true_positive",
+          "explanation": "Input from the HTTP header is processed by thing.doSomething(param) before being concatenated into an OS shell execution via ProcessBuilder. Because the implementation of ThingInterface.doSomething is external and unavailable in the provided code, it cannot be verified whether the input is sanitized or safe.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01029",
+          "expected": "true_positive",
+          "explanation": "The implementation of Test.doSomething is truncated starting at line 98, making it impossible to determine whether the returned variable bar contains unsanitized user input or a safe value.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01089",
+          "expected": "false_positive",
+          "explanation": "The helper method Test.doSomething is truncated after line 83, making it impossible to determine whether the untrusted param or a safe value is returned to be concatenated into the SQL statement.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01111",
+          "expected": "true_positive",
+          "explanation": "Header name input is assigned to param and passed to new Test().doSomething(request, param), but the implementation of Test is truncated after line 93. Without the body of doSomething, it cannot be determined whether bar is sanitized before reaching the FileInputStream sink.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01233",
+          "expected": "false_positive",
+          "explanation": "The helper method Test.doSomething() is truncated after line 75, making it impossible to determine whether untrusted input in 'param' actually flows into 'bar' or is sanitized/replaced before the File constructor.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01236",
+          "expected": "true_positive",
+          "explanation": "The implementation of Test.doSomething(...) is truncated at line 90, making it impossible to determine how the input param is processed, sanitized, or modified before being assigned to bar and used in the URI path.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01350",
+          "expected": "true_positive",
+          "explanation": "Untrusted input from request parameters is processed by 'thing.doSomething(param)' before being output directly to the HTTP response writer. Because the implementation of 'ThingInterface' is not provided in the source lines, it is uncertain whether the value is sanitized or modified.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01360",
+          "expected": "true_positive",
+          "explanation": "The value of 'switchTarget' is 'C' (guess.charAt(2)), but the provided code snippet is truncated after case 'B'. Because case 'C' and the default case are missing from the evidence, it is impossible to determine whether 'param' is assigned to 'bar' and executed.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01396",
+          "expected": "true_positive",
+          "explanation": "Request parameter 'BenchmarkTest01396' is retrieved and passed through ThingFactory.createThing().doSomething(param) before being concatenated into an INSERT SQL statement. Because the implementation and sanitization logic of ThingInterface are not present in the provided source code, it cannot be determined with certainty whether the input is properly sanitized.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01692",
+          "expected": "false_positive",
+          "explanation": "User input extracted from the request query string is decoded and processed through helper methods without neutralization, retaining the tainted input in bar. It is then concatenated directly into a command string executed by Runtime.getRuntime().exec(), permitting OS command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01747",
+          "expected": "false_positive",
+          "explanation": "The implementation of Test.doSomething is truncated at line 94, preventing verification of how the input parameter is processed or whether bar is sanitized before being used to construct the File URI.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01752",
+          "expected": "false_positive",
+          "explanation": "User input from the request is passed through Test.doSomething via a map lookup without validation or sanitization, concatenated directly into fileName, and opened in a FileInputStream, allowing path traversal.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01794",
+          "expected": "false_positive",
+          "explanation": "The method Test.doSomething assigns 'bar = param' because integer division (500 / 42) evaluates to 11, and 11 + 196 = 207 > 200. On non-Windows environments, 'bar' is concatenated directly into the argument string passed to 'sh -c' and executed via Runtime.exec, permitting command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01907",
+          "expected": "true_positive",
+          "explanation": "The source parameter from request.getHeader is passed into doSomething, but the implementation of doSomething is truncated after line 84. Without the complete method body, it is impossible to determine whether the path input is sanitized or safely handled before being opened with FileOutputStream.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01928",
+          "expected": "true_positive",
+          "explanation": "The implementation of the doSomething method is truncated after line 88, making it impossible to determine if the untrusted param propagates to bar or if it is sanitized or assigned a constant value. Consequently, the evidence is insufficient to confirm or refute a command injection vulnerability.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01987",
+          "expected": "true_positive",
+          "explanation": "The implementation of the doSomething method is truncated after line 108, leaving it undetermined whether the returned value 'bar' is influenced by untrusted input 'param' or hardcoded.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01990",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething(request, param) is truncated after line 94. Because its full implementation is missing from the evidence, it cannot be determined whether user input in param is sanitized, safely mapped, or discarded before reaching FileOutputStream.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02026",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething is truncated after line 82, making it impossible to determine whether the returned string contains the untrusted parameter or a safe constant before being passed to File.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02105",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 74, making it impossible to determine whether the returned string 'bar' contains untrusted input or safe data before reaching the File sink.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02135",
+          "expected": "false_positive",
+          "explanation": "The source code snippet cuts off at line 74 inside doSomething without revealing its return statement or how the returned value assigned to bar is computed and sanitized before being written to the response writer.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02187",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 78, leaving the switch case 'C' (selected by guess.charAt(2)) incomplete. Because the assignment to bar cannot be determined from the provided source code, the taint trace to the SQL query cannot be verified.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02231",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated after line 79 without closing braces or a return statement. Because the code is incomplete, it is impossible to determine whether untrusted input reaches the response writer on line 54.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02270",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething cuts off after line 87 inside a switch statement evaluated on switchTarget ('C'). Because the handling for case 'C' or default is truncated, it is impossible to determine whether bar receives user input or a safe constant.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02344",
+          "expected": "true_positive",
+          "explanation": "The user-controlled variable bar is passed exclusively as the envp parameter array (argsEnv) in Runtime.getRuntime().exec(cmd, argsEnv, ...), rather than as the command or argument string itself. Because the executed command string cmd is generated independently and does not incorporate user input, this pattern does not permit OS command injection (CWE-78).",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02414",
+          "expected": "true_positive",
+          "explanation": "The value of switchTarget evaluates to 'C', but the switch statement in doSomething is truncated after case 'A'. Without the rest of the switch statement and the return statement, it cannot be determined whether bar receives user input or a safe constant value.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02429",
+          "expected": "true_positive",
+          "explanation": "The value passed to Runtime.getRuntime().exec() depends on the output of thing.doSomething(param). Because the implementation of ThingInterface and the original source of param are not present in the code snippet, it cannot be verified whether the input is properly sanitized or retains untrusted taint.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02467",
+          "expected": "false_positive",
+          "explanation": "The implementation of the helper method doSomething is truncated at line 80, leaving it unknown whether user input in param is sanitized, validated, or replaced before being appended to the file path.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02470",
+          "expected": "false_positive",
+          "explanation": "The method doSomething is truncated after line 81, preventing verification of whether user input is properly sanitized or safely mapped before constructing fileName and instantiating FileOutputStream.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02491",
+          "expected": "false_positive",
+          "explanation": "The provided code terminates abruptly at line 76 inside doSomething without revealing its return statement or how thing is used. Consequently, it is impossible to determine whether the tainted param reaches the return value assigned to bar and printed at line 51.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02517",
+          "expected": "true_positive",
+          "explanation": "User input from the request is passed solely into the environment array parameter (argsEnv) of Runtime.getRuntime().exec, while the executed command string cmd is obtained independently without user input.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02562",
+          "expected": "true_positive",
+          "explanation": "The value of 'bar' used to construct 'fileName' at line 76 is obtained from 'doSomething(request, param)' at line 70. Because the implementation of 'doSomething' is truncated and absent from the provided source snippet, it cannot be determined whether the user input is sanitized or neutralized before reaching FileInputStream.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02587",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 99 without showing what value is actually returned and assigned to bar. Because the remainder of doSomething is missing, it cannot be determined whether user input reaches the response writer without proper sanitization.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02640",
+          "expected": "false_positive",
+          "explanation": "The evaluation depends on the return value of doSomething, which uses switchTarget determined by guess.charAt(1) ('B'). Because the snippet truncates at line 100 after case 'A', there is insufficient code to determine what value bar receives or whether param propagates into the SQL sink.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02650",
+          "expected": "true_positive",
+          "explanation": "In doSomething, switchTarget is evaluated as 'C' via guess.charAt(2), but the source code snippet truncates after case 'C': and case 'D':. Because the assignment to bar inside case 'C' is omitted from the evidence, it is uncertain whether user input reaches the SQL statement.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02668",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething is truncated after line 80, making it impossible to determine whether the untrusted param is sanitized, ignored, or returned into bar before reaching the FileOutputStream sink.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02669",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated at line 80 immediately after checking if param is not null. Without the rest of the implementation, it is impossible to determine whether the user-controlled param flows into bar or if it is properly sanitized before being passed to FileOutputStream.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02699",
+          "expected": "false_positive",
+          "explanation": "In doSomething, the condition `(7 * 42) - num > 200` calculates to `294 - 106 > 200` (188 > 200), which is false, selecting the ternary false branch and returning `param`. The tainted input in `bar` is concatenated into a shell invocation (`cmd.exe /c` or `sh -c`) and executed via `ProcessBuilder`, resulting in command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 13,
+      "fp_in_sample": 48,
+      "fp_removed": 31,
+      "fp_removed_rate": 0.6458,
+      "fp_retained": 4,
+      "genuine_dismissed": 2,
+      "genuine_dismissed_rate": 0.0417,
+      "genuine_human_review": 18,
+      "genuine_in_sample": 48,
+      "genuine_retained": 28,
+      "genuine_retained_rate": 0.5833,
+      "human_review": 31,
+      "human_review_rate": 0.3229,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 0.7302,
+      "recall": 0.9583,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 96,
+        "completion_tokens_total": 126252,
+        "cost_reported": 96,
+        "cost_total": 1.065892,
+        "latency_max_seconds": 27.178,
+        "latency_mean_seconds": 20.194,
+        "latency_reported": 96,
+        "prompt_tokens_reported": 96,
+        "prompt_tokens_total": 789929
+      }
+    },
+    {
+      "configuration": "D-validated-council",
+      "evaluated_findings": 96,
+      "f1": 0.8288,
+      "failures": [
+        {
+          "case_id": "BenchmarkTest00159",
+          "expected": "true_positive",
+          "explanation": "Input from the HTTP header is processed by thing.doSomething(param) before being concatenated into an OS shell execution via ProcessBuilder. Because the implementation of ThingInterface.doSomething is external and unavailable in the provided code, it cannot be verified whether the input is sanitized or safe.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01029",
+          "expected": "true_positive",
+          "explanation": "The implementation of Test.doSomething is truncated starting at line 98, making it impossible to determine whether the returned variable bar contains unsanitized user input or a safe value.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01089",
+          "expected": "false_positive",
+          "explanation": "The helper method Test.doSomething is truncated after line 83, making it impossible to determine whether the untrusted param or a safe value is returned to be concatenated into the SQL statement.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01111",
+          "expected": "true_positive",
+          "explanation": "Header name input is assigned to param and passed to new Test().doSomething(request, param), but the implementation of Test is truncated after line 93. Without the body of doSomething, it cannot be determined whether bar is sanitized before reaching the FileInputStream sink.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01233",
+          "expected": "false_positive",
+          "explanation": "The helper method Test.doSomething() is truncated after line 75, making it impossible to determine whether untrusted input in 'param' actually flows into 'bar' or is sanitized/replaced before the File constructor.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01236",
+          "expected": "true_positive",
+          "explanation": "The implementation of Test.doSomething(...) is truncated at line 90, making it impossible to determine how the input param is processed, sanitized, or modified before being assigned to bar and used in the URI path.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01350",
+          "expected": "true_positive",
+          "explanation": "Untrusted input from request parameters is processed by 'thing.doSomething(param)' before being output directly to the HTTP response writer. Because the implementation of 'ThingInterface' is not provided in the source lines, it is uncertain whether the value is sanitized or modified.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01360",
+          "expected": "true_positive",
+          "explanation": "The value of 'switchTarget' is 'C' (guess.charAt(2)), but the provided code snippet is truncated after case 'B'. Because case 'C' and the default case are missing from the evidence, it is impossible to determine whether 'param' is assigned to 'bar' and executed.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01396",
+          "expected": "true_positive",
+          "explanation": "Request parameter 'BenchmarkTest01396' is retrieved and passed through ThingFactory.createThing().doSomething(param) before being concatenated into an INSERT SQL statement. Because the implementation and sanitization logic of ThingInterface are not present in the provided source code, it cannot be determined with certainty whether the input is properly sanitized.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01692",
+          "expected": "false_positive",
+          "explanation": "User input extracted from the request query string is decoded and processed through helper methods without neutralization, retaining the tainted input in bar. It is then concatenated directly into a command string executed by Runtime.getRuntime().exec(), permitting OS command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01747",
+          "expected": "false_positive",
+          "explanation": "The implementation of Test.doSomething is truncated at line 94, preventing verification of how the input parameter is processed or whether bar is sanitized before being used to construct the File URI.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01752",
+          "expected": "false_positive",
+          "explanation": "User input from the request is passed through Test.doSomething via a map lookup without validation or sanitization, concatenated directly into fileName, and opened in a FileInputStream, allowing path traversal.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01794",
+          "expected": "false_positive",
+          "explanation": "The method Test.doSomething assigns 'bar = param' because integer division (500 / 42) evaluates to 11, and 11 + 196 = 207 > 200. On non-Windows environments, 'bar' is concatenated directly into the argument string passed to 'sh -c' and executed via Runtime.exec, permitting command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        },
+        {
+          "case_id": "BenchmarkTest01907",
+          "expected": "true_positive",
+          "explanation": "The source parameter from request.getHeader is passed into doSomething, but the implementation of doSomething is truncated after line 84. Without the complete method body, it is impossible to determine whether the path input is sanitized or safely handled before being opened with FileOutputStream.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01928",
+          "expected": "true_positive",
+          "explanation": "The implementation of the doSomething method is truncated after line 88, making it impossible to determine if the untrusted param propagates to bar or if it is sanitized or assigned a constant value. Consequently, the evidence is insufficient to confirm or refute a command injection vulnerability.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01987",
+          "expected": "true_positive",
+          "explanation": "The implementation of the doSomething method is truncated after line 108, leaving it undetermined whether the returned value 'bar' is influenced by untrusted input 'param' or hardcoded.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest01990",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething(request, param) is truncated after line 94. Because its full implementation is missing from the evidence, it cannot be determined whether user input in param is sanitized, safely mapped, or discarded before reaching FileOutputStream.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02026",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething is truncated after line 82, making it impossible to determine whether the returned string contains the untrusted parameter or a safe constant before being passed to File.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02105",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 74, making it impossible to determine whether the returned string 'bar' contains untrusted input or safe data before reaching the File sink.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02135",
+          "expected": "false_positive",
+          "explanation": "The source code snippet cuts off at line 74 inside doSomething without revealing its return statement or how the returned value assigned to bar is computed and sanitized before being written to the response writer.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02187",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 78, leaving the switch case 'C' (selected by guess.charAt(2)) incomplete. Because the assignment to bar cannot be determined from the provided source code, the taint trace to the SQL query cannot be verified.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02231",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated after line 79 without closing braces or a return statement. Because the code is incomplete, it is impossible to determine whether untrusted input reaches the response writer on line 54.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02270",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething cuts off after line 87 inside a switch statement evaluated on switchTarget ('C'). Because the handling for case 'C' or default is truncated, it is impossible to determine whether bar receives user input or a safe constant.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02344",
+          "expected": "true_positive",
+          "explanation": "The user-controlled variable bar is passed exclusively as the envp parameter array (argsEnv) in Runtime.getRuntime().exec(cmd, argsEnv, ...), rather than as the command or argument string itself. Because the executed command string cmd is generated independently and does not incorporate user input, this pattern does not permit OS command injection (CWE-78).",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02414",
+          "expected": "true_positive",
+          "explanation": "The value of switchTarget evaluates to 'C', but the switch statement in doSomething is truncated after case 'A'. Without the rest of the switch statement and the return statement, it cannot be determined whether bar receives user input or a safe constant value.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02429",
+          "expected": "true_positive",
+          "explanation": "The value passed to Runtime.getRuntime().exec() depends on the output of thing.doSomething(param). Because the implementation of ThingInterface and the original source of param are not present in the code snippet, it cannot be verified whether the input is properly sanitized or retains untrusted taint.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02467",
+          "expected": "false_positive",
+          "explanation": "The implementation of the helper method doSomething is truncated at line 80, leaving it unknown whether user input in param is sanitized, validated, or replaced before being appended to the file path.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02470",
+          "expected": "false_positive",
+          "explanation": "The method doSomething is truncated after line 81, preventing verification of whether user input is properly sanitized or safely mapped before constructing fileName and instantiating FileOutputStream.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02491",
+          "expected": "false_positive",
+          "explanation": "The provided code terminates abruptly at line 76 inside doSomething without revealing its return statement or how thing is used. Consequently, it is impossible to determine whether the tainted param reaches the return value assigned to bar and printed at line 51.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02517",
+          "expected": "true_positive",
+          "explanation": "User input from the request is passed solely into the environment array parameter (argsEnv) of Runtime.getRuntime().exec, while the executed command string cmd is obtained independently without user input.",
+          "outcome": "genuine_dismissed",
+          "reasons": [],
+          "verdict": "false_positive"
+        },
+        {
+          "case_id": "BenchmarkTest02562",
+          "expected": "true_positive",
+          "explanation": "The value of 'bar' used to construct 'fileName' at line 76 is obtained from 'doSomething(request, param)' at line 70. Because the implementation of 'doSomething' is truncated and absent from the provided source snippet, it cannot be determined whether the user input is sanitized or neutralized before reaching FileInputStream.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02587",
+          "expected": "true_positive",
+          "explanation": "The helper method doSomething is truncated after line 99 without showing what value is actually returned and assigned to bar. Because the remainder of doSomething is missing, it cannot be determined whether user input reaches the response writer without proper sanitization.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02640",
+          "expected": "false_positive",
+          "explanation": "The evaluation depends on the return value of doSomething, which uses switchTarget determined by guess.charAt(1) ('B'). Because the snippet truncates at line 100 after case 'A', there is insufficient code to determine what value bar receives or whether param propagates into the SQL sink.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02650",
+          "expected": "true_positive",
+          "explanation": "In doSomething, switchTarget is evaluated as 'C' via guess.charAt(2), but the source code snippet truncates after case 'C': and case 'D':. Because the assignment to bar inside case 'C' is omitted from the evidence, it is uncertain whether user input reaches the SQL statement.",
+          "outcome": "genuine_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02668",
+          "expected": "false_positive",
+          "explanation": "The implementation of doSomething is truncated after line 80, making it impossible to determine whether the untrusted param is sanitized, ignored, or returned into bar before reaching the FileOutputStream sink.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02669",
+          "expected": "false_positive",
+          "explanation": "The helper method doSomething is truncated at line 80 immediately after checking if param is not null. Without the rest of the implementation, it is impossible to determine whether the user-controlled param flows into bar or if it is properly sanitized before being passed to FileOutputStream.",
+          "outcome": "fp_human_review",
+          "reasons": [],
+          "verdict": "human_review"
+        },
+        {
+          "case_id": "BenchmarkTest02699",
+          "expected": "false_positive",
+          "explanation": "In doSomething, the condition `(7 * 42) - num > 200` calculates to `294 - 106 > 200` (188 > 200), which is false, selecting the ternary false branch and returning `param`. The tainted input in `bar` is concatenated into a shell invocation (`cmd.exe /c` or `sh -c`) and executed via `ProcessBuilder`, resulting in command injection.",
+          "outcome": "fp_retained",
+          "reasons": [],
+          "verdict": "true_positive"
+        }
+      ],
+      "fp_human_review": 13,
+      "fp_in_sample": 48,
+      "fp_removed": 31,
+      "fp_removed_rate": 0.6458,
+      "fp_retained": 4,
+      "genuine_dismissed": 2,
+      "genuine_dismissed_rate": 0.0417,
+      "genuine_human_review": 18,
+      "genuine_in_sample": 48,
+      "genuine_retained": 28,
+      "genuine_retained_rate": 0.5833,
+      "human_review": 31,
+      "human_review_rate": 0.3229,
+      "invalid_output_rate": 0.0,
+      "invalid_outputs": 0,
+      "malformed_results": 0,
+      "missing_results": 0,
+      "model": "google/gemini-3.8-flash",
+      "precision": 0.7302,
+      "recall": 0.9583,
+      "results_outside_sample": [],
+      "usage": {
+        "completion_tokens_reported": 96,
+        "completion_tokens_total": 126252,
+        "cost_reported": 96,
+        "cost_total": 1.065892,
+        "latency_max_seconds": 27.178,
+        "latency_mean_seconds": 20.194,
+        "latency_reported": 96,
+        "prompt_tokens_reported": 96,
+        "prompt_tokens_total": 789929
+      }
+    }
+  ],
+  "note": "Initial checkpoint sample, not a general accuracy estimate.",
+  "same_case_coverage": true,
+  "sample_size": 96
+}
