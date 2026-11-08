@@ -1,0 +1,146 @@
+{
+  "ceiling": "Recall can only fall: TriageBot never sees what Semgrep missed (FN).",
+  "configuration": "B-single-agent",
+  "formula": "For each of the four types, the final-test run gives the share of real vulnerabilities TriageBot keeps (a case sent to a human counts as kept) and the share of safe cases it removes. Those rates are applied to Semgrep's results for that type over the whole benchmark: kept real vulnerabilities are Semgrep's true positives times the keep rate; kept safe cases are Semgrep's false positives times one minus the removal rate; missed real vulnerabilities are Semgrep's false negatives plus Semgrep's true positives times one minus the keep rate. The four types are summed, and precision, recall and F1 are computed from the sums.",
+  "label": "projection: final-test rates applied to the full benchmark for the 4 types",
+  "mode": "single",
+  "provenance": {
+    "answer_key_sha256": "f0311c850dea7f15125113f7cfdbd7ad612d7f5951c7331584f6981b6ae2d630",
+    "case_set": "final-test",
+    "case_set_sha256": "3182ce45723df68a6932c2dfbf747811cf60a5fee3170c172a1222b575f7c543",
+    "date": "2026-11-08T20:20:52+00:00",
+    "git": {
+      "commit": "e39e415994a67137dff69bcfb524c3e09edec119",
+      "dirty": false,
+      "dirty_paths": []
+    },
+    "run_commit": "e39e415994a67137dff69bcfb524c3e09edec119",
+    "scan": "data/semgrep/semgrep-owasp-p-java-1.178.0.json",
+    "scan_sha256": "5614cdba5382269cf1f5d3c610df08c36c14bac92fc2d4ab45467f4961ef0001"
+  },
+  "result": {
+    "per_cwe": {
+      "CWE-22": {
+        "rates": {
+          "dismissed": 4,
+          "keep_rate": 0.7333333333333334,
+          "real": 15,
+          "removal_rate": 0.9333333333333333,
+          "removed": 14,
+          "safe": 15
+        },
+        "semgrep": {
+          "f1": 0.6685236768802229,
+          "fn": 13,
+          "fp": 106,
+          "precision": 0.5309734513274337,
+          "recall": 0.9022556390977443,
+          "tp": 120
+        },
+        "whole_system": {
+          "f1": 0.7717041800643087,
+          "kept_real": 88.0,
+          "kept_safe": 7.066666666666665,
+          "missed": 44.99999999999999,
+          "precision": 0.9256661991584854,
+          "recall": 0.6616541353383458
+        }
+      },
+      "CWE-78": {
+        "rates": {
+          "dismissed": 3,
+          "keep_rate": 0.8,
+          "real": 15,
+          "removal_rate": 0.8666666666666667,
+          "removed": 13,
+          "safe": 15
+        },
+        "semgrep": {
+          "f1": 0.6706586826347305,
+          "fn": 14,
+          "fp": 96,
+          "precision": 0.5384615384615384,
+          "recall": 0.8888888888888888,
+          "tp": 112
+        },
+        "whole_system": {
+          "f1": 0.7845884413309984,
+          "kept_real": 89.60000000000001,
+          "kept_safe": 12.799999999999997,
+          "missed": 36.39999999999999,
+          "precision": 0.875,
+          "recall": 0.7111111111111111
+        }
+      },
+      "CWE-79": {
+        "rates": {
+          "dismissed": 1,
+          "keep_rate": 0.9333333333333333,
+          "real": 15,
+          "removal_rate": 1.0,
+          "removed": 15,
+          "safe": 15
+        },
+        "semgrep": {
+          "f1": 0.7266187050359713,
+          "fn": 44,
+          "fp": 108,
+          "precision": 0.6516129032258065,
+          "recall": 0.8211382113821138,
+          "tp": 202
+        },
+        "whole_system": {
+          "f1": 0.8677508438171219,
+          "kept_real": 188.53333333333333,
+          "kept_safe": 0.0,
+          "missed": 57.46666666666666,
+          "precision": 1.0,
+          "recall": 0.7663956639566396
+        }
+      },
+      "CWE-89": {
+        "rates": {
+          "dismissed": 2,
+          "keep_rate": 0.8666666666666667,
+          "real": 15,
+          "removal_rate": 1.0,
+          "removed": 15,
+          "safe": 15
+        },
+        "semgrep": {
+          "f1": 0.7211093990755008,
+          "fn": 38,
+          "fp": 143,
+          "precision": 0.6206896551724138,
+          "recall": 0.8602941176470589,
+          "tp": 234
+        },
+        "whole_system": {
+          "f1": 0.8542544229149116,
+          "kept_real": 202.8,
+          "kept_safe": 0.0,
+          "missed": 69.19999999999999,
+          "precision": 1.0,
+          "recall": 0.7455882352941177
+        }
+      }
+    },
+    "semgrep_alone": {
+      "f1": 0.7038988408851422,
+      "fn": 109,
+      "fp": 453,
+      "precision": 0.5958965209634255,
+      "recall": 0.8597168597168597,
+      "tp": 668
+    },
+    "whole_system": {
+      "f1": 0.8331136818470251,
+      "kept_real": 568.9333333333334,
+      "kept_safe": 19.86666666666666,
+      "missed": 208.06666666666663,
+      "precision": 0.9662590579710145,
+      "recall": 0.7322179322179323
+    }
+  },
+  "run": "6-before"
+}

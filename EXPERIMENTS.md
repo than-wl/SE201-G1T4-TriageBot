@@ -93,10 +93,16 @@ returned the most wrong-language advice.
 Semantic retrieval is therefore the default and the final version (design
 decision 29).
 
-**Next:** step 5 rebuilds the mutation test; step 6 (runnable, not run yet)
-runs the final version once on the unseen final test, and
-`verification/whole_system.py` reports the whole system next to Semgrep alone
-to show how far Semgrep's recall limits it.
+**6. On 120 unseen cases the final version holds, and the council is the safe
+choice (step 6).** The council scored F1 96.7% (95.0% on the comparison set),
+removed 57 of 60 false alarms and dismissed 1 of 60 real vulnerabilities; the
+single agent removed the same 57 but dismissed 10. Projected over the whole
+benchmark for the four types, Semgrep plus the council keeps precision at
+97.1% against Semgrep's 59.6%, while recall moves only from 86.0% to 85.0%:
+almost every remaining miss is one Semgrep never flagged. Semgrep is now the
+bottleneck.
+
+**Next:** step 5 rebuilds the mutation test.
 
 ## Why we split the cases
 
@@ -599,7 +605,7 @@ verdicts is what the paid run measures.
   the single agent's US$0.4146 for 96 cases in `1b-before` (the same evidence;
   step 4 ran the council only). The registry holds them as `cost_per_case`
   (US$0.0043 and US$0.0146).
-- **Status:** runnable; not run yet.
+- **Status:** run on 9 Nov 2026 (commit `e39e415`), once.
 - **Two guards** protect the final test, which is run once. They apply to any
   step whose case set is the final test, before any question or model call:
   1. *A dirty tree is refused.* With uncommitted changes to tracked files,
@@ -629,8 +635,47 @@ verdicts is what the paid run measures.
   missed (FN), so Semgrep's recall is its ceiling. Output:
   `evidence/whole_system/<run>.json` and `.md`. Before step 6 has run, the
   script prints Semgrep alone and says to run step 6 first.
-- **Result:** _to be filled in after the run._
-- **Finding:** _to be filled in after the run._
+- **Result:**
+
+  | Measure | Single agent (`6-before`) | Council, validated (`6-after`) |
+  | --- | ---: | ---: |
+  | Precision | 94.3% | 95.2% |
+  | Recall | 83.3% | 98.3% |
+  | F1 | 88.5% | 96.7% |
+  | Real vulnerabilities dismissed (of 60) | 10 | 1 |
+  | False alarms removed (of 60) | 57 | 57 |
+  | Sent to a human (of 120) | 2 | 1 |
+  | Invalid answers | 0 | 0 |
+  | Cost (US$) / mean latency (s) | 0.53 / 9.9 | 1.76 / 18.8 |
+
+  Per type, the council's F1 is 96.8% (path traversal), 90.3% (OS command
+  injection; its one dismissal), 100% (XSS) and 100% (SQL injection).
+
+  Whole system vs Semgrep alone (projection, council):
+
+  | | Semgrep alone | Semgrep + TriageBot council | Semgrep + single agent |
+  | --- | ---: | ---: | ---: |
+  | Precision | 59.6% | 97.1% | 96.6% |
+  | Recall | 86.0% | 85.0% | 73.2% |
+  | F1 | 70.4% | 90.6% | 83.3% |
+  | False alarms left (of 453) | 453 | ≈20 | ≈20 |
+  | Real vulnerabilities missed (of 777) | 109 | ≈117 | ≈208 |
+- **Finding:** the design holds on cases nobody looked at, and the council's
+  value is safety.
+  - *No sign of tuning to the comparison set.* The council scored F1 96.7% on
+    the final test against 95.0% (step 4) and 96.0% (step 2) on the
+    comparison set.
+  - *The council's safety advantage grows on unseen cases.* Both reviewers
+    removed 57 of 60 false alarms, but the single agent dismissed 10 of 60
+    real vulnerabilities against the council's 1. On the comparison set the
+    gap was 3 against 0. The single agent is cheaper (US$0.53 vs US$1.76) and
+    faster (9.9 s vs 18.8 s), but every dismissed real vulnerability is a
+    silent miss.
+  - *Semgrep is now the bottleneck.* Adding the council would cut false alarms
+    from 453 to about 20 (precision 59.6% → 97.1%) while recall falls only
+    from 86.0% to 85.0%. Of the about 117 real vulnerabilities the whole system
+    misses, 109 are ones Semgrep never flagged. The next gain is in the first
+    stage (rules that catch more), not the second.
 
 ## Future work
 
