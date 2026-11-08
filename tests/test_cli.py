@@ -8,6 +8,7 @@ is about it.
 
 Run from the repo root: python -m unittest discover -s tests
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 import ast
 from contextlib import redirect_stderr, redirect_stdout
 import io

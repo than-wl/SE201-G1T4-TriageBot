@@ -107,9 +107,32 @@
       "id": "5",
       "title": "Mutation test",
       "question": "Does the verdict follow the code?",
-      "changes": "Rebuilt mutation test: small code changes that should flip the verdict.",
+      "changes": "The code: in each case one constant condition is flipped ('num > 200' to 'num < 200', the same length, so no line moves), which flips which branch runs and so the right verdict. Before: the originals; after: their mutants, each read from its own overlay root (the Benchmark source with only the mutated file replaced), so both are judged on the same evidence except that line. Both sides run the final version (the semantic profile), single agent and council, on one commit.",
       "case_set": "mutation",
-      "planned": "later task: the mutation set and its runner are not built yet"
+      "before": {
+        "profile": "semantic",
+        "modes": [
+          "single",
+          "council"
+        ]
+      },
+      "after": {
+        "profile": "semantic",
+        "modes": [
+          "single",
+          "council"
+        ],
+        "source": "mutant",
+        "labels": "flipped"
+      },
+      "scoring": "mutation",
+      "same_commit": true,
+      "cost_per_case": {
+        "single": 0.0043,
+        "council": 0.0146
+      },
+      "cost_note": "From the recorded per-case costs on the comparison set (as step 6): council US$1.3955 / 96 cases in 4-after (semantic profile); single agent US$0.4146 / 96 in 1b-before (the same evidence; step 4 ran the council only). 22 pairs, both sides, both modes: 4 runs of 22 cases, 176 calls, about US$0.83.",
+      "rule": "A pair counts only if the reviewer got the original right. Killed: the mutant's verdict is the flipped right answer. Survived: the verdict is unchanged. Escalated: the mutant was sent to a human; reported separately, not a kill. Mutation score = killed / pairs that meet the precondition, per configuration and per direction. `experiment run 5` refuses uncommitted changes to tracked files and a commit other than the one a saved run of step 5 recorded."
     },
     {
       "id": "6",

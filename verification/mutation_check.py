@@ -1,4 +1,13 @@
-"""Run pre-declared development source-mutation pairs through TriageBot."""
+"""Run pre-declared development source-mutation pairs through TriageBot.
+
+SUPERSEDED by step 5 of EXPERIMENTS.md (design decision 30): the frozen set
+data/samples/mutation.json, the overlay roots in triagebot/mutants.py, and
+`python -m triagebot experiment run 5`. Kept, unchanged, as a record of what went
+wrong: the originals were judged differently per reviewer (the council's came from
+a version without council mode), each case ran from a folder holding only the
+mutated file (the related source was missing), and there were five hand-picked
+cases in one direction. Do not use it for a new result.
+"""
 
 import argparse
 import json

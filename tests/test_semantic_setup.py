@@ -5,6 +5,7 @@ knowledge base written to a temporary folder (tests/semantic_fixture.py). The
 real committed KB is read only as JSON (scope.json and the chunk sizes); nothing
 is embedded with a real model.
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 import hashlib
 import io
 import json

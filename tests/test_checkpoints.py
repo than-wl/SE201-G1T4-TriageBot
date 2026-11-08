@@ -1,4 +1,5 @@
 """Real file-backed SQLite, safe provenance and true subprocess recovery tests."""
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from collections import Counter
 from contextlib import closing
 from copy import deepcopy

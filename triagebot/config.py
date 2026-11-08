@@ -50,6 +50,9 @@ _LOCAL_TMP = Path(__file__).resolve().parents[1] / "Context" / "tmp"   # git-ign
 CWE_CATALOGUE_DIR = _LOCAL_TMP / "cwe"
 CWE_CATALOGUE_XML = CWE_CATALOGUE_DIR / "cwec_v5.0.xml"
 KB_VECTOR_DB = _LOCAL_TMP / "kb_vectors.sqlite"   # derived from the KB; chunks added or changed are re-embedded
+# Step 5: one overlay root per mutant (a copy of the Benchmark source with only the mutated
+# file replaced), built from data/samples/mutation.json before a run (triagebot/mutants.py).
+MUTATION_OVERLAY_DIR = _LOCAL_TMP / "mutation-overlay"
 
 # --- source context -----------------------------------------------------
 _REPO_ROOT = Path(__file__).resolve().parents[1]

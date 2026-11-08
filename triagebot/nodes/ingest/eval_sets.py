@@ -12,6 +12,11 @@ split (seed 201, test fraction 0.5):
 
 and data/samples/retired_cases.json, every case an earlier run already used.
 
+    python -m triagebot.nodes.ingest.eval_sets mutation
+
+builds data/samples/mutation.json for step 5 (triagebot/nodes/ingest/mutation_set.py);
+it also reads the Benchmark source of the dev-half candidates.
+
 The answer key is used only to balance the draw. Each sample file holds only
 NormalisedAlert fields (the shape of selected_alerts.json); its manifest holds
 the rule, the seeds, the scan's fingerprint, the sample's own fingerprint and
@@ -253,7 +258,17 @@ def main(argv=None) -> int:
     b.add_argument("--answer-key", type=Path, default=config.ANSWER_KEY)
     b.add_argument("--evidence", type=Path, default=config.EVIDENCE_DIR)
     b.add_argument("--out", type=Path, default=config.SAMPLES_DIR)
+    m = sub.add_parser("mutation", help="build data/samples/mutation.json for step 5 "
+                                        "(needs the Benchmark source; reads the pilot and comparison sets)")
+    m.add_argument("--semgrep", type=Path, default=config.RECORDED_SCAN)
+    m.add_argument("--answer-key", type=Path, default=config.ANSWER_KEY)
+    m.add_argument("--benchmark", type=Path, default=config.BENCHMARK_ROOT,
+                   help="the OWASP Benchmark checkout (default BENCHMARK_ROOT); only read")
+    m.add_argument("--evidence", type=Path, default=config.EVIDENCE_DIR)
+    m.add_argument("--out", type=Path, default=config.SAMPLES_DIR)
     args = parser.parse_args(argv)
+    if args.command == "mutation":
+        return _main_mutation(args)
     try:
         files = build(args.semgrep, args.answer_key, args.evidence, samples_dir=args.out)
     except (EvalSetError, OSError, KeyError, json.JSONDecodeError) as error:
@@ -267,6 +282,32 @@ def main(argv=None) -> int:
         print(f"{name:<11} {manifest['cases']:>4} cases  sha256 {manifest['sample']['sha256'][:12]}  ({parts})")
     retired = json.loads(files[RETIRED_NAME])
     print(f"{'retired':<11} {retired['count']:>4} cases")
+    print(f"Written to {repo_path(args.out)}/")
+    return 0
+
+
+def _main_mutation(args) -> int:
+    """`mutation`: build and write mutation.json and its manifest (step 5)."""
+    from triagebot.nodes.ingest import mutation_set
+
+    try:
+        files, report = mutation_set.build(args.semgrep, args.answer_key, args.benchmark,
+                                           args.evidence, samples_dir=args.out)
+    except (EvalSetError, mutation_set.MutationError, OSError, KeyError,
+            UnicodeDecodeError, json.JSONDecodeError) as error:
+        print(f"Error: {error}", file=sys.stderr)
+        return 1
+    write(files, args.out)
+    manifest = json.loads(files[f"{mutation_set.NAME}.manifest.json"])
+    print(f"{'Type':<7} {'screened':>8}  {'eligible real->safe':>19}  {'eligible safe->real':>19}  selected")
+    for cwe, row in manifest["composition"].items():
+        print(f"{cwe:<7} {row['screened']:>8}  {row['eligible_real_to_safe']:>19}  "
+              f"{row['eligible_safe_to_real']:>19}  {row['real_to_safe']}+{row['safe_to_real']}"
+              + (f"  (short by {row['shortfall']})" if row["shortfall"] else ""))
+    for cwe, chosen in report["selected"].items():
+        for direction, ids in chosen.items():
+            print(f"  {cwe} {direction.replace('_to_', ' -> ').replace('_', ' ')}: {', '.join(ids)}")
+    print(f"{mutation_set.NAME:<11} {manifest['cases']:>4} cases  sha256 {manifest['sample']['sha256'][:12]}")
     print(f"Written to {repo_path(args.out)}/")
     return 0
 

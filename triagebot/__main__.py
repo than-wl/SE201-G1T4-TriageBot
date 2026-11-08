@@ -700,6 +700,21 @@ def experiment_show(step_id) -> int:
             for row in data["by_cwe"]["rows"]:
                 cwe_table.add_row(*row)
             console.print(cwe_table)
+    if data.get("mutation"):
+        console.print()
+        console.print(Text("Mutation score (pairs whose original was judged right)", style="bold"))
+        mutation_table = Table(box=box.SIMPLE_HEAD)
+        for number, header in enumerate(data["mutation"]["headers"]):
+            mutation_table.add_column(header, justify="left" if number == 0 else "right",
+                                      no_wrap=number == 0)
+        for row in data["mutation"]["rows"]:
+            mutation_table.add_row(*row)
+        console.print(mutation_table)
+        console.print("Killed: the mutant got the flipped right answer. Survived: same verdict as "
+                      "the original. Escalated: sent to a human (not a kill).", style="dim")
+    elif experiments.is_mutation_step(step) and data["rows"]:
+        console.print("Mutation score: not yet (both sides must be finished over the same cases).",
+                      markup=False)
     for note in data["notes"]:
         console.print(note, markup=False)
     for name in data["missing"]:
@@ -766,6 +781,10 @@ def _show_plan(plan) -> None:
             ("Modes", ", ".join(plan["modes"])),
             ("Cases", f"{len(plan['remaining'])} to run ({scope}); {plan['already_saved']} already saved"),
             ("Model", f"{plan['model']}, temperature {config.REVIEW_TEMPERATURE}"),
+            *([("Code", "the mutants: one overlay root per case under "
+                         f"{check.rel_path(config.MUTATION_OVERLAY_DIR)}/ (built before any call); "
+                         "scored against the flipped answers")]
+              if plan.get("source") == "mutant" else []),
             ("Model calls", f"{plan['calls']} ({per_case} per case){repairs}"),
             ("Estimated cost", f"about US${plan['estimated_cost']:.2f} ({cost} per case; "
                                "the real spend is recorded)")):
@@ -784,6 +803,7 @@ def experiment_run(step_id, side=None, repeat=1, limit=None, answer_key=None,
     try:
         plans = experiments.plan(step_id, side, repeat, limit, fresh=rerun_final_test)
         replaced = experiments.final_test_guard(plans, rerun_final_test)
+        experiments.same_commit_guard(plans)
         for plan in plans:
             profiles.require_ready(plan["profile"])
     except EXPERIMENT_ERRORS as error:

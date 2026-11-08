@@ -1,5 +1,6 @@
 """Phase 1 graph regressions; fixtures only, no network or API keys."""
 
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 import json

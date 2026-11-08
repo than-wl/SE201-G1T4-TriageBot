@@ -1,0 +1,94 @@
+{
+  "set": "mutation",
+  "purpose": "step 5: originals (before) and their one-character mutants (after); the right verdict of each mutant is the flip of its original's",
+  "rule": "dev half, not in pilot, comparison or the retired list; CWE-22, 78, 79 or 89 with a CWE-matching Semgrep alert (lowest start_line, then rule_id); exactly one '(<int> * <int>) <+|-> num > 200 ? \"<string>\" : <identifier>' and exactly one 'int num = <int>;' before it (comments stripped); the condition flips and is not tied at 200; the condition decides the answer (real: false, input flows; safe: true, constant used)",
+  "selection": "3 per direction (real -> safe, safe -> real) per type, drawn with random.Random(seed) per (type, direction) from the sorted eligible case IDs",
+  "mutation": {
+    "from": "num > 200",
+    "to": "num < 200"
+  },
+  "partition": "dev",
+  "split_seed": 201,
+  "test_fraction": 0.5,
+  "sample_seed": 201,
+  "excludes": {
+    "sets": [
+      "pilot",
+      "comparison",
+      "retired"
+    ],
+    "cases": 503
+  },
+  "overlap_with_excluded": {
+    "retired": 0,
+    "pilot": 0,
+    "comparison": 0
+  },
+  "scan": {
+    "file": "data/semgrep/semgrep-owasp-p-java-1.178.0.json",
+    "sha256": "5614cdba5382269cf1f5d3c610df08c36c14bac92fc2d4ab45467f4961ef0001"
+  },
+  "answer_key_sha256": "1809f6a690c6cf7dd6685df6ebe2eef8fe3ca93d19a7ca0ce45987ca4f5d78e1",
+  "benchmark_commit": "8b67a88d73b2594570fc21150705283de884620b",
+  "sample": {
+    "file": "data/samples/mutation.json",
+    "sha256": "bbaee0f179038a4fccdae520f45ab885df812d69b0a984e822b57b1880d0f7cc"
+  },
+  "cases": 22,
+  "composition": {
+    "CWE-22": {
+      "screened": 95,
+      "rejected": {
+        "0 ternaries of the form (expected exactly one)": 88
+      },
+      "eligible_real_to_safe": 2,
+      "eligible_safe_to_real": 5,
+      "requested": 6,
+      "real_to_safe": 2,
+      "safe_to_real": 3,
+      "selected": 5,
+      "shortfall": 1
+    },
+    "CWE-78": {
+      "screened": 79,
+      "rejected": {
+        "0 ternaries of the form (expected exactly one)": 64,
+        "label does not match the branch (the answer depends on something else)": 1
+      },
+      "eligible_real_to_safe": 7,
+      "eligible_safe_to_real": 7,
+      "requested": 6,
+      "real_to_safe": 3,
+      "safe_to_real": 3,
+      "selected": 6,
+      "shortfall": 0
+    },
+    "CWE-79": {
+      "screened": 125,
+      "rejected": {
+        "0 ternaries of the form (expected exactly one)": 115
+      },
+      "eligible_real_to_safe": 7,
+      "eligible_safe_to_real": 3,
+      "requested": 6,
+      "real_to_safe": 3,
+      "safe_to_real": 3,
+      "selected": 6,
+      "shortfall": 0
+    },
+    "CWE-89": {
+      "screened": 64,
+      "rejected": {
+        "0 ternaries of the form (expected exactly one)": 54
+      },
+      "eligible_real_to_safe": 8,
+      "eligible_safe_to_real": 2,
+      "requested": 6,
+      "real_to_safe": 3,
+      "safe_to_real": 2,
+      "selected": 5,
+      "shortfall": 1
+    }
+  },
+  "fingerprint_note": "SHA-256 of the file with LF line endings; source_sha256 and mutant_sha256 in the set are of the Java files with LF line endings"
+}

@@ -337,3 +337,49 @@ offline. TODO (Darren): own checks.
 ### What I kept or changed
 
 TODO (Darren)
+
+## 2026-11-09 — Step 5: the mutation test is rebuilt (runnable, not run)
+
+- **Tool (model):** Claude Code (claude-opus-5-5); prompt written by Darren (PROMPT_05)
+- **Files:** triagebot/nodes/ingest/mutation_set.py (new), triagebot/mutants.py (new),
+  triagebot/nodes/ingest/eval_sets.py, triagebot/experiments.py, triagebot/__main__.py,
+  triagebot/config.py, triagebot/nodes/context/retrieval.py,
+  triagebot/nodes/context/vector_store.py, experiments/registry.json,
+  data/samples/mutation.json (new), data/samples/mutation.manifest.json (new),
+  data/samples/README.md, tests/test_mutation.py (new), tests/isolated_store.py (new),
+  tests/test_vector_store.py, tests/test_experiments.py, every other tests/test_*.py and
+  tests/checkpoint_worker.py (one import line), verification/mutation_check.py (docstring),
+  EXPERIMENTS.md (step 5, case sets), docs/DESIGN_DECISIONS.md (decision 30), ai-log/darren.md
+- **Outcome:** Built and staged; step 5 not run (no model calls). The mutation set holds
+  22 pairs, not 24: CWE-22 has 2 eligible real → safe cases and CWE-89 has 2 eligible
+  safe → real cases, and the rules were not widened (eligible before selection: CWE-22
+  2 + 5, CWE-78 7 + 7, CWE-79 7 + 3, CWE-89 8 + 2). SHA-256 `bbaee0f17903…`. A free
+  check on all 22 real pairs found that the two evidence packs differ only on the mutated
+  line, that the line and its `int num` are in every pack, and that no comment-only text
+  reaches a prompt; the string literal "This should never happen" does (it is code).
+  Estimated cost of the run: 176 calls, about US$0.83 (the prompt's 288 calls counted 3
+  calls per case for the single agent). Also found the cause of the 8 Nov vector-store
+  wipe (the one-chunk checkpoint fixture under the new semantic default) and added the
+  guards in decision 30.
+
+### What I asked for
+
+Rebuild the step 5 mutation test without the old test's three faults: one deterministic,
+label-free set of constant-condition cases in both directions with a flip proof; mutants
+run from an overlay root of the real checkout, so their evidence matches the original's
+except the mutated line; step 5 in the registry with the same profile and commit on both
+sides and the Week 10 scoring (killed, survived, escalated, the precondition). Offline
+tests, documentation, and a fix so that no test can touch the real vector store. No model
+calls, no commits; changes staged only.
+
+### How I checked it
+
+The assistant ran the offline suite: 384 tests before, 408 after (2 skipped). It built
+the mutation set twice from the recorded scan and the Benchmark checkout (byte-identical),
+showed the step 5 plan without running it, and checked the evidence packs of all 22 real
+pairs with a stub knowledge base, in a temporary folder outside the repository.
+TODO (Darren): own checks.
+
+### What I kept or changed
+
+TODO (Darren)

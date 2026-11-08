@@ -3,6 +3,7 @@
 Offline: a keyword-based fake embedder stands in for fastembed, and a tiny
 catalogue and knowledge base are written to a temporary folder.
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 import hashlib
 import json
 import tempfile

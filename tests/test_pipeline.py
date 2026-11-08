@@ -1,5 +1,6 @@
 """End-to-end tests for the orchestration seam in triagebot.pipeline."""
 
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from pathlib import Path
 import json
 import tempfile

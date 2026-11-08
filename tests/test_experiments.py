@@ -5,6 +5,7 @@ benchmark checkout, the ingest fixtures' answer key, and case sets built from
 the ingest fixtures into a temporary data/samples/. The real registry
 (experiments/registry.json) is used throughout.
 """
+import isolated_store  # noqa: F401  (first: keeps every test off the real vector store)
 from contextlib import ExitStack, redirect_stderr, redirect_stdout
 import hashlib
 import io
@@ -147,7 +148,13 @@ class ExperimentTest(unittest.TestCase):
             self.assertEqual(by_id[step_id]["case_set"], "comparison")
             self.assertTrue(by_id[step_id]["question"])
         self.assertEqual((by_id["5"]["case_set"], by_id["6"]["case_set"]), ("mutation", "final-test"))
-        self.assertTrue(by_id["5"]["planned"])
+        self.assertNotIn("planned", by_id["5"])          # runnable since PROMPT_05 (decision 30)
+        for side in ("before", "after"):
+            self.assertEqual((by_id["5"][side]["profile"], by_id["5"][side]["modes"]),
+                             ("semantic", ["single", "council"]))
+        self.assertEqual((by_id["5"]["after"]["source"], by_id["5"]["after"]["labels"]), ("mutant", "flipped"))
+        self.assertNotIn("source", by_id["5"]["before"])
+        self.assertEqual((by_id["5"]["scoring"], by_id["5"]["same_commit"]), ("mutation", True))
         self.assertNotIn("planned", by_id["6"])          # runnable: the final version, run once
         self.assertEqual(by_id["6"]["before"], {"profile": "semantic", "modes": ["single"]})
         self.assertEqual(by_id["6"]["after"], {"profile": "semantic", "modes": ["council"]})
@@ -161,7 +168,7 @@ class ExperimentTest(unittest.TestCase):
             for step in experiments.load_registry():
                 self.assertIn(step["question"], printed)
             self.assertIn("not run yet", printed)
-            self.assertIn("planned (later task)", printed)
+            self.assertNotIn("planned (later task)", printed)     # every step is runnable
             code, printed, errors, _ = capture(cli.main, ["experiment", "show", "1"])
         self.assertEqual((code, errors), (0, ""))
         self.assertIn("No saved run for step 1 yet.", printed)
@@ -170,8 +177,11 @@ class ExperimentTest(unittest.TestCase):
     def test_planned_and_reused_sides_cannot_be_run(self):
         with self.assertRaisesRegex(experiments.ExperimentError, "reuses the saved run 1-after"):
             experiments.plan("2", side="before")
+        planned = [{"id": "9", "title": "Later", "question": "Later?", "case_set": "comparison",
+                    "planned": "later task"}]
         with self.assertRaisesRegex(experiments.ExperimentError, "not runnable yet"):
-            experiments.plan("5")
+            experiments.plan("9", registry=planned)
+        self.assertEqual(experiments.list_steps(registry=planned)[0]["state"], "planned (later task)")
         with self.assertRaisesRegex(experiments.ExperimentError, "--repeat must be 1"):
             experiments.plan("2", side="after", repeat=2)
         code, _, errors, _ = capture(cli.main, ["experiment", "show", "9"])
@@ -305,7 +315,7 @@ class ExperimentTest(unittest.TestCase):
         states = {row["step"]["id"]: row["state"] for row in experiments.list_steps()}
         self.assertEqual(states, {"1": "run", "1b": "not run yet", "1c": "not run yet",
                                   "2": "not run yet", "3": "not run yet",
-                                  "4": "not run yet", "5": "planned (later task)",
+                                  "4": "not run yet", "5": "not run yet",
                                   "6": "not run yet"})
         later = experiments.show_table("2")
         self.assertEqual(later["headers"], ["Measure", "Before C", "Before D"])

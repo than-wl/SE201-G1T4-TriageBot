@@ -20,7 +20,7 @@ apart from the cases we report.
 | `comparison` | development | 96 | CWE-22, CWE-78, CWE-79, CWE-89: 24 each (12 real, 12 safe) | The **comparison set**. Frozen. Steps 1 to 4 are measured on it, and nobody tunes on it. |
 | `final-test` | test | 120 | CWE-22, CWE-78, CWE-79, CWE-89: 30 each (15 real, 15 safe) | The **final test**. Run once, after the code freeze (step 6). |
 | `retired_cases.json` | both | 407 | Case IDs only | **Retired** cases: used by earlier runs, kept only as a record. |
-| mutation set | — | — | — | **Planned.** A rebuilt mutation test (step 5) will be added in a later task. |
+| `mutation` | development | 22 pairs | CWE-22: 2 real→safe, 3 safe→real; CWE-78: 3+3; CWE-79: 3+3; CWE-89: 3+2 | The **mutation set** (step 5): each original with its one-character mutant (`num > 200` to `num < 200`), which flips the right answer. No pilot, comparison or retired case. |
 
 - **Exploration set:** the pilot plus any other development case that is in no
   frozen set. This is where we read failures and try ideas.
@@ -32,6 +32,9 @@ apart from the cases we report.
   plus the 287-case audit list in `evidence/fresh-120/prior_case_audit.json`
   (which adds the one OpenRouter smoke-test case). They are never used for a
   new claim.
+- **Mutation set:** 3 pairs per direction per type were planned (24); two
+  strata have only 2 eligible cases, so it holds 22. The rules were not
+  widened (EXPERIMENTS.md, step 5).
 
 ## Files
 
@@ -47,6 +50,13 @@ Each set has two files:
   safe cases per CWE. These totals are evaluation-side; there is no per-case
   label.
 
+`mutation.json` also holds, per pair, the file, the line, the original and
+mutated expression, the evaluated values (the constants, the value of the
+expression, the condition before and after) and the SHA-256 of the original
+and mutated Java file. It holds no label either: the evaluation side takes each
+original's answer from the answer key and each mutant's as its flip. Its
+manifest counts the eligible and selected pairs per type and direction.
+
 Fingerprints are SHA-256 hashes of the file **with LF line endings**, so they
 are the same on Windows and macOS even if Git checks a file out with CRLF.
 `.gitattributes` keeps these files LF on checkout as well.
@@ -56,6 +66,7 @@ are the same on Windows and macOS even if Git checks a file out with CRLF.
 | `pilot` | `2b633145f724df28b6fffb112bbcce8304fbfa73d14aaa4100f4c8e7bebc578d` |
 | `comparison` | `311c5e73b3e909af005711a03a1aa04be69b060a13fe1923dc16dee615d7e91a` |
 | `final-test` | `3182ce45723df68a6932c2dfbf747811cf60a5fee3170c172a1222b575f7c543` |
+| `mutation` | `bbaee0f179038a4fccdae520f45ab885df812d69b0a984e822b57b1880d0f7cc` |
 
 ## How they are built
 
@@ -79,3 +90,14 @@ The builder stops with an error, and writes nothing, if:
 Running it twice gives byte-identical files. Rebuilding should never be needed;
 if the scan, the answer key or the split ever changed, the fingerprints would
 change too, and every earlier result would stop being comparable.
+
+The mutation set has its own command, because it also reads the Benchmark
+source (only the development-half candidates' files, after the split filter, so
+no final-test case is opened):
+
+```bash
+python -m triagebot.nodes.ingest.eval_sets mutation
+```
+
+It reads the pilot and comparison sets from this folder to exclude them, and
+writes only `mutation.json` and `mutation.manifest.json`.
