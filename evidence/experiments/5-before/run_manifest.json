@@ -1,0 +1,118 @@
+{
+  "benchmark_commit": "8b67a88d73b2594570fc21150705283de884620b",
+  "case_set": {
+    "cases": [
+      "BenchmarkTest00063",
+      "BenchmarkTest00064",
+      "BenchmarkTest00157",
+      "BenchmarkTest00294",
+      "BenchmarkTest00429",
+      "BenchmarkTest00658",
+      "BenchmarkTest00998",
+      "BenchmarkTest01053",
+      "BenchmarkTest01190",
+      "BenchmarkTest01290",
+      "BenchmarkTest01380",
+      "BenchmarkTest01473",
+      "BenchmarkTest01570",
+      "BenchmarkTest01587",
+      "BenchmarkTest01647",
+      "BenchmarkTest01693",
+      "BenchmarkTest01918",
+      "BenchmarkTest02070",
+      "BenchmarkTest02226",
+      "BenchmarkTest02560",
+      "BenchmarkTest02578",
+      "BenchmarkTest02657"
+    ],
+    "cases_in_set": 22,
+    "file": "data/samples/mutation.json",
+    "limit": null,
+    "name": "mutation",
+    "sha256": "bbaee0f179038a4fccdae520f45ab885df812d69b0a984e822b57b1880d0f7cc"
+  },
+  "configurations": [
+    "B-single-agent",
+    "C-council",
+    "D-validated-council"
+  ],
+  "finished_at": "2026-11-08T20:38:22+00:00",
+  "git": {
+    "commit": "e54eef660347b54b29209873b72eaf2596081fcd",
+    "dirty": false,
+    "dirty_paths": []
+  },
+  "labels": "answer key",
+  "max_tokens": 2000,
+  "model": {
+    "reported": [
+      "google/gemini-3.8-flash"
+    ],
+    "requested": "google/gemini-3.8-flash"
+  },
+  "modes": [
+    "single",
+    "council"
+  ],
+  "profile": {
+    "engineering_fixes": [
+      "strict JSON schema output",
+      "guidance-label normalisation in the validator",
+      "LangGraph council (Analyst || Skeptic -> Chair)",
+      "output token limit with room for hidden reasoning (2000)"
+    ],
+    "name": "semantic",
+    "settings": {
+      "KB_TARGET_PLATFORM": "java",
+      "MITRE_GUIDANCE_MAX_CHARS": 1500,
+      "RETRIEVAL_MODE": "semantic",
+      "REVIEW_WORKSHEET_ENABLED": false,
+      "SEMANTIC_GROUNDING": "mitre_record",
+      "SEMANTIC_KB_SCOPE": true,
+      "SEMANTIC_MAX_CHUNK_CHARS": 1800,
+      "SEMANTIC_MITRE_GUIDANCE": true,
+      "SEMANTIC_QUERY_ALT_TERMS": true,
+      "SOURCE_RELATED_ENABLED": true,
+      "SOURCE_WINDOW_LINES": 60
+    }
+  },
+  "question": "Does the verdict follow the code?",
+  "repeat": 1,
+  "retrieval": {
+    "cwe_catalogue_sha256": "bcda44c9abf61ff977f50c3c6649eea5a97a7b0626b0396c2c3ec4bfb973a3dc",
+    "embedding_model": "BAAI/bge-small-en-v1.5",
+    "guidance_max_chars": 4000,
+    "kb_scope_file": "triagebot/nodes/context/kb/scope.json",
+    "kb_scope_sha256": "acfbe052644b6ca6103bddf36449f3c91c604c7c4dc8904f99b9043b07644dcf",
+    "min_score": 0.0,
+    "query_max_chars": 1000,
+    "top_k": 6
+  },
+  "run": "5-before",
+  "sessions": [
+    {
+      "cases_before": 0,
+      "finished_at": "2026-11-08T20:38:22+00:00",
+      "git_commit": "e54eef660347b54b29209873b72eaf2596081fcd",
+      "git_dirty": false,
+      "started_at": "2026-11-08T20:27:13+00:00"
+    }
+  ],
+  "side": "before",
+  "source": {
+    "kind": "benchmark",
+    "note": "the Benchmark checkout, unchanged"
+  },
+  "started_at": "2026-11-08T20:27:13+00:00",
+  "status": "complete",
+  "step": "5",
+  "temperature": 0.0,
+  "title": "Mutation test",
+  "totals": {
+    "completion_tokens": 44600,
+    "cost_usd": 0.414383,
+    "failed_calls": 0,
+    "model_calls": 88,
+    "prompt_tokens": 329511
+  }
+}

@@ -1,0 +1,868 @@
+{
+  "model": "google/gemini-3.8-flash",
+  "results": [
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00063",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00063.java",
+          "line": 69,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00063.java",
+          "line": 71,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00063.java",
+          "line": 78,
+          "quote": "fis = new java.io.FileInputStream(new java.io.File(fileName));"
+        }
+      ],
+      "explanation": "The alert is a false positive because user input from the cookie never reaches the file creation sink. Line 71 uses a constant condition (7 * 18 + 106 = 232 > 200) that always evaluates to true, assigning the hardcoded constant 'This_should_always_happen' to bar.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 10.524,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 408,
+        "cost": 0.004569,
+        "prompt_tokens": 4052,
+        "total_tokens": 4460
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00064",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00064.java",
+          "line": 69,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00064.java",
+          "line": 71,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00064.java",
+          "line": 79,
+          "quote": "fos = new java.io.FileOutputStream(fileName);"
+        }
+      ],
+      "explanation": "The variable `bar` assigned on line 71 always evaluates to the constant string \"This_should_always_happen\" because `(7 * 18) + 106` equals `232`, which is strictly greater than 200. Consequently, the user-supplied cookie value in `param` is never reached or used in the FileOutputStream sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 7.497,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 408,
+        "cost": 0.00440025,
+        "prompt_tokens": 3827,
+        "total_tokens": 4235
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00157",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00157.java",
+          "line": 45,
+          "quote": "param = request.getHeader(\"Referer\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00157.java",
+          "line": 56,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00157.java",
+          "line": 59,
+          "quote": "response.getWriter().write(bar);"
+        }
+      ],
+      "explanation": "Untrusted input from the HTTP 'Referer' header is assigned to 'param' and decoded. The condition '(7 * 42) - num > 200' evaluates to false (188 > 200), causing 'bar' to hold the unescaped input, which is directly written to the HTML response.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java_Security_Cheat_Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 12.385,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 946,
+        "cost": 0.00536925,
+        "prompt_tokens": 2429,
+        "total_tokens": 3375
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00294",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00294.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"BenchmarkTest00294\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00294.java",
+          "line": 58,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00294.java",
+          "line": 70,
+          "quote": "argList.add(\"echo \" + bar);"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00294.java",
+          "line": 72,
+          "quote": "ProcessBuilder pb = new ProcessBuilder(argList);"
+        }
+      ],
+      "explanation": "The ternary expression `(7 * 42) - num > 200` evaluates at compile/runtime to `294 - 106 > 200` (which is `188 > 200`, evaluating to false). As a result, `bar` is assigned the user input `param`, which is concatenated into a shell invocation (`cmd.exe /c` or `sh -c`) without validation, allowing arbitrary command execution.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        },
+        {
+          "chunk_id": "OS_Command_Injection_Defense_Cheat_Sheet#001",
+          "doc": "OS Command Injection Defense Cheat Sheet",
+          "section": "Introduction",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/OS_Command_Injection_Defense_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 10.293,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 558,
+        "cost": 0.00440025,
+        "prompt_tokens": 3077,
+        "total_tokens": 3635
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00429",
+      "citations": [],
+      "explanation": "The alert is a false positive because the user-controlled parameter 'param' is unreachable at the SQL sink. The ternary expression evaluates (7 * 42) - num > 200 with num = 106, which calculates 294 - 106 = 188 > 200 (false), but actually 188 > 200 evaluates to false, wait: 7 * 42 = 294. 294 - 106 = 188. 188 > 200 is FALSE! When false, ternary expression takes the false branch: 'param'!",
+      "guidance": [],
+      "latency_seconds": 5.064,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 175,
+        "cost": 0.003471,
+        "prompt_tokens": 3753,
+        "total_tokens": 3928
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00658",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00658.java",
+          "line": 51,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00658.java",
+          "line": 53,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00658.java",
+          "line": 64,
+          "quote": "Process p = r.exec(cmd + bar);"
+        }
+      ],
+      "explanation": "The alert is a false positive because the variable 'bar' never receives the user-controlled input 'param'. The ternary condition evaluates (7 * 18) + 106 = 126 + 106 = 232, which is statically greater than 200, constantly resolving 'bar' to the safe hardcoded string 'This_should_always_happen'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 10.237,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 414,
+        "cost": 0.003924,
+        "prompt_tokens": 3162,
+        "total_tokens": 3576
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest00998",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00998.java",
+          "line": 61,
+          "quote": "param = java.net.URLDecoder.decode(theCookie.getValue(), \"UTF-8\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00998.java",
+          "line": 98,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00998.java",
+          "line": 69,
+          "quote": "String sql = \"{call \" + bar + \"}\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest00998.java",
+          "line": 75,
+          "quote": "connection.prepareCall("
+        }
+      ],
+      "explanation": "User-supplied cookie data is decoded into 'param' and returned by 'doSomething' because (7 * 42) - 106 = 188, which is not greater than 200. This unvalidated input is directly concatenated into a SQL stored procedure call and executed via CallableStatement.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 11.838,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 984,
+        "cost": 0.0067695,
+        "prompt_tokens": 4106,
+        "total_tokens": 5090
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01053",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01053.java",
+          "line": 65,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01053.java",
+          "line": 67,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01053.java",
+          "line": 54,
+          "quote": "response.getWriter().println(bar);"
+        }
+      ],
+      "explanation": "Although the 'Referer' header is extracted and decoded, the ternary operation '(7 * 18) + num > 200' evaluates statically to true (126 + 106 = 232 > 200), ensuring 'bar' is always the constant string 'This_should_always_happen'. Thus, untrusted user input never reaches the response writer.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 7.916,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 409,
+        "cost": 0.0034545,
+        "prompt_tokens": 2561,
+        "total_tokens": 2970
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01190",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01190.java",
+          "line": 59,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01190.java",
+          "line": 64,
+          "quote": "Process p = r.exec(args, argsEnv);"
+        }
+      ],
+      "explanation": "The HTTP header value is passed via argsEnv to Runtime.exec(args, argsEnv) rather than as a command argument. In Java, Runtime.exec(String[] cmdarray, String[] envp) sets environment variables in the format name=value; passing an unformatted string does not set an environment variable or alter the executed script path, and even if parsed as an environment variable, FOO is evaluated in the script rather than the passed raw string.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 9.432,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 342,
+        "cost": 0.0037395,
+        "prompt_tokens": 3276,
+        "total_tokens": 3618
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01290",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01290.java",
+          "line": 74,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01290.java",
+          "line": 76,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01290.java",
+          "line": 56,
+          "quote": "Process p = r.exec(cmd, argsEnv);"
+        }
+      ],
+      "explanation": "The user input param is not passed to the command execution sink because the condition (7 * 18) + num > 200 (126 + 106 = 232 > 200) always evaluates to true, replacing bar with the constant string 'This_should_always_happen'. Consequently, untrusted HTTP input never flows into argsEnv or Runtime.exec().",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "section": "Description",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 8.904,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 414,
+        "cost": 0.0039675,
+        "prompt_tokens": 3220,
+        "total_tokens": 3634
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01380",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01380.java",
+          "line": 80,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01380.java",
+          "line": 82,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01380.java",
+          "line": 52,
+          "quote": "String sql = \"{call \" + bar + \"}\";"
+        }
+      ],
+      "explanation": "The alert is a false positive because user input is never included in the executed SQL call. In Test.doSomething, the condition `(7 * 18) + num > 200` evaluates to `126 + 106 = 232 > 200`, which is always true, ensuring that `bar` is hardcoded to the constant 'This_should_always_happen'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 9.981,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 422,
+        "cost": 0.00452925,
+        "prompt_tokens": 3929,
+        "total_tokens": 4351
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01473",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01473.java",
+          "line": 47,
+          "quote": "String name = (String) names.nextElement();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01473.java",
+          "line": 53,
+          "quote": "param = name;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01473.java",
+          "line": 86,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01473.java",
+          "line": 62,
+          "quote": "String sql = \"SELECT * from USERS where USERNAME='foo' and PASSWORD='\" + bar + \"'\";"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01473.java",
+          "line": 67,
+          "quote": "statement.execute(sql, new int[] {1, 2});"
+        }
+      ],
+      "explanation": "In method doSomething, the condition `(7 * 42) - num > 200` calculates to `294 - 106 = 188 > 200`, which is false, but wait: 7 * 42 = 294. 294 - 106 = 188. 188 > 200 is false. When false, the ternary selects `param`! Let's check math: 7 * 40 = 280, 7 * 2 = 14 -> 294. 294 - 106 = 188. 188 > 200 is false. Therefore `bar = param`. Wait! param is the parameter name where value == 'BenchmarkTest01473'. The parameter name `name` is user-controlled via HTTP request parameter names! So `param` is tainted. Wait, then `bar` is tainted! And `sql` concatenates `bar` into `SELECT * from USERS where USERNAME='foo' and PASSWORD='` + bar + `'`. And statement.execute(sql) executes it! So this is a true positive!",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 11.459,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 688,
+        "cost": 0.00550275,
+        "prompt_tokens": 3897,
+        "total_tokens": 4585
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01570",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01570.java",
+          "line": 77,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01570.java",
+          "line": 79,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01570.java",
+          "line": 52,
+          "quote": "new java.io.File(org.owasp.benchmark.helpers.Utils.TESTFILES_DIR), bar);"
+        }
+      ],
+      "explanation": "The user input passed via the 'param' parameter is never actually used to construct the file path. The condition '(7 * 18) + num > 200' evaluates to '126 + 106 > 200' (232 > 200), which is statically true, causing 'bar' to always be assigned the constant string 'This_should_always_happen'.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "section": "Mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 12.787,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 432,
+        "cost": 0.00432975,
+        "prompt_tokens": 3613,
+        "total_tokens": 4045
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01587",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01587.java",
+          "line": 43,
+          "quote": "String[] values = request.getParameterValues(\"BenchmarkTest01587\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01587.java",
+          "line": 65,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01587.java",
+          "line": 52,
+          "quote": "response.getWriter().printf(java.util.Locale.US, bar, obj);"
+        }
+      ],
+      "explanation": "User input retrieved from request.getParameterValues is returned unchanged by Test.doSomething because (7 * 42) - 106 equals 188, which is not greater than 200. The unsanitized value is then written directly to the HTTP response via response.getWriter().printf, resulting in reflected XSS.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java Security Cheat Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 13.823,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 842,
+        "cost": 0.00504825,
+        "prompt_tokens": 2521,
+        "total_tokens": 3363
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01647",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01647.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01647.java",
+          "line": 109,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01647.java",
+          "line": 78,
+          "quote": "fos = new java.io.FileOutputStream(fileName, false);"
+        }
+      ],
+      "explanation": "In Test.doSomething, the ternary expression (7 * 42) - num > 200 evaluates (294 - 106) = 188 > 200, which is always false, but wait: (7 * 42) is 294, 294 - 106 = 188. 188 > 200 is false, so it evaluates to param! Wait, let's recalculate: 7 * 42 = 294. 294 - 106 = 188. 188 > 200 is false. Therefore, the ternary condition is false, returning param! Since param is returned, user input from the query string reaches FileOutputStream without validation.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-22",
+          "doc": "CWE-22: Improper Limitation of a Pathname to a Restricted Directory",
+          "section": "https://cwe.mitre.org/data/definitions/22.html",
+          "url": "https://cwe.mitre.org/data/definitions/22.html"
+        }
+      ],
+      "latency_seconds": 10.35,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 517,
+        "cost": 0.00486525,
+        "prompt_tokens": 3902,
+        "total_tokens": 4419
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01693",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01693.java",
+          "line": 101,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01693.java",
+          "line": 103,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01693.java",
+          "line": 83,
+          "quote": "r.exec(cmd + bar, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "The alert is a false positive because user input does not reach the command execution sink. In Test.doSomething, the condition `(7 * 18) + num > 200` evaluates to 126 + 106 = 232 > 200, which is always true, causing `bar` to be assigned the constant string 'This_should_always_happen' rather than the tainted parameter.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 8.7,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 443,
+        "cost": 0.0043035,
+        "prompt_tokens": 3523,
+        "total_tokens": 3966
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest01918",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01918.java",
+          "line": 64,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest01918.java",
+          "line": 66,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        }
+      ],
+      "explanation": "Although user input is read from the Referer header, the helper method doSomething evaluates a compile-time constant condition ((7 * 18) + num > 200 with num = 106, evaluating to 232 > 200, which is always true) that always returns a constant string rather than the user-supplied parameter.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 11.628,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 339,
+        "cost": 0.003201,
+        "prompt_tokens": 2573,
+        "total_tokens": 2912
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02070",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02070.java",
+          "line": 44,
+          "quote": "java.util.Enumeration<String> headers = request.getHeaders(\"BenchmarkTest02070\");"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02070.java",
+          "line": 58,
+          "quote": "String[] argsEnv = {bar};"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02070.java",
+          "line": 61,
+          "quote": "Process p = r.exec(cmd, argsEnv, new java.io.File(System.getProperty(\"user.dir\")));"
+        }
+      ],
+      "explanation": "Although the HTTP header input reaches the `argsEnv` parameter of `Runtime.getRuntime().exec()`, the command string itself is a static script path and not user-controlled. Furthermore, in `Runtime.exec(String command, String[] envp, File dir)`, `argsEnv` defines environment variables in the format `name=value`, but `bar` contains raw user input without an environment variable assignment (e.g. `FOO=...`), rendering it inert rather than a command injection sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-78",
+          "doc": "CWE-78: Improper Neutralization of Special Elements used in an OS Command",
+          "section": "The product constructs all or part of an OS command using externally-influenced input",
+          "url": "https://cwe.mitre.org/data/definitions/78.html"
+        }
+      ],
+      "latency_seconds": 10.45,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 432,
+        "cost": 0.00407475,
+        "prompt_tokens": 3273,
+        "total_tokens": 3705
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02226",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02226.java",
+          "line": 62,
+          "quote": "int num = 106;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02226.java",
+          "line": 64,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02226.java",
+          "line": 53,
+          "quote": "response.getWriter().print(bar.toCharArray());"
+        }
+      ],
+      "explanation": "The alert flags line 53 for writing user input directly to the response; however, `bar` is evaluated in `doSomething` where the ternary condition `(7 * 18) + num > 200` simplifies to `126 + 106 = 232 > 200`, which is always true. As a result, `bar` is assigned the constant string 'This_should_always_happen' and untrusted `param` cannot reach the response writer.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        }
+      ],
+      "latency_seconds": 10.136,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 436,
+        "cost": 0.003534,
+        "prompt_tokens": 2532,
+        "total_tokens": 2968
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02560",
+      "citations": [],
+      "explanation": "In doSomething(), the ternary condition '(7 * 42) - num > 200' evaluates with 7 * 42 = 294, and 294 - 106 = 188. Because 188 > 200 evaluates to false, the return value is param. Wait, (7 * 42) - 106 = 294 - 106 = 188. 188 > 200 is FALSE, so bar is assigned param! Since bar is param, untrusted input reaches FileInputStream directly without validation.",
+      "guidance": [],
+      "latency_seconds": 11.328,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 167,
+        "cost": 0.00367275,
+        "prompt_tokens": 4062,
+        "total_tokens": 4229
+      },
+      "verdict": "false_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02578",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02578.java",
+          "line": 43,
+          "quote": "String queryString = request.getQueryString();"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02578.java",
+          "line": 85,
+          "quote": "bar = (7 * 42) - num > 200 ? \"This should never happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02578.java",
+          "line": 74,
+          "quote": "response.getWriter().format(java.util.Locale.US, bar, obj);"
+        }
+      ],
+      "explanation": "User input from the query string is extracted, decoded, and passed to doSomething(), where the condition evaluating (7 * 42) - 106 > 200 (188 > 200) is false, causing the untrusted string to be returned and written directly to the HTTP response without sanitization or encoding.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-79",
+          "doc": "CWE-79: Improper Neutralization of Input During Web Page Generation",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/79.html"
+        },
+        {
+          "chunk_id": "Java_Security_Cheat_Sheet#018",
+          "doc": "Java Security Cheat Sheet",
+          "section": "Specific Injection types > HTML/JavaScript/CSS > How to prevent",
+          "url": "https://cheatsheetseries.owasp.org/cheatsheets/Java_Security_Cheat_Sheet.html"
+        }
+      ],
+      "latency_seconds": 11.863,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 793,
+        "cost": 0.00504225,
+        "prompt_tokens": 2758,
+        "total_tokens": 3551
+      },
+      "verdict": "true_positive"
+    },
+    {
+      "analysis": {},
+      "case_id": "BenchmarkTest02657",
+      "citations": [
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02657.java",
+          "line": 94,
+          "quote": "bar = (7 * 18) + num > 200 ? \"This_should_always_happen\" : param;"
+        },
+        {
+          "file": "src/main/java/org/owasp/benchmark/testcode/BenchmarkTest02657.java",
+          "line": 72,
+          "quote": "String sql = \"INSERT INTO users (username, password) VALUES ('foo','\" + bar + \"')\";"
+        }
+      ],
+      "explanation": "Although user input is read from the query string, method doSomething() always returns the constant string 'This_should_always_happen' because (7 * 18) + 106 equals 232, which is strictly greater than 200. Consequently, tainted input never reaches the SQL statement concatenation or execution sink.",
+      "guidance": [
+        {
+          "chunk_id": "MITRE-CWE-89",
+          "doc": "CWE-89: Improper Neutralization of Special Elements used in an SQL Command",
+          "section": "Potential mitigations",
+          "url": "https://cwe.mitre.org/data/definitions/89.html"
+        }
+      ],
+      "latency_seconds": 9.496,
+      "model": "google/gemini-3.8-flash",
+      "role": "single",
+      "usage": {
+        "completion_tokens": 353,
+        "cost": 0.00404175,
+        "prompt_tokens": 3624,
+        "total_tokens": 3977
+      },
+      "verdict": "false_positive"
+    }
+  ]
+}

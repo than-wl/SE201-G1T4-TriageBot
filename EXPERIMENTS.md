@@ -102,8 +102,12 @@ benchmark for the four types, Semgrep plus the council keeps precision at
 almost every remaining miss is one Semgrep never flagged. Semgrep is now the
 bottleneck.
 
-**Next:** step 5, the rebuilt mutation test (runnable, not run yet), checks
-that verdicts follow the code.
+**7. The council's verdicts follow the code; the single agent's often do not
+(step 5).** In 22 pairs, one character was changed so that the right answer
+flipped while Semgrep's alert stayed the same. The council flipped its verdict
+correctly in all 22 (mutation score 100%); the single agent in 8 of the 15
+pairs it got right to begin with (53%), mostly by calling real cases safe. It
+is the clearest evidence of what the council's extra cost buys.
 
 ## Why we split the cases
 
@@ -663,7 +667,7 @@ verdicts is what the paid run measures.
   (88 per side: 22 single + 66 council), about US$0.83, from the per-case
   costs recorded for step 6 (US$0.0043 single, US$0.0146 council; registry
   `cost_per_case`).
-- **Status:** runnable; not run yet.
+- **Status:** run on 9 Nov 2026.
 - **Commands:**
   - rebuild the set (free; needs the Benchmark):
     `python -m triagebot.nodes.ingest.eval_sets mutation`
@@ -672,8 +676,37 @@ verdicts is what the paid run measures.
   - run (paid, asks first; commit first): `python -m triagebot experiment run 5`
   - show: `python -m triagebot experiment show 5`
   - replay: `python -m triagebot experiment replay 5`
-- **Result:** _to be filled in after the run._
-- **Finding:** _to be filled in after the run._
+- **Result:** mutation score (killed / pairs whose original was judged right),
+  22 pairs, US$0.83 in total:
+
+  | | Single agent | Council (raw and validated) |
+  | --- | ---: | ---: |
+  | Originals judged right | 15 of 22 | 22 of 22 |
+  | Killed (verdict flipped correctly) | 8 | 22 |
+  | Survived (verdict unchanged) | 6 | 0 |
+  | Escalated to a human | 1 | 0 |
+  | **Mutation score** | **53.3%** | **100%** |
+  | real → safe / safe → real | 4 of 4 / 4 of 11 | 11 of 11 / 11 of 11 |
+
+  Before any mutation, the single agent already dismissed 7 of the 11 real
+  originals; on the mutants that became real, it dismissed 6 of 11.
+- **Finding:** on this pattern, the council follows the code and the single
+  agent does not.
+  - *The council killed all 22 mutants.* One changed character flipped its
+    verdict every time, in both directions, with the same alert from Semgrep.
+  - *The single agent leans towards "safe" on this pattern.* It called 7 of 11
+    real originals safe, and when a mutation made a safe case real it kept
+    calling it safe in 6 of 11 pairs. Its verdict did not follow the condition
+    that decides the answer. This matches step 6, where it dismissed 10 of 60
+    real vulnerabilities.
+  - *100% here is not a guarantee.* In step 4 the council dismissed
+    `BenchmarkTest01983`, a real case with this same pattern, with a plausible
+    but incomplete argument. 22 pairs show the council usually evaluates the
+    condition, not that it always does.
+  - *The old mutation test's conclusion survived a fair rebuild; its numbers
+    did not.* It reported 0 of 5 against 5 of 5 on mismatched baselines. With
+    the same commit, evidence and settings on both sides and both directions,
+    the gap is 53% against 100%.
 
 ### Step 6: Headline result
 

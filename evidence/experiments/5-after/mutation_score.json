@@ -1,0 +1,570 @@
+{
+  "after": "5-after",
+  "before": "5-before",
+  "case_set_sha256": "bbaee0f179038a4fccdae520f45ab885df812d69b0a984e822b57b1880d0f7cc",
+  "cases": 22,
+  "commits": {
+    "after": "e54eef660347b54b29209873b72eaf2596081fcd",
+    "before": "e54eef660347b54b29209873b72eaf2596081fcd"
+  },
+  "configurations": {
+    "B-single-agent": {
+      "overall": {
+        "escalated": 1,
+        "excluded_original_wrong": 7,
+        "killed": 8,
+        "mutation_score": 0.5333,
+        "pairs": 22,
+        "precondition_met": 15,
+        "survived": 6
+      },
+      "pairs": [
+        {
+          "case_id": "BenchmarkTest00063",
+          "direction": "safe_to_real",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "survived"
+        },
+        {
+          "case_id": "BenchmarkTest00064",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00157",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00294",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "excluded_original_wrong"
+        },
+        {
+          "case_id": "BenchmarkTest00429",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "excluded_original_wrong"
+        },
+        {
+          "case_id": "BenchmarkTest00658",
+          "direction": "safe_to_real",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "survived"
+        },
+        {
+          "case_id": "BenchmarkTest00998",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01053",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01190",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "excluded_original_wrong"
+        },
+        {
+          "case_id": "BenchmarkTest01290",
+          "direction": "safe_to_real",
+          "mutant": "human_review",
+          "original": "false_positive",
+          "outcome": "escalated"
+        },
+        {
+          "case_id": "BenchmarkTest01380",
+          "direction": "safe_to_real",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "survived"
+        },
+        {
+          "case_id": "BenchmarkTest01473",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "excluded_original_wrong"
+        },
+        {
+          "case_id": "BenchmarkTest01570",
+          "direction": "safe_to_real",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "survived"
+        },
+        {
+          "case_id": "BenchmarkTest01587",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01647",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "excluded_original_wrong"
+        },
+        {
+          "case_id": "BenchmarkTest01693",
+          "direction": "safe_to_real",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "survived"
+        },
+        {
+          "case_id": "BenchmarkTest01918",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02070",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "excluded_original_wrong"
+        },
+        {
+          "case_id": "BenchmarkTest02226",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02560",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "excluded_original_wrong"
+        },
+        {
+          "case_id": "BenchmarkTest02578",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02657",
+          "direction": "safe_to_real",
+          "mutant": "false_positive",
+          "original": "false_positive",
+          "outcome": "survived"
+        }
+      ],
+      "real_to_safe": {
+        "escalated": 0,
+        "excluded_original_wrong": 7,
+        "killed": 4,
+        "mutation_score": 1.0,
+        "pairs": 11,
+        "precondition_met": 4,
+        "survived": 0
+      },
+      "safe_to_real": {
+        "escalated": 1,
+        "excluded_original_wrong": 0,
+        "killed": 4,
+        "mutation_score": 0.3636,
+        "pairs": 11,
+        "precondition_met": 11,
+        "survived": 6
+      }
+    },
+    "C-council": {
+      "overall": {
+        "escalated": 0,
+        "excluded_original_wrong": 0,
+        "killed": 22,
+        "mutation_score": 1.0,
+        "pairs": 22,
+        "precondition_met": 22,
+        "survived": 0
+      },
+      "pairs": [
+        {
+          "case_id": "BenchmarkTest00063",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00064",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00157",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00294",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00429",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00658",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00998",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01053",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01190",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01290",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01380",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01473",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01570",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01587",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01647",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01693",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01918",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02070",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02226",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02560",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02578",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02657",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        }
+      ],
+      "real_to_safe": {
+        "escalated": 0,
+        "excluded_original_wrong": 0,
+        "killed": 11,
+        "mutation_score": 1.0,
+        "pairs": 11,
+        "precondition_met": 11,
+        "survived": 0
+      },
+      "safe_to_real": {
+        "escalated": 0,
+        "excluded_original_wrong": 0,
+        "killed": 11,
+        "mutation_score": 1.0,
+        "pairs": 11,
+        "precondition_met": 11,
+        "survived": 0
+      }
+    },
+    "D-validated-council": {
+      "overall": {
+        "escalated": 0,
+        "excluded_original_wrong": 0,
+        "killed": 22,
+        "mutation_score": 1.0,
+        "pairs": 22,
+        "precondition_met": 22,
+        "survived": 0
+      },
+      "pairs": [
+        {
+          "case_id": "BenchmarkTest00063",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00064",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00157",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00294",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00429",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00658",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest00998",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01053",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01190",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01290",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01380",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01473",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01570",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01587",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01647",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01693",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest01918",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02070",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02226",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02560",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02578",
+          "direction": "real_to_safe",
+          "mutant": "false_positive",
+          "original": "true_positive",
+          "outcome": "killed"
+        },
+        {
+          "case_id": "BenchmarkTest02657",
+          "direction": "safe_to_real",
+          "mutant": "true_positive",
+          "original": "false_positive",
+          "outcome": "killed"
+        }
+      ],
+      "real_to_safe": {
+        "escalated": 0,
+        "excluded_original_wrong": 0,
+        "killed": 11,
+        "mutation_score": 1.0,
+        "pairs": 11,
+        "precondition_met": 11,
+        "survived": 0
+      },
+      "safe_to_real": {
+        "escalated": 0,
+        "excluded_original_wrong": 0,
+        "killed": 11,
+        "mutation_score": 1.0,
+        "pairs": 11,
+        "precondition_met": 11,
+        "survived": 0
+      }
+    }
+  },
+  "note": "A pair counts only if the original was judged right; escalated is not a kill.",
+  "same_commit": true,
+  "step": "5"
+}
