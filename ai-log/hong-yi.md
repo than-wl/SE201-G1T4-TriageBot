@@ -467,7 +467,8 @@ not claimed for it until the comparison is re-run. No paid model calls were made
 ## 2026-11-08 — Pre-submission review against the rubric and instructor feedback
 
 - **Tool (model):** Claude Code (Claude Opus 5.5)
-- **Files:** IMPROVEMENTS.md; presentation slide 10 (draft, outside the repository)
+- **Files:** presentation slide 10 (draft, outside the repository); IMPROVEMENTS.md
+  (working notes, later removed from the repository)
 - **Outcome:** Changed
 
 ### What I asked for
@@ -494,9 +495,10 @@ who both said false alarm (all 4 were real vulnerabilities).
 
 ### What I kept or changed
 
-Kept: `IMPROVEMENTS.md` item 1 (end-to-end recall is capped by Semgrep's recall,
-per the instructor's feedback) and item 2 (keep the 11-CWE scope and present
-retrieval as an upgrade from the CWE map, not a scope expansion). Kept the
+Kept two conclusions for the presentation: end-to-end recall is capped by
+Semgrep's recall, per the instructor's feedback; and the 11-CWE scope stays, with
+retrieval presented as an upgrade from the CWE map, not a scope expansion. The
+working notes in `IMPROVEMENTS.md` were removed before merging. Kept the
 slide 10 structure; replaced the draft's unverified "usually kept the alert" with
 the recomputed figures. Rejected the assistant's first framing of TriageBot as
 giving developers "peace of mind", because our own results say it should not close
