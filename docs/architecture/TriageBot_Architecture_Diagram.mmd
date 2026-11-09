@@ -6,7 +6,7 @@ flowchart LR
       direction TB
       WINDOW["Alert source window"]
       RELATED["Referenced Java helpers and\nlocal shell or batch resources"]
-      GUIDE["CWE guidance retrieval\nkeyword or optional semantic SQLite index"]
+      GUIDE["Semantic guidance retrieval\nOWASP Cheat Sheets, anchored on the MITRE CWE record"]
     end
 
     NORM --> WINDOW
@@ -18,19 +18,18 @@ flowchart LR
       A["Analyst\nargues the likely verdict"]
       S["Skeptic\nchallenges weak evidence"]
       C["Chair\ncombines both reviews"]
-      R["Consistency repair\nresolves verdict/evidence conflicts"]
       V["Deterministic validator\nchecks schema and exact citations"]
       A --> C
       S --> C
-      C --> R --> V
+      C --> V
     end
 
     EVIDENCE --> A
     EVIDENCE --> S
+    EVIDENCE --> C
     OR["OpenRouter\ngoogle/gemini-3.8-flash\ntemperature 0"] --> A
     OR --> S
     OR --> C
-    OR --> R
 
     V --> TP["true_positive"]
     V --> FP["false_positive"]
@@ -41,7 +40,7 @@ flowchart LR
 
     subgraph EVAL["Evaluation only - labels never enter model prompts"]
       KEY["OWASP answer key"]
-      SPLIT["Frozen held-out sample\n60 genuine + 60 safe across 6 CWEs"]
+      SPLIT["Frozen held-out sample\n60 genuine + 60 safe across 4 CWEs"]
       SCORE["Precision, recall, F1,\nper-CWE failures, cost and latency"]
       KEY --> SPLIT --> SCORE
     end
