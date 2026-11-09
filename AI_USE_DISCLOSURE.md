@@ -3,6 +3,23 @@
 This document is the index for TriageBot's final AI-use evidence. It does not
 replace the five members' detailed logs.
 
+## Team declaration
+
+We used AI coding assistants to write and revise TriageBot's code, tests and
+documentation: Claude Code (with Claude Opus 5.5, Claude Sonnet 5.5 and
+mimo-v2.6-flash), OpenAI Codex (GPT-5) and DeepSeek (v4.1 flash). Claude, used
+in chat, helped plan the experiments, write the prompts given to Claude Code,
+review results, and draft the slides, their figures and the speaker notes.
+Claude Sonnet 5.5 and Claude Haiku 5.5 helped build the semantic retrieval and
+graded candidate passages for relevance; those grades are AI-produced, were not
+reviewed by a person, and are reported that way. Every AI-written change was
+reviewed by the member who committed it and checked by running the offline
+tests, replaying recorded runs, and comparing reported figures with the run
+manifests in `evidence/experiments/`. In the final phase Claude Code only
+staged changes; a team member made every commit and started every paid model
+run. Each use, including where the AI got it wrong, is recorded in the
+`ai-log/` folder.
+
 ## Runtime AI in the product
 
 The recorded evaluations used `google/gemini-3.8-flash` through OpenRouter at
@@ -22,7 +39,7 @@ validated exact citations, and converted unsupported output to `human_review`.
 | Member | Detailed record | Main recorded contribution areas |
 | --- | --- | --- |
 | Bradley | [ai-log/bradley.md](ai-log/bradley.md) | Evaluation/scoring harness, mutation-style tests, checkpoint report draft |
-| Darren | [ai-log/darren.md](ai-log/darren.md) | Ingest and Semgrep baseline, CLI/setup/CI, repository documentation |
+| Darren | [ai-log/darren.md](ai-log/darren.md) | Ingest and Semgrep baseline, CLI/setup/CI, repository documentation | Testing
 | Hong Yi | [ai-log/hong-yi.md](ai-log/hong-yi.md) | Shared contracts, retrieval/context, review roles, LangGraph and SQLite sessions, semantic retrieval |
 | Lisa | [ai-log/lisa.md](ai-log/lisa.md) | Deterministic schema/citation validation and disclosure documentation |
 | Wei Lin | [ai-log/wei-lin.md](ai-log/wei-lin.md) | Integration, evaluations, measured architecture improvements, final reporting |

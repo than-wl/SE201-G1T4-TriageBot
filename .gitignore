@@ -31,3 +31,5 @@ __pycache__/
 
 # Personal prompt files for coding assistants (not shared)
 *.local.md
+
+Context/*.zip
