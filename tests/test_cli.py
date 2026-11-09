@@ -184,7 +184,7 @@ class Menu(TempDir):
         self.assertIn("up to 4 model calls per finding", printed)
 
     def test_invalid_input_reprompts(self):
-        code, printed, prompts = self.run_menu("x", "", "6", "q")
+        code, printed, prompts = self.run_menu("x", "", "9", "q")
         self.assertEqual((code, prompts), (0, 4))
         self.assertIn("Unknown option 'x'", printed)
         self.assertNotIn("not yet available", printed.lower())

@@ -464,6 +464,90 @@ and recorded in design decision 22. Two limitations remain: durable runs fingerp
 alert's own file, and the teammate's reported numbers were produced before the graph and are
 not claimed for it until the comparison is re-run. No paid model calls were made.
 
+## 2026-11-08 — Pre-submission review against the rubric and instructor feedback
+
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** IMPROVEMENTS.md; presentation slide 10 (draft, outside the repository)
+- **Outcome:** Changed
+
+### What I asked for
+
+Read the project brief, rubric, AI-use policy, the instructor's proposal feedback
+and the lecture slides, then review the repository against them: walk the
+end-to-end flow with a scenario and list where the project is weak. Record the
+agreed improvements, and suggest better content for the bottom row of slide 10
+(the council), with a layout mock-up.
+
+### How I checked it
+
+Traced each claim back to code or saved runs before keeping it. Three claims from
+the assistant were wrong or out of date and were corrected after checking: semantic
+retrieval was described as off by default, but `config.py` on the current branch
+had already switched to it; the checkpoint was assumed to cover all 11 CWE
+categories, but `CHECKPOINT_REPORT.md` shows it covered CWE-89 only; and the
+"broader Semgrep rules raise recall to 88.3%" figure has no committed scan behind
+it. I recomputed the council behaviour on the slide from
+`evidence/experiments/6-after/results.jsonl` instead of using the draft's "usually
+kept the alert": 105 of 120 cases unanimous, 11 split (the Chair kept the alert
+in all 11, 10 correctly), and 4 cases where the Chair overruled two specialists
+who both said false alarm (all 4 were real vulnerabilities).
+
+### What I kept or changed
+
+Kept: `IMPROVEMENTS.md` item 1 (end-to-end recall is capped by Semgrep's recall,
+per the instructor's feedback) and item 2 (keep the 11-CWE scope and present
+retrieval as an upgrade from the CWE map, not a scope expansion). Kept the
+slide 10 structure; replaced the draft's unverified "usually kept the alert" with
+the recomputed figures. Rejected the assistant's first framing of TriageBot as
+giving developers "peace of mind", because our own results say it should not close
+alerts automatically.
+
+## 2026-11-10 — Full triage report as a PDF
+
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** triagebot/report.py, triagebot/__main__.py, tests/test_report.py,
+  tests/test_cli.py, requirements.txt
+- **Outcome:** Changed
+
+### What I asked for
+
+The ten-alert demo shows only a hand-picked sample. Add a way to export every
+alert of the 120-case final run as a PDF for developers: `python -m triagebot
+report`, a new menu option 6, and a prompt at the end of the demo. Group alerts
+into to fix, closed false alarms and for a person, each with its evidence and
+reasoning. The answer key must not be used, because a real developer would not
+have one. After the first version, I asked for per-finding subsections to reduce
+clutter: a summary, cited lines labelled by role (source, sink, guard), the
+council's votes, the validation result, and a recommended fix taken from MITRE's
+own mitigations rather than a new hand-written map.
+
+### How I checked it
+
+The full suite passes on Windows/Python 3.12 (431 tests). The new tests cover
+grouping, escalation reasons, council wording, line roles, the fallback when the
+CWE catalogue is missing, the CLI subcommand, and a test that fails if the answer
+key is loaded. I rendered the PDF pages and read them. That review found four
+problems: justified text with large gaps; "unanimous (high confidence)" shown for
+the one case where both specialists were unsure; an off-topic second MITRE
+mitigation for CWE-22; and a regex that never labelled `new java.io.File(...)` as
+a sink because an editing step had turned `\b` into a control character. After
+the fixes, 92 of 120 findings show a sink line. Most of the 28 without one are
+false alarms, where the Chair cites the guard instead. The summary counts (61 to
+fix, 58 closed, 1 for a person) match the validated verdicts in the saved run.
+I also found that an old menu process, started before the change, had
+overwritten the PDF with the old layout, and regenerated it in a fresh process.
+
+### What I kept or changed
+
+Kept the report structure, MITRE mitigations with a link-only fallback, and
+`fpdf2` as the only new dependency. Changed: only the first MITRE mitigation is
+shown; the sink pattern also covers `ProcessBuilder`; and the invalid-option menu
+test now uses "9", because "6" is a real option. Line-role labels are a pattern-based
+reading aid, not the model's own labelling. The ingest step is still tied to the
+OWASP Benchmark file layout, so the report cannot yet be produced for another
+codebase. The README does not yet document the `report` command. No paid model
+calls were made.
+
 ## 2026-11-02 | Git-history coverage check
 
 This log covers Hong Yi's authored work from the package scaffold and design
