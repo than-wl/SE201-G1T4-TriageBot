@@ -7,6 +7,8 @@ Interactive menu (no arguments), from the repository root:
     2  Triage one alert   One finding through the whole pipeline, every stage shown.
     3  Evaluate a sample  The checkpoint sample through each configuration, scored.
     4  Experiments        The experiments: show (free), replay (free) or run (paid).
+    5  Demo               Ten alerts from the final test, triaged (recorded, free).
+    6  Full report (PDF)  Every alert of the final test as a PDF for developers (free).
     q  Quit
 
 The menu starts with the setup check (triagebot/check.py) and, if the
@@ -21,6 +23,8 @@ Non-interactive subcommands (same functions as the menu options):
                                  [--export-svg PATH]
     python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
     python -m triagebot evaluate [--sample PATH] [--mode single,council]
+    python -m triagebot demo [--pace SECONDS] [--step] [--export-svg PATH]
+    python -m triagebot report [--run RUN] [--out PATH]
     python -m triagebot experiment list
     python -m triagebot experiment show STEP [--by-cwe]
     python -m triagebot experiment replay STEP [--answer-key PATH]
@@ -71,6 +75,7 @@ if sys.version_info < (3, 10):
 
 import argparse
 from datetime import datetime
+import io
 import json
 import os
 from pathlib import Path
@@ -92,7 +97,7 @@ except ImportError:
              f"the prompt then shows \"(.venv)\") and run: pip install -r requirements.txt   "
              f"(see README, Quick start).")
 
-from triagebot import check, config, experiments, pipeline, profiles
+from triagebot import check, config, demo, experiments, pipeline, profiles, report
 from triagebot.nodes.ingest import eval_sets, run
 from triagebot.nodes.score import evaluate as scoring
 
@@ -105,8 +110,11 @@ OPTIONS = (
     ("2", "Triage one alert", "One finding through the whole pipeline, every stage shown.", True),
     ("3", "Evaluate a sample", "The checkpoint sample through each configuration, scored.", True),
     ("4", "Experiments", "The experiments: show (free), replay (free) or run (paid).", True),
+    ("5", "Demo", "Ten alerts from the final test, triaged (recorded, free).", True),
+    ("6", "Full report (PDF)", "Every alert of the final test as a PDF for developers (free).", True),
 )
-PROMPT = "Choose 1, 2, 3, 4 or q: "
+PROMPT = "Choose 1, 2, 3, 4, 5, 6 or q: "
+DEMO_MENU_PACE = 0.4           # seconds per alert while the menu demo "reviews"
 REVIEW_MODES = ("single", "council")
 
 SEMGREP_RULESET = "p/java"
@@ -451,6 +459,45 @@ def baseline(semgrep=None, answer_key=None, out=None, rescan_first=False, detail
         console = shown
     if export_svg:
         console.print(f"Saved the screen to {_short(export_svg)}")
+    return 0
+
+
+# --- demo -------------------------------------------------------------------
+
+def run_demo(pace=0.0, step=False, export_svg=None, answer_key=None) -> int:
+    """Menu option 5 / `demo`: ten recorded final-test alerts, triaged (offline, no model calls).
+
+    export_svg: save only the result (the developer's new list), for a slide.
+    """
+    try:
+        shown = demo.load_demo(answer_key=answer_key)
+    except (demo.DemoUnavailable, OSError, ValueError, KeyError) as error:
+        return _fail(f"The demo needs the saved final-test run and the answer key: {error}")
+    if export_svg:
+        recorder = Console(record=True, width=SVG_WIDTH, force_terminal=True, color_system="truecolor",
+                           highlight=False, file=io.StringIO())
+        demo.show_result(shown, recorder)
+        target = Path(export_svg)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        recorder.save_svg(str(target), title="TriageBot · demo result")
+        console.print(f"Saved the result screen to {_short(export_svg)}")
+        return 0
+    demo.render(shown, console, pace=pace, step=step)
+    return 0
+
+
+def run_report(run=report.DEFAULT_RUN, out=None) -> int:
+    """Menu option 6 / `report`: every alert of a saved run as a PDF (offline, no answer key)."""
+    try:
+        data = report.load_report(run)
+        target = report.build_pdf(data, Path(out) if out else report.default_out(run))
+    except (report.ReportUnavailable, OSError, ValueError, KeyError) as error:
+        return _fail(f"Could not build the report: {error}")
+    counts = {v: sum(f["verdict"] == v for f in data["findings"])
+              for v in ("true_positive", "false_positive", "human_review")}
+    console.print(f"Saved the full report ({len(data['findings'])} alerts: "
+                  f"[red]{counts['true_positive']} to fix[/], [green]{counts['false_positive']} closed[/], "
+                  f"[yellow]{counts['human_review']} for a person[/]) to [bold]{_short(target)}[/]")
     return 0
 
 
@@ -1044,6 +1091,20 @@ def _menu_experiments(answer_key) -> None:
     _ask("Press Enter to return to the menu")
 
 
+def _menu_demo(answer_key) -> None:
+    if run_demo(pace=DEMO_MENU_PACE, step=True, answer_key=answer_key) == 0:
+        console.print()
+        if _ask("Download the full report of all final-test alerts as a PDF? [y/N] ") in ("y", "yes"):
+            run_report()
+    console.print()
+
+
+def _menu_report() -> None:
+    run_report()
+    console.print()
+    _ask("Press Enter to return to the menu")
+
+
 def menu(semgrep=None, answer_key=None, out=None) -> int:
     """Loop until q (or end of input)."""
     actions = {
@@ -1051,6 +1112,8 @@ def menu(semgrep=None, answer_key=None, out=None) -> int:
         "2": lambda: _menu_triage(out),
         "3": lambda: _menu_evaluate(answer_key, out),
         "4": lambda: _menu_experiments(answer_key),
+        "5": lambda: _menu_demo(answer_key),
+        "6": _menu_report,
     }
     try:
         _menu_check()
@@ -1129,6 +1192,17 @@ def parser() -> argparse.ArgumentParser:
     cr.add_argument("--allow-replay", action="store_true",
                     help="acknowledge possible duplicate model charges for an incomplete run")
 
+    dm = sub.add_parser("demo", help="menu option 5: ten final-test alerts, triaged (recorded, free)")
+    dm.add_argument("--pace", type=float, default=0.0,
+                    help="seconds per alert while reviewing, for recording a video (try 0.8; default 0)")
+    dm.add_argument("--step", action="store_true", help="wait for Enter between scenes (narrated demo)")
+    dm.add_argument("--export-svg", metavar="PATH", help="save only the result screen as an SVG (slide)")
+    dm.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
+
+    rp = sub.add_parser("report", help="menu option 6: every alert of a saved run as a PDF (free)")
+    rp.add_argument("--run", default=report.DEFAULT_RUN, help=f"saved run (default {report.DEFAULT_RUN})")
+    rp.add_argument("--out", metavar="PATH", help="PDF path (default Context/tmp/reports/)")
+
     x = sub.add_parser("experiment", help="menu option 4: the experiments (EXPERIMENTS.md)")
     xs = x.add_subparsers(dest="experiment_command", required=True)
     step_help = ("step number, 1 to 7 as in experiment list (supplementary: 1c; an internal step ID: "
@@ -1171,6 +1245,10 @@ def main(argv=None) -> int:
         return council_status(args.thread_id, args.db)
     if args.command == "council-resume":
         return council_resume(args.thread_id, args.db, args.out, args.benchmark_root, args.allow_replay)
+    if args.command == "demo":
+        return run_demo(args.pace, args.step, args.export_svg, args.answer_key)
+    if args.command == "report":
+        return run_report(args.run, args.out)
     if args.command == "experiment":
         if args.experiment_command == "list":
             return experiment_list()
