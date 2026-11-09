@@ -130,13 +130,13 @@ class Command(unittest.TestCase):
         by_cwe = {cwe: {"configurations": [cwe_row(configuration, 15, 1, 15, 12)]} for cwe in config.EVAL_SET_CWES}
         (folder / experiments.EVALUATION_BY_CWE).write_text(json.dumps({"by_cwe": by_cwe}), encoding="utf-8")
 
-    def test_before_step_6_it_prints_semgrep_alone_and_says_to_run_step_6(self):
+    def test_before_step_7_it_prints_semgrep_alone_and_says_to_run_step_7(self):
         code, printed = self.main("--mode", "council")
         self.assertEqual(code, 0)
         self.assertIn("Semgrep alone", printed)
         self.assertIn("| **All 4** |", printed)
-        self.assertIn("run step 6 first", printed)
-        self.assertIn("python -m triagebot experiment run 6", printed)
+        self.assertIn("run step 7 first", printed)
+        self.assertIn("python -m triagebot experiment run 7", printed)
         self.assertFalse((self.tmp / "whole_system").exists())
 
     def test_an_unfinished_or_wrong_run_is_not_used(self):

@@ -275,7 +275,7 @@ def main(argv=None) -> int:
     b.add_argument("--evidence", type=Path, nargs="+", default=list(config.RETIRED_EVIDENCE_DIRS),
                    help="folder(s) of earlier samples for the retired list (default: archive/checkpoint archive/evidence)")
     b.add_argument("--out", type=Path, default=config.SAMPLES_DIR)
-    m = sub.add_parser("mutation", help="build data/samples/mutation.json for step 5 "
+    m = sub.add_parser("mutation", help="build data/samples/mutation.json for step 6, the mutation test "
                                         "(needs the Benchmark source; reads the pilot and comparison sets)")
     m.add_argument("--semgrep", type=Path, default=config.RECORDED_SCAN)
     m.add_argument("--answer-key", type=Path, default=config.ANSWER_KEY)

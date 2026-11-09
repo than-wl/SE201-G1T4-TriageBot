@@ -1,11 +1,14 @@
 {
-  "description": "The planned experiments (EXPERIMENTS.md). Each step changes one group of settings, scored on one frozen case set. A side either runs (profile + modes) or reuses another step's saved run at no cost.",
+  "description": "The planned experiments (EXPERIMENTS.md), in story order. \"id\" is the internal step ID (run folders are named after it); \"display\" is the step number shown everywhere else (1 to 7). A supplementary step has no display number and is not listed, but can still be shown and replayed by its ID. Each step changes one group of settings, scored on one frozen case set. A side either runs (profile + modes) or reuses another step's saved run at no cost. side_labels names the table column of each side (or of each mode of a side).",
   "steps": [
     {
       "id": "1",
-      "title": "Council versus single agent",
+      "display": 1,
+      "title": "Single agent vs council, ±25 lines of code",
+      "what": "Single agent vs council",
       "question": "Does a council beat one agent?",
-      "changes": "The reviewer: one agent, then the Analyst / Skeptic / Chair council. The evidence and settings stay at the base profile.",
+      "changes": "One AI reviewer against a council of three (Analyst, Skeptic, Chair), each shown 25 lines of code either side of the alert.",
+      "details": "The reviewer: one agent, then the Analyst / Skeptic / Chair council. The evidence and settings stay at the base profile.",
       "case_set": "comparison",
       "before": {
         "profile": "base",
@@ -20,45 +23,21 @@
         ],
         "repeats": 2
       },
+      "side_labels": {
+        "before": "Single agent",
+        "after": "Council"
+      },
+      "highlight": "f1",
       "repeat_note": "The council is run twice with identical settings; the difference between the two runs is the noise between identical runs."
     },
     {
-      "id": "1b",
-      "title": "Council versus single agent, with more code",
-      "question": "Does the council beat one agent once the AI sees more of the code?",
-      "changes": "The reviewer, as in step 1, but at the evidence profile (60 lines either side plus related source). Step 1 compared them at the base profile; this tests whether the council's value depends on the evidence it gets.",
-      "case_set": "comparison",
-      "before": {
-        "profile": "evidence",
-        "modes": [
-          "single"
-        ]
-      },
-      "after": {
-        "reuse": "2-after"
-      }
-    },
-    {
-      "id": "1c",
-      "title": "Council versus single agent, with more code and the worksheet",
-      "question": "Does the council beat one agent once the AI also fills in the reasoning worksheet?",
-      "changes": "The reviewer, as in step 1, but at the worksheet profile (more code plus the reasoning worksheet and consistency repair).",
-      "case_set": "comparison",
-      "before": {
-        "profile": "worksheet",
-        "modes": [
-          "single"
-        ]
-      },
-      "after": {
-        "reuse": "3-after"
-      }
-    },
-    {
       "id": "2",
-      "title": "More of the code",
+      "display": 2,
+      "title": "Showing the AI more of the code",
+      "what": "More of the code",
       "question": "Does showing the AI more of the code help?",
-      "changes": "The evidence: source window 25 to 60 lines either side, and related source (called methods, other files, referenced scripts) switched on.",
+      "changes": "The council is shown 60 lines either side, plus the methods, files and scripts that code refers to, instead of 25 lines.",
+      "details": "The evidence: source window 25 to 60 lines either side, and related source (called methods, other files, referenced scripts) switched on.",
       "case_set": "comparison",
       "before": {
         "reuse": "1-after"
@@ -68,13 +47,45 @@
         "modes": [
           "council"
         ]
-      }
+      },
+      "side_labels": {
+        "before": "Council · ±25 lines",
+        "after": "Council · more code"
+      },
+      "highlight": "f1"
+    },
+    {
+      "id": "1b",
+      "display": 3,
+      "title": "Single agent vs council, with more code",
+      "what": "Single vs council, more code",
+      "question": "Does the council still matter once the AI has the code?",
+      "changes": "Step 1 again, but both reviewers get the extra code from step 2.",
+      "details": "The reviewer, as in step 1, but at the evidence profile (60 lines either side plus related source). Step 1 compared them at the base profile; this tests whether the council's value depends on the evidence it gets.",
+      "case_set": "comparison",
+      "before": {
+        "profile": "evidence",
+        "modes": [
+          "single"
+        ]
+      },
+      "after": {
+        "reuse": "2-after"
+      },
+      "side_labels": {
+        "before": "Single agent",
+        "after": "Council"
+      },
+      "highlight": "genuine_dismissed"
     },
     {
       "id": "3",
-      "title": "Reasoning worksheet",
-      "question": "Does a reasoning worksheet with a consistency check help?",
-      "changes": "The output: a structured analysis (source, sink, reaches the sink, protection, protection effective) is required, and a verdict that contradicts it gets one repair call.",
+      "display": 4,
+      "title": "A reasoning worksheet",
+      "what": "Reasoning worksheet",
+      "question": "Does a reasoning worksheet help?",
+      "changes": "The council must also fill in a short reasoning worksheet, and a verdict that contradicts it is sent back once.",
+      "details": "The output: a structured analysis (source, sink, reaches the sink, protection, protection effective) is required, and a verdict that contradicts it gets one repair call.",
       "case_set": "comparison",
       "before": {
         "reuse": "2-after"
@@ -84,13 +95,21 @@
         "modes": [
           "council"
         ]
-      }
+      },
+      "side_labels": {
+        "before": "Council · no worksheet",
+        "after": "Council · worksheet"
+      },
+      "highlight": "f1"
     },
     {
       "id": "4",
-      "title": "Semantic retrieval",
+      "display": 5,
+      "title": "Semantic guidance instead of a hand-written table",
+      "what": "Semantic guidance",
       "question": "Does semantic retrieval hold up?",
-      "changes": "The guidance source: the hand-made CWE table is replaced by semantic search over the OWASP cheat sheets, anchored on the alert's MITRE CWE record, with the set-up rules R1-R5 fixed before measuring (design decision 28). Built on step 2 (evidence profile, council); the worksheet from step 3 showed no benefit and is not carried forward.",
+      "changes": "The council's security guidance comes from a search over the OWASP cheat sheets instead of a hand-written table.",
+      "details": "The guidance source: the hand-made CWE table is replaced by semantic search over the OWASP cheat sheets, anchored on the alert's MITRE CWE record, with the set-up rules R1-R5 fixed before measuring (design decision 28). Built on step 2 (evidence profile, council); the worksheet from step 4 showed no benefit and is not carried forward.",
       "case_set": "comparison",
       "before": {
         "reuse": "2-after"
@@ -101,13 +120,21 @@
           "council"
         ]
       },
+      "side_labels": {
+        "before": "Council · hand-written table",
+        "after": "Council · semantic search"
+      },
+      "highlight": "f1",
       "rule": "Agreed in advance: if semantic retrieval holds or improves accuracy on the comparison set, it is reported as an improvement. If not, it stays the design choice, argued on scalability and maintainability, and the accuracy difference is stated plainly. Any tuning happens on exploration cases only, followed by one measurement on the comparison set."
     },
     {
       "id": "5",
-      "title": "Mutation test",
+      "display": 6,
+      "title": "Mutation test: does the verdict follow the code?",
+      "what": "Mutation test",
       "question": "Does the verdict follow the code?",
-      "changes": "The code: in each case one constant condition is flipped ('num > 200' to 'num < 200', the same length, so no line moves), which flips which branch runs and so the right verdict. Before: the originals; after: their mutants, each read from its own overlay root (the Benchmark source with only the mutated file replaced), so both are judged on the same evidence except that line. Both sides run the final version (the semantic profile), single agent and council, on one commit.",
+      "changes": "One character in each case's code is changed so that the right answer flips; Semgrep's alert stays the same.",
+      "details": "The code: in each case one constant condition is flipped ('num > 200' to 'num < 200', the same length, so no line moves), which flips which branch runs and so the right verdict. Before: the originals; after: their mutants, each read from its own overlay root (the Benchmark source with only the mutated file replaced), so both are judged on the same evidence except that line. Both sides run the final version (the semantic profile), single agent and council, on one commit.",
       "case_set": "mutation",
       "before": {
         "profile": "semantic",
@@ -125,20 +152,33 @@
         "source": "mutant",
         "labels": "flipped"
       },
+      "side_labels": {
+        "before": {
+          "single": "Single · original",
+          "council": "Council · original"
+        },
+        "after": {
+          "single": "Single · mutated",
+          "council": "Council · mutated"
+        }
+      },
       "scoring": "mutation",
       "same_commit": true,
       "cost_per_case": {
         "single": 0.0043,
         "council": 0.0146
       },
-      "cost_note": "From the recorded per-case costs on the comparison set (as step 6): council US$1.3955 / 96 cases in 4-after (semantic profile); single agent US$0.4146 / 96 in 1b-before (the same evidence; step 4 ran the council only). 22 pairs, both sides, both modes: 4 runs of 22 cases, 176 calls, about US$0.83.",
-      "rule": "A pair counts only if the reviewer got the original right. Killed: the mutant's verdict is the flipped right answer. Survived: the verdict is unchanged. Escalated: the mutant was sent to a human; reported separately, not a kill. Mutation score = killed / pairs that meet the precondition, per configuration and per direction. `experiment run 5` refuses uncommitted changes to tracked files and a commit other than the one a saved run of step 5 recorded."
+      "cost_note": "From the recorded per-case costs on the comparison set (as step 7): council US$1.3955 / 96 cases in 4-after (semantic profile); single agent US$0.4146 / 96 in 1b-before (the same evidence; step 5 ran the council only). 22 pairs, both sides, both modes: 4 runs of 22 cases, 176 calls, about US$0.83.",
+      "rule": "A pair counts only if the reviewer got the original right. Killed: the mutant's verdict is the flipped right answer. Survived: the verdict is unchanged. Escalated: the mutant was sent to a human; reported separately, not a kill. Mutation score = killed / pairs that meet the precondition, per configuration and per direction. `experiment run 6` refuses uncommitted changes to tracked files and a commit other than the one a saved run of step 6 recorded."
     },
     {
       "id": "6",
-      "title": "Headline result",
-      "question": "How well does the final system do on cases it has never seen?",
-      "changes": "Nothing is changed: the final version (the semantic profile, design decision 29), single agent and council, run once on the unseen final test after the code freeze.",
+      "display": 7,
+      "title": "Final test on 120 unseen cases",
+      "what": "Final test",
+      "question": "How well does it do on cases it has never seen?",
+      "changes": "Nothing changes: the final version, single agent and council, is run once on 120 cases kept aside until now.",
+      "details": "Nothing is changed: the final version (the semantic profile, design decision 29), single agent and council, run once on the unseen final test after the code freeze.",
       "case_set": "final-test",
       "before": {
         "profile": "semantic",
@@ -153,16 +193,40 @@
         ]
       },
       "side_labels": {
-        "before": "Single",
+        "before": "Single agent",
         "after": "Council"
       },
-      "per_cwe": true,
+      "highlight": "genuine_dismissed",
       "cost_per_case": {
         "single": 0.0043,
         "council": 0.0146
       },
-      "cost_note": "From the recorded per-case costs on the comparison set: council US$1.3955 / 96 cases in 4-after (semantic profile); single agent US$0.4146 / 96 in 1b-before (the evidence profile, the same evidence; step 4 ran the council only). For 120 cases: about US$0.52 single + US$1.75 council.",
-      "rule": "The final test is run once. `experiment run 6` refuses a working tree with uncommitted changes to tracked files (the run records the commit it ran on) and refuses a fresh run once a run has results; an interrupted run resumes. Starting over needs --i-know-this-reruns-the-final-test."
+      "cost_note": "From the recorded per-case costs on the comparison set: council US$1.3955 / 96 cases in 4-after (semantic profile); single agent US$0.4146 / 96 in 1b-before (the evidence profile, the same evidence; step 5 ran the council only). For 120 cases: about US$0.52 single + US$1.75 council.",
+      "rule": "The final test is run once. `experiment run 7` refuses a working tree with uncommitted changes to tracked files (the run records the commit it ran on) and refuses a fresh run once a run has results; an interrupted run resumes. Starting over needs --i-know-this-reruns-the-final-test."
+    },
+    {
+      "id": "1c",
+      "display": null,
+      "supplementary": true,
+      "title": "Supplementary: single agent with the worksheet",
+      "what": "Single agent with the worksheet",
+      "question": "Does the council still matter once the AI also fills in the worksheet?",
+      "changes": "Step 3 again, with the reasoning worksheet added for both reviewers (the worksheet was later dropped).",
+      "details": "The reviewer, as in step 1, but at the worksheet profile (more code plus the reasoning worksheet and consistency repair).",
+      "case_set": "comparison",
+      "before": {
+        "profile": "worksheet",
+        "modes": [
+          "single"
+        ]
+      },
+      "after": {
+        "reuse": "3-after"
+      },
+      "side_labels": {
+        "before": "Single agent · worksheet",
+        "after": "Council · worksheet"
+      }
     }
   ]
 }

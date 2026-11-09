@@ -9,7 +9,7 @@ measured types (CWE-22, 78, 79, 89), scored with the existing CWE-matched rule
   FN  real vulnerabilities with no matching alert
 
 Whole system, projected: Semgrep followed by TriageBot. For each CWE, the finished
-step 6 run (the final test) gives two rates:
+step 7 run (the final test; runs 6-before and 6-after) gives two rates:
 
   keep rate     share of real cases kept (a case sent to a human counts as kept)
   removal rate  share of safe cases removed
@@ -25,8 +25,8 @@ ceiling is Semgrep's recall. That ceiling is the point of the comparison.
 
 Reads only the recorded scan (config.RECORDED_SCAN), the answer key and the run's
 evaluation_by_cwe.json. The answer key is used on the evaluation side only. Writes
-evidence/whole_system/<run>.json and .md. Before step 6 has been run it prints
-Semgrep alone and says to run step 6 first (nothing is written).
+evidence/whole_system/<run>.json and .md. Before step 7 has been run it prints
+Semgrep alone and says to run step 7 first (nothing is written).
 
     python verification/whole_system.py --mode council     # run 6-after, D (validated council)
     python verification/whole_system.py --mode single      # run 6-before, B (single agent)
@@ -45,9 +45,9 @@ from triagebot import config, experiments  # noqa: E402
 from triagebot.nodes.ingest.mapping import cwe_matches  # noqa: E402
 
 CWES = config.EVAL_SET_CWES
-STEP = "6"
+STEP = "7"                 # the final test's display number (internal step 6)
 OUT_DIR = ROOT / "evidence" / "whole_system"
-# --mode -> (run of step 6, the configuration that is the whole system's output)
+# --mode -> (run of step 7, the configuration that is the whole system's output)
 MODES = {
     "council": ("6-after", "D-validated-council"),
     "single": ("6-before", "B-single-agent"),
@@ -172,11 +172,11 @@ def load_run(run, out_root=None) -> tuple[dict, dict]:
     out_root = Path(out_root or config.EXPERIMENTS_OUT)
     status = experiments.run_status(run, out_root)
     if status["state"] == "none":
-        raise WholeSystemError(f"run {run} does not exist yet; run step 6 first: "
+        raise WholeSystemError(f"run {run} does not exist yet; run step 7 first: "
                                f"python -m triagebot experiment run {STEP}")
     if status["state"] != "complete" or status["cases_total"] != status["cases_in_set"]:
         raise WholeSystemError(f"run {run} is not finished ({status['cases_saved']} of "
-                               f"{status['cases_in_set']} cases); finish step 6 first: "
+                               f"{status['cases_in_set']} cases); finish step 7 first: "
                                f"python -m triagebot experiment run {STEP}")
     folder = out_root / run
     manifest = json.loads((folder / experiments.MANIFEST).read_text(encoding="utf-8"))

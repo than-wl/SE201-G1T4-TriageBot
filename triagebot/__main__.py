@@ -22,7 +22,7 @@ Non-interactive subcommands (same functions as the menu options):
     python -m triagebot triage --case BenchmarkTestNNNNN [--mode single|council]
     python -m triagebot evaluate [--sample PATH] [--mode single,council]
     python -m triagebot experiment list
-    python -m triagebot experiment show STEP
+    python -m triagebot experiment show STEP [--by-cwe]
     python -m triagebot experiment replay STEP [--answer-key PATH]
     python -m triagebot experiment run STEP [--side before|after] [--repeat N] [--limit N]
                                        [--i-know-this-reruns-the-final-test]
@@ -42,13 +42,15 @@ saves the screen as an SVG (README screenshot).
 triage and evaluate run the connected review pipeline. They require an
 OpenRouter API key and therefore make paid model calls.
 
-experiment: the steps in EXPERIMENTS.md (triagebot/experiments.py). list and
-show are offline and need no API key or answer key; replay re-scores saved
-outputs against the answer key without model calls; run prints the cost
-estimate and asks before any paid call, saving after every case so an
-interrupted run resumes. A step on the final test (step 6) is run once: run
-refuses uncommitted changes to tracked files, and refuses to start it again
-once it has results unless --i-know-this-reruns-the-final-test is given.
+experiment: the steps in EXPERIMENTS.md (triagebot/experiments.py), numbered
+1 to 7 in story order. STEP is that number (experiments.resolve_step(); 1b and
+1c, and id:N for an internal step ID, also work). list and show are offline
+and need no API key or answer key; show --by-cwe adds the table per weakness;
+replay re-scores saved outputs against the answer key without model calls; run
+prints the cost estimate and asks before any paid call, saving after every
+case so an interrupted run resumes. A step on the final test (step 7) is run
+once: run refuses uncommitted changes to tracked files, and refuses to start
+it again once it has results unless --i-know-this-reruns-the-final-test is given.
 
 check: prints the setup table; exit code 1 while a required item is MISSING
 (0 with --no-fail, for CI, where the Benchmark is never cloned).
@@ -643,87 +645,120 @@ def council_resume(thread_id, db=None, out=None, benchmark_root=None, allow_repl
 
 EXPERIMENT_ERRORS = (experiments.ExperimentError, eval_sets.EvalSetError, profiles.ProfileError,
                      OSError, ValueError, KeyError, json.JSONDecodeError)
-RUN_STATE = {"none": "no saved run", "partial": "in progress", "complete": "saved"}
+LIST_STATE = {"not run yet": "runnable", "partly run": "partly run", "planned (later task)": "planned"}
+
+
+def _printable(text) -> str:
+    """Text the console can encode: "→" becomes "->" on a console without it (cp1252)."""
+    encoding = getattr(console.file, "encoding", None) or "utf-8"
+    try:
+        text.encode(encoding)
+        return text
+    except UnicodeEncodeError:
+        return text.replace("→", "->").encode(encoding, "replace").decode(encoding)
+    except LookupError:
+        return text
+
+
+def _run_date(row) -> str:
+    """The local date a step's own runs finished ("9 Nov"), or "" if unknown."""
+    stamps = [r.get("finished_at") for r in row["runs"] if not r["reused"] and r.get("finished_at")]
+    if not stamps:
+        return ""
+    try:
+        when = datetime.fromisoformat(max(stamps)).astimezone()
+    except ValueError:
+        return ""
+    return f"{when.day} {when:%b}"
+
+
+def _list_status(row) -> str:
+    if row["state"] == "run":
+        date = _run_date(row)
+        return f"run {date}" if date else "run"
+    return LIST_STATE.get(row["state"], row["state"])
 
 
 def experiment_list() -> int:
-    """`experiment list`: every step, its question, and whether saved runs exist (offline)."""
+    """`experiment list` (and menu option 4): the steps in story order, offline.
+
+    One row per step: display number, what it changes, its question, case set and status.
+    Supplementary steps (1c) are not listed; `experiment show 1c` still works.
+    """
     try:
         rows = experiments.list_steps()
     except EXPERIMENT_ERRORS as error:
         return _fail(str(error))
     table = Table(title="Experiments (EXPERIMENTS.md)", title_justify="left", title_style="bold",
-                  box=box.SIMPLE_HEAD)
-    for column in ("Step", "Question", "Case set", "Status", "Saved runs"):
-        table.add_column(column, no_wrap=column in ("Step", "Case set"))
+                  box=box.SIMPLE_HEAD, padding=(0, 1, 0, 0), pad_edge=False)
+    for column in ("Step", "What", "Question", "Case set", "Status"):
+        table.add_column(column, no_wrap=column != "Question", justify="right" if column == "Step" else "left")
     for row in rows:
         step = row["step"]
-        saved = [f"{r['name']} ({RUN_STATE[r['state']]}{', reused' if r['reused'] else ''})"
-                 for r in row["runs"] if r["state"] != "none"]
-        runs = ", ".join(saved) or ("none" if row["runs"] else DASH)
-        table.add_row(step["id"], step["question"], step["case_set"], row["state"], runs)
+        number = step["display"] if step.get("display") is not None else step["id"]
+        table.add_row(str(number), step.get("what") or step.get("title", ""), step["question"],
+                      experiments.case_set_label(step["case_set"]), _list_status(row))
     console.print(table)
     return 0
 
 
-def experiment_show(step_id) -> int:
-    """`experiment show`: the before/after table from saved evaluation files (offline)."""
+def _table(headers, rows, text_columns=1, highlight=None, group=None) -> Table:
+    table = Table(box=box.SIMPLE_HEAD)
+    for number, header in enumerate(headers):
+        table.add_column(_printable(header), justify="left" if number < text_columns else "right",
+                         no_wrap=number < text_columns)
+    for number, row in enumerate(rows):
+        last_of_group = bool(group) and (number + 1) % group == 0 and number + 1 < len(rows)
+        table.add_row(*(_printable(cell) for cell in row),
+                      style="bold" if number == highlight else None, end_section=last_of_group)
+    return table
+
+
+def experiment_show(step_text, by_cwe=False) -> int:
+    """`experiment show`: the step's table from saved evaluation files (offline, free).
+
+    ``step_text`` is what the user typed (experiments.resolve_step()). ``by_cwe`` adds the
+    table per weakness (--by-cwe).
+    """
     try:
-        data = experiments.show_table(step_id)
+        step = experiments.resolve_step(step_text)
+        data = experiments.show_table(step["id"], by_cwe=by_cwe)
     except EXPERIMENT_ERRORS as error:
         return _fail(str(error))
-    step = data["step"]
-    _section(f"Step {step['id']}: {step['question']}")
+    label = experiments.step_label(step)
+    _section(f"{label}: {step['question']}")
     console.print(step.get("changes", ""), markup=False)
     if step.get("planned"):
         console.print(f"Not runnable yet: {step['planned']}.", markup=False)
         return 0
     if not data["rows"]:
-        console.print(f"No saved run for step {step['id']} yet.", markup=False)
+        console.print(f"No saved run for {label.lower()} yet.", markup=False)
     else:
-        table = Table(box=box.SIMPLE_HEAD)
-        for number, header in enumerate(data["headers"]):
-            table.add_column(header, justify="left" if number == 0 else "right", no_wrap=number == 0)
-        for row in data["rows"]:
-            table.add_row(*row)
-        console.print(table)
-        for line in data["legend"]:
-            console.print(line, style="dim", markup=False)
-        console.print("Precision, recall and F1 count a case sent to a human as kept.", style="dim")
+        console.print(_table(data["headers"], data["rows"], highlight=data["highlight"]))
+        if data["rerun"]:
+            console.print(data["rerun"], markup=False)
         if data.get("by_cwe"):
             console.print()
             console.print(Text("By weakness (CWE)", style="bold"))
-            cwe_table = Table(box=box.SIMPLE_HEAD)
-            for number, header in enumerate(data["by_cwe"]["headers"]):
-                cwe_table.add_column(header, justify="left" if number < 2 else "right",
-                                     no_wrap=number < 2)
-            for row in data["by_cwe"]["rows"]:
-                cwe_table.add_row(*row)
-            console.print(cwe_table)
+            cwe = data["by_cwe"]
+            console.print(_table(cwe["headers"], cwe["rows"], text_columns=2, group=cwe["group"]))
     if data.get("mutation"):
         console.print()
-        console.print(Text("Mutation score (pairs whose original was judged right)", style="bold"))
-        mutation_table = Table(box=box.SIMPLE_HEAD)
-        for number, header in enumerate(data["mutation"]["headers"]):
-            mutation_table.add_column(header, justify="left" if number == 0 else "right",
-                                      no_wrap=number == 0)
-        for row in data["mutation"]["rows"]:
-            mutation_table.add_row(*row)
-        console.print(mutation_table)
-        console.print("Killed: the mutant got the flipped right answer. Survived: same verdict as "
-                      "the original. Escalated: sent to a human (not a kill).", style="dim")
+        console.print(Text("Mutation score: verdict flipped correctly, of the pairs whose original "
+                           "was judged right", style="bold"))
+        console.print(_table(data["mutation"]["headers"], data["mutation"]["rows"],
+                             highlight=data["mutation"]["highlight"]))
     elif experiments.is_mutation_step(step) and data["rows"]:
         console.print("Mutation score: not yet (both sides must be finished over the same cases).",
                       markup=False)
+    for line in data["footer"]:
+        console.print(line, style="dim", markup=False)
     for note in data["notes"]:
         console.print(note, markup=False)
     for name in data["missing"]:
         console.print(f"Not run yet: {name}.", markup=False)
-    commands = experiments.commands(step["id"])
     if data["missing"] or data["notes"]:
-        console.print(f"Run it (paid, asks first): {commands['run']}", markup=False)
-    if data["rows"]:
-        console.print(f"Re-score it (free, needs the answer key): {commands['replay']}", markup=False)
+        console.print(f"Run it (paid, asks first): {experiments.commands(step)['run']}", markup=False)
     return 0
 
 
@@ -732,18 +767,27 @@ def _answer_key_path(answer_key):
     return path if path.is_file() else None
 
 
-def experiment_replay(step_id, answer_key=None) -> int:
-    """`experiment replay`: re-score saved outputs against the answer key; no model calls."""
+def experiment_replay(step_text, answer_key=None) -> int:
+    """`experiment replay`: re-score saved outputs against the answer key; no model calls.
+
+    ``step_text`` is what the user typed (experiments.resolve_step()).
+    """
+    try:
+        step = experiments.resolve_step(step_text)
+    except EXPERIMENT_ERRORS as error:
+        return _fail(str(error))
     key = _answer_key_path(answer_key)
     if key is None:
         return _fail(f"replay needs the OWASP Benchmark answer key ({SETUP_HINT}), "
                      "or pass --answer-key PATH")
     try:
-        results = experiments.replay(step_id, key)
+        results = experiments.replay(step["id"], key)
     except EXPERIMENT_ERRORS as error:
         return _fail(str(error))
+    label = experiments.step_label(step)
+    _section(f"{label}, replay: {step['question']}")
     if not results:
-        console.print(f"No finished run to replay for step {step_id}.", markup=False)
+        console.print(f"No finished run to replay for {label.lower()}.", markup=False)
         return 0
     for result in results:
         status = Text("matches", style="green") if result["matches"] else Text("DIFFERS", style="bold red")
@@ -763,7 +807,8 @@ def _describe(settings) -> str:
 def _show_plan(plan) -> None:
     step = plan["step"]
     console.print()
-    console.print(Text(f"Step {step['id']}, {plan['side']} side: {step['question']}", style="bold"))
+    console.print(Text(f"{experiments.step_label(step)}, {plan['side']} side: {step['question']}",
+                       style="bold"))
     grid = Table.grid(padding=(0, 2))
     grid.add_column(style="dim")
     grid.add_column()
@@ -792,16 +837,18 @@ def _show_plan(plan) -> None:
     console.print(grid)
 
 
-def experiment_run(step_id, side=None, repeat=1, limit=None, answer_key=None,
+def experiment_run(step_text, side=None, repeat=1, limit=None, answer_key=None,
                    caller_factory=None, benchmark_root=None, rerun_final_test=False) -> int:
     """`experiment run`: a PAID run, after showing the estimate and asking for confirmation.
 
-    A final-test step (step 6) must pass experiments.final_test_guard() first: no
-    uncommitted changes to tracked files, and no fresh start once it has results
+    ``step_text`` is what the user typed (experiments.resolve_step(): `7` is the final
+    test, internal 6). A final-test step must pass experiments.final_test_guard() first:
+    no uncommitted changes to tracked files, and no fresh start once it has results
     unless rerun_final_test (--i-know-this-reruns-the-final-test). Resuming is allowed.
     """
     try:
-        plans = experiments.plan(step_id, side, repeat, limit, fresh=rerun_final_test)
+        step = experiments.resolve_step(step_text)
+        plans = experiments.plan(step["id"], side, repeat, limit, fresh=rerun_final_test)
         replaced = experiments.final_test_guard(plans, rerun_final_test)
         experiments.same_commit_guard(plans)
         for plan in plans:
@@ -856,7 +903,7 @@ def experiment_run(step_id, side=None, repeat=1, limit=None, answer_key=None,
         except EXPERIMENT_ERRORS as error:
             return _fail(f"{error}\nFinished cases are saved; run the same command to resume.")
         console.print(f"Saved: {check.rel_path(plan['dir'])}/ (see report.md)", markup=False)
-    return experiment_show(step_id)
+    return experiment_show(step_text)
 
 
 def _has_api_key() -> bool:
@@ -967,11 +1014,11 @@ def _menu_evaluate(answer_key, out) -> None:
 
 def _menu_experiments(answer_key) -> None:
     experiment_list()
-    step = _ask("Step (for example 1; [bold]\\[Enter][/] = back to menu): ")
+    step = _ask("Step (1 to 7, as listed; [bold]\\[Enter][/] = back to menu): ")
     if not step:
         return
     try:
-        experiments.get_step(step)
+        experiments.resolve_step(step)            # a plain number is the display number
     except EXPERIMENT_ERRORS as error:
         console.print(str(error), markup=False)
         _ask("Press Enter to return to the menu")
@@ -1084,14 +1131,18 @@ def parser() -> argparse.ArgumentParser:
 
     x = sub.add_parser("experiment", help="menu option 4: the experiments (EXPERIMENTS.md)")
     xs = x.add_subparsers(dest="experiment_command", required=True)
-    xs.add_parser("list", help="every step, its question, and whether saved runs exist (offline)")
-    xshow = xs.add_parser("show", help="before/after table from saved runs (offline, free)")
-    xshow.add_argument("step", help="step number, for example 1")
+    step_help = ("step number, 1 to 7 as in experiment list (supplementary: 1c; an internal step ID: "
+                 "id:N, for example id:4, as in the run folder names)")
+    xs.add_parser("list", help="the steps in story order: what each changes, its question, case set "
+                               "and status (offline)")
+    xshow = xs.add_parser("show", help="the step's table from saved runs (offline, free)")
+    xshow.add_argument("step", help=step_help)
+    xshow.add_argument("--by-cwe", action="store_true", help="also show the table per weakness (CWE)")
     xreplay = xs.add_parser("replay", help="re-score saved outputs against the answer key (free)")
-    xreplay.add_argument("step", help="step number, for example 1")
+    xreplay.add_argument("step", help=step_help)
     xreplay.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
     xrun = xs.add_parser("run", help="PAID run; prints the cost estimate and asks first")
-    xrun.add_argument("step", help="step number, for example 1")
+    xrun.add_argument("step", help=step_help)
     xrun.add_argument("--side", choices=("before", "after"),
                       help="run one side only (default: every side that is not reused)")
     xrun.add_argument("--repeat", type=int, default=1,
@@ -1099,7 +1150,7 @@ def parser() -> argparse.ArgumentParser:
     xrun.add_argument("--limit", type=int, help="run only the first N cases (smoke test)")
     xrun.add_argument("--answer-key", help="expectedresults-1.2.csv (default: under BENCHMARK_ROOT)")
     xrun.add_argument(experiments.RERUN_FLAG, dest="rerun_final_test", action="store_true",
-                      help="start a final-test step (step 6) again from nothing although it already "
+                      help="start a final-test step (step 7) again from nothing although it already "
                            "has results; the old results are moved aside, not deleted")
     return p
 
@@ -1124,7 +1175,7 @@ def main(argv=None) -> int:
         if args.experiment_command == "list":
             return experiment_list()
         if args.experiment_command == "show":
-            return experiment_show(args.step)
+            return experiment_show(args.step, args.by_cwe)
         if args.experiment_command == "replay":
             return experiment_replay(args.step, args.answer_key)
         return experiment_run(args.step, args.side, args.repeat, args.limit, args.answer_key,

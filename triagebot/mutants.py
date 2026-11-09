@@ -196,7 +196,7 @@ def score_pairs(case_ids, labels, before, after) -> dict:
 
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="python -m triagebot.mutants",
-                                     description="Overlay roots for the step 5 mutants.")
+                                     description="Overlay roots for the step 6 mutants (the mutation test).")
     sub = parser.add_subparsers(dest="command", required=True)
     b = sub.add_parser("build", help="build the overlay roots from data/samples/mutation.json")
     b.add_argument("--benchmark", type=Path, default=config.BENCHMARK_ROOT,

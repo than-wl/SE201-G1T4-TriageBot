@@ -1,6 +1,15 @@
 """Experiment runner: plan, run, show and replay the steps in EXPERIMENTS.md.
 
-The steps live in experiments/registry.json. Each step has a "before" and an
+The steps live in experiments/registry.json, in story order. A step has two
+numbers: its internal ID ("id": 1, 1b, 1c, 2 to 6), which names its run folders
+and is what every function here takes, and its display number ("display": 1 to
+7), which is what the user sees and types. resolve_step() turns what the user
+typed into a step: a plain number is the display number, "1b" and "1c" are
+internal IDs, and "id:N" reaches an internal numeric ID. A supplementary step
+(1c) has no display number: list_steps() leaves it out, but it can still be
+shown and replayed by its ID.
+
+Each step has a "before" and an
 "after" side; a side either runs (a profile from triagebot/profiles.py plus
 review modes) or reuses another step's saved run at no cost. Every run is
 scored on one frozen case set from data/samples/ and saved to
@@ -24,13 +33,17 @@ outputs against the answer key and makes no model calls.
 The answer key is read only in finalize() and replay(), after the model calls,
 and only evaluation-side files (evaluation*.json, report.md) carry scores.
 
-A step whose case set is the final test (step 6) is run once. final_test_guard()
+show_table() shows one column per side and review mode: the single agent (B)
+and the validated council (D, the version that ships). The raw council (C) stays
+in the saved files and evaluation.json; it was identical to D in every run.
+
+A step whose case set is the final test (step 7, internal 6) is run once. final_test_guard()
 refuses to start it on a working tree with uncommitted changes to tracked files
 (the run records the commit it ran on), and refuses a fresh run once a run has
 results; resuming an interrupted run is allowed (it is the same run). Starting
 over needs RERUN_FLAG, and the old results are moved aside, not deleted.
 
-The mutation test (step 5, "scoring": "mutation" in the registry) runs its after
+The mutation test (step 6, internal 5, "scoring": "mutation" in the registry) runs its after
 side ("source": "mutant") from one overlay root per case (triagebot/mutants.py)
 and scores it against the flipped answers ("labels": "flipped"). Once both sides
 are finished, finalize() also writes <step>-after/mutation_score.json: killed,
@@ -59,12 +72,12 @@ MANIFEST = "run_manifest.json"
 EVALUATION = "evaluation.json"
 EVALUATION_BY_CWE = "evaluation_by_cwe.json"
 REPORT = "report.md"
-MUTATION_SCORE = "mutation_score.json"       # step 5: in the after side's folder
+MUTATION_SCORE = "mutation_score.json"       # the mutation step (internal 5): in the after side's folder
 SOURCES = ("benchmark", "mutant")            # where a side reads the case's code from
 FLIPPED = "flipped"                          # a side scored against the flipped answers
 FAILED_CALL_PREFIX = "Model call failed"     # report.failure() explanation
 
-# (label, key, kind) for the before/after table; kind formats the value.
+# (label, key, kind) for report.md (every configuration, B, C and D); kind formats the value.
 METRICS = (
     ("Precision", "precision", "pct"),
     ("Recall", "recall", "pct"),
@@ -77,13 +90,33 @@ METRICS = (
     ("Total cost (US$)", "usage.cost_total", "money"),
     ("Prompt tokens", "usage.prompt_tokens_total", "int"),
 )
-# The per-CWE table (steps with "per_cwe": true in the registry, such as step 6).
+# The terminal table (show_table): the configuration shown per review mode, and the rows.
+# Invalid answers appear only when a column has any.
+SHOWN = {"single": "B-single-agent", "council": "D-validated-council"}
+DISPLAY_METRICS = (
+    ("Real vulnerabilities dismissed", "genuine_dismissed", "of_genuine"),
+    ("False alarms removed", "fp_removed", "of_fp"),
+    ("Sent to a human", "human_review", "of_all"),
+    ("Precision", "precision", "pct"),
+    ("Recall", "recall", "pct"),
+    ("F1", "f1", "pct"),
+    ("Invalid answers", "invalid_outputs", "int"),
+    ("Cost (US$)", "usage.cost_total", "usd"),
+    ("Mean time per case (s)", "usage.latency_mean_seconds", "seconds"),
+)
+OF = {"of_genuine": "genuine_in_sample", "of_fp": "fp_in_sample", "of_all": "evaluated_findings"}
+F1_NOTE = "F1 counts a case sent to a human as kept."
+# The per-CWE table (show_table(..., by_cwe=True); `experiment show STEP --by-cwe`).
 CWE_METRICS = (
     ("F1", "f1", "pct"),
     ("Real vulnerabilities dismissed", "genuine_dismissed", "of_genuine"),
     ("False alarms removed", "fp_removed", "of_fp"),
     ("Sent to a human", "human_review", "of_all"),
 )
+CWE_NAMES = {"CWE-22": "Path traversal", "CWE-78": "Command injection",
+             "CWE-79": "Cross-site scripting", "CWE-89": "SQL injection"}
+CASE_SET_NAMES = {"pilot": "Pilot", "comparison": "Comparison", "final-test": "Final test",
+                  "mutation": "Mutation"}
 
 
 class ExperimentError(ValueError):
@@ -107,6 +140,9 @@ def load_registry(path=None) -> list[dict]:
                 if (spec.get("source") == "mutant") != (spec.get("labels") == FLIPPED):
                     raise ExperimentError(f"step {step['id']} {side}: a mutant side is scored "
                                           f"against the flipped answers, and only a mutant side")
+    numbers = [step["display"] for step in steps if step.get("display") is not None]
+    if len(numbers) != len(set(numbers)):
+        raise ExperimentError(f"two steps share a display number: {numbers}")
     return steps
 
 
@@ -115,11 +151,72 @@ def is_mutation_step(step) -> bool:
 
 
 def get_step(step_id, registry=None) -> dict:
+    """The step with this internal ID (as in its run folder names)."""
     steps = registry if registry is not None else load_registry()
     for step in steps:
         if step["id"] == str(step_id):
             return step
     raise ExperimentError(f"unknown step {step_id!r}; choose from {', '.join(s['id'] for s in steps)}")
+
+
+def _choices(steps) -> str:
+    numbers = sorted(s["display"] for s in steps if s.get("display") is not None)
+    return f"{numbers[0]} to {numbers[-1]} (see experiment list)" if numbers else "a step in the registry"
+
+
+def resolve_step(text, registry=None) -> dict:
+    """The step the user typed: a plain number is the display number (`5` is internal 4);
+    other IDs (`1b`, `1c`) are internal; `id:N` reaches the internal ID N."""
+    steps = registry if registry is not None else load_registry()
+    text = str(text).strip()
+    if text.lower().startswith("id:"):
+        try:
+            return get_step(text[3:].strip(), steps)
+        except ExperimentError:
+            raise ExperimentError(f"unknown step {text!r}: no internal step ID "
+                                  f"{text[3:].strip()!r}") from None
+    if text.isdigit():
+        for step in steps:
+            if step.get("display") == int(text):
+                return step
+    else:
+        for step in steps:
+            if step["id"] == text:
+                return step
+    raise ExperimentError(f"unknown step {text!r}; choose {_choices(steps)}")
+
+
+def step_label(step) -> str:
+    """What the user sees: "Step 7", or "Supplementary step 1c"."""
+    if step.get("display") is not None:
+        return f"Step {step['display']}"
+    return f"Supplementary step {step['id']}" if step.get("supplementary") else f"Step {step['id']}"
+
+
+def _name(step) -> str:
+    """step_label() in the middle of a sentence."""
+    label = step_label(step)
+    return label[0].lower() + label[1:]
+
+
+def column_label(step, side, mode) -> str:
+    """The table column of one side and review mode ("side_labels" in the registry: one name
+    per side, or one per mode of a side)."""
+    label = step.get("side_labels", {}).get(side)
+    if isinstance(label, dict):
+        label = label.get(mode)
+    return label or f"{side.capitalize()} · {'single agent' if mode == 'single' else 'council'}"
+
+
+def case_set_label(name, samples_dir=None) -> str:
+    """"Comparison · 96", "Mutation · 22 pairs", "Final test · 120" (from the set's manifest)."""
+    title = CASE_SET_NAMES.get(name, name)
+    path = Path(samples_dir or config.SAMPLES_DIR) / f"{name}.manifest.json"
+    try:
+        cases = _read_json(path)["cases"]
+    except (OSError, ValueError, KeyError):
+        return title
+    return f"{title} · {cases}" + (" pairs" if name == "mutation" else "")
 
 
 def run_name(step_id, side, repeat=1) -> str:
@@ -154,19 +251,27 @@ def run_status(name, out_root=None) -> dict:
     folder = Path(out_root or config.EXPERIMENTS_OUT) / name
     manifest_path = folder / MANIFEST
     if not manifest_path.is_file():
-        return {"name": name, "state": "none", "cases_saved": 0, "cases_total": None}
+        return {"name": name, "state": "none", "cases_saved": 0, "cases_total": None,
+                "finished_at": None}
     manifest = _read_json(manifest_path)
     saved = len(_completed(folder, manifest["modes"]))
     state = "complete" if manifest.get("status") == "complete" and (folder / EVALUATION).is_file() else "partial"
     return {"name": name, "state": state, "cases_saved": saved,
             "cases_total": len(manifest["case_set"]["cases"]),
-            "cases_in_set": manifest["case_set"]["cases_in_set"]}
+            "cases_in_set": manifest["case_set"]["cases_in_set"],
+            "finished_at": manifest.get("finished_at")}
 
 
-def list_steps(out_root=None, registry=None) -> list[dict]:
-    """Every step with its question and the state of each saved run it reads."""
+def list_steps(out_root=None, registry=None, include_supplementary=False) -> list[dict]:
+    """Every step in story order (display number) with the state of each saved run it reads.
+
+    Supplementary steps (no display number, such as 1c) are left out unless asked for.
+    """
+    steps = registry if registry is not None else load_registry()
+    steps = [s for s in steps if include_supplementary or not s.get("supplementary")]
+    steps = sorted(steps, key=lambda s: (s.get("display") is None, s.get("display") or 0))
     rows = []
-    for step in registry if registry is not None else load_registry():
+    for step in steps:
         runs = runs_for(step)
         statuses = []
         for side in ("before", "after"):
@@ -280,7 +385,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
     """
     step = get_step(step_id, registry)
     if step.get("planned"):
-        raise ExperimentError(f"step {step['id']} is not runnable yet: {step['planned']}")
+        raise ExperimentError(f"{_name(step)} is not runnable yet: {step['planned']}")
     if side not in (None, "before", "after"):
         raise ExperimentError(f"side must be before or after, not {side!r}")
     if limit is not None and limit < 1:
@@ -294,11 +399,11 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
         spec = step[name_side]
         if "reuse" in spec:
             raise ExperimentError(
-                f"step {step['id']} {name_side} reuses the saved run {spec['reuse']}; there is "
+                f"{_name(step)} {name_side} reuses the saved run {spec['reuse']}; there is "
                 f"nothing to run (run it under its own step)")
         planned_repeats = spec.get("repeats", 1)
         if not 1 <= repeat <= planned_repeats:
-            raise ExperimentError(f"step {step['id']} {name_side} is planned with {planned_repeats} "
+            raise ExperimentError(f"{_name(step)} {name_side} is planned with {planned_repeats} "
                                   f"run(s); --repeat must be 1" + (f" to {planned_repeats}" if planned_repeats > 1 else ""))
         name = run_name(step["id"], name_side, repeat)
         folder = out_root / name
@@ -311,7 +416,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
         if source == "mutant":
             mutations = mutation_set.load_mutations(samples_dir)
             if sorted(mutations) != sorted(a["case_id"] for a in alerts):
-                raise ExperimentError(f"step {step['id']}: the mutations do not match the case set")
+                raise ExperimentError(f"{_name(step)}: the mutations do not match the case set")
         existing = folder / MANIFEST
         if existing.is_file() and not fresh:
             old = _read_json(existing)
@@ -351,7 +456,7 @@ def plan(step_id, side=None, repeat=1, limit=None, out_root=None, samples_dir=No
     return plans
 
 
-# --- the final test is run once (step 6) -----------------------------------------------------
+# --- the final test is run once (step 7, internal 6) ----------------------------------------
 
 def is_final_test(step) -> bool:
     return step.get("case_set") == FINAL_TEST
@@ -378,18 +483,18 @@ def final_test_guard(plans, rerun=False, git=None) -> list[dict]:
     if not is_final_test(step):
         if rerun:
             raise ExperimentError(f"{RERUN_FLAG} applies only to a step whose case set is "
-                                  f"{FINAL_TEST}; step {step['id']} uses {step['case_set']}")
+                                  f"{FINAL_TEST}; {_name(step)} uses {step['case_set']}")
         return []
     git = git if git is not None else git_state()
     if git.get("commit") is None:
         raise ExperimentError(
-            f"step {step['id']} runs the final test, which records the commit it ran on, but the "
+            f"{_name(step)} runs the final test, which records the commit it ran on, but the "
             "Git commit could not be read; run it from a Git checkout of this repository")
     if git.get("dirty"):
         paths = git.get("dirty_paths") or []
         shown = ", ".join(paths[:10]) + (f" and {len(paths) - 10} more" if len(paths) > 10 else "")
         raise ExperimentError(
-            f"step {step['id']} runs the final test, which records the commit it ran on: commit "
+            f"{_name(step)} runs the final test, which records the commit it ran on: commit "
             f"first. Uncommitted changes to tracked files: {shown}")
     existing = []
     for plan_ in plans:
@@ -409,7 +514,8 @@ def final_test_guard(plans, rerun=False, git=None) -> list[dict]:
 
 
 def same_commit_guard(plans, git=None) -> None:
-    """For a step with "same_commit": true (step 5): refuse unless every side runs on one commit.
+    """For a step with "same_commit": true (step 6, internal 5): refuse unless both sides run on one
+    commit.
 
     The working tree must have no uncommitted changes to tracked files, and every
     saved run of the step (either side, any session) must have recorded the current
@@ -420,12 +526,12 @@ def same_commit_guard(plans, git=None) -> None:
     step = plans[0]["step"]
     git = git if git is not None else git_state()
     if git.get("commit") is None:
-        raise ExperimentError(f"step {step['id']} runs both sides on one commit, but the Git "
+        raise ExperimentError(f"{_name(step)} runs both sides on one commit, but the Git "
                               "commit could not be read; run it from a Git checkout of this repository")
     if git.get("dirty"):
         paths = git.get("dirty_paths") or []
         shown = ", ".join(paths[:10]) + (f" and {len(paths) - 10} more" if len(paths) > 10 else "")
-        raise ExperimentError(f"step {step['id']} runs both sides on one commit: commit first. "
+        raise ExperimentError(f"{_name(step)} runs both sides on one commit: commit first. "
                               f"Uncommitted changes to tracked files: {shown}")
     out_root = Path(plans[0]["dir"]).parent
     for side, names in runs_for(step).items():
@@ -441,7 +547,7 @@ def same_commit_guard(plans, git=None) -> None:
             other = sorted(c for c in commits if c != git["commit"])
             if other:
                 raise ExperimentError(
-                    f"step {step['id']} runs both sides on one commit, but {name} was run on "
+                    f"{_name(step)} runs both sides on one commit, but {name} was run on "
                     f"{', '.join((c or 'an unknown commit')[:12] for c in other)}, not "
                     f"{git['commit'][:12]}; check out that commit, or delete "
                     f"{eval_sets.repo_path(out_root / name)}/ to run it again here")
@@ -615,7 +721,7 @@ def _totals(folder, manifest) -> dict:
 
 
 def _answer_key(answer_key_path, flip_cases=()) -> dict:
-    """The answer key, with the label of each case in ``flip_cases`` flipped (step 5 mutants)."""
+    """The answer key, with the label of each case in ``flip_cases`` flipped (the mutants of internal step 5)."""
     from triagebot.nodes.ingest.answer_key import load_answer_key
 
     key = load_answer_key(answer_key_path)
@@ -627,7 +733,7 @@ def _answer_key(answer_key_path, flip_cases=()) -> dict:
 def score(case_ids, answer_key_path, configurations, flip=False) -> tuple[dict, dict]:
     """(evaluation, evaluation_by_cwe) for saved configurations; reads the answer key.
 
-    ``flip``: score against the flipped answers (the mutants of step 5).
+    ``flip``: score against the flipped answers (the mutants of internal step 5).
     """
     from triagebot.nodes.score import evaluate as scoring, final_report
 
@@ -667,7 +773,7 @@ def finalize(folder, answer_key) -> dict:
     return manifest
 
 
-# --- the mutation score (step 5, evaluation side) ---------------------------------------------
+# --- the mutation score (step 6, internal 5; evaluation side) --------------------------------
 
 def mutation_score(step, answer_key, out_root=None) -> dict | None:
     """killed / survived / escalated per configuration and direction, from both sides' saved
@@ -702,27 +808,40 @@ def write_mutation_score(step, answer_key, out_root=None) -> dict | None:
     return result
 
 
-MUTATION_ROWS = (("Pairs", "pairs"), ("Original right (precondition met)", "precondition_met"),
-                 ("Excluded: original wrong", "excluded_original_wrong"), ("Killed", "killed"),
-                 ("Survived (verdict unchanged)", "survived"), ("Escalated to a human", "escalated"))
+MUTATION_ROWS = (("Pairs", "pairs"), ("Original judged right", "precondition_met"),
+                 ("Left out (original judged wrong)", "excluded_original_wrong"),
+                 ("Verdict flipped correctly", "killed"), ("Verdict unchanged", "survived"),
+                 ("Sent to a human", "escalated"))
+MUTATION_DIRECTIONS = (("real_to_safe", "real → safe"), ("safe_to_real", "safe → real"))
 
 
 def mutation_table(step, out_root=None) -> dict | None:
-    """{"headers", "rows"} from the saved mutation_score.json (offline), or None."""
+    """{"headers", "rows", "highlight"} from the saved mutation_score.json (offline), or None.
+
+    One column per reviewer: the single agent (B) and the validated council (D); the raw
+    council (C) stays in the file. The last rows split the mutation score by direction.
+    """
     out_root = Path(out_root or config.EXPERIMENTS_OUT)
     path = out_root / runs_for(step)["after"][0] / MUTATION_SCORE
     if not path.is_file():
         return None
     configs = _read_json(path)["configurations"]
-    groups = (("overall", "All"), ("real_to_safe", "real→safe"), ("safe_to_real", "safe→real"))
-    headers = ["Measure"] + [f"{_letter(name)} {label}" for name in configs for _, label in groups]
-    rows = [[label] + [str(configs[name][group][key]) for name in configs for group, _ in groups]
-            for label, key in MUTATION_ROWS]
-    rows.append(["Mutation score (killed / precondition met)"] + [
-        "–" if configs[name][group]["mutation_score"] is None
-        else f"{configs[name][group]['mutation_score']:.1%}"
-        for name in configs for group, _ in groups])
-    return {"headers": headers, "rows": rows}
+    shown = [(label, configs[name]) for label, name in (("Single agent", SHOWN["single"]),
+                                                       ("Council", SHOWN["council"])) if name in configs]
+
+    def score(group):
+        value = group["mutation_score"]
+        return "–" if value is None else f"{value:.1%}"
+
+    rows = [[label] + [str(c["overall"][key]) for _, c in shown] for label, key in MUTATION_ROWS]
+    rows.append(["Mutation score"] + [score(c["overall"]) for _, c in shown])
+    highlight = len(rows) - 1
+    for group, label in MUTATION_DIRECTIONS:
+        rows.append([f"  {label}"] + [
+            f"{score(c[group])} ({c[group]['killed']} of {c[group]['precondition_met']})"
+            for _, c in shown])
+    return {"headers": ["Measure"] + [label for label, _ in shown], "rows": rows,
+            "highlight": highlight}
 
 
 # --- showing (free, offline) ------------------------------------------------------------------
@@ -739,30 +858,17 @@ def _format(value, kind, row):
         return "–"
     if kind == "pct":
         return f"{value:.1%}"
-    if kind == "of_genuine":
-        return f"{value} of {row['genuine_in_sample']}"
-    if kind == "of_fp":
-        return f"{value} of {row['fp_in_sample']}"
-    if kind == "of_all":
-        return f"{value} of {row['evaluated_findings']}"
+    if kind in OF:
+        return f"{value} of {row[OF[kind]]}"
     if kind == "money":
         return f"{value:.4f}"
+    if kind == "usd":
+        return f"{value:.2f}"
     if kind == "float":
         return f"{value:.2f}"
+    if kind == "seconds":
+        return f"{value:.1f}"
     return f"{value:,}" if isinstance(value, int) else str(value)
-
-
-def _difference(a, b, kind):
-    if a is None or b is None:
-        return "–"
-    delta = b - a
-    if kind == "pct":
-        return f"{delta * 100:+.1f}"            # percentage points (see the legend)
-    if kind == "money":
-        return f"{delta:+.4f}"
-    if kind == "float":
-        return f"{delta:+.2f}"
-    return f"{delta:+,}" if isinstance(delta, int) else f"{delta:+}"
 
 
 def _short_config(name):
@@ -770,97 +876,109 @@ def _short_config(name):
             "D-validated-council": "D council (validated)"}.get(name, name)
 
 
-def _letter(name):
-    return name.split("-", 1)[0]
+def _plural(count, word):
+    return f"{count} {word}" + ("" if count == 1 else "s")
 
 
-CONFIG_LEGEND = "B = single agent; C = council, raw; D = council after deterministic validation."
+def _rerun_difference(out_root, first, second, modes) -> str:
+    """How two identical runs differed: the number of cases whose shown verdict changed."""
+    differed = cases = 0
+    for mode in modes:
+        verdicts = []
+        for name in (first, second):
+            rows = _read_json(Path(out_root) / name / f"{SHOWN[mode]}.json")["results"]
+            verdicts.append({r.get("case_id", n): r.get("verdict") for n, r in enumerate(rows)})
+        common = set(verdicts[0]) & set(verdicts[1])
+        cases = max(cases, len(common))
+        differed += sum(verdicts[0][c] != verdicts[1][c] for c in common)
+    return f"Identical rerun: differed on {_plural(differed, 'case')} of {cases}."
 
 
-def show_table(step_id, out_root=None, registry=None) -> dict:
-    """The before/after table for one step from saved evaluation files (no key needed).
+def show_table(step_id, out_root=None, registry=None, by_cwe=False) -> dict:
+    """The table for one step from saved evaluation files (offline; no key needed).
 
-    Returns {"step", "headers", "rows", "legend", "notes", "missing", "by_cwe"}.
-    A column is one configuration of one saved run, headed by its side and letter
-    (for example "After C"; a step may name its sides in the registry,
-    "side_labels", as step 6 does: "Single B", "Council C"); the legend names the
-    run behind each side. Where a side has two identical runs, one more column per
-    configuration ("Noise C") shows run 2 minus run 1: the noise between identical
-    runs. For a step with "per_cwe": true, by_cwe is {"headers", "rows"}: the same
-    columns per weakness, from evaluation_by_cwe.json; otherwise None.
+    ``step_id`` is the internal ID (resolve_step() turns what the user typed into one).
+    Returns {"step", "headers", "rows", "highlight", "rerun", "footer", "notes", "missing",
+    "by_cwe", "mutation"}. A column is one review mode of one side's saved run, named by
+    column_label(): the single agent (B) or the validated council (D). A row's "(of N)"
+    holds the count every column shares. "highlight" is the index of the row the step is
+    about (registry "highlight", a metric key), or None. Where a side has two identical runs,
+    the second is not a column: "rerun" says on how many cases it differed. ``by_cwe`` adds
+    {"headers", "rows", "group"}: the same columns per weakness, from evaluation_by_cwe.json
+    ("group" rows per weakness; the weakness is named on its first row only).
     """
     step = get_step(step_id, registry)
     out_root = Path(out_root or config.EXPERIMENTS_OUT)
     runs = runs_for(step)
-    columns, notes, missing, loaded, legend = [], [], [], {}, []
-    by_cwe_columns = []
-    side_labels = step.get("side_labels", {})
+    columns, notes, missing, shown_runs, cwe_columns = [], [], [], [], []
+    rerun = None
     for side in ("before", "after"):
-        for number, name in enumerate(runs[side], 1):
-            side_label = side_labels.get(side, side.capitalize()) + (f" #{number}" if number > 1 else "")
+        finished = []
+        for name in runs[side]:
             status = run_status(name, out_root)
             if status["state"] == "none":
                 missing.append(name)
-                continue
-            if status["state"] == "partial":
+            elif status["state"] == "partial":
                 notes.append(f"{name} is not finished: {status['cases_saved']} of "
                              f"{status['cases_total']} cases saved.")
-                continue
-            folder = out_root / name
-            evaluation = _read_json(folder / EVALUATION)
-            manifest = _read_json(folder / MANIFEST)
-            loaded[name] = {row["configuration"]: row for row in evaluation["configurations"]}
-            limit = manifest["case_set"]["limit"]
-            if limit:
-                notes.append(f"{name} covers only the first {limit} of "
-                             f"{manifest['case_set']['cases_in_set']} cases (--limit).")
-            reused = f", reused from step {name.split('-')[0]}" if name.split("-")[0] != step["id"] else ""
-            legend.append(f"{side_label}: run {name} ({manifest['profile']['name']} profile, "
-                          f"{' and '.join(manifest['modes'])}{reused})")
-            for config_name in manifest["configurations"]:
-                columns.append((f"{side_label} {_letter(config_name)}", loaded[name][config_name]))
-            if step.get("per_cwe"):
-                per_cwe = _read_json(folder / EVALUATION_BY_CWE)["by_cwe"]
-                for config_name in manifest["configurations"]:
-                    by_cwe_columns.append((f"{side_label} {_letter(config_name)}", {
-                        cwe: next(r for r in entry["configurations"] if r["configuration"] == config_name)
-                        for cwe, entry in per_cwe.items()}))
-    noise = []
-    for side in ("before", "after"):
-        names = [n for n in runs[side] if n in loaded]
-        if len(names) >= 2:
-            first, second = names[0], names[1]
-            legend.append(f"Noise: {second} minus {first}, two runs with identical settings "
-                          "(the noise between identical runs); rates in percentage points.")
-            for config_name in loaded[first]:
-                if config_name != "A-scanner-only" and config_name in loaded[second]:
-                    noise.append((f"Noise {_letter(config_name)}",
-                                  loaded[first][config_name], loaded[second][config_name]))
-    if columns:
-        legend.append(CONFIG_LEGEND)
-        if is_mutation_step(step):
-            legend.append("Before: the original cases, scored against the answer key. After: their "
-                          "mutants, scored against the flipped answers.")
-    headers = ["Measure"] + [label for label, _ in columns] + [label for label, _, _ in noise]
-    rows = []
-    for label, key, kind in METRICS:
-        cells = [_format(_value(row, key), kind, row) for _, row in columns]
-        cells += [_difference(_value(a, key), _value(b, key), kind) for _, a, b in noise]
+            else:
+                finished.append(name)
+        if not finished:
+            continue
+        name = finished[0]
+        shown_runs.extend(finished)
+        folder = out_root / name
+        evaluation = {row["configuration"]: row for row in _read_json(folder / EVALUATION)["configurations"]}
+        manifest = _read_json(folder / MANIFEST)
+        limit = manifest["case_set"]["limit"]
+        if limit:
+            notes.append(f"{name} covers only the first {limit} of "
+                         f"{manifest['case_set']['cases_in_set']} cases (--limit).")
+        per_cwe = _read_json(folder / EVALUATION_BY_CWE)["by_cwe"] if by_cwe else {}
+        for mode in manifest["modes"]:
+            label = column_label(step, side, mode)
+            columns.append({"label": label, "mode": mode, "row": evaluation[SHOWN[mode]]})
+            if by_cwe:
+                cwe_columns.append({"label": label, "mode": mode, "per": {
+                    cwe: next(r for r in entry["configurations"] if r["configuration"] == SHOWN[mode])
+                    for cwe, entry in per_cwe.items()}})
+        if len(finished) >= 2:
+            rerun = _rerun_difference(out_root, finished[0], finished[1], manifest["modes"])
+    if is_mutation_step(step):          # reviewer by reviewer: original next to mutated
+        columns.sort(key=lambda c: MODES.index(c["mode"]))
+        cwe_columns.sort(key=lambda c: MODES.index(c["mode"]))
+    rows, highlight = [], None
+    for label, key, kind in DISPLAY_METRICS:
+        values = [_value(c["row"], key) for c in columns]
+        if key == "invalid_outputs" and not any(values):
+            continue
+        totals = {c["row"].get(OF[kind]) for c in columns} if kind in OF else set()
+        if len(totals) == 1:            # every column has the same N: it goes in the row name
+            label = f"{label} (of {totals.pop()})"
+            cells = [_format(v, "int", c["row"]) for v, c in zip(values, columns)]
+        else:
+            cells = [_format(v, kind, c["row"]) for v, c in zip(values, columns)]
+        if key == step.get("highlight"):
+            highlight = len(rows)
         rows.append([label] + cells)
-    by_cwe = None
-    if by_cwe_columns:
-        cwes = sorted({cwe for _, per in by_cwe_columns for cwe in per},
+    by_cwe_table = None
+    if cwe_columns:
+        cwes = sorted({cwe for c in cwe_columns for cwe in c["per"]},
                       key=lambda c: int(c.split("-")[1]) if c.split("-")[-1].isdigit() else 0)
         cwe_rows = []
         for cwe in cwes:
-            for label, key, kind in CWE_METRICS:
-                cwe_rows.append([cwe, label] + [
-                    _format(_value(per[cwe], key), kind, per[cwe]) if cwe in per else "–"
-                    for _, per in by_cwe_columns])
-        by_cwe = {"headers": ["CWE", "Measure"] + [label for label, _ in by_cwe_columns],
-                  "rows": cwe_rows}
-    return {"step": step, "headers": headers, "rows": rows if columns else [],
-            "legend": legend, "notes": notes, "missing": missing, "by_cwe": by_cwe,
+            name = f"{cwe} {CWE_NAMES[cwe]}" if cwe in CWE_NAMES else cwe
+            for number, (label, key, kind) in enumerate(CWE_METRICS):
+                cwe_rows.append([name if number == 0 else "", label] + [
+                    _format(_value(c["per"][cwe], key), kind, c["per"][cwe]) if cwe in c["per"] else "–"
+                    for c in cwe_columns])
+        by_cwe_table = {"headers": ["Weakness", "Measure"] + [c["label"] for c in cwe_columns],
+                        "rows": cwe_rows, "group": len(CWE_METRICS)}
+    footer = [F1_NOTE, "Runs: " + ", ".join(shown_runs) + "."] if columns else []
+    return {"step": step, "headers": ["Measure"] + [c["label"] for c in columns],
+            "rows": rows if columns else [], "highlight": highlight if columns else None,
+            "rerun": rerun, "footer": footer, "notes": notes, "missing": missing,
+            "by_cwe": by_cwe_table,
             "mutation": mutation_table(step, out_root) if is_mutation_step(step) else None}
 
 
@@ -871,10 +989,18 @@ def markdown_table(table, text_columns=1) -> str:
     return "\n".join(lines)
 
 
-def commands(step_id) -> dict[str, str]:
+def commands(step) -> dict[str, str]:
+    """The show / replay / run commands for a step (a step dict, or an internal ID), by the
+    number the user types: the display number, or the ID of a supplementary step."""
+    if not isinstance(step, dict):
+        try:
+            step = get_step(step)
+        except (ExperimentError, OSError):
+            step = {"id": str(step)}
+    number = step["display"] if step.get("display") is not None else step["id"]
     base = "python -m triagebot experiment"
-    return {"show": f"{base} show {step_id}", "replay": f"{base} replay {step_id}",
-            "run": f"{base} run {step_id}"}
+    return {"show": f"{base} show {number}", "replay": f"{base} replay {number}",
+            "run": f"{base} run {number}"}
 
 
 def report_markdown(folder) -> str:
@@ -885,8 +1011,9 @@ def report_markdown(folder) -> str:
     step_id, side = manifest["step"], manifest["side"]
     try:
         step = get_step(step_id)
-        changes = step.get("changes", "")
+        changes = step.get("details") or step.get("changes", "")
     except (ExperimentError, OSError):
+        step = {"id": step_id}
         changes = ""
     rows = {row["configuration"]: row for row in evaluation["configurations"]}
     configs = manifest["configurations"]
@@ -901,7 +1028,9 @@ def report_markdown(folder) -> str:
     scope = (f"{cases_run} of {case_set['cases_in_set']} cases (the first {case_set['limit']}, a smoke test)"
              if case_set["limit"] else f"all {cases_run} cases")
     lines = [
-        f"# Step {step_id}, {side} side: {manifest['question']}",
+        f"# {step_label(step)}, {side} side: {manifest['question']}",
+        "",
+        f"Internal step ID `{step_id}` (EXPERIMENTS.md, Step numbers).",
         "",
         f"Run `{manifest['run']}`, finished {manifest['finished_at']} (UTC).",
         "",
@@ -943,17 +1072,17 @@ def report_markdown(folder) -> str:
         "",
         "## Reproduce",
         "",
-        f"- Show the before/after table (free, offline): `{commands(step_id)['show']}`",
+        f"- Show the before/after table (free, offline): `{commands(step)['show']}`",
         f"- Re-score the saved outputs (free, needs the Benchmark answer key): "
-        f"`{commands(step_id)['replay']}`",
-        _rerun_line(step_id, side, manifest, case_set),
+        f"`{commands(step)['replay']}`",
+        _rerun_line(step, side, manifest, case_set),
         "",
     ]
     return "\n".join(lines)
 
 
-def _rerun_line(step_id, side, manifest, case_set) -> str:
-    command = (f"{commands(step_id)['run']} --side {side}"
+def _rerun_line(step, side, manifest, case_set) -> str:
+    command = (f"{commands(step)['run']} --side {side}"
                + (f" --repeat {manifest['repeat']}" if manifest["repeat"] > 1 else "")
                + (f" --limit {case_set['limit']}" if case_set["limit"] else ""))
     if case_set["name"] == FINAL_TEST:

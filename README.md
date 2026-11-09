@@ -24,7 +24,7 @@ They were measured on the OWASP Benchmark (Java) for four weakness types: path
 traversal (CWE-22), OS command injection (CWE-78), cross-site scripting (CWE-79)
 and SQL injection (CWE-89). Gemini 3.8 Flash, temperature 0.
 
-**Council vs single agent on 120 unseen cases** (step 6, runs `6-before` and
+**Council vs single agent on 120 unseen cases** (step 7, runs `6-before` and
 `6-after`, run once after the code freeze):
 
 | | Single agent | Council (validated) |
@@ -35,18 +35,18 @@ and SQL injection (CWE-89). Gemini 3.8 Flash, temperature 0.
 | Sent to a human (of 120) | 2 | 1 |
 | Cost (US$) / mean latency (s) | 0.53 / 9.9 | 1.76 / 18.8 |
 
-**Whole system vs Semgrep alone** (a projection of step 6 over the whole
+**Whole system vs Semgrep alone** (a projection of step 7 over the whole
 benchmark for the four types; `evidence/whole_system/6-after.md`): precision
 59.6% → **97.1%**, recall 86.0% → 85.0%, false alarms left 453 → about 20. Of
 the about 117 real vulnerabilities still missed, 109 are ones Semgrep never
 flagged: Semgrep is now the bottleneck.
 
-**Does the verdict follow the code?** (step 5, runs `5-before` and `5-after`):
+**Does the verdict follow the code?** (step 6, runs `5-before` and `5-after`):
 in 22 pairs, one character was changed so that the right answer flipped while
 Semgrep's alert stayed the same. Mutation score: council **100%** (22 of 22),
 single agent 53% (8 of the 15 it got right to begin with).
 
-**Semantic retrieval** (step 4, run `4-after`): guidance found by search,
+**Semantic retrieval** (step 5, run `4-after`): guidance found by search,
 anchored on each weakness's MITRE record, held accuracy within the noise floor
 (F1 95.0% vs 96.0%) and needs no hand-written weakness-to-guidance table.
 
@@ -140,11 +140,11 @@ python -m triagebot experiment list
 ```
 
 ```bash
-python -m triagebot experiment show 6
+python -m triagebot experiment show 7
 ```
 
 ```bash
-python -m triagebot experiment replay 4
+python -m triagebot experiment replay 5
 ```
 
 ```bash
@@ -170,7 +170,9 @@ python -m triagebot baseline
 - `experiment show <step>` prints a step's before/after table from the saved
   results and needs nothing else. `experiment replay <step>` re-scores the
   saved verdicts against the Benchmark answer key and checks they equal the
-  committed report. Steps: 1, 1b, 1c, 2, 3, 4, 5, 6.
+  committed report. Steps 1 to 7, in story order (`experiment list`); run
+  folders keep their internal IDs ([Step numbers](EXPERIMENTS.md#step-numbers)).
+  `experiment show 7 --by-cwe` adds the table per weakness.
 - `--explain` shows the guidance one weakness gets: `improved` is the final
   set-up, `original` the first one (all five set-up rules off). It needs step
   4 of the quick start.
@@ -182,12 +184,12 @@ python -m triagebot baseline
 **Paid** (OpenRouter calls; needs the API key):
 
 ```bash
-python -m triagebot experiment run 4
+python -m triagebot experiment run 5
 ```
 
 Before any call it prints the case set, the number of calls and the estimated
 cost, and asks for confirmation. It saves each case as it finishes, so an
-interrupted run resumes. Step 6 is the final test and is guarded: it refuses
+interrupted run resumes. Step 7 is the final test and is guarded: it refuses
 uncommitted changes and refuses a second run.
 
 All subcommands: `python -m triagebot --help`.
@@ -270,7 +272,7 @@ in [RESPONSIBLE_AI_RISK_ASSESSMENT.md](RESPONSIBLE_AI_RISK_ASSESSMENT.md).
 - TriageBot is decision support. A qualified reviewer must check the cited
   code before any finding is suppressed.
 - It cannot recover what Semgrep missed, and a validated citation proves the
-  quote exists, not that the reasoning is right: in step 4 all three reviewers
+  quote exists, not that the reasoning is right: in step 5 all three reviewers
   dismissed one real vulnerability with a plausible but incomplete argument.
 - The answer key is read only by the evaluation code, after the model calls.
 - Source code, scanner output, retrieved text and model output are treated as

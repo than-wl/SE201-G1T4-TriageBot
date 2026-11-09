@@ -510,7 +510,7 @@ class StepFiveRunTest(unittest.TestCase):
 
     def run_cli(self, *args, answers=("y",), **kwargs):
         callers = ReadingCallers()
-        result = capture(cli.experiment_run, "5", *args, answers=answers, caller_factory=callers,
+        result = capture(cli.experiment_run, "6", *args, answers=answers, caller_factory=callers,
                          benchmark_root=str(self.bench), **kwargs)
         return result, callers
 
@@ -558,19 +558,33 @@ class StepFiveRunTest(unittest.TestCase):
             self.assertEqual(score["configurations"][config_name]["safe_to_real"]["killed"], 1)
         self.assertEqual(sorted(p.name for p in self.overlays.iterdir()), sorted(self.mutations))
 
+        # Display number 6 is internal step 5: one column per reviewer (B and D), split by direction.
         table = experiments.show_table("5")["mutation"]
-        self.assertEqual(table["headers"][:4], ["Measure", "B All", "B real→safe", "B safe→real"])
-        self.assertEqual(table["rows"][-1][1], "100.0%")
-        code, shown, errors, _ = capture(cli.main, ["experiment", "show", "5"])
+        self.assertEqual(table["headers"], ["Measure", "Single agent", "Council"])
+        rows = {row[0]: row[1:] for row in table["rows"]}
+        validated = score["configurations"]["D-validated-council"]["overall"]     # the Council column
+        shown_score = ("–" if validated["mutation_score"] is None
+                       else f"{validated['mutation_score']:.1%}")
+        self.assertEqual(rows["Mutation score"], ["100.0%", shown_score])
+        self.assertEqual(rows["Verdict flipped correctly"], ["2", str(validated["killed"])])
+        self.assertEqual(rows["Pairs"], ["2", "2"])
+        self.assertEqual(rows["  real → safe"][0], "100.0% (1 of 1)")
+        self.assertEqual(table["rows"][table["highlight"]][0], "Mutation score")
+        self.assertEqual(experiments.show_table("5")["headers"], [
+            "Measure", "Single · original", "Single · mutated", "Council · original", "Council · mutated"])
+        code, shown, errors, _ = capture(cli.main, ["experiment", "show", "6"])
         self.assertEqual((code, errors), (0, ""))
+        self.assertIn("Step 6: Does the verdict follow the code?", shown)
         self.assertIn("Mutation score", shown)
-        self.assertIn("flipped answers", shown)
-        code, replayed, errors, _ = capture(cli.main, ["experiment", "replay", "5"])
+        self.assertIn("Council · mutated", shown)
+        self.assertIn("Runs: 5-before, 5-after.", shown)
+        code, replayed, errors, _ = capture(cli.main, ["experiment", "replay", "6"])
         self.assertEqual((code, errors), (0, ""), replayed)
         self.assertEqual(replayed.count("matches"), 2)
         self.assertIn("mutation_score.json", replayed)
         code, listed, errors, _ = capture(cli.main, ["experiment", "list"])     # menu option 4
-        self.assertRegex(listed, r"\n\s*5\s+Does the verdict follow the code\?\s+mutation\s+run")
+        self.assertRegex(listed, r"\n\s*6\s+Mutation test\s+Does the verdict follow the code\?\s+"
+                                 r"Mutation · 2 pairs\s+run")
 
     def test_both_sides_must_run_on_one_commit(self):
         dirty = {"commit": "a" * 40, "dirty": True, "dirty_paths": ["triagebot/config.py"]}

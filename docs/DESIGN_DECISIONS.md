@@ -487,6 +487,8 @@ so the plain-Python single-agent path and the graph run the same code.
   graph path until the comparison is re-run there.
 
 
+> Decisions 23 to 30 (the experiments) use the internal step IDs (1, 1b, 1c, 2 to 6); the steps are now shown as 1 to 7 in story order, mapped in [EXPERIMENTS.md, Step numbers](../EXPERIMENTS.md#step-numbers).
+
 ## 23. Frozen evaluation case sets and a retired-case list
 
 **Decision.** Every new result is measured on one of three frozen case sets in

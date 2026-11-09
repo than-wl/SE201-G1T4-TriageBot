@@ -217,6 +217,18 @@ class Menu(TempDir):
         paid.assert_not_called()
         show.assert_not_called()
 
+    def test_option_4_uses_the_display_numbers(self):
+        with mock.patch.object(cli, "experiment_show", return_value=0) as show:
+            code, printed, _ = self.run_menu("4", "5", "s", "", "q")
+            self.run_menu("4", "1c", "s", "", "q")            # supplementary: not listed, still shown
+            self.run_menu("4", "id:4", "s", "", "q")          # an internal ID
+        self.assertEqual(code, 0)
+        self.assertEqual(show.call_args_list, [mock.call("5"), mock.call("1c"), mock.call("id:4")])
+        self.assertRegex(printed, r"\n\s*5\s+Semantic guidance\s+Does semantic retrieval hold up\?")
+        self.assertRegex(printed, r"\n\s*7\s+Final test\s+How well does it do")
+        self.assertNotIn("1c", printed.split("Step (")[0])
+        self.assertIn("Step (1 to 7, as listed", printed)
+
     def test_menu_and_subcommand_call_the_same_functions(self):
         ctx = object()
         with mock.patch.object(cli, "prepare_baseline", return_value=ctx) as prepare, \

@@ -10,6 +10,30 @@ Earlier results ([archive/FINAL_RESULTS.md](archive/FINAL_RESULTS.md),
 runs made before this plan. They are kept for the record and are superseded by
 this document (see [Earlier runs](#earlier-runs)).
 
+## Step numbers
+
+The steps are numbered 1 to 7 in story order, the same in this document, the
+terminal (`python -m triagebot experiment list`, menu option 4) and the slides.
+Each step also has an internal ID, which names its run folders under
+`evidence/experiments/` and was its number when it was defined. The folders were
+not renamed.
+
+| Step | Internal ID | Title | Run folders |
+| --- | --- | --- | --- |
+| 1 | `1` | Single agent vs council, ±25 lines of code | `1-before`, `1-after`, `1-after-repeat-2` |
+| 2 | `2` | Showing the AI more of the code | `1-after` (reused), `2-after` |
+| 3 | `1b` | Single agent vs council, with more code | `1b-before`, `2-after` (reused) |
+| 4 | `3` | A reasoning worksheet | `2-after` (reused), `3-after` |
+| 5 | `4` | Semantic guidance instead of a hand-written table | `2-after` (reused), `4-after` |
+| 6 | `5` | Mutation test: does the verdict follow the code? | `5-before`, `5-after` |
+| 7 | `6` | Final test on 120 unseen cases | `6-before`, `6-after` |
+| supplementary | `1c` | Single agent with the worksheet | `1c-before`, `3-after` (reused) |
+
+`experiment show N` takes the step number; `1b` and `1c` also work. Design
+decisions 23 to 30 were written with the internal IDs, and the `report.md` in
+each run folder was written when the run finished, so its commands still use
+them: `experiment show 4` in `4-after/report.md` is now `experiment show 5`.
+
 ## Framing
 
 Scoped to the OWASP Benchmark's categories for this proof of concept; built to
@@ -23,10 +47,9 @@ Benchmark has enough cases of each to measure on.
 
 ## Results so far, in story order
 
-This section is the narrative for the presentation. The step numbers are the
-order the experiments were defined in; the story below reads them in the order
-that explains them best. All results are on the frozen 96-case comparison set
-(4 types × 24, half real, half safe), Gemini 3.8 Flash at temperature 0.
+This section is the narrative for the presentation, one paragraph per step.
+Steps 1 to 5 are on the frozen 96-case comparison set (4 types × 24, half real,
+half safe), Gemini 3.8 Flash at temperature 0.
 
 **The noise floor.** The base council was run twice with identical settings.
 The two runs differed on 1 case of 96 (sent to a human: 31 vs 32) and on
@@ -60,7 +83,7 @@ rose from 82.9% to 96.0%, cases sent to a human fell from 31 to 4, and false
 alarms removed rose from 31 to 44 of 48. The single agent improved the same way
 (81.1% to 93.8%). The extra evidence cost about 29% more per run.
 
-**3. Once the AI has the code, the council's value is safety (step 1b).** With
+**3. Once the AI has the code, the council's value is safety (step 3).** With
 the same evidence, both reviewers removed about the same number of false alarms
 (44 vs 45), but the council dismissed 0 real vulnerabilities against the single
 agent's 3. In the cases where they differed, the Analyst and Skeptic disagreed
@@ -71,9 +94,10 @@ disagreed on only 2 to 4 cases per run, so the council matters on few cases,
 but those are the dangerous ones. The price is about 3× the cost and 2× the
 latency of a single agent.
 
-**4. The reasoning worksheet adds nothing measurable (steps 3 and 1c).** For the
-council nothing changed beyond the noise floor (sent to a human 4 to 3). For the
-single agent, real vulnerabilities dismissed went from 3 to 5. The worksheet
+**4. The reasoning worksheet adds nothing measurable (step 4 and the
+supplementary run `1c-before`).** For the council nothing changed beyond the
+noise floor (sent to a human 4 to 3). For the single agent, real
+vulnerabilities dismissed went from 3 to 5. The worksheet
 worked as designed: every answer filled in all of its fields, and every verdict
 agreed with its worksheet, so the consistency repair never fired. It had
 nothing to catch. The "reasoned right, labelled wrong" problem it was built for
@@ -81,7 +105,7 @@ was seen in earlier runs with less code; with enough evidence it did not occur.
 The worksheet was therefore dropped from the final version (design decision 27).
 
 **5. Semantic retrieval replaces the hand-made table without losing accuracy
-(step 4).** The guidance now comes from search over the OWASP sheets, anchored
+(step 5).** The guidance now comes from search over the OWASP sheets, anchored
 on the alert's MITRE record, with the set-up fixed in advance. On the
 comparison set it matched step 2 within the noise floor (F1 96.0% vs 95.0%; one
 real path traversal dismissed by all three reviewers with a plausible but
@@ -94,21 +118,21 @@ returned the most wrong-language advice.
 Semantic retrieval is therefore the default and the final version (design
 decision 29).
 
-**6. On 120 unseen cases the final version holds, and the council is the safe
-choice (step 6).** The council scored F1 96.7% (95.0% on the comparison set),
+**6. The council's verdicts follow the code; the single agent's often do not
+(step 6).** In 22 pairs, one character was changed so that the right answer
+flipped while Semgrep's alert stayed the same. The council flipped its verdict
+correctly in all 22 (mutation score 100%); the single agent in 8 of the 15
+pairs it got right to begin with (53%), mostly by calling real cases safe. It
+is the clearest evidence of what the council's extra cost buys.
+
+**7. On 120 unseen cases the final version holds, and the council is the safe
+choice (step 7).** The council scored F1 96.7% (95.0% on the comparison set),
 removed 57 of 60 false alarms and dismissed 1 of 60 real vulnerabilities; the
 single agent removed the same 57 but dismissed 10. Projected over the whole
 benchmark for the four types, Semgrep plus the council keeps precision at
 97.1% against Semgrep's 59.6%, while recall moves only from 86.0% to 85.0%:
 almost every remaining miss is one Semgrep never flagged. Semgrep is now the
 bottleneck.
-
-**7. The council's verdicts follow the code; the single agent's often do not
-(step 5).** In 22 pairs, one character was changed so that the right answer
-flipped while Semgrep's alert stayed the same. The council flipped its verdict
-correctly in all 22 (mutation score 100%); the single agent in 8 of the 15
-pairs it got right to begin with (53%), mostly by calling real cases safe. It
-is the clearest evidence of what the council's extra cost buys.
 
 ## Why we split the cases
 
@@ -133,7 +157,7 @@ real vulnerabilities and half safe code. The files and their build rules are in
 | `comparison` | development | 96 | CWE-22, 78, 79, 89: 24 each (12 real, 12 safe) | Excludes every pilot case | `311c5e73b3e9…` |
 | `final-test` | test | 120 | CWE-22, 78, 79, 89: 30 each (15 real, 15 safe) | Excludes every retired case | `3182ce45723d…` |
 | retired | both | 407 | Case IDs only | Every case used by an earlier run | — |
-| `mutation` | development | 22 pairs | CWE-22: 2 real→safe, 3 safe→real; CWE-78: 3+3; CWE-79: 3+3; CWE-89: 3+2 | Step 5: one constant condition decides the answer; excludes pilot, comparison and retired cases ([step 5](#step-5-does-the-verdict-follow-the-code)) | `bbaee0f17903…` |
+| `mutation` | development | 22 pairs | CWE-22: 2 real→safe, 3 safe→real; CWE-78: 3+3; CWE-79: 3+3; CWE-89: 3+2 | Step 6: one constant condition decides the answer; excludes pilot, comparison and retired cases ([step 6](#step-6-does-the-verdict-follow-the-code)) | `bbaee0f17903…` |
 
 - The **exploration set** is the pilot plus any other development case. This
   is where we read failures and try ideas.
@@ -182,7 +206,7 @@ What each setting means:
   own retrieval, so the default does not change any profile.
 - **Semantic set-up:** five rules that decide how semantic retrieval builds
   the guidance (design decision 28; see
-  [step 4](#semantic-retrieval-set-up-fixed-before-measuring)). The `semantic`
+  [step 5](#semantic-retrieval-set-up-fixed-before-measuring)). The `semantic`
   profile turns all five on. The other profiles use `map`, which ignores them.
 
 **On in every profile** (engineering fixes, not experiments): strict JSON
@@ -199,12 +223,13 @@ call. Only tokens actually generated are billed. The per-type checklists are **o
 modes, number of model calls and an estimated cost, and asks before making
 any paid call. It saves each case as soon as it finishes, so an interrupted
 run resumes where it stopped. Each run writes
-`evidence/experiments/<step>-<side>[-repeat-N]/`:
+`evidence/experiments/<internal ID>-<side>[-repeat-N]/` (see
+[Step numbers](#step-numbers)):
 
 | File | What it holds |
 | --- | --- |
 | `results.jsonl` | One line per finished case: every role's report and the final verdict (no labels) |
-| `B-single-agent.json`, `C-council.json`, `D-validated-council.json` | The saved verdicts in the evaluator's format (B single agent, C raw council, D council after the deterministic validator) |
+| `B-single-agent.json`, `C-council.json`, `D-validated-council.json` | The saved verdicts in the evaluator's format (B single agent, C raw council, D council after the deterministic validator). The terminal shows B and D only: D is the version that ships, and C equalled it in every council run |
 | `evaluation.json`, `evaluation_by_cwe.json` | The scores, overall and per weakness |
 | `run_manifest.json` | Profile and every setting, case set and fingerprint, model, temperature, Git commit and whether the code had uncommitted changes, start and end time, total cost and tokens, failed calls |
 | `report.md` | A short plain-English report with the results table and the commands to replay it |
@@ -213,7 +238,7 @@ Three commands, for any step:
 
 | Command | Cost | Needs |
 | --- | --- | --- |
-| `python -m triagebot experiment show <step>` | free | nothing (offline; no API key, no answer key) |
+| `python -m triagebot experiment show <step>` | free | nothing (offline; no API key, no answer key); `--by-cwe` adds the table per weakness |
 | `python -m triagebot experiment replay <step>` | free | the Benchmark answer key; makes no model calls |
 | `python -m triagebot experiment run <step>` | paid | API key, Benchmark; asks first |
 
@@ -227,21 +252,22 @@ keeps. A case sent to a human counts as kept, because a human still sees it.
 "Real vulnerabilities dismissed" is the most serious failure: a real problem
 marked as a false alarm. Costs are the provider's reported cost in US dollars.
 
-## The six steps
+## The seven steps
 
 | Step | Question | Before | After | Case set |
 | --- | --- | --- | --- | --- |
 | 1 | Does a council beat one agent? | `base` profile, single agent | `base` profile, council (run twice to measure the noise between identical runs) | comparison |
 | 2 | Does showing the AI more of the code help? | step 1 council | `evidence` profile, council | comparison |
-| 3 | Does a reasoning worksheet with a consistency check help? | step 2 | `worksheet` profile, council | comparison |
-| 4 | Does semantic retrieval hold up? | step 2 (the worksheet was dropped after step 3) | `semantic` profile, council | comparison |
-| 5 | Does the verdict follow the code? | `semantic` profile, single agent and council, on the originals | the same, on their mutants | mutation |
-| 6 | Headline result | `semantic` profile, single agent (run once) | `semantic` profile, council (run once) | final test |
+| 3 | Does the council still matter once the AI has the code? | `evidence` profile, single agent | step 2 council | comparison |
+| 4 | Does a reasoning worksheet help? | step 2 | `worksheet` profile, council | comparison |
+| 5 | Does semantic retrieval hold up? | step 2 (the worksheet was dropped after step 4) | `semantic` profile, council | comparison |
+| 6 | Does the verdict follow the code? | `semantic` profile, single agent and council, on the originals | the same, on their mutants | mutation |
+| 7 | How well does it do on cases it has never seen? | `semantic` profile, single agent (run once) | `semantic` profile, council (run once) | final test |
 
 Cost estimates use US$0.004 per case for the single agent and US$0.016 per
-case for the council (`config.EXPERIMENT_COST_PER_CASE`), except steps 5 and 6,
-which use the per-case costs recorded in steps 1b and 4. The real spend is recorded
-in each run manifest.
+case for the council (`config.EXPERIMENT_COST_PER_CASE`), except steps 6 and 7,
+which use the per-case costs recorded in steps 3 and 5 (runs `1b-before` and
+`4-after`). The real spend is recorded in each run manifest.
 
 ### Step 1: Does a council beat one agent?
 
@@ -264,30 +290,6 @@ in each run manifest.
 - **Result:** single agent F1 81.1%, 3 real vulnerabilities dismissed, 30 of 48 false alarms removed, 32 of 96 sent to a human; council 82.9%, 2, 31, 31; council rerun 82.9%, 2, 31, 32. Same verdict on 94 of 96 cases.
 - **Finding:** with ±25 lines the reviewer design makes no difference; both lack the code that decides the answer. The two identical council runs differ by 1 case: the noise floor.
 
-### Steps 1b and 1c: does the council's value depend on the evidence?
-
-Added after step 1's first council run (8 Nov). At the `base` profile the
-council and the single agent reached the same verdict on 94 of 96 cases, while
-an earlier run with 60 lines of code had shown a clear council advantage. So
-the council-versus-single comparison is repeated at the next two profiles,
-reusing the council runs of steps 2 and 3 and adding only a single-agent run
-for each.
-
-| Step | Before (new run) | After (reused) |
-| --- | --- | --- |
-| 1b | `evidence` profile, single agent (run `1b-before`) | step 2 council (`2-after`) |
-| 1c | `worksheet` profile, single agent (run `1c-before`) | step 3 council (`3-after`) |
-
-- **Question:** does the council beat one agent once the AI sees more of the
-  code, and once it also fills in the reasoning worksheet?
-- **Case set:** comparison (96 cases).
-- **Cost estimate:** 96 single-agent calls each, about US$0.38 each.
-- **Status:** run on 8 Nov 2026.
-- **Commands:** `python -m triagebot experiment show 1b` (or `1c`);
-  `python -m triagebot experiment run 1b --side before` (or `1c`).
-- **Result:** with more code, single agent F1 93.8% with 3 real vulnerabilities dismissed vs council 96.0% with 0; with the worksheet too, single agent 91.5% with 5 dismissed vs council 96.0% with 0. False alarms removed: 45 vs 44 in both.
-- **Finding:** once the AI has the code, the council removes no more false alarms than one agent, but it stops real vulnerabilities being dismissed, for about 3× the cost and 2× the latency.
-
 ### Step 2: Does showing the AI more of the code help?
 
 - **Question:** does a wider source window, plus the code the alert's code
@@ -304,7 +306,29 @@ for each.
 - **Result:** council F1 82.9% → 96.0%; real vulnerabilities dismissed 2 → 0; false alarms removed 31 → 44 of 48; sent to a human 31 → 4 of 96; cost US$1.07 → 1.37.
 - **Finding:** the largest gain of any step. Most uncertainty came from missing code, not weak reasoning.
 
-### Step 3: Does a reasoning worksheet with a consistency check help?
+### Step 3: Does the council still matter once the AI has the code?
+
+Added after step 1's first council run (8 Nov), as internal step `1b`. At the
+`base` profile the council and the single agent reached the same verdict on 94
+of 96 cases, while an earlier run with 60 lines of code had shown a clear
+council advantage. So the council-versus-single comparison is repeated with
+more code, reusing step 2's council run and adding only a single-agent run.
+
+- **Question:** does the council beat one agent once the AI sees more of the
+  code?
+- **Before:** `evidence` profile, single agent (run `1b-before`).
+- **After:** step 2's council run `2-after`, reused.
+- **Case set:** comparison (96 cases).
+- **Cost estimate:** 96 single-agent calls, about US$0.38.
+- **Status:** run on 8 Nov 2026.
+- **Commands:**
+  - show: `python -m triagebot experiment show 3`
+  - replay: `python -m triagebot experiment replay 3`
+  - re-run: `python -m triagebot experiment run 3 --side before`
+- **Result:** with more code, single agent F1 93.8% with 3 real vulnerabilities dismissed vs council 96.0% with 0. False alarms removed: 45 vs 44.
+- **Finding:** once the AI has the code, the council removes no more false alarms than one agent, but it stops real vulnerabilities being dismissed, for about 3× the cost and 2× the latency.
+
+### Step 4: Does a reasoning worksheet help?
 
 - **Question:** does asking for a structured analysis, and repairing verdicts
   that contradict it, lead to better decisions?
@@ -314,18 +338,18 @@ for each.
 - **Cost estimate:** 288 calls, about US$1.54, plus up to 96 repair calls.
 - **Status:** run on 8 Nov 2026.
 - **Commands:**
-  - show: `python -m triagebot experiment show 3`
-  - replay: `python -m triagebot experiment replay 3`
-  - re-run: `python -m triagebot experiment run 3`
+  - show: `python -m triagebot experiment show 4`
+  - replay: `python -m triagebot experiment replay 4`
+  - re-run: `python -m triagebot experiment run 4`
 - **Result:** council unchanged (F1 96.0%, 0 dismissed, 44 removed; sent to a human 4 → 3). Every answer filled in the worksheet and agreed with it; the repair never fired.
-- **Finding:** no measurable benefit once the AI has enough code, and the single agent dismissed more real vulnerabilities with it (3 → 5). Dropped from the final version (design decision 27).
+- **Finding:** no measurable benefit once the AI has enough code, and the single agent dismissed more real vulnerabilities with it (3 → 5; see [Supplementary](#supplementary-single-agent-with-the-worksheet)). Dropped from the final version (design decision 27).
 
-### Step 4: Does semantic retrieval hold up?
+### Step 5: Does semantic retrieval hold up?
 
 - **Question:** can semantic retrieval from the official CWE text replace the
   hand-made weakness-to-cheat-sheet table without losing accuracy?
-- **Before:** step 2's run `2-after`, reused. The worksheet from step 3 is not
-  carried forward (design decision 27), so step 4 changes only the retrieval.
+- **Before:** step 2's run `2-after`, reused. The worksheet from step 4 is not
+  carried forward (design decision 27), so step 5 changes only the retrieval.
 - **After:** `semantic` profile, council (run `4-after`).
 - **Case set:** comparison (96 cases).
 - **Cost estimate:** 288 calls, about US$1.40.
@@ -335,9 +359,9 @@ for each.
   The run stops with these commands if either is missing.
 - **Status:** run on 9 Nov 2026.
 - **Commands:**
-  - show: `python -m triagebot experiment show 4`
-  - replay: `python -m triagebot experiment replay 4`
-  - re-run: `python -m triagebot experiment run 4`
+  - show: `python -m triagebot experiment show 5`
+  - replay: `python -m triagebot experiment replay 5`
+  - re-run: `python -m triagebot experiment run 5`
 - **Result:** council F1 96.0% → 95.0%; real vulnerabilities dismissed 0 → 1 of 48; false alarms removed 44 → 44 of 48; sent to a human 4 → 4 of 96; cost US$1.37 → 1.40; failed model calls 1 → 4 of 288.
 - **Finding:** accuracy holds, within the noise floor. Only two cases changed
   outcome, both path traversal (CWE-22):
@@ -356,19 +380,19 @@ for each.
   96, inside the noise floor of two or more) while removing the hand-made table
   and covering any CWE MITRE knows. Failed model calls rose from 1 to 4 of 288
   (a parse failure, a cut-off answer and an HTTP 400 among them); only one
-  changed an outcome. Too few to call a trend; watched in step 6.
+  changed an outcome. Too few to call a trend; watched in step 7.
 
   The hand-made table has rows for 6 of the 9 CWE numbers in the recorded scan;
   adding rows would fix this scan, but every new CWE needs a new row, which is
   the maintenance cost semantic retrieval removes.
 - **Decision:** semantic retrieval with this set-up is now the default and the
   final version (design decision 29). The map remains available as
-  `RETRIEVAL_MODE = "map"` and in the step 1 to 3 profiles.
+  `RETRIEVAL_MODE = "map"` and in the profiles of steps 1 to 4.
 - **Dropped for time:** the planned guidance-off run ("does guidance matter at
   all?": the same council with no retrieved guidance) was not run. It is listed
   under [Future work](#future-work).
 
-#### The step 4 rule, agreed in advance
+#### The step 5 rule, agreed in advance
 
 If semantic retrieval holds or improves accuracy on the comparison set, it is
 reported as an improvement. If not, it remains the design choice, argued on
@@ -378,7 +402,7 @@ by one measurement on the comparison set.
 
 #### Semantic retrieval set-up (fixed before measuring)
 
-Step 4 asks whether semantic retrieval can replace the hand-made table. The
+Step 5 asks whether semantic retrieval can replace the hand-made table. The
 case for it is scale: the table covers only the weaknesses someone wrote down,
 while the MITRE catalogue covers every CWE. Because the comparison set is
 measured once per configuration (design decision 26), the set-up was fixed
@@ -395,7 +419,7 @@ set-up (design decision 28).
 | R5 Grounding gate | A chunk scores at least 0.0 (always true) | The CWE has a valid, non-deprecated MITRE record | A score threshold cannot separate relevant from irrelevant chunks here; a record either exists or not |
 
 The guidance budget is unchanged (4,000 characters, at most 6 chunks), because
-step 4 is compared with `2-after`. In numbers: R3 leaves out 21 sheets (4
+step 5 is compared with `2-after`. In numbers: R3 leaves out 21 sheets (4
 retired, 1 attack catalogue, 16 for other platforms; 533 chunks); R4 splits 214
 chunks into 447 pieces. The improved set-up searches 2,886 chunks.
 
@@ -446,7 +470,7 @@ Alternate terms (R1): 6 of the scan's 9 CWEs have them.
 | 643 | XPath Injection |
 | 326, 328, 501 | none (and CWE-501 has no MITRE mitigations, so its MITRE chunk is the description only) |
 
-**Known limits, left unchanged** so that step 4 differs from `2-after` in
+**Known limits, left unchanged** so that step 5 differs from `2-after` in
 retrieval only:
 
 - *Filling stops at the first chunk that does not fit.* CWE-89 stops at 2,965
@@ -587,7 +611,7 @@ The set-up was not changed after seeing these results (design decisions 26
 and 28). Whether trading OWASP passages for applicability and coverage changes
 verdicts is what the paid run measures.
 
-### Step 5: Does the verdict follow the code?
+### Step 6: Does the verdict follow the code?
 
 - **Question:** when a case's code is changed so that its right answer flips
   (safe becomes vulnerable, or the reverse), does TriageBot's verdict flip too?
@@ -612,7 +636,7 @@ verdicts is what the paid run measures.
   swaps `>` for `<` in that one expression and changes nothing else. It is the
   same length, so no line number moves, and it flips which branch runs, so the
   right verdict flips. `BenchmarkTest01983`, which the council dismissed in
-  step 4, is this pattern (it is a comparison case, so it is not in this set).
+  step 5, is this pattern (it is a comparison case, so it is not in this set).
 - **Eligibility** (all must hold; `triagebot/nodes/ingest/mutation_set.py`):
   - the case is in the development half and not in the pilot, the comparison
     set or the retired list (so never in the final test);
@@ -649,8 +673,8 @@ verdicts is what the paid run measures.
   stay, because they are code: a real → safe mutant uses the constant
   `"This should never happen"`.
 - **Both sides:** the final version (the `semantic` profile), single agent and
-  council, on one commit. `experiment run 5` refuses uncommitted changes to
-  tracked files, and a commit other than the one a saved step 5 run recorded.
+  council, on one commit. `experiment run 6` refuses uncommitted changes to
+  tracked files, and a commit other than the one a saved step 6 run recorded.
   Each case's record holds the SHA-256 of the file it was judged on.
 - **Scoring** (as in Week 10). A pair counts only if the reviewer got the
   original right (the precondition). Then the mutant is
@@ -663,10 +687,10 @@ verdicts is what the paid run measures.
   direction. Pairs excluded because the original was wrong are reported too.
   The after side's own table scores the mutants against the flipped answers;
   the mutation score is in `5-after/mutation_score.json` and in
-  `experiment show 5`.
+  `experiment show 6` (single agent and validated council).
 - **Cost estimate:** 4 runs of 22 cases (both sides, both modes), 176 calls
   (88 per side: 22 single + 66 council), about US$0.83, from the per-case
-  costs recorded for step 6 (US$0.0043 single, US$0.0146 council; registry
+  costs recorded for step 7 (US$0.0043 single, US$0.0146 council; registry
   `cost_per_case`).
 - **Status:** run on 9 Nov 2026.
 - **Commands:**
@@ -674,9 +698,9 @@ verdicts is what the paid run measures.
     `python -m triagebot.nodes.ingest.eval_sets mutation`
   - build the overlay roots (free; `run` also does it):
     `python -m triagebot.mutants build` (and `clean` to remove them)
-  - run (paid, asks first; commit first): `python -m triagebot experiment run 5`
-  - show: `python -m triagebot experiment show 5`
-  - replay: `python -m triagebot experiment replay 5`
+  - run (paid, asks first; commit first): `python -m triagebot experiment run 6`
+  - show: `python -m triagebot experiment show 6`
+  - replay: `python -m triagebot experiment replay 6`
 - **Result:** mutation score (killed / pairs whose original was judged right),
   22 pairs, US$0.83 in total:
 
@@ -698,9 +722,9 @@ verdicts is what the paid run measures.
   - *The single agent leans towards "safe" on this pattern.* It called 7 of 11
     real originals safe, and when a mutation made a safe case real it kept
     calling it safe in 6 of 11 pairs. Its verdict did not follow the condition
-    that decides the answer. This matches step 6, where it dismissed 10 of 60
+    that decides the answer. This matches step 7, where it dismissed 10 of 60
     real vulnerabilities.
-  - *100% here is not a guarantee.* In step 4 the council dismissed
+  - *100% here is not a guarantee.* In step 5 the council dismissed
     `BenchmarkTest01983`, a real case with this same pattern, with a plausible
     but incomplete argument. 22 pairs show the council usually evaluates the
     condition, not that it always does.
@@ -709,26 +733,26 @@ verdicts is what the paid run measures.
     the same commit, evidence and settings on both sides and both directions,
     the gap is 53% against 100%.
 
-### Step 6: Headline result
+### Step 7: Final test on 120 unseen cases
 
 - **Question:** how well does the final system do on cases it has never seen?
 - **Run:** the final version, the `semantic` profile (design decision 29), with
   the single agent (run `6-before`) and the council (run `6-after`), run once
-  after the code freeze; nothing is changed after it. `experiment show 6` puts
-  them side by side (columns "Single B", "Council C", "Council D") and adds a
-  table per weakness (CWE).
+  after the code freeze; nothing is changed after it. `experiment show 7` puts
+  them side by side (columns "Single agent" and "Council", the validated
+  council), and `experiment show 7 --by-cwe` adds a table per weakness (CWE).
 - **Case set:** final test (120 cases: 30 per type, 15 real and 15 safe).
 - **Cost estimate:** 480 calls (120 single + 360 council), about US$2.27:
   US$0.52 single + US$1.75 council. Taken from the recorded per-case costs on
   the comparison set: the council's US$1.3955 for 96 cases in `4-after`, and
   the single agent's US$0.4146 for 96 cases in `1b-before` (the same evidence;
-  step 4 ran the council only). The registry holds them as `cost_per_case`
+  step 5 ran the council only). The registry holds them as `cost_per_case`
   (US$0.0043 and US$0.0146).
 - **Status:** run on 9 Nov 2026 (commit `e39e415`), once.
 - **Two guards** protect the final test, which is run once. They apply to any
   step whose case set is the final test, before any question or model call:
   1. *A dirty tree is refused.* With uncommitted changes to tracked files,
-     `experiment run 6` stops: commit first, because the final test records
+     `experiment run 7` stops: commit first, because the final test records
      the commit it ran on.
   2. *A second run is refused.* Once a run has results, a fresh run does not
      start. Resuming an interrupted run still works (it is the same run), and
@@ -736,9 +760,9 @@ verdicts is what the paid run measures.
      `--i-know-this-reruns-the-final-test`; the old results are then moved to
      `<run>-superseded-<time>/`, not deleted.
 - **Commands:**
-  - run (paid, asks first; commit first): `python -m triagebot experiment run 6`
-  - show: `python -m triagebot experiment show 6`
-  - replay: `python -m triagebot experiment replay 6`
+  - run (paid, asks first; commit first): `python -m triagebot experiment run 7`
+  - show: `python -m triagebot experiment show 7` (add `--by-cwe` for the table per weakness)
+  - replay: `python -m triagebot experiment replay 7`
 - **Whole system vs Semgrep alone** (free, after the run):
   `python verification/whole_system.py --mode council` and
   `python verification/whole_system.py --mode single`. The script reads the
@@ -752,8 +776,8 @@ verdicts is what the paid run measures.
   TP × keep rate; kept safe = FP × (1 − removal rate); missed = FN + TP ×
   (1 − keep rate). Recall can only fall: TriageBot never sees what Semgrep
   missed (FN), so Semgrep's recall is its ceiling. Output:
-  `evidence/whole_system/<run>.json` and `.md`. Before step 6 has run, the
-  script prints Semgrep alone and says to run step 6 first.
+  `evidence/whole_system/<run>.json` and `.md`. Before step 7 has run, the
+  script prints Semgrep alone and says to run step 7 first.
 - **Result:**
 
   | Measure | Single agent (`6-before`) | Council, validated (`6-after`) |
@@ -782,7 +806,7 @@ verdicts is what the paid run measures.
 - **Finding:** the design holds on cases nobody looked at, and the council's
   value is safety.
   - *No sign of tuning to the comparison set.* The council scored F1 96.7% on
-    the final test against 95.0% (step 4) and 96.0% (step 2) on the
+    the final test against 95.0% (step 5) and 96.0% (step 2) on the
     comparison set.
   - *The council's safety advantage grows on unseen cases.* Both reviewers
     removed 57 of 60 false alarms, but the single agent dismissed 10 of 60
@@ -796,10 +820,33 @@ verdicts is what the paid run measures.
     misses, 109 are ones Semgrep never flagged. The next gain is in the first
     stage (rules that catch more), not the second.
 
+### Supplementary: single agent with the worksheet
+
+Internal step `1c`, added with step 3 (8 Nov). The worksheet was dropped
+(design decision 27) and the council was chosen, so this comparison is no
+longer part of the story. It is kept as evidence that the worksheet made the
+single agent worse: real vulnerabilities dismissed went from 3 (step 3) to 5.
+It is not in `experiment list` or the menu, but it can still be shown and
+replayed.
+
+- **Question:** does the council beat one agent once the AI also fills in the
+  reasoning worksheet?
+- **Before:** `worksheet` profile, single agent (run `1c-before`).
+- **After:** step 4's council run `3-after`, reused.
+- **Case set:** comparison (96 cases).
+- **Cost estimate:** 96 single-agent calls, about US$0.38.
+- **Status:** run on 8 Nov 2026.
+- **Commands:**
+  - show: `python -m triagebot experiment show 1c`
+  - replay: `python -m triagebot experiment replay 1c`
+  - re-run: `python -m triagebot experiment run 1c --side before`
+- **Result:** with the worksheet too, single agent F1 91.5% with 5 real vulnerabilities dismissed vs council 96.0% with 0. False alarms removed: 45 vs 44.
+- **Finding:** as in step 3: once the AI has the code, the council removes no more false alarms than one agent, but it stops real vulnerabilities being dismissed, for about 3× the cost and 2× the latency.
+
 ## Future work
 
 - **Does guidance matter at all?** The same council with no retrieved guidance,
-  on the comparison set. Planned for step 4 and dropped for time. It would show
+  on the comparison set. Planned for step 5 and dropped for time. It would show
   how much of the accuracy comes from the guidance and how much from the code
   the AI is shown.
 

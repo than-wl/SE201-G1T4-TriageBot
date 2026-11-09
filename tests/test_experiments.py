@@ -134,9 +134,20 @@ class ExperimentTest(unittest.TestCase):
 
     # --- registry and listing -------------------------------------------------------------
 
-    def test_registry_describes_the_six_steps(self):
+    def test_registry_describes_the_steps_in_story_order(self):
         steps = experiments.load_registry()
-        self.assertEqual([s["id"] for s in steps], ["1", "1b", "1c", "2", "3", "4", "5", "6"])
+        # Internal IDs (the run folder names) in story order; the display numbers are 1 to 7.
+        self.assertEqual([s["id"] for s in steps], ["1", "2", "1b", "3", "4", "5", "6", "1c"])
+        self.assertEqual([s.get("display") for s in steps], [1, 2, 3, 4, 5, 6, 7, None])
+        self.assertEqual([s["id"] for s in steps if s.get("supplementary")], ["1c"])
+        for step in steps:
+            for field in ("title", "what", "question", "changes"):
+                self.assertTrue(step[field], f"{step['id']} {field}")
+            self.assertLessEqual(len(step["what"].split()), 5, step["what"])
+            self.assertLessEqual(len(step["changes"]), 160, step["id"])     # at most 2 lines
+        self.assertEqual([s["what"] for s in steps if s.get("display")], [
+            "Single agent vs council", "More of the code", "Single vs council, more code",
+            "Reasoning worksheet", "Semantic guidance", "Mutation test", "Final test"])
         by_id = {s["id"]: s for s in steps}
         self.assertEqual(by_id["1"]["before"], {"profile": "base", "modes": ["single"]})
         self.assertEqual((by_id["1"]["after"]["profile"], by_id["1"]["after"]["repeats"]), ("base", 2))
@@ -166,9 +177,17 @@ class ExperimentTest(unittest.TestCase):
             code, printed, errors, _ = capture(cli.main, ["experiment", "list"])
             self.assertEqual((code, errors), (0, ""))
             for step in experiments.load_registry():
-                self.assertIn(step["question"], printed)
-            self.assertIn("not run yet", printed)
-            self.assertNotIn("planned (later task)", printed)     # every step is runnable
+                if step.get("supplementary"):
+                    self.assertNotIn(step["question"], printed)
+                else:
+                    self.assertIn(step["question"], printed)
+                    self.assertIn(step["what"], printed)
+            self.assertIn("runnable", printed)
+            self.assertNotIn("planned", printed)     # every step is runnable
+            self.assertIn("Comparison · 2", printed)       # the fixture case sets
+            self.assertIn("Final test · 2", printed)
+            numbers = re.findall(r"^\s*(\d+)\s{2,}", printed, re.M)
+            self.assertEqual(numbers, [str(n) for n in range(1, 8)])     # story order, one per step
             code, printed, errors, _ = capture(cli.main, ["experiment", "show", "1"])
         self.assertEqual((code, errors), (0, ""))
         self.assertIn("No saved run for step 1 yet.", printed)
@@ -186,7 +205,92 @@ class ExperimentTest(unittest.TestCase):
             experiments.plan("2", side="after", repeat=2)
         code, _, errors, _ = capture(cli.main, ["experiment", "show", "9"])
         self.assertEqual(code, 1)
-        self.assertIn("unknown step '9'", errors)
+        self.assertIn("unknown step '9'; choose 1 to 7", errors)
+
+    # --- display numbers ----------------------------------------------------------------
+
+    def test_a_plain_number_is_the_display_number(self):
+        resolved = {text: experiments.resolve_step(text)["id"]
+                    for text in ("1", "2", "3", "4", "5", "6", "7", "1b", "1c", " 5 ")}
+        self.assertEqual(resolved, {"1": "1", "2": "2", "3": "1b", "4": "3", "5": "4", "6": "5",
+                                    "7": "6", "1b": "1b", "1c": "1c", " 5 ": "4"})
+        # id:N reaches an internal ID, numeric or not.
+        for text, internal in (("id:4", "4"), ("ID:4", "4"), ("id:6", "6"), ("id:1b", "1b"), ("id:1", "1")):
+            self.assertEqual(experiments.resolve_step(text)["id"], internal, text)
+        for text in ("8", "0", "id:7", "id:", "1d", "step 5", ""):
+            with self.assertRaises(experiments.ExperimentError, msg=text):
+                experiments.resolve_step(text)
+        labels = {s["id"]: experiments.step_label(s) for s in experiments.load_registry()}
+        self.assertEqual(labels, {"1": "Step 1", "2": "Step 2", "1b": "Step 3", "3": "Step 4",
+                                  "4": "Step 5", "5": "Step 6", "6": "Step 7",
+                                  "1c": "Supplementary step 1c"})
+        self.assertEqual(experiments.commands(experiments.get_step("4"))["show"],
+                         "python -m triagebot experiment show 5")
+        self.assertEqual(experiments.commands("1c")["replay"], "python -m triagebot experiment replay 1c")
+
+    def test_the_cli_takes_display_numbers(self):
+        code, printed, errors, _ = capture(cli.main, ["experiment", "show", "5"])
+        self.assertEqual((code, errors), (0, ""))
+        self.assertIn("Step 5: Does semantic retrieval hold up?", printed)
+        self.assertIn("Not run yet: 4-after.", printed)               # the folder keeps its ID
+        self.assertIn("python -m triagebot experiment run 5", printed)
+        for text in ("id:4", "3", "1b"):
+            code, printed, errors, _ = capture(cli.main, ["experiment", "show", text])
+            self.assertEqual((code, errors), (0, ""), text)
+        self.assertIn("Step 3: Does the council still matter once the AI has the code?", printed)
+        (code, printed, errors, _), _ = self.run_cli("4", side="after", answers=("n",))
+        self.assertEqual((code, errors), (0, ""))
+        self.assertIn("Step 4, after side: Does a reasoning worksheet help?", printed)
+        self.assertIn("3-after", printed)                              # the run folder
+        self.assertIn("worksheet (window ±60", printed)                # internal step 3's profile
+        help_text = io.StringIO()
+        with redirect_stdout(help_text), self.assertRaises(SystemExit):
+            cli.main(["experiment", "show", "--help"])
+        self.assertIn("id:4", " ".join(help_text.getvalue().split()))
+
+    def test_the_supplementary_step_is_hidden_but_can_be_shown(self):
+        self.assertNotIn("1c", [row["step"]["id"] for row in experiments.list_steps()])
+        self.assertEqual([row["step"]["id"] for row in experiments.list_steps(include_supplementary=True)],
+                         ["1", "2", "1b", "3", "4", "5", "6", "1c"])
+        code, listed, _, _ = capture(cli.main, ["experiment", "list"])
+        self.assertNotIn("1c", listed)
+        self.assertNotIn("worksheet?", listed)
+        experiments.execute(experiments.plan("1c", side="before")[0], ANSWER_KEY,
+                            FixtureCallers(), str(self.bench))
+        code, shown, errors, _ = capture(cli.main, ["experiment", "show", "1c"])
+        self.assertEqual((code, errors), (0, ""))
+        self.assertIn("Supplementary step 1c: Does the council still matter once the AI also fills in "
+                      "the worksheet?", shown)
+        self.assertIn("Single agent · worksheet", shown)
+        self.assertIn("Not run yet: 3-after.", shown)
+        code, replayed, errors, _ = capture(cli.main, ["experiment", "replay", "1c"])
+        self.assertEqual((code, errors), (0, ""))
+        self.assertIn("1c-before: matches", replayed)
+
+    def test_each_step_names_its_columns_in_plain_words(self):
+        expected = {   # display number: {(side, mode): label}
+            1: {("before", "single"): "Single agent", ("after", "council"): "Council"},
+            2: {("before", "council"): "Council · ±25 lines", ("after", "council"): "Council · more code"},
+            3: {("before", "single"): "Single agent", ("after", "council"): "Council"},
+            4: {("before", "council"): "Council · no worksheet", ("after", "council"): "Council · worksheet"},
+            5: {("before", "council"): "Council · hand-written table",
+                ("after", "council"): "Council · semantic search"},
+            6: {("before", "single"): "Single · original", ("after", "single"): "Single · mutated",
+                ("before", "council"): "Council · original", ("after", "council"): "Council · mutated"},
+            7: {("before", "single"): "Single agent", ("after", "council"): "Council"},
+        }
+        for number, labels in expected.items():
+            step = experiments.resolve_step(str(number))
+            for (side, mode), label in labels.items():
+                self.assertEqual(experiments.column_label(step, side, mode), label, (number, side, mode))
+                spec = step[side]
+                if "reuse" not in spec:          # a column only for a mode the side runs
+                    self.assertIn(mode, spec["modes"], (number, side))
+        # No raw-council or letter columns, and the shown configuration per mode.
+        self.assertEqual(experiments.SHOWN, {"single": "B-single-agent", "council": "D-validated-council"})
+        for step in experiments.load_registry():
+            text = json.dumps(step.get("side_labels"), ensure_ascii=False)
+            self.assertNotRegex(text, r"\b(Before|After) [BCD]\b|\braw\b", step["id"])
 
     # --- the paid run and its confirmation --------------------------------------------------
 
@@ -208,11 +312,15 @@ class ExperimentTest(unittest.TestCase):
         with mock.patch.object(cli, "experiment_run", return_value=0) as run:
             cli.main(["experiment", "run", "1", "--side", "after", "--repeat", "2", "--limit", "5"])
             cli.main(["experiment", "run", "3"])
-            cli.main(["experiment", "run", "6", experiments.RERUN_FLAG])
+            cli.main(["experiment", "run", "7", experiments.RERUN_FLAG])
         self.assertEqual(run.call_args_list, [
             mock.call("1", "after", 2, 5, None, rerun_final_test=False),
             mock.call("3", None, 1, None, None, rerun_final_test=False),
-            mock.call("6", None, 1, None, None, rerun_final_test=True)])
+            mock.call("7", None, 1, None, None, rerun_final_test=True)])
+        with mock.patch.object(cli, "experiment_show", return_value=0) as show:
+            cli.main(["experiment", "show", "7"])
+            cli.main(["experiment", "show", "7", "--by-cwe"])
+        self.assertEqual(show.call_args_list, [mock.call("7", False), mock.call("7", True)])
 
     def test_estimate_uses_the_per_case_constants(self):
         before, after = experiments.plan("1")
@@ -292,36 +400,65 @@ class ExperimentTest(unittest.TestCase):
         manifest = experiments.execute(plan, ANSWER_KEY, FixtureCallers(error_on_call=2), str(self.bench))
         self.assertEqual(manifest["totals"]["failed_calls"], 1)
 
-    def test_show_puts_before_and_after_side_by_side_with_the_noise(self):
+    def test_show_puts_single_agent_and_council_side_by_side_with_the_rerun(self):
         self.run_step_1()
         table = experiments.show_table("1")
-        self.assertEqual(table["headers"], ["Measure", "Before B", "After C", "After D",
-                                            "After #2 C", "After #2 D", "Noise C", "Noise D"])
-        self.assertEqual(table["legend"][:3], [
-            "Before: run 1-before (base profile, single)",
-            "After: run 1-after (base profile, council)",
-            "After #2: run 1-after-repeat-2 (base profile, council)"])
-        self.assertIn("1-after-repeat-2 minus 1-after", table["legend"][3])
-        self.assertEqual([row[0] for row in table["rows"]], [m[0] for m in experiments.METRICS])
-        rows = {row[0]: row for row in table["rows"]}
-        self.assertEqual(rows["Total cost (US$)"][1:4], ["0.0040", "0.0120", "0.0120"])
-        self.assertEqual(rows["Precision"][-2:], ["+0.0", "+0.0"])   # identical runs: no noise
+        # One column per reviewer: the single agent and the validated council; the identical
+        # rerun is one line, not a column.
+        self.assertEqual(table["headers"], ["Measure", "Single agent", "Council"])
+        self.assertEqual(table["rerun"], "Identical rerun: differed on 0 cases of 2.")
+        self.assertEqual(table["footer"], ["F1 counts a case sent to a human as kept.",
+                                           "Runs: 1-before, 1-after, 1-after-repeat-2."])
+        self.assertEqual([row[0] for row in table["rows"]], [
+            "Real vulnerabilities dismissed (of 1)", "False alarms removed (of 1)",
+            "Sent to a human (of 2)", "Precision", "Recall", "F1", "Cost (US$)",
+            "Mean time per case (s)"])                 # no invalid answers: no such row
+        self.assertEqual(table["rows"][table["highlight"]][0], "F1")
+        rows = {row[0]: row[1:] for row in table["rows"]}
+        self.assertEqual(rows["Cost (US$)"], ["0.00", "0.01"])
+        evaluation = json.loads((self.out / "1-after" / "evaluation.json").read_text(encoding="utf-8"))
+        validated = next(r for r in evaluation["configurations"] if r["configuration"] == "D-validated-council")
+        self.assertEqual(rows["F1"][1], "–" if validated["f1"] is None else f"{validated['f1']:.1%}")
+        self.assertEqual(rows["Sent to a human (of 2)"][1], str(validated["human_review"]))
         code, printed, errors, _ = capture(cli.main, ["experiment", "show", "1"])
         self.assertEqual((code, errors), (0, ""))
-        self.assertIn("Real vulnerabilities dismissed", printed)
-        self.assertIn("Noise C", printed)
-        self.assertIn("the noise between identical runs", printed)
+        self.assertIn("Step 1: Does a council beat one agent?", printed)
+        self.assertIn("Real vulnerabilities dismissed (of 1)", printed)
+        self.assertIn("Identical rerun: differed on 0 cases of 2.", printed)
+        for hidden in ("Before B", "After C", "Prompt tokens", "Invalid answers", "By weakness",
+                       "council, raw", "Noise"):
+            self.assertNotIn(hidden, printed)
+
+        # An identical rerun that differs is counted per case.
+        rerun = self.out / "1-after-repeat-2" / "D-validated-council.json"
+        data = json.loads(rerun.read_text(encoding="utf-8"))
+        data["results"][0]["verdict"] = "human_review" if data["results"][0]["verdict"] != "human_review" \
+            else "true_positive"
+        rerun.write_text(json.dumps(data), encoding="utf-8")
+        self.assertEqual(experiments.show_table("1")["rerun"], "Identical rerun: differed on 1 case of 2.")
 
         states = {row["step"]["id"]: row["state"] for row in experiments.list_steps()}
-        self.assertEqual(states, {"1": "run", "1b": "not run yet", "1c": "not run yet",
-                                  "2": "not run yet", "3": "not run yet",
-                                  "4": "not run yet", "5": "not run yet",
+        self.assertEqual(states, {"1": "run", "1b": "not run yet", "2": "not run yet",
+                                  "3": "not run yet", "4": "not run yet", "5": "not run yet",
                                   "6": "not run yet"})
-        later = experiments.show_table("2")
-        self.assertEqual(later["headers"], ["Measure", "Before C", "Before D"])
-        self.assertEqual(later["legend"][0],
-                         "Before: run 1-after (base profile, council, reused from step 1)")
+        code, listed, _, _ = capture(cli.main, ["experiment", "list"])
+        self.assertRegex(listed, r"\n\s*1\s+Single agent vs council\s+Does a council beat one agent\?"
+                                 r"\s+Comparison · 2\s+run \d+ \w{3}\s*\n")
+        later = experiments.show_table("2")              # step 2 reuses step 1's council run
+        self.assertEqual(later["headers"], ["Measure", "Council · ±25 lines"])
+        self.assertEqual(later["footer"][1], "Runs: 1-after.")
         self.assertEqual(later["missing"], ["2-after"])
+
+    def test_invalid_answers_are_shown_only_when_there_are_some(self):
+        self.run_step_1()
+        path = self.out / "1-after" / "evaluation.json"
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for row in data["configurations"]:
+            if row["configuration"] == "D-validated-council":
+                row["invalid_outputs"] = 1
+        path.write_text(json.dumps(data), encoding="utf-8")
+        rows = {row[0]: row[1:] for row in experiments.show_table("1")["rows"]}
+        self.assertEqual(rows["Invalid answers"], ["0", "1"])
 
     def test_replay_rescores_and_detects_tampering(self):
         self.run_step_1()
@@ -432,16 +569,22 @@ class ExperimentTest(unittest.TestCase):
     def test_the_final_test_refuses_a_dirty_tree(self):
         callers = FixtureCallers()
         dirty = {"commit": "a" * 40, "dirty": True, "dirty_paths": ["triagebot/config.py"]}
-        with mock.patch.object(experiments, "git_state", return_value=dirty):
-            (code, printed, errors, asked), _ = self.run_cli("6", callers=callers)
-        self.assertEqual((code, asked, callers.calls), (1, 0, 0))
-        self.assertIn("commit first", errors)
-        self.assertIn("records the commit it ran on", errors)
-        self.assertIn("triagebot/config.py", errors)
-        self.assertFalse(self.out.exists())
+        # Display number 7 is the final test (internal 6); the guard is keyed on the case set,
+        # so it holds however the step is typed.
+        self.assertTrue(experiments.is_final_test(experiments.resolve_step("7")))
+        self.assertFalse(experiments.is_final_test(experiments.resolve_step("6")))
+        for typed in ("7", "id:6"):
+            with mock.patch.object(experiments, "git_state", return_value=dirty):
+                (code, printed, errors, asked), _ = self.run_cli(typed, callers=callers)
+            self.assertEqual((code, asked, callers.calls), (1, 0, 0), typed)
+            self.assertIn("step 7 runs the final test", errors)
+            self.assertIn("commit first", errors)
+            self.assertIn("records the commit it ran on", errors)
+            self.assertIn("triagebot/config.py", errors)
+            self.assertFalse(self.out.exists())
         with mock.patch.object(experiments, "git_state",
                                return_value={"commit": None, "dirty": None, "dirty_paths": []}):
-            (code, _, errors, _), _ = self.run_cli("6", callers=callers)
+            (code, _, errors, _), _ = self.run_cli("7", callers=callers)
         self.assertEqual(code, 1)
         self.assertIn("Git commit could not be read", errors)
         # Other steps are not guarded.
@@ -451,26 +594,33 @@ class ExperimentTest(unittest.TestCase):
 
     def test_the_final_test_runs_once_and_shows_single_and_council_by_cwe(self):
         with self.offline_semantic():
-            (code, printed, errors, _), callers = self.run_cli("6")
+            (code, printed, errors, _), callers = self.run_cli("7")
             self.assertEqual((code, errors), (0, ""), printed)
+            self.assertIn("Step 7, before side: How well does it do on cases it has never seen?", printed)
             cases = len(experiments.plan("6")[0]["alerts"])
             self.assertEqual(callers.calls, 4 * cases)
             for name in ("6-before", "6-after"):
                 self.assertEqual(experiments.run_status(name)["state"], "complete")
 
             table = experiments.show_table("6")
-            self.assertEqual(table["headers"], ["Measure", "Single B", "Council C", "Council D"])
-            self.assertEqual(table["legend"][:2], ["Single: run 6-before (semantic profile, single)",
-                                                   "Council: run 6-after (semantic profile, council)"])
-            self.assertEqual(table["by_cwe"]["headers"], ["CWE", "Measure", "Single B", "Council C", "Council D"])
-            cwes = {row[0] for row in table["by_cwe"]["rows"]}
-            self.assertEqual(len(table["by_cwe"]["rows"]), len(cwes) * len(experiments.CWE_METRICS))
-            self.assertIsNone(experiments.show_table("1")["by_cwe"])
-            code, shown, errors, _ = capture(cli.main, ["experiment", "show", "6"])
+            self.assertEqual(table["headers"], ["Measure", "Single agent", "Council"])
+            self.assertEqual(table["footer"][1], "Runs: 6-before, 6-after.")
+            self.assertEqual(table["rows"][table["highlight"]][0].split(" (")[0], "Real vulnerabilities dismissed")
+            self.assertIsNone(table["by_cwe"])                     # only with --by-cwe
+            by_cwe = experiments.show_table("6", by_cwe=True)["by_cwe"]
+            self.assertEqual(by_cwe["headers"], ["Weakness", "Measure", "Single agent", "Council"])
+            names = [row[0] for row in by_cwe["rows"] if row[0]]
+            self.assertEqual(names, ["CWE-78 Command injection", "CWE-79 Cross-site scripting"])
+            self.assertEqual(len(by_cwe["rows"]), len(names) * len(experiments.CWE_METRICS))
+            code, shown, errors, _ = capture(cli.main, ["experiment", "show", "7"])
+            self.assertEqual((code, errors), (0, ""))
+            self.assertIn("Step 7: How well does it do on cases it has never seen?", shown)
+            self.assertNotIn("By weakness (CWE)", shown)
+            code, shown, errors, _ = capture(cli.main, ["experiment", "show", "7", "--by-cwe"])
             self.assertEqual((code, errors), (0, ""))
             self.assertIn("By weakness (CWE)", shown)
-            self.assertIn("Single B", shown)
-            code, replayed, errors, _ = capture(cli.main, ["experiment", "replay", "6"])
+            self.assertIn("CWE-79 Cross-site scripting", shown)
+            code, replayed, errors, _ = capture(cli.main, ["experiment", "replay", "7"])
             self.assertEqual((code, errors), (0, ""))
             self.assertEqual(replayed.count("matches"), 2)
             report = (self.out / "6-after" / "report.md").read_text(encoding="utf-8")
@@ -478,19 +628,19 @@ class ExperimentTest(unittest.TestCase):
             self.assertNotIn("delete this folder", report)
 
             # A second run is refused, before any question or call.
-            (code, _, errors, asked), callers = self.run_cli("6")
+            (code, _, errors, asked), callers = self.run_cli("7")
             self.assertEqual((code, asked, callers.calls), (1, 0, 0))
             self.assertIn("already has results on the final test", errors)
             self.assertIn(experiments.RERUN_FLAG, errors)
 
             # With the flag, answering no changes nothing.
-            (code, printed, errors, _), callers = self.run_cli("6", answers=("n",), rerun_final_test=True)
+            (code, printed, errors, _), callers = self.run_cli("7", answers=("n",), rerun_final_test=True)
             self.assertEqual((code, errors, callers.calls), (0, "", 0))
             self.assertIn("Starting over: 6-before", printed)
             self.assertEqual(sorted(p.name for p in self.out.iterdir()), ["6-after", "6-before"])
 
             # With the flag and yes, the old results are kept aside and the run starts from nothing.
-            (code, printed, errors, _), callers = self.run_cli("6", rerun_final_test=True)
+            (code, printed, errors, _), callers = self.run_cli("7", rerun_final_test=True)
             self.assertEqual((code, errors), (0, ""), printed)
             self.assertEqual(callers.calls, 4 * cases)
             names = sorted(p.name for p in self.out.iterdir())
@@ -506,7 +656,7 @@ class ExperimentTest(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "connection dropped"):
                 experiments.execute(plan, ANSWER_KEY, FixtureCallers(fail_on_call=4), str(self.bench))
             self.assertEqual(experiments.run_status("6-after")["state"], "partial")
-            (code, printed, errors, _), callers = self.run_cli("6", side="after")
+            (code, printed, errors, _), callers = self.run_cli("7", side="after")
             self.assertEqual((code, errors), (0, ""), printed)
             self.assertIn("1 already saved", printed)
             self.assertEqual(callers.calls, 3 * (plan["cases_in_set"] - 1))   # only the unfinished cases
@@ -516,9 +666,9 @@ class ExperimentTest(unittest.TestCase):
 
     def test_a_limited_final_test_run_is_extended_not_refused(self):
         with self.offline_semantic():
-            (code, _, errors, _), _ = self.run_cli("6", side="before", limit=1)
+            (code, _, errors, _), _ = self.run_cli("7", side="before", limit=1)
             self.assertEqual((code, errors), (0, ""))
-            (code, printed, errors, _), callers = self.run_cli("6", side="before")
+            (code, printed, errors, _), callers = self.run_cli("7", side="before")
             self.assertEqual((code, errors), (0, ""), printed)
             self.assertEqual(callers.calls, len(experiments.plan("6")[0]["alerts"]) - 1)
 
@@ -560,6 +710,41 @@ class ExperimentTest(unittest.TestCase):
                       else [json.loads(text)])
             found = set(keys(values)) & LABEL_KEYS
             self.assertEqual(found, set(), f"answer-key field in {path.parent.name}/{path.name}")
+
+
+class SavedEvidenceTest(unittest.TestCase):
+    """The committed runs under evidence/experiments/, read only (show and replay write nothing)."""
+
+    def test_the_tables_show_the_saved_results(self):
+        tables = {s["id"]: experiments.show_table(s["id"]) for s in experiments.load_registry()}
+        for step_id, table in tables.items():
+            self.assertEqual((table["missing"], table["notes"]), ([], []), step_id)
+            self.assertTrue(table["rows"], step_id)
+        self.assertEqual(tables["1"]["rerun"], "Identical rerun: differed on 1 case of 96.")
+        rows = {row[0]: row[1:] for row in tables["6"]["rows"]}      # step 7, the final test
+        self.assertEqual(rows["Real vulnerabilities dismissed (of 60)"], ["10", "1"])
+        self.assertEqual(rows["False alarms removed (of 60)"], ["57", "57"])
+        self.assertEqual(rows["F1"], ["88.5%", "96.7%"])
+        mutation = {row[0]: row[1:] for row in tables["5"]["mutation"]["rows"]}   # step 6
+        self.assertEqual(mutation["Mutation score"], ["53.3%", "100.0%"])
+        self.assertEqual(mutation["Original judged right"], ["15", "22"])
+        # The raw council (C) is not a column anywhere; it equals the validated one (D) where shown.
+        for step_id, table in tables.items():
+            self.assertNotIn("C", " ".join(table["headers"]).split(), step_id)
+
+    @unittest.skipUnless(config.ANSWER_KEY and Path(config.ANSWER_KEY).is_file(),
+                         "needs the OWASP Benchmark answer key")
+    def test_every_replay_still_matches_its_saved_evaluation(self):
+        replayed = set()
+        for step in experiments.load_registry():
+            results = experiments.replay(step["id"], config.ANSWER_KEY)
+            self.assertTrue(results, step["id"])
+            for result in results:
+                self.assertTrue(result["matches"], (step["id"], result))
+                replayed.add(result["run"])
+        saved = {p.name for p in Path(config.EXPERIMENTS_OUT).iterdir() if (p / experiments.MANIFEST).is_file()}
+        self.assertEqual(replayed, saved)            # every saved run, reused ones included
+        self.assertEqual(len(saved), 12)
 
 
 if __name__ == "__main__":
