@@ -550,6 +550,45 @@ OWASP Benchmark file layout, so the report cannot yet be produced for another
 codebase. The README does not yet document the `report` command. No paid model
 calls were made.
 
+## 2026-11-10 — README redesign, screenshots and architecture diagram
+
+- **Tool (model):** Claude Code (Claude Opus 5.5)
+- **Files:** README.md, docs/images/readme/*.png, docs/architecture/architecture.html
+- **Outcome:** Changed
+
+### What I asked for
+
+Restyle the README after a reference README from another course project
+(centred header, badges, table of contents, captioned screenshots) without
+changing its content, and add real screenshots of the CLI and the PDF report.
+Redraw the architecture diagram in the style of a reference image I supplied.
+Check the README against the project brief's deliverable requirements.
+
+### How I checked it
+
+The screenshots are recorded from the real CLI with rich's recorder, plus pages
+of the generated PDF report; none are mocked. I ran every free command in the
+README (`experiment list`, `show 7`, `replay 5`, `check`, `baseline`, both
+`retrieval --explain` variants, `demo --step`, `report`); all exit 0. All 23 link
+and image targets resolve. I found that the first report crops cut off text at
+the edges, and had them re-cropped to the content bounds. A teammate review of
+the diagram against the code found one error and four imprecisions. I confirmed
+the error in `execution.py`: consistency repair never runs in the final
+configuration, because the reasoning worksheet is off. The redrawn diagram also
+deliberately leaves out components in the reference image that this project
+does not have (a local Qwen3 model, a JSONL audit log, a router).
+
+### What I kept or changed
+
+Kept the README's wording. Added menu options 5 and 6, a short demo and report
+subsection, a callout reusing the existing "decision support" sentence, and a
+footer about the synthetic benchmark. Changed the diagram after review: removed
+consistency repair; added the evidence-pack arrow into the Chair; reworded the
+knowledge base (only OWASP passages are embedded, and the MITRE record is looked
+up by ID); listed alert details and hints in the evidence pack; and labelled the
+developer outputs "from a saved run". The older Mermaid diagram is still out of
+date and is still linked.
+
 ## 2026-11-02 | Git-history coverage check
 
 This log covers Hong Yi's authored work from the package scaffold and design
