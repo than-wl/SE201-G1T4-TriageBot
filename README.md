@@ -10,6 +10,8 @@ SE201 AI-Driven Software Engineering · Team G1T4
 
 ![The developer's new list: the demo result](docs/images/readme/demo-result.png)
 
+<sub>Ten alerts from the final test, shown by the demo (menu option 5). The full results, mistakes included, are in <a href="#2-results">Results</a>.</sub>
+
 </div>
 
 ---
@@ -44,9 +46,9 @@ scanner's recall is its ceiling.
 <p align="center"><img src="docs/images/readme/architecture.png" alt="TriageBot architecture" width="1000"><br>
 <sub>Architecture: scanner → evidence pack → council → validator → verdict, with the evaluation harness kept apart.</sub></p>
 
-[Architecture diagram](docs/architecture/README.md) (editable Mermaid source:
-[docs/architecture/TriageBot_Architecture_Diagram.mmd](docs/architecture/TriageBot_Architecture_Diagram.mmd);
-the image above is drawn from [docs/architecture/architecture.html](docs/architecture/architecture.html)).
+The image is drawn from [docs/architecture/architecture.html](docs/architecture/architecture.html)
+(open it in a browser to edit or re-export). A simpler Mermaid version is in
+[docs/architecture/README.md](docs/architecture/README.md).
 
 ---
 
@@ -366,11 +368,11 @@ AI-assisted commits carry an `Assisted-by:` trailer. The consolidated record is
 
 | Member | Responsibilities |
 | --- | --- |
-| Darren | Semgrep integration, alert normalisation, benchmark mapping and split |
-| Hong Yi | Shared contracts, retrieval knowledge base, context payload, review roles |
-| Lisa | Deterministic validator |
-| Bradley | Evaluation harness, checkpoint report |
-| Wei Lin | Repository setup, integration, submission |
+| Darren | Semgrep integration, alert normalisation, benchmark mapping and dev/test split; the scanner-baseline screen, quick start and CI. For the final version: the replayable experiment framework, experiment steps 1 to 7 and their recorded results, semantic retrieval as the default, the rebuilt mutation test, the whole-system projection, and the README and archive restructure |
+| Hong Yi | Shared contracts, retrieval knowledge base, context payload, review roles and the live OpenRouter caller; the LangGraph council and its SQLite checkpoint sessions; semantic retrieval over the MITRE CWE catalogue and its vector store; the full PDF triage report; the README redesign and architecture diagram |
+| Lisa | Deterministic validator; checkpoint report and AI-use records |
+| Bradley | Evaluation harness and scoring tests, checkpoint report |
+| Wei Lin | Repository setup and feasibility study, pipeline integration and evaluation architecture, the command-injection evidence fix and fresh 120-case evaluation, final submission materials, the ten-alert demo |
 
 ---
 
