@@ -1,0 +1,13 @@
+# AI Use Reflection: Darren
+
+## What I learned about using these tools effectively
+
+AI coding tools worked best when we gave them clear roles instead of using one chat for everything. A stronger model planned the work and broke it into phases, and a lighter model carried out one phase at a time. Each phase ended at a checkpoint we could review before moving on. Grounding documents mattered just as much: an AGENTS.md file and our project documentation gave the agent our conventions and the decisions we had already made, so its output was more predictable and stayed closer to what we intended. Above all, the tools don't take responsibility for the work. We are accountable for everything we submit, so every AI-generated change still had to be read, tested and understood by one of us. Human review was the safeguard that mattered most.
+
+## Where the tools were strong, and where they were weak
+
+They were strongest when the task was clearly defined and the result could be checked automatically. With linters, a CI pipeline and tests in place, the agent fixed bugs and refactored reliably, because a failing check showed both it and us straight away when something was wrong. Clear interfaces between components helped in the same way, because they gave the agent a precise target. They were weakest when the AI's context fell behind the project. Some design choices and requirement changes were agreed verbally in meetings, and I didn't always update the context I gave my AI tools afterwards. The agent kept working from a slightly outdated picture, so its plans drifted gradually from what the team wanted. Because each step looked reasonable on its own, the drift was easy to miss. The lesson for me was that keeping the AI's context up to date is part of my job, and I still need to understand the system well enough to notice when its output starts moving away from what we agreed.
+
+## What went wrong, and what I would do differently
+
+Early on, some of our test results and claims weren't backed by evidence, which led to confusion and debates about results nobody could reproduce. Because each of us owned a separate part of the system, it was also hard to make sure everyone understood the reasons behind decisions made in other parts. Next time I would keep a decision log, such as Architecture Decision Records, from day one, so every decision has a written reason that both teammates and AI agents can read. I would also write a short summary after every meeting so that verbal agreements reach the project documents and my AI context, and make sure every result we report is backed by a reproducible test run before it goes into a slide or report.

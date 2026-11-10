@@ -1,0 +1,13 @@
+# AI Use Reflection: Darren
+
+## What I learned about using these tools effectively 
+
+The most important lesson I learnt is that I should decide how I will check the output before I ask the tool for it. When I built the evaluator, I first worked out the expected scores for a small five-case example by hand. This meant I could compare the tool's numbers against my own, instead of trusting code simply because it looked correct. I also learnt that generated tests need to be reviewed as a separate piece of work, which is the idea of separation of duties. I also found that a clear and careful instructions matters as much as the code itself. I learnt that the tool is most valuable when I use it as a critic rather than only as a writer. By asking it what an audience might challenge on a presentation, I discovered weak arguments that I would otherwise have missed.
+
+## Where the tools were strong, and where they were weak
+
+The tools were strong in several areas. They were fast at producing the first version of code and tests, and they could read the whole repository to cross-check numbers between different files. They were also good at spotting contradictions in our own claims. The tool also explained code section by section, which helped me make sure that I could explain every part of my own work. However, they were often confident without evidence. The tools showed context failure, where the output is correct in general but wrong for this particular codebase. The tool did not know which files were current, so it used numbers from evaluation runs that my teammates had already archived and replaced.
+
+## What went wrong, and what I would do differently
+
+First, my first set of generated tests missed a real bug, where a case sent to human review could be counted as a correct answer. My planted-bug check caught 3 out of the 4 bugs, and I then added the missing test. If I did this again, I would run that check from the very start. Second, some of the used results that were already out of date. The team had re-run the whole evaluation, but the tool kept the archived results because nothing told it which file was the source of truth. In the future, I would name one results file as the source of truth in every request, and re-check every number against the evidence files. Third, some of the wording the AI produced made exaggerated claims. From now on, I would test every claim with whether we can show and be able to explain in depth if an audience ask about it.
